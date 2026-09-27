@@ -1,5 +1,5 @@
 import { useRef, useState, type Ref } from 'react'
-import { ChevronDown, Copy, Eye, EyeOff, FolderOpen, Pencil, Plus, Save, Trash2 } from 'lucide-react'
+import { ChevronDown, Copy, Eye, EyeOff, FolderOpen, Pencil, Plus, Save, Settings2, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
@@ -79,6 +79,7 @@ export function ApiConfigPanel({ open, onOpenChange, config, update, profileMana
   async function saveProfile() {
     try {
       const result = await saveProfileFile(config, activeProfileName)
+      profileManager.markSaved(config)
       toast.success(t(result === 'saved' ? 'api.profileSaved' : 'api.profileDownloadStarted'))
     } catch (error) {
       if (error instanceof DOMException && error.name === 'AbortError') return
@@ -110,13 +111,18 @@ export function ApiConfigPanel({ open, onOpenChange, config, update, profileMana
             <Button
               type="button"
               variant="outline"
-              size="sm"
-              className="h-8 gap-1.5 px-2.5 font-normal max-w-[140px] sm:max-w-[200px] shrink-0"
+              size={profileManager.isActiveDirty ? 'icon-sm' : 'sm'}
+              className={cn(
+                'h-8 shrink-0 font-normal',
+                profileManager.isActiveDirty ? 'w-8' : 'gap-1.5 px-2.5 max-w-[140px] sm:max-w-[200px]',
+              )}
               disabled={disabled}
-              aria-label={t('api.selectProfile')}
+              aria-label={t(profileManager.isActiveDirty ? 'api.selectProfileDirty' : 'api.selectProfile')}
+              title={profileManager.isActiveDirty ? t('api.selectProfileDirty') : undefined}
             >
-              <span className="truncate">{activeProfileName}</span>
-              <ChevronDown className="size-3.5 shrink-0 opacity-60" />
+              {profileManager.isActiveDirty
+                ? <Settings2 className="size-4" aria-hidden="true" />
+                : <><span className="truncate">{activeProfileName}</span><ChevronDown className="size-3.5 shrink-0 opacity-60" /></>}
             </Button>
           } />
           <DropdownMenuContent align="start" className="min-w-48">

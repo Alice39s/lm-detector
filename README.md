@@ -42,7 +42,7 @@ bun run preview
 
 Web 只读取随构建发布的数据库。没有采样入库、JSONL 导入、浏览器建库或 IndexedDB 数据库覆盖功能。
 
-网站支持简体中文和英文，语言与主题偏好保存在 localStorage。API 设置与配置预设（包括 API Key）自动保存在 localStorage，刷新或重新打开浏览器后仍可恢复。配置菜单可显式加载 JSON 预设；加载后编辑只更新浏览器中的副本。只有点击“保存”才会将当前预设写入具名 JSON 文件（其中包含 API Key）。旧版 sessionStorage 中的密钥会迁移到 localStorage。
+网站支持简体中文和英文，语言与主题偏好保存在 localStorage。API 设置与配置预设（包括 API Key）自动保存在 localStorage，刷新或重新打开浏览器后仍可恢复。配置菜单可显式加载 JSON 预设；加载后编辑只更新浏览器中的副本。当前设置与上次加载或保存的预设不一致时，配置名称按钮收起为方形配置图标；恢复一致或再次保存后显示名称。只有点击“保存”才会将当前预设写入具名 JSON 文件（其中包含 API Key）。旧版 sessionStorage 中的密钥会迁移到 localStorage。
 
 API 请求和密钥通过同源 `/api/proxy` 转发到用户填写的 HTTPS 地址。代理不保存或记录密钥，上游不需要支持浏览器 CORS。Chat Completions、Responses 和 Messages 均支持 JSON 与 SSE；并行开关决定三个请求同时或依次执行。回复框固定高度，流式输出在框内自动滚动。单条重试沿用该条成功取样时的配置，失败或取消时保留旧回复。结果只呈现算法返回的候选顺序及置信度，不生成特征解释，不提供 URL 分享。可保存当前主题的 PNG 图片或导出候选列表 JSON。
 

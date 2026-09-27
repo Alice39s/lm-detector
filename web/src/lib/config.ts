@@ -10,19 +10,26 @@ export interface ApiProfile extends WebApiConfig {
   name: string
 }
 
+interface ProfileSnapshot extends WebApiConfig {
+  name: string
+}
+
 export interface StoredApiProfiles {
   activeId: string
   profiles: ApiProfile[]
+  savedProfiles: Record<string, ProfileSnapshot>
 }
 
 export interface ApiProfileManager {
   profiles: ApiProfile[]
   activeId: string
+  isActiveDirty: boolean
   select: (id: string) => void
   create: (name?: string, template?: Partial<WebApiConfig>) => string
   duplicate: (id: string, suffix?: string) => string
   remove: (id: string) => void
   rename: (id: string, name: string) => void
+  markSaved: (profile: ApiProfile) => void
 }
 
 const PROFILES_STORAGE_KEY = 'fingerpoint-detect-profiles-v1'
@@ -39,6 +46,41 @@ export const defaultConfig: WebApiConfig = {
   stream: true,
   parallel: false,
   autoVerify: false,
+}
+
+const configFields = ['baseUrl', 'apiKey', 'model', 'effort', 'format', 'stream', 'parallel', 'autoVerify'] as const
+
+function snapshot(profile: ApiProfile): ProfileSnapshot {
+  const { name, baseUrl, apiKey, model, effort, format, stream, parallel, autoVerify } = profile
+  return { name, baseUrl, apiKey, model, effort, format, stream, parallel, autoVerify }
+}
+
+function readSnapshot(raw: unknown): ProfileSnapshot | null {
+  if (!raw || typeof raw !== 'object') return null
+  const value = raw as Record<string, unknown>
+  if (typeof value.name !== 'string') return null
+  for (const field of ['baseUrl', 'apiKey', 'model', 'effort']) {
+    if (typeof value[field] !== 'string') return null
+  }
+  if (value.format !== 'openai' && value.format !== 'responses' && value.format !== 'anthropic') return null
+  for (const field of ['stream', 'parallel', 'autoVerify']) {
+    if (typeof value[field] !== 'boolean') return null
+  }
+  return {
+    name: value.name,
+    baseUrl: value.baseUrl as string,
+    apiKey: value.apiKey as string,
+    model: value.model as string,
+    effort: value.effort as string,
+    format: value.format,
+    stream: value.stream as boolean,
+    parallel: value.parallel as boolean,
+    autoVerify: value.autoVerify as boolean,
+  }
+}
+
+function isDirty(profile: ApiProfile, saved: ProfileSnapshot): boolean {
+  return profile.name.trim() !== saved.name.trim() || configFields.some(field => profile[field] !== saved[field])
 }
 
 function generateId(): string {
@@ -83,7 +125,14 @@ function readProfiles(): StoredApiProfiles | null {
         const activeId = typeof parsed.activeId === 'string' && sanitizedList.some((p: ApiProfile) => p.id === parsed.activeId)
           ? parsed.activeId
           : sanitizedList[0].id
-        return { activeId, profiles: sanitizedList }
+        const rawSnapshots = parsed.savedProfiles && typeof parsed.savedProfiles === 'object'
+          ? parsed.savedProfiles as Record<string, unknown>
+          : {}
+        const savedProfiles = Object.fromEntries(sanitizedList.map((profile: ApiProfile) => [
+          profile.id,
+          readSnapshot(rawSnapshots[profile.id]) ?? snapshot(profile),
+        ]))
+        return { activeId, profiles: sanitizedList, savedProfiles }
       }
     }
   } catch { /* No usable profiles in storage */ }
@@ -105,7 +154,7 @@ function restore(): StoredApiProfiles {
           const sessionKey = sessionStorage.getItem(SESSION_KEY)
           if (sessionKey) migrated.apiKey = sessionKey
         }
-        return { activeId: id, profiles: [migrated] }
+        return { activeId: id, profiles: [migrated], savedProfiles: { [id]: snapshot(migrated) } }
       }
     }
   } catch {
@@ -113,9 +162,11 @@ function restore(): StoredApiProfiles {
   }
 
   const initialId = generateId()
+  const initialProfile = { ...defaultConfig, id: initialId, name: 'OpenRouter' }
   return {
     activeId: initialId,
-    profiles: [{ ...defaultConfig, id: initialId, name: 'OpenRouter' }],
+    profiles: [initialProfile],
+    savedProfiles: { [initialId]: snapshot(initialProfile) },
   }
 }
 
@@ -210,6 +261,7 @@ export function useApiConfig(onPersistError?: () => void) {
     commit(prev => ({
       activeId: id,
       profiles: [...prev.profiles, newProfile],
+      savedProfiles: { ...prev.savedProfiles, [id]: snapshot(newProfile) },
     }))
     return id
   }, [commit])
@@ -234,6 +286,7 @@ export function useApiConfig(onPersistError?: () => void) {
       return {
         activeId: newId,
         profiles: nextProfiles,
+        savedProfiles: { ...prev.savedProfiles, [newId]: snapshot(newProfile) },
       }
     })
     return newId
@@ -247,9 +300,12 @@ export function useApiConfig(onPersistError?: () => void) {
       if (prev.activeId === id) {
         nextActiveId = nextProfiles[0].id
       }
+      const savedProfiles = { ...prev.savedProfiles }
+      delete savedProfiles[id]
       return {
         activeId: nextActiveId,
         profiles: nextProfiles,
+        savedProfiles,
       }
     })
   }, [commit])
@@ -261,14 +317,26 @@ export function useApiConfig(onPersistError?: () => void) {
     }))
   }, [commit])
 
+  const markSaved = useCallback((profile: ApiProfile) => {
+    commit(prev => {
+      if (!prev.profiles.some(p => p.id === profile.id)) return prev
+      return {
+        ...prev,
+        savedProfiles: { ...prev.savedProfiles, [profile.id]: snapshot(profile) },
+      }
+    })
+  }, [commit])
+
   const manager: ApiProfileManager = {
     profiles: state.profiles,
     activeId: state.activeId,
+    isActiveDirty: isDirty(activeProfile, state.savedProfiles[activeProfile.id]),
     select,
     create,
     duplicate,
     remove,
     rename,
+    markSaved,
   }
 
   return [activeProfile, update, manager] as const
