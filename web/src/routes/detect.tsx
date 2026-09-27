@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useLocation, useSearchParams } from 'react-router'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowUpRight, Copy, Loader2, MoreVertical, Terminal } from 'lucide-react'
+import { ArrowUpRight, Copy, Loader2, MoreVertical, Star, Terminal } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -285,6 +285,10 @@ export default function DetectRoute() {
           <span className="sm:hidden">{t('detect.cliGuideShort')}</span>
           <span className="hidden sm:inline">{t('detect.cliGuide')}</span>
           <ArrowUpRight className="size-3.5" aria-hidden="true" />
+        </a>
+        <a href="https://github.com/Ikaleio/lm-detector" target="_blank" rel="noopener noreferrer" className="fp-cli-star">
+          <Star className="size-3.5" aria-hidden="true" />
+          {t('detect.starRequest')}
         </a>
       </aside>
 

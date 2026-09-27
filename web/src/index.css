@@ -165,6 +165,8 @@
 .fp-cli-command:hover > svg { color: var(--primary); }
 .fp-cli-link { display: inline-flex; align-items: center; gap: .15rem; margin-left: auto; color: var(--primary); font-weight: 500; white-space: nowrap; text-decoration: none; }
 .fp-cli-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+.fp-cli-star { display: inline-flex; align-items: center; gap: .25rem; color: var(--muted-foreground); white-space: nowrap; text-decoration: none; }
+.fp-cli-star:hover { color: var(--foreground); text-decoration: underline; text-underline-offset: 3px; }
 
 html[data-page-direction="forward"] { --fp-page-offset: 100%; }
 html[data-page-direction="back"] { --fp-page-offset: -100%; }

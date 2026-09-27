@@ -1,4 +1,5 @@
 import { useRef, useState, type Ref } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronDown, Copy, Eye, EyeOff, FolderOpen, Pencil, Plus, Save, Settings2, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -24,6 +25,7 @@ import { useI18n } from '@/i18n'
 import type { ApiProfile, ApiProfileManager, WebApiConfig } from '@/lib/config'
 import { readProfileFile, saveProfileFile } from '@/lib/profile-file'
 import { cn } from '@/lib/utils'
+import { useMotionPreset } from '@/lib/motion'
 
 const placeholders: Record<WebApiConfig['format'], string> = {
   openai: 'https://api.openai.com/v1',
@@ -31,6 +33,7 @@ const placeholders: Record<WebApiConfig['format'], string> = {
   anthropic: 'https://api.anthropic.com',
 }
 const efforts = ['none', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max']
+const MotionButton = motion.create(Button)
 
 function SwitchRow({ id, label, help, checked, onChange, disabled }: { id: string; label: string; help?: string; checked: boolean; onChange: (v: boolean) => void; disabled: boolean }) {
   return (
@@ -56,6 +59,7 @@ interface Props {
 
 export function ApiConfigPanel({ open, onOpenChange, config, update, profileManager, disabled, containerRef }: Props) {
   const { t } = useI18n()
+  const { reduced, snappy } = useMotionPreset()
   const [showKey, setShowKey] = useState(false)
   const profileNameRef = useRef<HTMLInputElement>(null)
   const profileFileRef = useRef<HTMLInputElement>(null)
@@ -108,22 +112,31 @@ export function ApiConfigPanel({ open, onOpenChange, config, update, profileMana
       <div className="flex items-center min-h-[48px] px-2 sm:px-3 py-1 gap-2">
         <DropdownMenu>
           <DropdownMenuTrigger render={
-            <Button
+            <MotionButton
               type="button"
               variant="outline"
               size={profileManager.isActiveDirty ? 'icon-sm' : 'sm'}
+              layout="size"
+              transition={snappy}
               className={cn(
-                'h-8 shrink-0 font-normal',
+                'h-8 shrink-0 overflow-hidden font-normal',
                 profileManager.isActiveDirty ? 'w-8' : 'gap-1.5 px-2.5 max-w-[140px] sm:max-w-[200px]',
               )}
               disabled={disabled}
               aria-label={t(profileManager.isActiveDirty ? 'api.selectProfileDirty' : 'api.selectProfile')}
               title={profileManager.isActiveDirty ? t('api.selectProfileDirty') : undefined}
             >
-              {profileManager.isActiveDirty
-                ? <Settings2 className="size-4" aria-hidden="true" />
-                : <><span className="truncate">{activeProfileName}</span><ChevronDown className="size-3.5 shrink-0 opacity-60" /></>}
-            </Button>
+              <AnimatePresence initial={false} mode="popLayout">
+                {profileManager.isActiveDirty
+                  ? <motion.span key="dirty" initial={reduced ? false : { opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} transition={snappy} className="flex items-center justify-center">
+                      <Settings2 className="size-4" aria-hidden="true" />
+                    </motion.span>
+                  : <motion.span key="named" initial={reduced ? false : { opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={snappy} className="flex min-w-0 items-center gap-1.5">
+                      <span className="truncate">{activeProfileName}</span>
+                      <ChevronDown className="size-3.5 shrink-0 opacity-60" />
+                    </motion.span>}
+              </AnimatePresence>
+            </MotionButton>
           } />
           <DropdownMenuContent align="start" className="min-w-48">
             <DropdownMenuGroup>
