@@ -6,6 +6,7 @@ import type { DetectOptions } from './detect-options'
 import type { DetectionState } from './detect-run'
 import { acceptedSample, cleanText, type Sample } from './detect-request'
 import type { UpdateNotice } from './detect-update'
+import { StarNote } from './detect-help'
 
 const seconds = (milliseconds: number) => `${(Math.max(0, milliseconds) / 1000).toFixed(1)}s`
 const percentage = (value: number | null | undefined) => value == null ? '—' : `${(value * 100).toFixed(1)}%`
@@ -119,6 +120,7 @@ function Dashboard({ state, options, bankSize, cancel, saved, fatal, updateNotic
       {fatal && <Text color="red">{safe(fatal)}</Text>}
       {saved && <Text color="green">Saved {safe(saved)}</Text>}
       <Text dimColor>{state.finishedAt ? `${scored}/${state.total} rounds scored · ${elapsed}` : 'q / Ctrl+C to cancel · each round waits for all requested samples'}</Text>
+      {state.finishedAt && scored > 0 && !fatal && <StarNote />}
     </Box>
     {updateNotice && <Box marginTop={1} flexDirection="column">
       <Text color="yellow">Update available: {updateNotice.current} → {updateNotice.latest}</Text>

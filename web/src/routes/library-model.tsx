@@ -5,7 +5,8 @@ import { ChevronLeft } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty'
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
+import { PixelShader, PixelSpinner } from '@/components/pixel-shader'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useLoadedBank } from '@/lib/bank-context'
@@ -38,7 +39,12 @@ export default function LibraryModelRoute() {
               {model.family_name} · {t('library.samplesCount', { n: model.response_count })} · {Object.keys(model.sources).join(' / ')}
             </p>
           </>
-        ) : <h1 className="text-h1">{t('library.notFound')}</h1>}
+        ) : (
+          <>
+            <h1 className="text-h1">{t('library.notFound')}</h1>
+            <PixelShader effect="static" className="mt-3 h-24 w-full max-w-md rounded-xl text-muted-foreground/40" />
+          </>
+        )}
       </div>
       {model && <ModelSamples key={model.id} modelId={model.id} />}
     </div>
@@ -90,10 +96,13 @@ function ModelSamples({ modelId }: { modelId: string }) {
   if (load.status === 'loading') {
     return (
       <div className="flex flex-col gap-4" role="status" aria-busy="true">
-        <span>{t('library.loading')}</span>
+        <span className="flex items-center gap-2"><PixelSpinner className="text-muted-foreground" />{t('library.loading')}</span>
         <Skeleton className="h-9 w-80 max-w-full" />
-        <Skeleton className="h-40 rounded-xl" />
-        <Skeleton className="h-40 rounded-xl" />
+        {[0, 1].map(i => (
+          <Skeleton key={i} className="relative h-40 overflow-hidden rounded-xl">
+            <PixelShader effect="blocks" className="absolute inset-0 text-muted-foreground/25" />
+          </Skeleton>
+        ))}
       </div>
     )
   }
@@ -102,6 +111,7 @@ function ModelSamples({ modelId }: { modelId: string }) {
     return (
       <Empty className="border">
         <EmptyHeader>
+          <EmptyMedia><PixelShader effect="static" className="h-16 w-40 rounded-lg text-muted-foreground/45" /></EmptyMedia>
           <EmptyTitle>{t('library.noSamples')}</EmptyTitle>
           <EmptyDescription>{t('library.noSamplesBody')}</EmptyDescription>
         </EmptyHeader>

@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { Empty, EmptyContent, EmptyHeader, EmptyTitle } from '@/components/ui/empty'
+import { Empty, EmptyContent, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
+import { PixelShader } from '@/components/pixel-shader'
 import { Segmented } from '@/components/segmented'
 import { useLoadedBank } from '@/lib/bank-context'
 import { useI18n } from '@/i18n'
@@ -110,7 +111,10 @@ export default function LibraryRoute() {
         </>
       ) : (
         <Empty className="border">
-          <EmptyHeader><EmptyTitle>{t(filtered ? 'library.empty' : 'library.emptyBank')}</EmptyTitle></EmptyHeader>
+          <EmptyHeader>
+            <EmptyMedia><PixelShader effect="static" className="h-16 w-40 rounded-lg text-muted-foreground/45" /></EmptyMedia>
+            <EmptyTitle>{t(filtered ? 'library.empty' : 'library.emptyBank')}</EmptyTitle>
+          </EmptyHeader>
           {filtered && <EmptyContent><Button variant="outline" size="sm" onClick={() => { setQuery(''); setFamilies([]) }}>{t('library.clearFilters')}</Button></EmptyContent>}
         </Empty>
       )}

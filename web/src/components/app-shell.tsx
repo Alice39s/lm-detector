@@ -9,6 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuRadio
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { Toaster } from '@/components/ui/sonner'
+import { PixelShader } from '@/components/pixel-shader'
 import { useI18n } from '@/i18n'
 import { useMotionPreset } from '@/lib/motion'
 import { BankContext } from '@/lib/bank-context'
@@ -134,8 +135,11 @@ export function AppShell({ detect }: { detect: ReactNode }) {
       <header className="fp-topbar">
         <div className="fp-topbar-inner">
           <NavLink to="/" onClick={event => navigatePage(event, '/')} className="fp-brand">
-            <span className="fp-brand-title">{t('app.name')}</span>
-            <span className="fp-brand-byline">by Ikaleio</span>
+            <PixelShader effect="fingerprint" cell={2} className="fp-brand-mark" />
+            <span className="fp-brand-text">
+              <span className="fp-brand-title">{t('app.name')}</span>
+              <span className="fp-brand-byline">by Ikaleio</span>
+            </span>
           </NavLink>
           <nav ref={navRef} className="fp-nav" aria-label={t('app.navigation')}>
             {links.map(link => (
@@ -188,6 +192,7 @@ function BankBoundary({ children }: { children: ReactNode }) {
     return (
       <div className="fp-page">
         <h1 className="text-h1">{t('app.bankFailed')}</h1>
+        <PixelShader effect="static" className="h-24 w-full rounded-xl text-destructive/35" />
         <div><Button variant="outline" onClick={reload}>{t('app.retry')}</Button></div>
       </div>
     )
@@ -198,9 +203,11 @@ function BankBoundary({ children }: { children: ReactNode }) {
         <h1 className="sr-only">{t('app.bankLoading')}</h1>
         <Skeleton className="h-8 w-64" />
         <div className="fp-grid-samples">
-          <Skeleton className="h-64 rounded-xl" />
-          <Skeleton className="h-64 rounded-xl" />
-          <Skeleton className="h-64 rounded-xl" />
+          {[0, 1, 2].map(i => (
+            <Skeleton key={i} className="relative h-64 overflow-hidden rounded-xl">
+              <PixelShader effect="blocks" className="absolute inset-0 text-muted-foreground/25" />
+            </Skeleton>
+          ))}
         </div>
       </div>
     )

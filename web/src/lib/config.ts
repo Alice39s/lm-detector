@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ApiConfig } from '@fingerpoint/shared/types'
 
 export interface WebApiConfig extends ApiConfig {
+  relaxed: boolean
   autoVerify: boolean
 }
 
@@ -44,15 +45,16 @@ export const defaultConfig: WebApiConfig = {
   effort: '',
   format: 'openai',
   stream: true,
-  parallel: false,
-  autoVerify: false,
+  parallel: true,
+  relaxed: true,
+  autoVerify: true,
 }
 
-const configFields = ['baseUrl', 'apiKey', 'model', 'effort', 'format', 'stream', 'parallel', 'autoVerify'] as const
+const configFields = ['baseUrl', 'apiKey', 'model', 'effort', 'format', 'stream', 'parallel', 'relaxed', 'autoVerify'] as const
 
 function snapshot(profile: ApiProfile): ProfileSnapshot {
-  const { name, baseUrl, apiKey, model, effort, format, stream, parallel, autoVerify } = profile
-  return { name, baseUrl, apiKey, model, effort, format, stream, parallel, autoVerify }
+  const { name, baseUrl, apiKey, model, effort, format, stream, parallel, relaxed, autoVerify } = profile
+  return { name, baseUrl, apiKey, model, effort, format, stream, parallel, relaxed, autoVerify }
 }
 
 function readSnapshot(raw: unknown): ProfileSnapshot | null {
@@ -66,6 +68,7 @@ function readSnapshot(raw: unknown): ProfileSnapshot | null {
   for (const field of ['stream', 'parallel', 'autoVerify']) {
     if (typeof value[field] !== 'boolean') return null
   }
+  if (value.relaxed !== undefined && typeof value.relaxed !== 'boolean') return null
   return {
     name: value.name,
     baseUrl: value.baseUrl as string,
@@ -75,6 +78,7 @@ function readSnapshot(raw: unknown): ProfileSnapshot | null {
     format: value.format,
     stream: value.stream as boolean,
     parallel: value.parallel as boolean,
+    relaxed: typeof value.relaxed === 'boolean' ? value.relaxed : true,
     autoVerify: value.autoVerify as boolean,
   }
 }
@@ -106,7 +110,7 @@ function sanitizeProfile(raw: unknown, fallbackId: string, fallbackName = ''): A
     if (obj.format === 'openai' || obj.format === 'responses' || obj.format === 'anthropic') {
       profile.format = obj.format
     }
-    for (const field of ['stream', 'parallel', 'autoVerify'] as const) {
+    for (const field of ['stream', 'parallel', 'relaxed', 'autoVerify'] as const) {
       if (typeof obj[field] === 'boolean') profile[field] = obj[field] as boolean
     }
   }
@@ -174,8 +178,8 @@ function persist(state: StoredApiProfiles) {
   localStorage.setItem(PROFILES_STORAGE_KEY, JSON.stringify(state))
   const active = state.profiles.find(p => p.id === state.activeId) ?? state.profiles[0]
   if (active) {
-    const { baseUrl, apiKey, model, effort, format, stream, parallel, autoVerify } = active
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ baseUrl, apiKey, model, effort, format, stream, parallel, autoVerify }))
+    const { baseUrl, apiKey, model, effort, format, stream, parallel, relaxed, autoVerify } = active
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ baseUrl, apiKey, model, effort, format, stream, parallel, relaxed, autoVerify }))
   }
   localStorage.removeItem(LEGACY_KEY)
   sessionStorage.removeItem(SESSION_KEY)

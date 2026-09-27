@@ -1,93 +1,272 @@
+<div align="center">
+
 # LM Fingerpoint Detector
 
-基于 [ModelTrace](https://github.com/xqy2006/ModelTrace) 的模型指纹检测器。通过三条整数生成挑战比较模型的输出分布。Web 与 CLI 使用同一套算法和正式数据库。
+**让模型随手写几百个整数，识别 API 背后的大语言模型**
 
-## 目录
+简体中文 · [English](./README.en.md)
+
+[![npm](https://img.shields.io/npm/v/lmfpd?logo=npm&label=lmfpd&color=cb3837)](https://www.npmjs.com/package/lmfpd)
+[![Web](https://img.shields.io/badge/Web-lm.ikale.io-0ea5e9)](https://lm.ikale.io)
+[![Bun](https://img.shields.io/badge/Bun-1.4.2-000?logo=bun)](https://bun.sh)
+[![License](https://img.shields.io/badge/license-MIT-22c55e)](./LICENSE)
+
+[在线检测](https://lm.ikale.io) · [使用](#使用) · [CLI 使用](#cli-使用) · [原理](#原理) · [致谢](#致谢)
+
+</div>
+
+---
+
+## 简介
+
+中转站或第三方 API 声称提供某个模型，实际接入的可能是另一个模型。LM Fingerpoint Detector 用一个与语义无关的任务核对这一点：让模型凭第一反应写出约 300 个 1–355 之间的整数。语言模型写出的“随机数”并不均匀，每个模型偏好的数值、区间和末位数字相对稳定。检测器把这组分布与参考库比对，给出最接近的候选模型。
+
+- **两种入口**：[网页](https://lm.ikale.io)支持手动粘贴和直连 API；命令行 `fpd` 提供实时终端界面、多轮检测和 JSON 输出。
+- **三种协议**：OpenAI Responses、Chat Completions 和 Anthropic Messages，默认使用 SSE 流式响应。
+- **参考库**：覆盖 GPT、Claude、Gemini、Grok、Qwen、DeepSeek 等常见模型家族。网页的参考库页面可以只读浏览和导出。
+- **可追溯的数据维护**：`fpd sample`、`fpd enroll`、`fpd retrain` 依次完成采样、入库和离线重训。失败记录和旧尝试全部保留。
+
+> [!IMPORTANT]
+> 检测结果是**参考库内的封闭集合排序**。不在库中的模型也会得到一个“最像”的候选，排名分数和置信度都不是身份证明。判断渠道是否可信时，请固定请求参数、重复多轮，并结合其他证据。
+
+## 使用
+
+### 网页
+
+打开 **[lm.ikale.io](https://lm.ikale.io)**，选择检测模式：
+
+| 模式 | 操作 | 适用场景 |
+| --- | --- | --- |
+| 手动 | 复制页面生成的三道挑战，分别发给目标模型，再把回答粘贴回页面 | 只有聊天界面，没有 API Key |
+| API | 填写 Base URL、API Key、模型名和协议，页面自动采样 | 检测 API 渠道 |
+
+每条回答至少需要 80 个有效整数，且不少于要求数量的 55%。三条回答都有效时，页面给出排名、核验分数和置信度。只有一两条有效时，页面只给出排名。
+
+API 模式的请求经同源 `/api/proxy` 转发，上游无需支持 CORS。代理不限制供应商，但只接受使用 HTTPS 默认端口的完整域名。API 设置保存在浏览器 localStorage 中。导出的结果图片不含密钥、接口地址和回答正文。
+
+### 命令行
+
+无需安装。任选一种运行时直接运行：
+
+```sh
+# Node.js ≥ 22
+npx lmfpd@latest -b https://api.example.com/v1 -k sk-xxx -m gpt-6-astra
+
+# Bun ≥ 1.4.2
+bunx --bun lmfpd@latest -b https://api.example.com/v1 -k sk-xxx -m gpt-6-astra
+```
+
+完整参数见 [CLI 使用](#cli-使用)。
+
+### 本地开发
+
+```sh
+bun install
+bun run dev          # 同步数据并启动 Web 开发服务器（已接入 /api/proxy）
+bun run typecheck    # TypeScript 类型检查
+bun run build        # 构建网站到 web/dist
+bun run build:cli    # 打包 npm CLI 到 dist/fpd
+bun run fpd --help   # 在仓库内直接运行 CLI
+```
+
+部署到 Cloudflare Pages 或 GitHub Pages 的步骤见 [docs/deployment.md](./docs/deployment.md)。
+
+## CLI 使用
+
+```text
+fpd [detect] [options]        检测（默认命令）
+fpd sample [options]          采集一个可移植的参考批次
+fpd enroll DIR [options]      校验批次并写入参考库
+fpd retrain --data-dir DIR    离线重训核验器与置信度校准
+```
+
+运行方式任选其一。每个子命令都支持 `--help`。
+
+```sh
+npx lmfpd@latest [command] [options]          # Node.js ≥ 22
+bunx --bun lmfpd@latest [command] [options]   # Bun ≥ 1.4.2
+bun run fpd [command] [options]               # 在本仓库内
+```
+
+下文示例使用 `npx`。使用 Bun 时，把 `npx lmfpd@latest` 换成 `bunx --bun lmfpd@latest`。
+
+### 检测
+
+```sh
+# 显式传入连接参数
+npx lmfpd@latest -b https://api.example.com/v1 -k sk-xxx -m gpt-6-astra
+
+# 从环境变量 BASE_URL、API_KEY、MODEL 读取连接参数；使用 Chat Completions 并设置推理强度
+npx lmfpd@latest -a cc -e high
+
+# 连续检测 5 轮
+npx lmfpd@latest -n 5
+
+# 严格模式、关闭流式响应，并保存完整报告（不含凭据）
+npx lmfpd@latest -s -ns --timeout 180 --output result.json
+
+# 离线重新分析已保存的报告，不请求模型
+npx lmfpd@latest --input result.json --json
+```
+
+| 参数 | 说明 | 默认值 |
+| --- | --- | --- |
+| `-b, --baseurl URL` | Base URL 或完整端点；未写端点路径时自动补全 | `$BASE_URL` |
+| `-k, --apikey KEY` | API Key | `$API_KEY` |
+| `-m, --model MODEL` | 请求的模型名 | `$MODEL` |
+| `-a, --api TYPE` | `responses`、`chatcompletion`（或 `cc`）、`message`，可只写前缀 | `responses` |
+| `-e, --effort LEVEL` | 推理强度，例如 `low`、`high`，也可填供应商自定义值 | 不发送 |
+| `-ns, --no-stream` | 使用普通 JSON 响应代替 SSE | SSE |
+| `--timeout SECONDS` | SSE 首字节时限；JSON 模式下为完整响应时限 | `120` |
+| `--count N` | 每轮样本数，1–3；少于 3 条时只给出排名 | `3` |
+| `-p, --parallel N` | 每轮并发数，1–3，不超过 `--count` | `3` |
+| `-n, --repeat N` | 顺序执行的检测轮数 | `1` |
+| `-s, --strict` | 关闭自动截断，要求 3 条完整有效的回答 | 关闭 |
+| `--challenges FILE` | 每轮复用保存的挑战，数量必须等于 `--count` | 随机生成 |
+| `--bank FILE` | 使用自定义参考库 | 内置参考库 |
+| `--input FILE` | 离线分析保存的输出 | — |
+| `--output FILE` | 把所有轮次、样本和结果保存为 JSON | — |
+| `--json` | 向 stdout 输出 JSON，代替终端界面 | — |
+| `--no-update-check` | 关闭后台更新检查，也可设置 `FPD_NO_UPDATE_CHECK=1` | 开启 |
+
+命令行参数优先于环境变量。默认的宽松模式把每条回答截断到要求的数量。每轮等全部样本结束后才开始下一轮。检测不自动重试，也不会把样本写入参考库。按 `q` 或 `Ctrl+C` 可以取消。
+
+### 维护参考库
+
+以下流程为新模型或新渠道补充参考数据，可在仓库外运行。CLI 随包附带的数据只读，写入目标必须用 `--data-dir` 显式指定。交互式入库时，CLI 也可以识别本仓库并请求确认。
+
+```sh
+# 1. 采样：逐一请求 36 道固定挑战；缺少的设置会打开交互向导
+npx lmfpd@latest sample -b https://openrouter.ai/api/v1 -m vendor/model \
+  --label model --family vendor --family-name Vendor --channel openrouter/vendor
+
+# 中断或部分失败后，按原设置续采
+npx lmfpd@latest sample --resume runs/<timestamp>
+
+# 2. 入库：先预检，再校验原始证据、去重并重建派生库
+npx lmfpd@latest enroll runs/<timestamp> --data-dir ./data --dry-run
+npx lmfpd@latest enroll runs/<timestamp> --data-dir ./data
+
+# 3. 重训：离线拟合核验器与置信度校准（需要 uv，不请求模型 API）
+npx lmfpd@latest retrain --data-dir ./data
+```
+
+| 常用参数 | 说明 |
+| --- | --- |
+| `--count N` | 固定挑战数量，1–36，默认 36 |
+| `-p, --parallel N` | 并发请求数，1–36，默认 3 |
+| `--max-attempts N` | 每道挑战的累计尝试上限，1–20，默认 3 |
+| `--response-model ID` | 允许的响应模型名；重复传入可接受别名 |
+| `--subscription` | 订阅渠道，名称必须以 `-subscription` 结尾；`codex-subscription` 使用本机 Codex 登录 |
+| `--enroll --data-dir DIR` | 采样结束后立即入库 |
+| `--json` | 非交互模式，向 stdout 输出最终 JSON |
+
+入库按模型、渠道、条件、题目和文本去重。重训的嵌套校准未通过时，现有的 `shared_detector.json` 保持不变。每次训练的计划、指标和冻结源码保存在数据目录的 `.training/` 下。
+
+## 原理
+
+```mermaid
+flowchart LR
+    A["挑战提示词<br/>约 300 个 1–355 的整数"] --> B["目标模型"]
+    B --> C["解析整数序列"]
+    C --> D["特征<br/>数值分布 + 位置分段 + 末位数字"]
+    D --> E["排名器<br/>LDA · 近邻 · 去干扰中心"]
+    D --> F["核验器<br/>高斯似然比 + 线性模型"]
+    E --> G["温度校准<br/>参考库内置信度"]
+    E --> H["检测结果"]
+    F --> H
+    G --> H
+```
+
+### 1. 挑战
+
+每轮生成 3 道挑战。每道挑战要求的数量从 292–332 中不重复抽取，措辞由多组模板随机组合。提示词要求模型逐个位置凭第一反应选择 1–355 的整数。提示词禁止模型调用工具或代码，也禁止从 1 开始计数、单调递增或递减、等差、循环等规则化模式。因此，得到的序列主要反映模型自身的取值偏好。
+
+参考库使用另一套固定的 36 道挑战：12 种提示环境各 3 道，要求数量为 218–333。提示环境的区别在于是否附加系统提示词或用户前缀。
+
+### 2. 解析
+
+解析器从回答中取出最长的一段 1–355 整数；字母会打断一段序列。设 $N$ 为要求数量，有效整数少于 $\max(80, \lceil 0.55N \rceil)$ 的回答不参与评分。拒答和严重截断的回答因此被排除。
+
+### 3. 特征
+
+每条回答转换为两块特征：
+
+- **数值分布**：355 个取值的计数经平滑后开平方（Hellinger 嵌入）。这样，特征之间的欧氏距离与 Hellinger 距离成正比。
+
+$$
+\phi_i = \sqrt{\frac{c_i + \alpha}{\sum_{j=1}^{355} c_j + 355\alpha}}, \qquad \alpha = 0.5
+$$
+
+- **位置与末位**：序列均分为 4 段，每段统计 16 个取值区间；再加上末位数字 0–9 的分布，共 $4 \times 16 + 10 = 74$ 维，同样平滑后开平方。
+
+两块特征分别标准化并单位化，再按 0.75 : 0.25 的权重拼接。
+
+### 4. 排名器
+
+排名器对参考库中的每个模型计算三项分数，在候选之间标准化后加权求和：
+
+$$
+s = 0.5\, z_{\text{LDA}} + 0.25\, z_{\text{kNN}} + 0.25\, z_{\text{centroid}}
+$$
+
+- **LDA**：对前 128 个整数的特征做线性判别投影，多条回答取平均。
+- **近邻**：取与该模型参考回答最近的 7 个平方距离的平均值，多条回答取中位数。
+- **去干扰中心**：提示环境会让同一模型的分布整体偏移。建库时，SVD 从各环境的均值偏移中估计至多 2 维的干扰子空间。评分时先投影掉该子空间，再计算与各模型中心的余弦相似度。位置分段特征还会与各环境下的模型模板比较。
+
+排名分数 $s$ 决定候选顺序。
+
+### 5. 核验器
+
+核验器只在三条回答都有效时运行。它把特征投影到低维空间，并为每个候选计算以下特征：
+
+- 在“同一模型”“其他模型”“库外模型”三种假设下的高斯对数密度
+- 单条回答的似然增益
+- 与该模型参考回答的近邻距离
+- 该候选的排名分数领先幅度
+
+线性模型把这些特征合成核验分数。如果排名第一的候选与核验分数最高的候选不同，结果会标注分歧。
+
+### 6. 置信度校准
+
+置信度是参考库内的温度 softmax：
+
+$$
+p_k = \frac{\exp(\tau s_k)}{\sum_j \exp(\tau s_j)}
+$$
+
+`fpd retrain` 离线拟合温度 $\tau$。拟合过程先逐一留出 12 种环境，再两两留出，共重新拟合 78 次排名器，并用留出结果估计 $\tau$。嵌套留出的二元 NLL 必须低于常数基线，且 AUC 必须大于 0.75；否则，重训不替换现有检测器。$p_k$ 只在参考库模型之间分配，不代表“确实是该模型”的概率。
+
+### 7. 数据文件
+
+| 文件 | 内容 |
+| --- | --- |
+| `data/unified_reference.jsonl` | 参考批次，每行包含模型、渠道、请求参数和回答 |
+| `data/unified_bank.json` | 由参考批次派生的统计库 |
+| `data/shared_detector.json` | 冻结的排名器、核验器和校准参数，用 SHA-256 绑定参考数据 |
+| `data/enrollment-suite.json` | 36 道固定采样挑战 |
+
+如果参考库与检测器不匹配（例如用 `--bank` 指定自定义库），检测只给出传统排名，不计算核验分数和置信度。数据变更记录见 [data/README.md](./data/README.md)。
+
+## 项目结构
 
 ```text
 .
-├── web/       # React 检测网站
-├── server/    # 共用 API 代理
-├── api/       # Vercel Functions 入口
-├── functions/ # Cloudflare Pages Functions 入口
-├── docs/      # 部署与运行说明
-├── cli/       # Bun + TypeScript 检测、采样工具
-├── shared/    # 挑战、响应解析、评分和建库算法
-├── data/      # 正式参考数据、模型参数和固定采样挑战
-└── runs/      # 本地采样与检测记录，不提交 Git
+├── cli/        命令行 fpd（Bun + Ink），发布为 npm 包 lmfpd
+├── web/        检测网站与只读参考库（React + shadcn/ui + Tailwind CSS）
+├── shared/     Web 与 CLI 共用的挑战、解析和评分算法
+├── data/       参考数据、派生库、冻结检测器和固定挑战
+├── offline/    离线重训与校准（Python，由 uv 运行）
+├── server/     同源 API 代理实现
+├── functions/  Cloudflare Pages Functions 入口
+├── api/        Vercel Functions 入口
+└── docs/       部署说明
 ```
 
-本目录是独立的 Bun workspace。依赖、锁文件、TypeScript 配置、部署配置和 CI 均在本目录。构建不需要外层研究目录。以下命令均从本目录执行。
+## 致谢
 
-`api/` 和 `functions/` 分别保留部署平台要求的路由入口，共用 `server/proxy.ts`。`web/scripts/` 保存数据同步和 Vite 代理适配脚本。生成目录 `web/public/data/`、`web/dist/`、`.vercel/`、`.wrangler/` 不提交 Git；`data/archive/` 与 `data/collections/` 是需要保留的采样证据。
+感谢 [xqy2006/ModelTrace](https://github.com/xqy2006/ModelTrace) 提供了算法思路参考和部分原始数据。
 
-## 安装与运行
+## 许可证
 
-需要 Bun 1.4.2。
-
-```sh
-bun install --frozen-lockfile
-bun run dev
-bun run typecheck
-bun run build
-bun run preview
-```
-
-`dev` 和 `build` 会将脱敏数据同步到 `web/public/data/`。生产静态文件位于 `web/dist/`。
-
-## Web
-
-- 检测：生成三条挑战并粘贴回答，或调用 API 自动检测。支持 Chat Completions、Responses 和 Anthropic Messages，支持流式输出与单条重试。
-- 统一库：只读查看模型、来源和参考样本，支持导出。
-
-Web 只读取随构建发布的数据库。没有采样入库、JSONL 导入、浏览器建库或 IndexedDB 数据库覆盖功能。
-
-网站支持简体中文和英文，语言与主题偏好保存在 localStorage。API 设置与配置预设（包括 API Key）自动保存在 localStorage，刷新或重新打开浏览器后仍可恢复。配置菜单可显式加载 JSON 预设；加载后编辑只更新浏览器中的副本。当前设置与上次加载或保存的预设不一致时，配置名称按钮收起为方形配置图标；恢复一致或再次保存后显示名称。只有点击“保存”才会将当前预设写入具名 JSON 文件（其中包含 API Key）。旧版 sessionStorage 中的密钥会迁移到 localStorage。
-
-API 请求和密钥通过同源 `/api/proxy` 转发到用户填写的 HTTPS 地址。代理不保存或记录密钥，上游不需要支持浏览器 CORS。Chat Completions、Responses 和 Messages 均支持 JSON 与 SSE；并行开关决定三个请求同时或依次执行。回复框固定高度，流式输出在框内自动滚动。单条重试沿用该条成功取样时的配置，失败或取消时保留旧回复。结果只呈现算法返回的候选顺序及置信度，不生成特征解释，不提供 URL 分享。可保存当前主题的 PNG 图片或导出候选列表 JSON。
-
-## 检测 CLI
-
-检测 CLI 使用英文 Ink TUI，显示采样进度、候选排名和多轮结果。设置 `API_KEY`、`MODEL`、`BASE_URL`，或用命令行参数覆盖：
-
-```sh
-bun run fpd --model gpt-5.6-sol --apikey sk-xxx --baseurl https://openrouter.ai/api/v1 -p 3 -n 5
-bun run fpd --api chatcompletion --output result.json
-bun run fpd --count 1 --output single.json
-bun run fpd --input result.json --json
-bun run fpd --help
-```
-
-默认使用 Responses 和 SSE，每轮三条挑战，最多三条并行。`--count` 指定每轮题数（1–3，默认 3）；`--count 1` 只请求一次并给出无置信度的候选排名，`--count 2` 同样只给排名。`-p` 仅控制并发，实际并发不超过题数；`-n` 指定轮数，每轮请求全部结束后才启动下一轮。宽松模式达到目标数字数量后自动截断，部分样本成功时只给排名；`-s` 关闭自动截断，要求 `--count 3` 且三条全部成功。`-ns` 关闭 SSE。`--timeout` 以秒指定首字节超时，默认 120 秒，收到 SSE 后不再计时。
-
-也可通过 `npx lmfpd@latest -b URL -k KEY -m MODEL` 直接运行 npm 包；仅安装 Bun 时使用 `bunx --bun lmfpd@latest`。发布包支持 Node.js 22+ 和 Bun 1.4.2+。`--help` 提供分组说明和使用示例。CLI、共享算法、参考库或依赖更新到 `main` 后，发布工作流会自动生成新版本并更新 npm 的 `latest` 标签。
-
-旧检测入口 `bun run detect:legacy` 保留原有检测接口。采样与入库已接入新版 `fpd sample`、`fpd enroll`。详见 [`cli/README.md`](cli/README.md)。
-
-## 采样与入库 CLI
-
-`fpd sample` 提供参数向导、请求前确认、实时进度和取消续采。仓库内可用 `bun run sample`；仓库外可用 `npx lmfpd@latest sample`，不需要检出仓库。非交互运行必须提供完整参数，`--json` 将结果写到 stdout。
-
-批次共用模型、渠道和调用设置，每条样本保存实际提示词、回答、完整性、尝试编号、`note` 和证据路径。订阅渠道必须以 `-subscription` 结尾，例如 `codex-subscription`、`kimi-code-subscription`。`openrouter/anthropic` 等固定供应商渠道会发送仅允许该供应商、禁止回退的路由参数；实际供应商信息另外保留。
-
-使用 `fpd sample --resume DIR` 续采，成功挑战直接跳过。`fpd enroll DIR --dry-run` 预览入库，`fpd enroll DIR` 确认后去重与重建。交互模式从当前目录识别本仓库并选择 `data/`；仓库外或非交互模式必须指定 `--data-dir DIR`。显式目录始终优先，CLI 安装目录中的参考库只读。
-
-完整示例、必填 metadata、恢复规则和产物说明见 [CLI 采样流程](cli/WORKFLOW.md)。
-
-## 数据与算法
-
-- `data/unified_reference.jsonl`：每行一个批次，共用元数据与 `samples` 数组；只接受新格式。
-- `data/unified_bank.json`：参考回答派生的指纹库。
-- `data/shared_detector.json`：冻结的排名、核验参数与排名温度校准层。
-- `data/enrollment-suite.json`：固定采样挑战集。
-- `data/import_manifest.json`：保留的历史迁移清单，不作为当前数量统计，也不随 Web 构建发布。
-
-`shared/shared-detector.ts` 计算候选排名、核验分数和置信度。浏览器 Worker、主线程回退和 CLI 共用同一实现。核验分数和置信度需要三条有效回答；允许部分样本排名时，一两条有效回答只生成候选排名，无法评分时返回 `unscorable`。置信度是校准层在参考身份上的闭集概率：按排名分数乘以冻结的温度后归一化，合计为 100%，与排名同序。它不含库外概率，也不能独立证明后端身份。核验分数只作为第二意见显示是否与排名一致。缺少匹配校准层时回退为未校准的核验 sigmoid 读数，未适配冻结核验器的自定义库使用传统排名。
-
-`shared/builder.ts` 提供离线建库算法。参考库、派生库和冻结核验参数需要匹配。参考样本不能包含固定评估集的回答。采样与入库由 TypeScript CLI 完成，回归评估在外层研究仓库进行。产品构建只同步正式数据。参考库变化后，核验器不匹配时使用基础排名，置信度为空；核验器匹配、仅校准层缺失或不匹配时，显示未校准的核验读数。
-
-原始参考数据来自 ModelTrace 提交 `60949ef522a84f66b1236b459308b48028d36949`。格式迁移前的原始行完整保存在 `data/archive/schema-cutover/`，后续批次保留来源和请求证据。来源标签不能作为上游身份的独立认证。
-
-## 部署
-
-Vercel、Cloudflare Pages、GitHub Pages 及本地代理的配置见 [部署说明](docs/deployment.md)。
+[MIT](./LICENSE)

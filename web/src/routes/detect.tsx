@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { ApiConfigPanel } from '@/components/api-config-panel'
+import { PixelShader, PixelSpinner } from '@/components/pixel-shader'
 import { Segmented } from '@/components/segmented'
 import { useLoadedBank } from '@/lib/bank-context'
 import { ResultPanel } from '@/components/result-panel'
@@ -147,9 +148,9 @@ export default function DetectRoute() {
         if (index === undefined || accepted.has(index)) return
         const state = challenge.state ?? 'pending'
         if (state === 'requesting' && !startedAt.has(index)) startedAt.set(index, performance.now())
-        const finished = state === 'done' || state === 'rejected'
+        const finished = state === 'done' || state === 'capped' || state === 'rejected'
         const elapsedMs = finished && startedAt.has(index) ? performance.now() - startedAt.get(index)! : undefined
-        if (state === 'done' && challenge.text.trim()) {
+        if ((state === 'done' || state === 'capped') && challenge.text.trim()) {
           accepted.add(index)
           sampledConfigs.current[index] = frozenConfig
           patch(index, { text: challenge.text, draftText: undefined, state, elapsedMs, errorCode: undefined, httpStatus: undefined, errorText: undefined })
@@ -271,7 +272,8 @@ export default function DetectRoute() {
         <Segmented label={t('detect.modeLabel')} value={mode} onChange={m => { if (!activeRun.current) setMode(m) }} disabled={locked} options={[{ value: 'manual', label: t('detect.modeManual') }, { value: 'api', label: t('detect.modeApi') }]} />
       </div>
 
-      <aside className="fp-cli-promo" aria-label={t('detect.cliTitle')}>
+      <aside className="fp-cli-promo relative isolate overflow-hidden" aria-label={t('detect.cliTitle')}>
+        <PixelShader effect="rain" className="absolute inset-0 -z-10 text-muted-foreground/30 [mask-image:linear-gradient(90deg,transparent_25%,#000_70%)]" />
         <div className="flex min-w-0 items-center gap-2">
           <Terminal className="size-4 shrink-0 text-primary" aria-hidden="true" />
           <strong className="shrink-0 font-medium">{t('detect.cliTitle')}</strong>
@@ -285,10 +287,6 @@ export default function DetectRoute() {
           <span className="sm:hidden">{t('detect.cliGuideShort')}</span>
           <span className="hidden sm:inline">{t('detect.cliGuide')}</span>
           <ArrowUpRight className="size-3.5" aria-hidden="true" />
-        </a>
-        <a href="https://github.com/Ikaleio/lm-detector" target="_blank" rel="noopener noreferrer" className="fp-cli-star">
-          <Star className="size-3.5" aria-hidden="true" />
-          {t('detect.starRequest')}
         </a>
       </aside>
 
@@ -325,42 +323,49 @@ export default function DetectRoute() {
 
       {phase === 'computing' && (
         <div className="flex h-12 items-center gap-2 text-body text-muted-foreground" role="status">
-          <Loader2 className="size-4 animate-spin" />
+          <PixelSpinner />
           {t('detect.computing')}
+          <PixelShader effect="scan" cell={3} className="h-6 min-w-0 flex-1 text-muted-foreground/60" />
         </div>
       )}
       {phase === 'result' && result && <ResultPanel result={result} />}
 
-      <div className="fp-actionbar">
-        {phase === 'result' ? (
-          <>
-            {result && <DropdownMenu>
-              <DropdownMenuTrigger render={<Button variant="ghost" size="icon-lg" aria-label={t('detect.more')} />}><MoreVertical /></DropdownMenuTrigger>
-              <DropdownMenuContent align="end"><DropdownMenuGroup><DropdownMenuItem onClick={() => client.exportAnalysis(result)}>{t('detect.exportJson')}</DropdownMenuItem></DropdownMenuGroup></DropdownMenuContent>
-            </DropdownMenu>}
-            <Button variant="outline" className="h-9" onClick={saveImage}>{t('detect.saveImage')}</Button>
-            <Button className="h-9" onClick={restart}>{t('detect.restart')}</Button>
-          </>
-        ) : phase === 'sampling' ? (
-          <>
-            <Button variant="outline" className="h-9" onClick={stop}>{t('detect.stop')}</Button>
-            <Button className="h-9" disabled><Loader2 data-icon="inline-start" className="animate-spin" />{t('detect.sampling')}</Button>
-          </>
-        ) : phase === 'computing' ? (
-          <Button className="h-9" disabled><Loader2 data-icon="inline-start" className="animate-spin" />{t('detect.computing')}</Button>
-        ) : (
-          <>
-            {samples.some(s => s.text.trim() || s.draftText?.trim()) && <Button variant="ghost" className="h-9" onClick={restart}>{t('detect.restart')}</Button>}
-            {mode === 'api' && emptyIndexes.length > 0 ? (
-              <>
-                {filled > 0 && <Button variant="outline" className="h-9" onClick={() => verify()}>{t('detect.verifyPartial', { n: filled })}</Button>}
-                <Button className="h-9" onClick={() => sampleIndexes(emptyIndexes)}>{t('detect.startSampling')}</Button>
-              </>
-            ) : (
-              <Button className="h-9" disabled={filled === 0} onClick={() => verify()}>{filled === 0 ? t('detect.verifyLocked') : filled < 3 ? t('detect.verifyPartial', { n: filled }) : t('detect.verify')}</Button>
-            )}
-          </>
-        )}
+      <div className="fp-detect-footer">
+        <a href="https://github.com/Ikaleio/lm-detector" target="_blank" rel="noopener noreferrer" className="fp-star-link">
+          <Star className="size-4" aria-hidden="true" />
+          {t('detect.starRequest')}
+        </a>
+        <div className="fp-actionbar">
+          {phase === 'result' ? (
+            <>
+              {result && <DropdownMenu>
+                <DropdownMenuTrigger render={<Button variant="ghost" size="icon-lg" aria-label={t('detect.more')} />}><MoreVertical /></DropdownMenuTrigger>
+                <DropdownMenuContent align="end"><DropdownMenuGroup><DropdownMenuItem onClick={() => client.exportAnalysis(result)}>{t('detect.exportJson')}</DropdownMenuItem></DropdownMenuGroup></DropdownMenuContent>
+              </DropdownMenu>}
+              <Button variant="outline" className="h-9" onClick={saveImage}>{t('detect.saveImage')}</Button>
+              <Button className="h-9" onClick={restart}>{t('detect.restart')}</Button>
+            </>
+          ) : phase === 'sampling' ? (
+            <>
+              <Button variant="outline" className="h-9" onClick={stop}>{t('detect.stop')}</Button>
+              <Button className="h-9" disabled><Loader2 data-icon="inline-start" className="animate-spin" />{t('detect.sampling')}</Button>
+            </>
+          ) : phase === 'computing' ? (
+            <Button className="h-9" disabled><PixelSpinner data-icon="inline-start" />{t('detect.computing')}</Button>
+          ) : (
+            <>
+              {samples.some(s => s.text.trim() || s.draftText?.trim()) && <Button variant="ghost" className="h-9" onClick={restart}>{t('detect.restart')}</Button>}
+              {mode === 'api' && emptyIndexes.length > 0 ? (
+                <>
+                  {filled > 0 && <Button variant="outline" className="h-9" onClick={() => verify()}>{t('detect.verifyPartial', { n: filled })}</Button>}
+                  <Button className="h-9" onClick={() => sampleIndexes(emptyIndexes)}>{t('detect.startSampling')}</Button>
+                </>
+              ) : (
+                <Button className="h-9" disabled={filled === 0} onClick={() => verify()}>{filled === 0 ? t('detect.verifyLocked') : filled < 3 ? t('detect.verifyPartial', { n: filled }) : t('detect.verify')}</Button>
+              )}
+            </>
+          )}
+        </div>
       </div>
 
       <Dialog open={active && errorDetail !== null} onOpenChange={open => !open && setErrorDetail(null)}>

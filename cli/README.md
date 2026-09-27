@@ -105,7 +105,7 @@ The input can be a saved report, a report with `outputs`, an array of one to thr
 
 `--count` applies only to online detection and cannot be combined with `--input`; offline rounds use the saved outputs. Online reports include the requested count as `request.count` and the effective concurrency as `request.parallel`.
 
-The TUI shows the latest ranking and recent round summaries. JSON retains every round. The most frequent candidate counts round winners; it is not a combined probability. Confidence is relative to models in the reference bank and does not establish the upstream model's identity. An incompatible custom bank uses the existing legacy ranker without confidence scores.
+The TUI shows the latest ranking and recent round summaries. After at least one scored round, a dimmed final line links the GitHub repository. JSON retains every round. The most frequent candidate counts round winners; it is not a combined probability. Confidence is relative to models in the reference bank and does not establish the upstream model's identity. An incompatible custom bank uses the existing legacy ranker without confidence scores.
 
 Exit codes: `0` when all requested rounds produce a ranking, `1` for invalid input or any unscored round, `130` after cancellation, and `143` after SIGTERM. A partial ranking is a successful relaxed-mode result.
 

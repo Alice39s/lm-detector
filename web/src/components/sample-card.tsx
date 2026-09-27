@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { PixelShader } from '@/components/pixel-shader'
 import { useI18n } from '@/i18n'
 import { cn } from '@/lib/utils'
 import { parseNumbers } from '@/lib/client'
@@ -26,9 +27,10 @@ export type Mode = 'manual' | 'api'
 export const minimumNumbers = (expected: number) => Math.max(80, Math.ceil(expected * 0.55))
 export const isBusyState = (s: SampleUI['state']) => s === 'pending' || s === 'requesting' || s === 'streaming'
 
-export function badgeFor(sample: SampleUI, expected: number): { key: 'empty' | 'filled' | 'short' | 'requesting' | 'streaming' | 'rejected' | 'stopped'; tone: 'muted' | 'success' | 'warning' | 'destructive' } {
+export function badgeFor(sample: SampleUI, expected: number): { key: 'empty' | 'filled' | 'short' | 'requesting' | 'streaming' | 'capped' | 'rejected' | 'stopped'; tone: 'muted' | 'success' | 'warning' | 'destructive' } {
   if (sample.state === 'pending' || sample.state === 'requesting') return { key: 'requesting', tone: 'warning' }
   if (sample.state === 'streaming') return { key: 'streaming', tone: 'warning' }
+  if (sample.state === 'capped') return { key: 'capped', tone: 'success' }
   if (sample.state === 'rejected') return { key: 'rejected', tone: 'destructive' }
   if (sample.state === 'stopped') return { key: 'stopped', tone: 'muted' }
   if (!sample.text.trim()) return { key: 'empty', tone: 'muted' }
@@ -82,7 +84,7 @@ export function SampleCard({ index, challenge, sample, mode, canSample, locked, 
 
   useLayoutEffect(() => {
     const reply = replyRef.current
-    if (reply && mode === 'api' && (busy || sample.state === 'done')) reply.scrollTop = reply.scrollHeight
+    if (reply && mode === 'api' && (busy || sample.state === 'done' || sample.state === 'capped')) reply.scrollTop = reply.scrollHeight
   }, [visibleText, mode, busy, sample.state])
 
   async function copy() {
@@ -119,7 +121,9 @@ export function SampleCard({ index, challenge, sample, mode, canSample, locked, 
           </DropdownMenu>
         </div>
       </div>
-      <div className="h-px bg-border" />
+      <div className="relative h-px bg-border">
+        {busy && <PixelShader effect="march" cell={2} className="absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 text-muted-foreground/60" />}
+      </div>
       <div className="flex flex-col gap-1">
         <div className="flex h-6 items-center justify-between">
           <span className="text-meta text-muted-foreground">{t('detect.prompt')}</span>
@@ -135,27 +139,31 @@ export function SampleCard({ index, challenge, sample, mode, canSample, locked, 
       <div className="flex min-h-0 flex-col gap-1">
         <label htmlFor={replyId} className="flex h-6 items-center text-meta text-muted-foreground">{t('detect.reply')}</label>
         {busy || visibleText || mode === 'manual' ? (
-          <Textarea
-            ref={replyRef}
-            id={replyId}
-            value={visibleText}
-            readOnly={busy || locked}
-            aria-busy={busy}
-            aria-describedby={replacementFailed || unaccepted || sample.state === 'rejected' ? `${replyId}-status` : undefined}
-            onChange={e => onChange(e.target.value)}
-            placeholder={t('detect.replyPlaceholder')}
-            aria-label={`${t('detect.sample', { n: index + 1 })} · ${t('detect.reply')}`}
-            className="fp-reply text-body"
-            spellCheck={false}
-          />
+          <div className="relative">
+            <Textarea
+              ref={replyRef}
+              id={replyId}
+              value={visibleText}
+              readOnly={busy || locked}
+              aria-busy={busy}
+              aria-describedby={replacementFailed || unaccepted || sample.state === 'rejected' ? `${replyId}-status` : undefined}
+              onChange={e => onChange(e.target.value)}
+              placeholder={t('detect.replyPlaceholder')}
+              aria-label={`${t('detect.sample', { n: index + 1 })} · ${t('detect.reply')}`}
+              className="fp-reply text-body"
+              spellCheck={false}
+            />
+            {busy && !visibleText && <PixelShader effect="rain" className="absolute inset-px rounded-[calc(var(--radius)-1px)] text-muted-foreground/30" />}
+          </div>
         ) : (
           <button
             type="button"
             id={replyId}
-            className="fp-reply flex w-full items-center justify-center rounded-lg border border-dashed border-input text-body text-muted-foreground hover:bg-muted disabled:opacity-50"
+            className="fp-reply relative isolate flex w-full items-center justify-center overflow-hidden rounded-lg border border-dashed border-input text-body text-muted-foreground hover:bg-muted disabled:opacity-50"
             disabled={!canSample || locked}
             onClick={onResample}
           >
+            <PixelShader effect="dither" className="absolute inset-0 -z-10 text-muted-foreground/20" />
             {t('detect.waitingSample')}
           </button>
         )}

@@ -23,12 +23,12 @@ export function endpoint(config:ApiConfig){
   if(config.format==='anthropic')return base.endsWith('/messages')?base:base+(base.endsWith('/v1')?'/messages':'/v1/messages')
   return base.endsWith('/chat/completions')?base:base+(base.endsWith('/v1')?'/chat/completions':'/v1/chat/completions')
 }
-export async function complete(config:ApiConfig,prompt:string,system='',signal?:AbortSignal,onText?:(text:string)=>void,transport:CompletionTransport=directTransport){
+export async function complete(config:ApiConfig,prompt:string,system='',signal?:AbortSignal,onText?:(text:string)=>void,transport:CompletionTransport=directTransport,maxNumbers?:number){
   const body=completionBody(config,prompt,system)
   const timeout=AbortSignal.timeout(COMPLETION_TIMEOUT_MS),combined=signal?AbortSignal.any([signal,timeout]):timeout
   try{
     const response=await transport(endpoint(config),config,body,combined)
-    return await readCompletion(response,config.format,onText)
+    return await readCompletion(response,config.format,onText,undefined,maxNumbers)
   }catch(error){
     if(signal?.aborted)throw coded('已取消请求','aborted')
     if(timeout.aborted)throw coded('上游请求超时，请重试','timeout')
@@ -49,10 +49,10 @@ export async function testApi(config:ApiConfig,challenges:Challenge[],onProgress
   const run=async(i:number)=>{
     signal?.throwIfAborted();states[i]={...states[i],status:'正在请求',state:'requesting'};report(`正在请求挑战 ${i+1}`,i)
     try{
-      const r=await complete(config,challenges[i].prompt,'',signal,text=>{states[i]={text,status:'正在接收输出',state:'streaming'};report(config.parallel?'三个挑战并行处理中':`挑战 ${i+1} 正在接收输出`,i)},transport)
+      const r=await complete(config,challenges[i].prompt,'',signal,text=>{states[i]={text,status:'正在接收输出',state:'streaming'};report(config.parallel?'三个挑战并行处理中':`挑战 ${i+1} 正在接收输出`,i)},transport,config.relaxed ? challenges[i].expected_count : undefined)
       states[i].text=r.text
       if(parseNumbers(r.text).length<Math.max(80,Math.ceil(challenges[i].expected_count*.55)))throw coded('有效数字不足','insufficient_numbers')
-      outputs[i]={text:r.text,expected_count:challenges[i].expected_count};accepted++;states[i]={...states[i],status:'已完成',state:'done'}
+      outputs[i]={text:r.text,expected_count:challenges[i].expected_count};accepted++;states[i]={...states[i],status:r.capped?'capped':'done',state:r.capped?'capped':'done'}
     }catch(error){
       if(signal?.aborted)throw coded('已取消请求','aborted')
       const e=error as CodedError,message=e instanceof Error?e.message:'请求失败'

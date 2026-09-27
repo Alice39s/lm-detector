@@ -42,6 +42,7 @@
   --destructive: oklch(0.58 0.22 27);
   --success: oklch(0.6 0.15 150);
   --warning: oklch(0.72 0.16 75);
+  --star: oklch(0.56 0.12 80);
   --border: oklch(0.9 0 0);
   --input: oklch(0.9 0 0);
   --ring: oklch(0.55 0.17 255);
@@ -73,6 +74,7 @@
   --destructive: oklch(0.7 0.19 27);
   --success: oklch(0.72 0.15 150);
   --warning: oklch(0.8 0.15 75);
+  --star: oklch(0.84 0.12 88);
   --border: oklch(0.27 0 0);
   --input: oklch(0.27 0 0);
   --ring: oklch(0.72 0.15 255);
@@ -135,7 +137,9 @@
 .fp-shell > main { min-width: 0; flex: 1; display: flex; flex-direction: column; }
 .fp-topbar { position: sticky; top: 0; z-index: 20; height: 56px; background: var(--background); border-bottom: 1px solid var(--border); }
 .fp-topbar-inner { height: 100%; max-width: 1440px; margin: 0 auto; padding: 0 1rem; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; }
-.fp-brand { display: flex; flex-direction: column; justify-self: start; }
+.fp-brand { display: flex; align-items: center; gap: .5rem; justify-self: start; }
+.fp-brand-text { display: flex; flex-direction: column; }
+.fp-brand-mark { flex-shrink: 0; width: 32px; height: 32px; color: var(--muted-foreground); }
 .fp-brand-title { font-family: var(--font-brand-title); font-size: .875rem; line-height: 1.25; font-weight: 500; white-space: nowrap; }
 .fp-brand-byline { font-family: var(--font-brand-byline); font-size: .75rem; line-height: 1rem; font-weight: 400; color: color-mix(in oklab, var(--foreground) 70%, transparent); }
 .fp-repository-link { display: inline-flex; align-items: center; gap: .4rem; padding: .5rem; border-radius: var(--radius); color: var(--muted-foreground); font-size: .75rem; white-space: nowrap; text-decoration: none; }
@@ -165,8 +169,6 @@
 .fp-cli-command:hover > svg { color: var(--primary); }
 .fp-cli-link { display: inline-flex; align-items: center; gap: .15rem; margin-left: auto; color: var(--primary); font-weight: 500; white-space: nowrap; text-decoration: none; }
 .fp-cli-link:hover { text-decoration: underline; text-underline-offset: 3px; }
-.fp-cli-star { display: inline-flex; align-items: center; gap: .25rem; color: var(--muted-foreground); white-space: nowrap; text-decoration: none; }
-.fp-cli-star:hover { color: var(--foreground); text-decoration: underline; text-underline-offset: 3px; }
 
 html[data-page-direction="forward"] { --fp-page-offset: 100%; }
 html[data-page-direction="back"] { --fp-page-offset: -100%; }
@@ -192,6 +194,12 @@ html[data-page-direction]::view-transition-new(root) { animation-name: fp-page-i
 .fp-grid-samples { display: grid; gap: 1rem; align-items: stretch; }
 @media (min-width: 1024px) { .fp-grid-samples { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 
+.fp-detect-footer { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; }
+.fp-detect-footer > .fp-actionbar { margin-left: auto; }
+.fp-star-link { display: inline-flex; align-items: center; gap: .375rem; height: 2.25rem; padding: 0 .75rem; border: 1px solid color-mix(in oklab, var(--star) 35%, var(--border)); border-radius: var(--radius); background: color-mix(in oklab, var(--star) 8%, var(--card)); color: var(--star); font-size: .875rem; font-weight: 500; white-space: nowrap; text-decoration: none; outline: none; transition: background-color .15s, border-color .15s; }
+.fp-star-link:hover { background: color-mix(in oklab, var(--star) 14%, var(--card)); border-color: color-mix(in oklab, var(--star) 55%, var(--border)); }
+.fp-star-link:focus-visible { border-color: var(--ring); box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent); }
+.fp-star-link svg { fill: currentColor; }
 .fp-actionbar { display: flex; justify-content: flex-end; align-items: center; gap: 0.5rem; }
 @media (max-width: 767px) {
   .fp-actionbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; min-height: 64px; padding: .5rem 1rem calc(.5rem + env(safe-area-inset-bottom)); background: var(--background); border-top: 1px solid var(--border); }
@@ -250,3 +258,9 @@ html[data-page-direction]::view-transition-new(root) { animation-name: fp-page-i
   }
 }
 .fp-mono { font-family: var(--font-mono); }
+
+/* design.md 4.4 像素着色器：宿主决定尺寸，画布按整格放大。 */
+@layer components {
+  .fp-pixel { position: relative; display: block; overflow: hidden; pointer-events: none; }
+  .fp-pixel > canvas { position: absolute; top: 0; left: 0; image-rendering: pixelated; }
+}

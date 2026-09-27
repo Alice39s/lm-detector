@@ -3,6 +3,7 @@ import { motion, useMotionValueEvent, useSpring } from 'framer-motion'
 import { TriangleAlert } from 'lucide-react'
 import { Alert, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
+import { PixelShader } from '@/components/pixel-shader'
 import { useI18n } from '@/i18n'
 import { listItem, listStagger, spring as motionSpring, useMotionPreset } from '@/lib/motion'
 import { confidenceOf, NORMAL_CONFIDENCE_THRESHOLD } from '@/lib/result-confidence'
@@ -45,12 +46,14 @@ export function ResultPanel({ result }: { result: Analysis }) {
   return (
     <section className="flex flex-col gap-6" aria-labelledby="result-title">
       <h2 id="result-title" className="text-section-title">{t('detect.result')}</h2>
-      <div className="fp-card flex flex-col gap-1 p-4">
+      <div className="fp-card relative flex flex-col gap-1 overflow-hidden p-4">
+        <PixelShader effect="twinkle" cell={2} className="absolute inset-x-0 top-0 h-2 text-primary/60" />
         {unscorable ? (
           <>
             <span className="text-meta text-muted-foreground">{t('detect.result')}</span>
             <span className="text-display">{t('detect.unscorable')}</span>
             <span className="text-body text-muted-foreground">{t('detect.unscorableBody', { used: result.used_outputs })}</span>
+            <PixelShader effect="static" className="mt-3 h-16 w-full rounded-lg text-muted-foreground/40" />
           </>
         ) : (
           <div className="fp-result-summary">

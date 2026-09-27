@@ -1,5 +1,6 @@
 import type { CodedError, ErrorCode } from './types'
 import type { Completion } from './reference'
+import { parseNumbers } from './fingerprint-core.js'
 
 export type Format = 'openai' | 'responses' | 'anthropic'
 export interface CompletionResult {
@@ -10,6 +11,7 @@ export interface CompletionResult {
   providerReported?: string
   finishReason?: string
   completion: Completion
+  capped?: boolean
 }
 const coded = (message: string, code: ErrorCode, extra?: Partial<CodedError>): CodedError => Object.assign(new Error(message), { code }, extra)
 function isObject(value: unknown): value is Record<string, unknown> {
@@ -24,11 +26,11 @@ function array(value: unknown): Record<string, unknown>[] {
 function string(value: unknown): string { return typeof value === 'string' ? value : '' }
 const outputText = (response: Record<string, unknown>): string => array(response.output).filter(x => x.type === 'message').flatMap(x => array(x.content)).filter(x => x.type === 'output_text').map(x => string(x.text)).join('')
 
-export async function readCompletion(response: Response, format: Format, onText?: (text: string) => void, onProgress?: (result: CompletionResult) => void): Promise<CompletionResult> {
-  let text = '', finish = '', terminal = false, ended = false
+export async function readCompletion(response: Response, format: Format, onText?: (text: string) => void, onProgress?: (result: CompletionResult) => void, maxNumbers?: number): Promise<CompletionResult> {
+  let text = '', finish = '', terminal = false, ended = false, capped = false
   let responseModel: string | undefined, responseId: string | undefined, providerReported: string | undefined, usage: unknown
   const snapshot = (): CompletionResult => ({ text, responseModel, responseId, usage, providerReported, finishReason: finish || undefined,
-    completion: terminal && ['stop', 'end_turn', 'completed'].includes(finish) ? 'complete' : ['length', 'max_tokens', 'incomplete', 'max_output_tokens'].includes(finish) || (ended && !terminal && text.length > 0) ? 'truncated' : 'unknown' })
+    capped, completion: capped ? 'truncated' : terminal && ['stop', 'end_turn', 'completed'].includes(finish) ? 'complete' : ['length', 'max_tokens', 'incomplete', 'max_output_tokens'].includes(finish) || (ended && !terminal && text.length > 0) ? 'truncated' : 'unknown' })
   const report = () => onProgress?.(snapshot())
   const metadata = (value: unknown) => {
     const d = object(value)
@@ -37,7 +39,18 @@ export async function readCompletion(response: Response, format: Format, onText?
     if (typeof d.provider === 'string') providerReported = d.provider
     if (d.usage) usage = d.usage
   }
-  const emit = (part: string) => { text += part; onText?.(text); report() }
+  const emit = (part: string) => {
+    text += part
+    onText?.(text)
+    report()
+    if (maxNumbers === undefined) return
+    // A trailing digit may still grow (for example, 3 -> 355); count only complete integers.
+    const numbers = parseNumbers(text.replace(/\d+$/, '')) as number[]
+    if (numbers.length >= maxNumbers) {
+      text = numbers.slice(0, maxNumbers).join(', ')
+      capped = true
+    }
+  }
   try {
     if (!response.ok) {
       let d: Record<string, unknown>
@@ -92,19 +105,26 @@ export async function readCompletion(response: Response, format: Format, onText?
         report()
       }
       try {
-        while (true) {
+        while (!terminal && !capped) {
           const { done, value } = await reader.read()
           buffer += done ? decoder.decode() : decoder.decode(value, { stream: true })
           let match: RegExpExecArray | null
-          while (!terminal && (match = /\r?\n\r?\n/.exec(buffer))) { event(buffer.slice(0, match.index)); buffer = buffer.slice(match.index + match[0].length) }
-          if (terminal) break
-          if (done) { if (buffer.trim()) event(buffer); break }
+          while (!terminal && !capped && (match = /\r?\n\r?\n/.exec(buffer))) { event(buffer.slice(0, match.index)); buffer = buffer.slice(match.index + match[0].length) }
+          if (done) { if (!terminal && !capped && buffer.trim()) event(buffer); break }
         }
       } finally { void reader.cancel().catch(() => {}); reader.releaseLock() }
     }
     ended = true
     if (['refusal', 'content_filter'].includes(finish)) throw coded('渠道拒绝了此请求', 'refused')
-    if (snapshot().completion !== 'complete' || !text) throw coded('输出未完整结束，本条不计入检测或入库', 'incomplete')
+    if (!capped && snapshot().completion !== 'complete') throw coded('输出未完整结束，本条不计入检测或入库', 'incomplete')
+    if (maxNumbers !== undefined && !capped) {
+      const numbers = parseNumbers(text) as number[]
+      if (numbers.length > maxNumbers) {
+        text = numbers.slice(0, maxNumbers).join(', ')
+        capped = true
+      }
+    }
+    if (!text) throw coded('输出未完整结束，本条不计入检测或入库', 'incomplete')
     return snapshot()
   } catch (error) {
     ended = true

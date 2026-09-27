@@ -1,7 +1,7 @@
 ---
 name: fingerpoint-design
 description: 用于 Fingerpoint 的三样本检测、API 配置、候选结果、图片导出和只读样本库。服务需要比较 LLM 指纹的用户，支持简体中文和英文、浅色和深色主题。
-version: 2026-09-22.4
+version: 2026-09-28.4
 ---
 
 # Fingerpoint design.md
@@ -32,6 +32,7 @@ version: 2026-09-22.4
 ### 应用外壳
 
 - 桌面顶栏高 56px；左侧站名，中间“检测 / 样本库”，右侧仓库入口、语言和主题切换。仓库入口在 1024px 以下收为图标。640px 以下使用 88px 双行顶栏，将主导航排在第二行。
+- 左上标识左侧放 32px 像素指纹动画 `.fp-brand-mark`，使用 muted-foreground；右侧为两行文字。（来源：2026-09-28 用户要求图标改为 muted 色。）
 - 左上标识使用两行：`Figerpoint Detector` 使用 `--font-brand-title`、14px、500 字重、1.25 行高；`by Ikaleio` 使用 `--font-brand-byline`、12px、400 字重、16px 行高，颜色为前景色的 70% 不透明度。（来源：2026-09-22 用户指定 FisProxy 截图，参数取自其品牌标识实现。）
 - 主题菜单提供“浅色 / 深色 / 跟随系统”，用单选标记显示当前选择；默认跟随系统。
 - 保存手动选择；选择“跟随系统”后实时响应系统外观变化。切换主题不清除检测内容。
@@ -61,19 +62,21 @@ version: 2026-09-22.4
 - 结果阶段三张 Compact 卡片始终保留。点击卡片在下方展开对应详情，再次点击或使用详情右上角的收起按钮关闭；一次只展开一个样本。
 - Compact 卡片与详情不共用 layoutId。详情只在当前位置做高度展开，不做跨位置变形；减少动效时直接开合。
 - 操作栏靠近样本；768px 以下固定在底部，并留出内容及安全区空间。
+- 求 Star 入口使用 `.fp-star-link`，与操作栏同在 `.fp-detect-footer` 一行：Star 靠样本区左边缘，操作栏靠右，两者与样本网格左右边缘对齐，高度同为 36px。颜色使用 `--star` 柔和金色，浅色主题取深金褐以保证对比度，只用低饱和底色和细边框，不加动画或渐变。768px 以下操作栏固定在底部，Star 留在内容流末尾左侧。（来源：2026-09-28 用户要求。）
 - 点击重新检测后直接生成新提示词并清除已有回复和结果，不弹出确认框。
 
 ### 取样状态
 
-- `pending`、`requesting`、`streaming`、`done`、`rejected`、`stopped` 分别映射到本地化状态文案。
+- `pending`、`requesting`、`streaming`、`done`、`capped`、`rejected`、`stopped` 分别映射到本地化状态文案。
 - 请求期间将完整旧回复与临时流式文本分开保存。
-- 仅成功完整结束且达到数字阈值的回复替换旧回复。
+- 正常完整结束且达到数字阈值的回复可替换旧回复；宽松模式主动达到目标数并截断的回复也可替换旧回复，标为 `capped`。
+- 宽松模式仅在收到目标数量的完整有效整数后取消 SSE 读取；尾部尚未结束的整数不计数。非流式 JSON 必须完整成功结束，超出目标数时只采用前 N 个有效整数。
 - 失败或取消单条替换时保留旧回复和旧结果。
 - 成功替换或手动编辑回复时清除旧结果。
-- 未完成的流式片段不能自动参与验证。用户编辑后可手动采用。
+- 未完成且未达到目标数的流式片段不能自动参与验证。用户编辑后可手动采用。
 - 单条重新取样沿用该条成功取样时的参数和原提示词。
 - 并行开关控制三个请求同时或依次执行；不自动重试失败请求。
-- 自动验证默认关闭。开启后仅在本轮指定请求全部成功、三条回复齐全时执行。
+- 流式、并行、宽松模式、自动验证在新配置中默认开启；旧配置已明确保存的开关状态保持不变。自动验证仅在本轮指定请求全部成功、三条回复齐全时执行。
 - 离开检测页时中止正在进行的请求，保留已完成内容，忽略旧运行的后续回调。
 
 ### API 配置
@@ -83,7 +86,7 @@ version: 2026-09-22.4
 - API 摘要整行使用等宽字体，包括 Base URL、分隔符和 model。
 - 展开后显示配置表单。桌面字段分两列，窄屏排为一列。
 - 配置卡片使用 220ms 高度和透明度过渡，展开或收起时摘要保持原位；减少动效时立即完成。
-- 字段顺序：Base URL、model、API Key、reasoning_effort、协议、流式、并行、自动验证、本标签页记住 Key。
+- 字段顺序：Base URL、model、API Key、reasoning_effort、协议、流式、并行、宽松模式、自动验证。
 - 协议选项固定为 Chat Completions、Messages、Responses。
 - reasoning_effort 可留空，允许输入上游支持的任意值，不限制为少数预设。
 - Key 默认隐藏，可通过有名称的按钮切换可见性。
@@ -146,7 +149,7 @@ version: 2026-09-22.4
 - `text-meta` 只承载数量、日期等次要内容，不承载主要操作和限制说明。
 - 数值统一使用 tabular-nums；百分比保留一位小数。
 - 浅色及深色 token 都在 `src/index.css` 中定义，页面不复制色值。
-- 蓝色用于主要操作、焦点和置信度条；状态使用 success、warning、destructive 语义色。
+- 蓝色用于主要操作、焦点和置信度条；状态使用 success、warning、destructive 语义色；`--star` 只用于求 Star 入口，不作为状态色。
 - 不按厂商分配置信度条颜色。
 
 ### 布局与表面
@@ -172,19 +175,44 @@ version: 2026-09-22.4
 - 尊重 reduced-motion：取消错开与位移，数字直接到目标值，弹层、加载状态及 CSS 过渡也立即完成。
 - 动效不能阻止取消、输入或键盘导航。
 
+### 像素着色器
+
+- 装饰区域和长耗时操作使用像素风 GLSL 动画。（来源：2026-09-27 用户要求。）
+- 使用 `PixelShader` 与 `PixelSpinner`；效果定义在 `src/lib/pixel-effects.ts`，全站共用 `src/lib/pixel-renderer.ts` 的一个离屏 WebGL 上下文，不为单个装饰新建上下文。
+- 宿主元素决定尺寸；画布按 `cell` 整格缩放，用 `image-rendering: pixelated` 放大。
+- 颜色取宿主的 currentColor（含 alpha）。非强调区域统一使用 muted-foreground，不使用蓝色或黄色粒子。（来源：2026-09-28 用户反馈强调色装饰喧宾夺主。）
+- 例外：计算主按钮内的 spinner 跟随按钮文字色；结果摘要卡顶边使用 primary；样本库载入失败使用 destructive。
+- 取样中的状态徽标和主按钮使用原有 lucide `Loader2` 旋转图标，不使用着色器 spinner。（来源：2026-09-27 用户要求。）
+- 装饰不承载数据含义，设置 aria-hidden，不接收指针事件。背景类装饰放在 `isolate` 容器内的 `-z-10` 层，不遮挡文字。
+- 只绘制进入视口的装饰，上限 24fps；着色器时间统一以 0.5 倍速推进（`PLAYBACK_RATE`）；减少动效时只绘制一帧静态画面；不支持 WebGL 时保持透明。（来源：2026-09-27 用户要求放慢到 0.5x。）
+- 页脚不放像素装饰。（来源：2026-09-28 用户要求删除页脚波纹。）
+
+| 效果 | 位置 | 颜色 |
+|---|---|---|
+| fingerprint | 顶栏标识，2px 格 | muted-foreground |
+| rain | CLI 提示条背景，向左渐隐；API 请求尚无回复时的回复区 | muted-foreground/30 |
+| dither | API 模式的等待取样区域 | muted-foreground/20 |
+| march | 取样中样本卡标题下的分隔线 | muted-foreground/60 |
+| scan | 计算状态行 | muted-foreground/60 |
+| spinner | 计算主按钮、计算状态行、样本详情载入 | currentColor |
+| blocks | 样本库与样本详情的载入骨架 | muted-foreground/25 |
+| twinkle | 结果摘要卡顶边 8px | primary/60 |
+| static | 空状态、未找到模型、不可评分结果、样本库载入失败 | muted-foreground；载入失败用 destructive/35 |
+
 ## 5. 可用原语
 
 | 角色 | 实现名称 | 路径 | 状态 |
 |---|---|---|---|
-| 颜色与主题 | background、foreground、card、popover、primary、muted、muted-foreground、border、input、ring、success、warning、destructive | `src/index.css` | 已实现 |
+| 颜色与主题 | background、foreground、card、popover、primary、muted、muted-foreground、border、input、ring、success、warning、destructive、star | `src/index.css` | 已实现 |
 | 字号 | text-display、text-display-number、text-h1、text-section-title、text-card-title、text-body、text-meta | `src/index.css` | 已实现 |
-| 容器 | fp-shell、fp-page、fp-page-wide、fp-grid-samples、fp-actionbar、fp-result-row | `src/index.css` | 已实现 |
+| 容器 | fp-shell、fp-page、fp-page-wide、fp-grid-samples、fp-detect-footer、fp-actionbar、fp-result-row | `src/index.css` | 已实现 |
 | 表面与数据 | fp-card、fp-bar、fp-reply、fp-mono | `src/index.css` | 已实现 |
 | 控件 | Button、Input、Textarea、Field、Switch、ToggleGroup、Tabs、Collapsible | `src/components/ui/` | 已实现 |
 | 浮层 | Dialog、DropdownMenu、Tooltip、Sonner | `src/components/ui/` | 已实现 |
 | 数据反馈 | Table、Badge、Empty、Skeleton、Alert | `src/components/ui/` | 已实现 |
 | 检测对象 | SampleCard、SampleStrip、ResultPanel、ApiConfigPanel（摘要类 fp-api-summary） | `src/components/`、`src/index.css` | 已实现 |
 | 动效 | useMotionPreset、spring、listStagger、listItem | `src/lib/motion.ts` | 已实现 |
+| 像素装饰 | PixelShader、PixelSpinner、fp-pixel、fp-brand-mark | `src/components/pixel-shader.tsx`、`src/lib/pixel-effects.ts`、`src/lib/pixel-renderer.ts`、`src/index.css` | 已实现 |
 | 图标 | lucide-react | `package.json` | 已安装 |
 
 [必须] 公开原语是本表的组件、类和 token；使用前确认 API 存在。
@@ -214,7 +242,7 @@ version: 2026-09-22.4
 [必须] 不自动向参考库写入检测回复。
 [必须] 不添加 URL 分享、贡献样本、登录等未请求入口。
 [建议] 不默认采用居中宣传标题加卡片网格。（决策：检测工具需要任务密度。）
-[建议] 不叠加卡片、装饰图标底板或渐变。（决策：使用表面、文字和状态建立层级。）
+[建议] 不叠加卡片、装饰图标底板或渐变；像素装饰只按“像素着色器”一节的位置和颜色使用。（决策：使用表面、文字和状态建立层级。）
 [建议] 普通元数据不使用胶囊徽标。（决策：徽标只表示状态。）
 
 ## 8. 实现与接入

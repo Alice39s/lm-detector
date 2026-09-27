@@ -37,6 +37,10 @@ const examples = [
   ['Analyze a saved report without calling a model', 'npx lmfpd@latest --input result.json --json'],
 ] as const
 
+export function StarNote() {
+  return <Text dimColor><Text color="yellow">★</Text> Like FPD? Star it on GitHub: {terminalLink('github.com/Ikaleio/lm-detector', 'https://github.com/Ikaleio/lm-detector', { fallback: false })}</Text>
+}
+
 function Help() {
   const { columns } = useWindowSize()
   const width = Math.max(32, Math.min(columns || 80, 100))
@@ -77,6 +81,7 @@ function Help() {
       </Box>)}
     </Box>
     <Box marginTop={1}><Text dimColor>API examples without -b, -k, and -m require BASE_URL, API_KEY, and MODEL.</Text></Box>
+    <Box marginTop={1}><StarNote /></Box>
   </Box>
 }
 
