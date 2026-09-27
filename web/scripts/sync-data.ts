@@ -1,5 +1,6 @@
-import { mkdir, readFile, writeFile, copyFile, stat, rm } from 'node:fs/promises'
+import { mkdir, readFile, writeFile, stat, rm } from 'node:fs/promises'
 import { createHash } from 'node:crypto'
+import { zstdCompressSync } from 'node:zlib'
 import { redactPrivateMetadata } from '@fingerpoint/shared/privacy'
 import { parseReference, referenceSamples } from '@fingerpoint/shared/reference'
 
@@ -21,9 +22,26 @@ if (sampleCounts.size !== bank.models.length || bank.models.some((model: { id: s
 const references = batches.map(batch => JSON.stringify(redactPrivateMetadata(batch))).join('\n') + '\n'
 const publicBank = redactPrivateMetadata(bank)
 publicBank.reference_sha256 = createHash('sha256').update(references).digest('hex')
+const chunkSize = 4 * 1024 * 1024
+const manifest: Record<string, string[]> = {}
+async function publish(name: string, content: string) {
+  const compressed = zstdCompressSync(Buffer.from(content))
+  const digest = createHash('sha256').update(compressed).digest('hex').slice(0, 16)
+  const parts: string[] = []
+  for (let offset = 0; offset < compressed.length; offset += chunkSize) {
+    const part = `${name}.${digest}.${parts.length}.zst`
+    await writeFile(`web/public/data/chunks/${part}`, compressed.subarray(offset, offset + chunkSize))
+    parts.push(part)
+  }
+  manifest[name] = parts
+}
+await rm('web/public/data', { recursive: true, force: true })
 await mkdir('web/public/data', { recursive: true })
-await writeFile('web/public/data/unified_reference.jsonl', references)
-await writeFile('web/public/data/unified_bank.json', JSON.stringify(publicBank, null, 2) + '\n')
-await rm('web/public/data/import_manifest.json', { force: true })
-await copyFile('data/shared_detector.json', 'web/public/data/shared_detector.json')
+await mkdir('web/public/data/chunks')
+await publish('unified_reference.jsonl', references)
+await publish('unified_bank.json', JSON.stringify(publicBank))
+await publish('shared_detector.json', await readFile('data/shared_detector.json', 'utf8'))
+await writeFile('web/public/data/manifest.json', JSON.stringify(manifest))
+await mkdir('web/.generated', { recursive: true })
+await writeFile('web/.generated/unified_bank.json', JSON.stringify(publicBank, null, 2) + '\n')
 console.log(`Synced ${batches.length} reference batches, ${[...sampleCounts.values()].reduce((sum, count) => sum + count, 0)} samples and their derived bank.`)

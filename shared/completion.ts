@@ -41,7 +41,7 @@ export async function readCompletion(response: Response, format: Format, onText?
   try {
     if (!response.ok) {
       let d: Record<string, unknown>
-      try { d = object(await response.json()) } catch { throw coded(`代理不可用（HTTP ${response.status}），请使用 Vercel 或本地预览服务`, 'proxy_unavailable', { httpStatus: response.status }) }
+      try { d = object(await response.json()) } catch { throw coded(`代理不可用（HTTP ${response.status}），请确认站点包含 API 代理函数`, 'proxy_unavailable', { httpStatus: response.status }) }
       metadata(d)
       throw coded(`HTTP ${response.status}：${string(object(d.error).message) || string(d.message) || '请求失败'}`, 'http', { httpStatus: response.status })
     }

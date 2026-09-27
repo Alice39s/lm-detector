@@ -6,6 +6,7 @@ import { analyzeSharedOutputs, type SharedDetector } from '@fingerpoint/shared/s
 import type { Analysis, ApiConfig, Bank, Challenge, CollectionProgress, Output } from '@fingerpoint/shared/types'
 import { parseReference, referenceSamples } from '@fingerpoint/shared/reference'
 import type { ReferenceBatch, ReferenceSample } from '@fingerpoint/shared/reference'
+import { readStaticData } from './static-data'
 export { generateChallenges, parseNumbers }
 
 export interface ReferenceEntry { batch: ReferenceBatch; sample: ReferenceSample }
@@ -13,10 +14,9 @@ let current:Bank|undefined, referenceCache:ReferenceBatch[]|undefined
 let loading:Promise<Bank>|undefined
 let detectorLoading:Promise<SharedDetector>|undefined
 function loadDetector():Promise<SharedDetector>{
-  return detectorLoading ??= readFile('shared_detector.json').then(r=>r.json()).catch(error=>{detectorLoading=undefined;throw error})
+  return detectorLoading ??= readStaticData('shared_detector.json').then(data=>JSON.parse(data) as SharedDetector)
+    .catch(error=>{detectorLoading=undefined;throw error})
 }
-const url=(file:string)=>`${import.meta.env.BASE_URL}data/${file}`
-async function readFile(file:string) {const response=await fetch(url(file));if(!response.ok)throw new Error('统一库文件加载失败，请刷新重试');return response}
 function worker<T>(data:unknown,onProgress?:(text:string)=>void,fallback?:()=>T):Promise<T>{
   return new Promise((resolve,reject)=>{
     let w:Worker|undefined,finished=false
@@ -44,10 +44,10 @@ function worker<T>(data:unknown,onProgress?:(text:string)=>void,fallback?:()=>T)
 export async function loadBank():Promise<Bank>{
   if(current)return current
   if(loading)return loading
-  loading=readFile('unified_bank.json').then(response=>response.json()).then((bank:Bank)=>{current=bank;return bank}).catch(error=>{loading=undefined;throw error})
+  loading=readStaticData('unified_bank.json').then(data=>JSON.parse(data) as Bank).then((bank:Bank)=>{current=bank;return bank}).catch(error=>{loading=undefined;throw error})
   return loading
 }
-export async function loadReferences():Promise<ReferenceBatch[]>{await loadBank();if(!referenceCache)referenceCache=parseReference(await(await readFile('unified_reference.jsonl')).text());return referenceCache}
+export async function loadReferences():Promise<ReferenceBatch[]>{await loadBank();if(!referenceCache)referenceCache=parseReference(await readStaticData('unified_reference.jsonl'));return referenceCache}
 export async function loadSamples(model:string):Promise<ReferenceEntry[]>{return [...referenceSamples((await loadReferences()).filter(batch=>batch.model.id===model))]}
 export async function analyze(outputs:Output[],bank:Bank):Promise<Analysis>{
   const detector=await loadDetector()

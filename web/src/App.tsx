@@ -1,7 +1,6 @@
 import { HashRouter, Link, Route, Routes } from 'react-router'
 import { MotionConfig } from 'framer-motion'
 import { ThemeProvider } from 'next-themes'
-import { Analytics } from '@vercel/analytics/react'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { AppShell } from '@/components/app-shell'
 import { I18nProvider, useI18n } from '@/i18n'
@@ -38,7 +37,6 @@ export default function App() {
           </TooltipProvider>
         </MotionConfig>
       </I18nProvider>
-      <Analytics />
     </ThemeProvider>
   )
 }

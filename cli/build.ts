@@ -48,8 +48,8 @@ await chmod(executable, 0o755)
 const offlineFiles = (await readdir(resolve(root, 'offline'))).filter(name => name.endsWith('.py'))
 await Promise.all(offlineFiles.map(name => copyFile(resolve(root, 'offline', name), resolve(destination, 'offline', name))))
 await Promise.all([
-  ...['unified_bank.json', 'shared_detector.json'].map(name =>
-    copyFile(resolve(root, 'web/public/data', name), resolve(destination, 'data', name))),
+  copyFile(resolve(root, 'web/.generated/unified_bank.json'), resolve(destination, 'data/unified_bank.json')),
+  copyFile(resolve(root, 'data/shared_detector.json'), resolve(destination, 'data/shared_detector.json')),
   copyFile(resolve(root, 'cli/README.md'), resolve(destination, 'README.md')),
   copyFile(resolve(root, 'LICENSE'), resolve(destination, 'LICENSE')),
   writeFile(resolve(destination, 'package.json'), JSON.stringify({
