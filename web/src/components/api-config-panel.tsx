@@ -1,5 +1,5 @@
-import { useState, type Ref } from 'react'
-import { ChevronDown, Copy, Eye, EyeOff, Plus, Trash2 } from 'lucide-react'
+import { useRef, useState, type Ref } from 'react'
+import { ChevronDown, Copy, Eye, EyeOff, Pencil, Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
@@ -56,6 +56,7 @@ interface Props {
 export function ApiConfigPanel({ open, onOpenChange, config, update, profileManager, disabled, containerRef }: Props) {
   const { t } = useI18n()
   const [showKey, setShowKey] = useState(false)
+  const profileNameRef = useRef<HTMLInputElement>(null)
   const baseUrl = config.baseUrl.trim() || t('api.baseUrlMissing')
   const model = config.model.trim() || t('api.modelMissing')
   const activeProfileName = config.name.trim() || config.model.trim() || t('api.defaultProfileName')
@@ -104,18 +105,33 @@ export function ApiConfigPanel({ open, onOpenChange, config, update, profileMana
               </DropdownMenuRadioGroup>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => {
-                setShowKey(false)
-                profileManager.create()
-                onOpenChange(true)
-                toast.success(t('api.profileCreated'))
-              }}
-              className="cursor-pointer"
-            >
-              <Plus className="size-4" />
-              <span>{t('api.newProfile')}</span>
-            </DropdownMenuItem>
+            <DropdownMenuGroup>
+              <DropdownMenuItem
+                onClick={() => {
+                  onOpenChange(true)
+                  requestAnimationFrame(() => {
+                    profileNameRef.current?.focus()
+                    profileNameRef.current?.select()
+                  })
+                }}
+                className="cursor-pointer"
+              >
+                <Pencil className="size-4" />
+                <span>{t('api.renameProfile')}</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setShowKey(false)
+                  profileManager.create()
+                  onOpenChange(true)
+                  toast.success(t('api.profileCreated'))
+                }}
+                className="cursor-pointer"
+              >
+                <Plus className="size-4" />
+                <span>{t('api.newProfile')}</span>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
 
@@ -139,6 +155,7 @@ export function ApiConfigPanel({ open, onOpenChange, config, update, profileMana
                 {t('api.profileName')}
               </FieldLabel>
               <Input
+                ref={profileNameRef}
                 id="api-profile-name"
                 className="h-8 max-w-xs text-sm"
                 value={config.name}
