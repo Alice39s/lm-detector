@@ -1,5 +1,5 @@
 import { useRef, useState, type Ref } from 'react'
-import { ChevronDown, Copy, Eye, EyeOff, Pencil, Plus, Trash2 } from 'lucide-react'
+import { ChevronDown, Copy, Eye, EyeOff, FolderOpen, Pencil, Plus, Save, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
@@ -22,6 +22,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { Segmented } from '@/components/segmented'
 import { useI18n } from '@/i18n'
 import type { ApiProfile, ApiProfileManager, WebApiConfig } from '@/lib/config'
+import { readProfileFile, saveProfileFile } from '@/lib/profile-file'
 import { cn } from '@/lib/utils'
 
 const placeholders: Record<WebApiConfig['format'], string> = {
@@ -57,9 +58,33 @@ export function ApiConfigPanel({ open, onOpenChange, config, update, profileMana
   const { t } = useI18n()
   const [showKey, setShowKey] = useState(false)
   const profileNameRef = useRef<HTMLInputElement>(null)
+  const profileFileRef = useRef<HTMLInputElement>(null)
   const baseUrl = config.baseUrl.trim() || t('api.baseUrlMissing')
   const model = config.model.trim() || t('api.modelMissing')
   const activeProfileName = config.name.trim() || config.model.trim() || t('api.defaultProfileName')
+
+  async function loadProfile(file: File | undefined) {
+    if (!file) return
+    try {
+      const { name, config: loaded } = await readProfileFile(file)
+      setShowKey(false)
+      profileManager.create(name, loaded)
+      onOpenChange(true)
+      toast.success(t('api.profileLoaded'))
+    } catch {
+      toast.error(t('api.profileLoadFailed'))
+    }
+  }
+
+  async function saveProfile() {
+    try {
+      const result = await saveProfileFile(config, activeProfileName)
+      toast.success(t(result === 'saved' ? 'api.profileSaved' : 'api.profileDownloadStarted'))
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') return
+      toast.error(t('api.profileSaveFailed'))
+    }
+  }
 
   return (
     <Collapsible
@@ -69,6 +94,16 @@ export function ApiConfigPanel({ open, onOpenChange, config, update, profileMana
       className="fp-card rr-block scroll-mt-20"
       aria-label={t('api.title')}
     >
+      <input
+        ref={profileFileRef}
+        type="file"
+        accept=".json,application/json"
+        className="hidden"
+        onChange={event => {
+          void loadProfile(event.target.files?.[0])
+          event.target.value = ''
+        }}
+      />
       <div className="flex items-center min-h-[48px] px-2 sm:px-3 py-1 gap-2">
         <DropdownMenu>
           <DropdownMenuTrigger render={
@@ -131,6 +166,14 @@ export function ApiConfigPanel({ open, onOpenChange, config, update, profileMana
                 <Plus className="size-4" />
                 <span>{t('api.newProfile')}</span>
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => profileFileRef.current?.click()} className="cursor-pointer">
+                <FolderOpen className="size-4" />
+                <span>{t('api.loadProfile')}</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => { void saveProfile() }} className="cursor-pointer">
+                <Save className="size-4" />
+                <span>{t('api.saveProfile')}</span>
+              </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -150,22 +193,25 @@ export function ApiConfigPanel({ open, onOpenChange, config, update, profileMana
         <Separator />
         <FieldSet disabled={disabled} className="min-w-0 p-4 space-y-4" aria-label={t('api.title')}>
           <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-border/70">
-            <div className="flex flex-1 min-w-[220px] items-center gap-2">
-              <FieldLabel htmlFor="api-profile-name" className="shrink-0 text-meta text-muted-foreground">
-                {t('api.profileName')}
-              </FieldLabel>
-              <Input
-                ref={profileNameRef}
-                id="api-profile-name"
-                className="h-8 max-w-xs text-sm"
-                value={config.name}
-                placeholder={config.model.trim() || t('api.profileNamePlaceholder')}
-                disabled={disabled}
-                autoComplete="off"
-                spellCheck={false}
-                onChange={e => profileManager.rename(config.id, e.target.value)}
-                onBlur={() => profileManager.rename(config.id, config.name.trim())}
-              />
+            <div className="flex flex-1 min-w-[220px] flex-col gap-1">
+              <div className="flex items-center gap-2">
+                <FieldLabel htmlFor="api-profile-name" className="shrink-0 text-meta text-muted-foreground">
+                  {t('api.profileName')}
+                </FieldLabel>
+                <Input
+                  ref={profileNameRef}
+                  id="api-profile-name"
+                  className="h-8 max-w-xs text-sm"
+                  value={config.name}
+                  placeholder={config.model.trim() || t('api.profileNamePlaceholder')}
+                  disabled={disabled}
+                  autoComplete="off"
+                  spellCheck={false}
+                  onChange={e => profileManager.rename(config.id, e.target.value)}
+                  onBlur={() => profileManager.rename(config.id, config.name.trim())}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">{t('api.profileStorageHelp')}</p>
             </div>
             <div className="flex items-center gap-1.5 shrink-0">
               <Tooltip>
@@ -208,6 +254,23 @@ export function ApiConfigPanel({ open, onOpenChange, config, update, profileMana
                   </Button>
                 } />
                 <TooltipContent>{t('api.duplicateProfileHelp')}</TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger render={
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-8 gap-1"
+                    disabled={disabled}
+                    onClick={() => { void saveProfile() }}
+                  >
+                    <Save className="size-3.5" />
+                    <span>{t('api.saveProfile')}</span>
+                  </Button>
+                } />
+                <TooltipContent>{t('api.saveProfileHelp')}</TooltipContent>
               </Tooltip>
 
               <Tooltip>
