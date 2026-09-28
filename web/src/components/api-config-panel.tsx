@@ -1,6 +1,6 @@
 import { useRef, useState, type Ref } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ChevronDown, Copy, Eye, EyeOff, FolderOpen, Pencil, Plus, Save, Settings2, Trash2 } from 'lucide-react'
+import { ChevronDown, Copy, Download, Eye, EyeOff, FolderOpen, Pencil, Plus, Save, Settings2, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
@@ -80,14 +80,18 @@ export function ApiConfigPanel({ open, onOpenChange, config, update, profileMana
     }
   }
 
-  async function saveProfile() {
+  function saveProfile() {
+    profileManager.markSaved(config)
+    toast.success(t('api.profileSaved'))
+  }
+
+  async function exportProfile() {
     try {
       const result = await saveProfileFile(config, activeProfileName)
-      profileManager.markSaved(config)
-      toast.success(t(result === 'saved' ? 'api.profileSaved' : 'api.profileDownloadStarted'))
+      toast.success(t(result === 'saved' ? 'api.profileExported' : 'api.profileDownloadStarted'))
     } catch (error) {
       if (error instanceof DOMException && error.name === 'AbortError') return
-      toast.error(t('api.profileSaveFailed'))
+      toast.error(t('api.profileExportFailed'))
     }
   }
 
@@ -189,9 +193,13 @@ export function ApiConfigPanel({ open, onOpenChange, config, update, profileMana
                 <FolderOpen className="size-4" />
                 <span>{t('api.loadProfile')}</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => { void saveProfile() }} className="cursor-pointer">
+              <DropdownMenuItem onClick={saveProfile} className="cursor-pointer">
                 <Save className="size-4" />
                 <span>{t('api.saveProfile')}</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => { void exportProfile() }} className="cursor-pointer">
+                <Download className="size-4" />
+                <span>{t('api.exportProfile')}</span>
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>
@@ -283,7 +291,7 @@ export function ApiConfigPanel({ open, onOpenChange, config, update, profileMana
                     size="sm"
                     className="h-8 gap-1"
                     disabled={disabled}
-                    onClick={() => { void saveProfile() }}
+                    onClick={saveProfile}
                   >
                     <Save className="size-3.5" />
                     <span>{t('api.saveProfile')}</span>

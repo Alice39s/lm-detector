@@ -123,7 +123,7 @@ export function analyzeSharedOutputs(outputs:Output[],bank:Bank,artifact:SharedD
   if(!supportsSharedDetector(bank,artifact)) {
     const old:Analysis=analyzeGlobalOutputs(outputs,bank)
     return {...old,probability:null,absolute_match:null,family_probability:null,
-      results:old.results.map(r=>({model:r.model,display_name:r.display_name,family_name:r.family_name,score:r.score,
+      results:old.results.map(r=>({model:r.model,display_name:r.display_name,family:r.family,family_name:r.family_name,score:r.score,
         probability:null,absolute_match:null,verification_score:null,verification_confidence:null,identity_probability:null})),
       family_probabilities:[],calibration:null,
       probability_status:'unavailable',verification_confidence:null,risk_certificate:null,
@@ -146,7 +146,7 @@ export function analyzeSharedOutputs(outputs:Output[],bank:Bank,artifact:SharedD
     const {ranking}=rankSharedNumbers(parsed.filter((_,i)=>diagnostics[i].accepted),artifact)
     const order=artifact.model_ids.map((_,i)=>i).sort((i,j)=>ranking[j]-ranking[i])
     const results=order.map(i=>({model:artifact.model_ids[i],display_name:bank.models[i].display_name,
-      family_name:bank.models[i].family_name,score:ranking[i],verification_score:null,
+      family:bank.models[i].family,family_name:bank.models[i].family_name,score:ranking[i],verification_score:null,
       verification_confidence:null,probability:null,absolute_match:null,identity_probability:null}))
     const first=order[0]
     return {...common,method:'shared-ranker-partial-v1',decision:'partial',
@@ -165,7 +165,7 @@ export function analyzeSharedOutputs(outputs:Output[],bank:Bank,artifact:SharedD
   const confidence=calibrateSharedScores(ranking,scores,artifact)
   const order=artifact.model_ids.map((_,i)=>i).sort((i,j)=>ranking[j]-ranking[i])
   const results=order.map(i=>({model:artifact.model_ids[i],display_name:bank.models[i].display_name,
-    family_name:bank.models[i].family_name,score:ranking[i],verification_score:scores[i],
+    family:bank.models[i].family,family_name:bank.models[i].family_name,score:ranking[i],verification_score:scores[i],
     verification_confidence:confidence.values[i],
     verification_features:features[i],probability:confidence.calibrated?confidence.values[i]:null,absolute_match:null,
     identity_probability:confidence.calibrated?confidence.values[i]:null}))

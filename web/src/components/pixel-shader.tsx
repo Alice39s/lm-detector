@@ -6,20 +6,22 @@ type PixelShaderProps = Omit<ComponentProps<'span'>, 'children'> & {
   effect: PixelEffect
   /** 每个像素格的 CSS 像素边长。 */
   cell?: number
+  /** 24×24 视图框内的 SVG 路径（evenodd），供需要形状遮罩的效果使用。 */
+  mask?: string
 }
 
 /** 装饰性像素着色器：填满自身尺寸，颜色取 currentColor（含 alpha），不接收指针事件。 */
-export function PixelShader({ effect, cell = 4, className, ...props }: PixelShaderProps) {
+export function PixelShader({ effect, cell = 4, mask, className, ...props }: PixelShaderProps) {
   const host = useRef<HTMLSpanElement>(null)
   const view = useRef<PixelViewHandle | null>(null)
   useEffect(() => {
-    const handle = attachPixelView(host.current!, effect, cell)
+    const handle = attachPixelView(host.current!, effect, cell, mask)
     view.current = handle
     return () => {
       handle?.dispose()
       view.current = null
     }
-  }, [effect, cell])
+  }, [effect, cell, mask])
   // 父组件切换状态色时随渲染重新取色。
   useLayoutEffect(() => view.current?.refresh())
   return <span ref={host} aria-hidden="true" className={cn('fp-pixel', className)} {...props} />

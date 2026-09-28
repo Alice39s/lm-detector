@@ -95,6 +95,7 @@ version: 2026-09-28.4
 - 取样及计算期间禁用配置编辑；重新展开配置时 Key 恢复隐藏。
 - 告知用户请求和密钥经本站代理转发到填写的服务，服务器不保存密钥。
 - API 设置支持本地多配置预设（Profiles）：收起时摘要条左侧提供快速切换菜单，展开后顶部工具栏支持配置重命名、新建、一键克隆副本与安全删除。设置（包括密钥）自动保存在 localStorage，刷新或重新打开浏览器后恢复，兼容迁移旧版单项配置与 sessionStorage 密钥。
+- “保存”只把当前配置确认保存到浏览器并清除未保存标记，不下载文件；JSON 配置文件通过配置菜单的“导出”生成，“加载”读取该文件。（来源：2026-09-27 用户要求保存按钮不下载 JSON。）
 
 ### 结果
 
@@ -181,7 +182,8 @@ version: 2026-09-28.4
 - 使用 `PixelShader` 与 `PixelSpinner`；效果定义在 `src/lib/pixel-effects.ts`，全站共用 `src/lib/pixel-renderer.ts` 的一个离屏 WebGL 上下文，不为单个装饰新建上下文。
 - 宿主元素决定尺寸；画布按 `cell` 整格缩放，用 `image-rendering: pixelated` 放大。
 - 颜色取宿主的 currentColor（含 alpha）。非强调区域统一使用 muted-foreground，不使用蓝色或黄色粒子。（来源：2026-09-28 用户反馈强调色装饰喧宾夺主。）
-- 例外：计算主按钮内的 spinner 跟随按钮文字色；结果摘要卡顶边使用 primary；样本库载入失败使用 destructive。
+- 例外：计算主按钮内的 spinner 跟随按钮文字色；样本库载入失败使用 destructive。
+- 结果摘要卡不放顶边粒子。有检测结果时，在模型名称右侧用 `logo` 效果以 muted-foreground 拼出该模型家族的品牌标识；参考库中的每个 family 都要在 `src/lib/brand-logos.ts` 中有对应路径，缺失时不显示标识。（来源：2026-09-27 用户要求。）
 - 取样中的状态徽标和主按钮使用原有 lucide `Loader2` 旋转图标，不使用着色器 spinner。（来源：2026-09-27 用户要求。）
 - 装饰不承载数据含义，设置 aria-hidden，不接收指针事件。背景类装饰放在 `isolate` 容器内的 `-z-10` 层，不遮挡文字。
 - 只绘制进入视口的装饰，上限 24fps；着色器时间统一以 0.5 倍速推进（`PLAYBACK_RATE`）；减少动效时只绘制一帧静态画面；不支持 WebGL 时保持透明。（来源：2026-09-27 用户要求放慢到 0.5x。）
@@ -196,7 +198,7 @@ version: 2026-09-28.4
 | scan | 计算状态行 | muted-foreground/60 |
 | spinner | 计算主按钮、计算状态行、样本详情载入 | currentColor |
 | blocks | 样本库与样本详情的载入骨架 | muted-foreground/25 |
-| twinkle | 结果摘要卡顶边 8px | primary/60 |
+| logo | 结果摘要中模型名称右侧的品牌标识（遮罩取自 `lib/brand-logos.ts`） | muted-foreground |
 | static | 空状态、未找到模型、不可评分结果、样本库载入失败 | muted-foreground；载入失败用 destructive/35 |
 
 ## 5. 可用原语

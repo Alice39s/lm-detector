@@ -5,6 +5,7 @@ import { Alert, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { PixelShader } from '@/components/pixel-shader'
 import { useI18n } from '@/i18n'
+import { brandLogos } from '@/lib/brand-logos'
 import { listItem, listStagger, spring as motionSpring, useMotionPreset } from '@/lib/motion'
 import { confidenceOf, NORMAL_CONFIDENCE_THRESHOLD } from '@/lib/result-confidence'
 import type { Analysis } from '@fingerpoint/shared/types'
@@ -38,6 +39,7 @@ export function ResultPanel({ result }: { result: Analysis }) {
   const { reduced } = useMotionPreset()
   const unscorable = result.decision === 'unscorable' || result.results.length === 0
   const top = result.results[0]
+  const logo = top && brandLogos[top.family]
   const topConfidence = top ? confidenceOf(top) : null
   const lowConfidence = !unscorable && topConfidence !== null && topConfidence < NORMAL_CONFIDENCE_THRESHOLD
   const hasScores = result.results.some(r => confidenceOf(r) !== null)
@@ -46,8 +48,7 @@ export function ResultPanel({ result }: { result: Analysis }) {
   return (
     <section className="flex flex-col gap-6" aria-labelledby="result-title">
       <h2 id="result-title" className="text-section-title">{t('detect.result')}</h2>
-      <div className="fp-card relative flex flex-col gap-1 overflow-hidden p-4">
-        <PixelShader effect="twinkle" cell={2} className="absolute inset-x-0 top-0 h-2 text-primary/60" />
+      <div className="fp-card flex flex-col gap-1 overflow-hidden p-4">
         {unscorable ? (
           <>
             <span className="text-meta text-muted-foreground">{t('detect.result')}</span>
@@ -57,10 +58,13 @@ export function ResultPanel({ result }: { result: Analysis }) {
           </>
         ) : (
           <div className="fp-result-summary">
-            <div className="flex min-w-0 flex-col gap-1">
-              <span className="text-meta text-muted-foreground">{t('detect.topLabel')}</span>
-              <span className="text-display [overflow-wrap:anywhere]">{top.display_name}</span>
-              {top.family_name && <span className="text-body text-muted-foreground">{top.family_name}</span>}
+            <div className="flex min-w-0 items-center gap-4">
+              <div className="flex min-w-0 flex-col gap-1">
+                <span className="text-meta text-muted-foreground">{t('detect.topLabel')}</span>
+                <span className="text-display [overflow-wrap:anywhere]">{top.display_name}</span>
+                {top.family_name && <span className="text-body text-muted-foreground">{top.family_name}</span>}
+              </div>
+              {logo && <PixelShader effect="logo" cell={2} mask={logo} className="size-12 shrink-0 text-muted-foreground sm:size-16" />}
             </div>
             <div className="fp-result-score flex flex-col items-end gap-1 text-right">
               {topConfidence === null

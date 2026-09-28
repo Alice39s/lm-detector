@@ -152,15 +152,22 @@ void main() {
 }
 `
 
-/** 闪烁的像素星点与斜向微光，用于结果卡顶边。 */
-const twinkle = /* glsl */ `
+/**
+ * 像素按对角线次序逐格落位（落位瞬间高亮）、拼出宿主提供的遮罩形状，之后斜向微光定期掠过，用于品牌标识。
+ * 遮罩覆盖率量化为三级 alpha，细笔画不会在低分辨率下断开。
+ */
+const logo = /* glsl */ `
+uniform sampler2D u_mask;
+uniform float u_age;
 void main() {
   vec2 p = floor(gl_FragCoord.xy);
-  float h = hash(p);
-  float life = 1. - fract(u_time * (.3 + h * .7) + h * 7.);
-  float spark = step(.82, hash(p + 9.)) * floor(life * 4.) / 4.;
-  float shimmer = step(bayer4(p + vec2(floor(u_time * 8.), 0.)), .18);
-  ink(max(spark, shimmer * .3));
+  float m = texture2D(u_mask, vec2(p.x + .5, u_res.y - p.y - .5) / u_res).a;
+  float shape = step(.2, m) * ceil(m * 3.) / 3.;
+  float diag = (p.x + u_res.y - p.y) / (u_res.x + u_res.y);
+  float land = u_age - diag * .5 - hash(p) * .3;
+  float fresh = step(land, .12);
+  float glint = step(abs(diag - fract(u_time * .3) * 4. + 1.5), .08);
+  ink(shape * step(0., land) * max(.7 + .3 * glint, fresh));
 }
 `
 
@@ -173,7 +180,7 @@ export const pixelEffects = {
   blocks,
   dither,
   spinner,
-  twinkle,
+  logo,
 }
 
 export type PixelEffect = keyof typeof pixelEffects
