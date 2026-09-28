@@ -129,7 +129,7 @@ npx lmfpd@latest --input result.json --json
 | `--json` | Write JSON to stdout instead of the terminal interface | — |
 | `--no-update-check` | Disable background update checks. `FPD_NO_UPDATE_CHECK=1` does the same | On |
 
-Command line options override environment variables. The default relaxed mode truncates an answer once it reaches 500 integers. Each round waits for all its samples to finish before the next round starts. Detection does not retry automatically and never writes samples to the reference bank. Press `q` or `Ctrl+C` to cancel.
+Command line options override environment variables. The default relaxed mode truncates each answer to its requested count. Each round waits for all its samples to finish before the next round starts. Detection does not retry automatically and never writes samples to the reference bank. Press `q` or `Ctrl+C` to cancel.
 
 ### Reference bank maintenance
 
@@ -150,6 +150,8 @@ npx lmfpd@latest enroll runs/<timestamp> --data-dir ./data
 # 3. Retrain: refit the verifier and confidence calibration offline (requires uv; no model API calls)
 npx lmfpd@latest retrain --data-dir ./data
 ```
+
+Sampling stops reading an answer once it reaches 500 integers and truncates it there, so a looping model cannot run forever. Such answers are recorded as truncated and accepted. The limit is stored in the batch manifest, so older batches are not truncated when resumed or verified.
 
 | Common option | Description |
 | --- | --- |

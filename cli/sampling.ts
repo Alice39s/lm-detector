@@ -36,6 +36,8 @@ export interface Task {
 export interface Manifest extends BatchInfo {
   codex: boolean
   timeout_ms: number
+  /** 收到这么多完整整数后结束读取并截断，防止模型无限循环输出。旧批次没有此字段，不截断。 */
+  max_numbers?: number
   tasks: Task[]
   fingerprint: string
 }
@@ -65,6 +67,8 @@ export interface Attempt {
   retryable?: boolean
   selection?: Selection
 }
+/** 新批次的截断上限，高于挑战集的最大要求数量。 */
+const COLLECTION_MAX_NUMBERS = 500
 export interface Adjustment { challenge: string; prompt?: string; systemPrompt?: string; effort?: string; note: string }
 export interface LiveAttempt { challenge: string; attempt: number; text: string; count: number }
 export interface CollectionProgress {
@@ -132,7 +136,7 @@ export function createManifest(config: ApiConfig, metadata: Metadata, count: num
     source: { channel: metadata.channel, endpoint: url },
     request: { model: config.model, format: requestFormat(config.format), stream: config.stream ?? true, reasoning_effort: config.effort, response_models: [...metadata.response_models] },
     plan: { suite_sha256: sha256(JSON.stringify(suite)), challenge_ids: tasks.map(task => task.id) },
-    codex, timeout_ms: COMPLETION_TIMEOUT_MS, tasks, fingerprint: '',
+    codex, timeout_ms: COMPLETION_TIMEOUT_MS, max_numbers: COLLECTION_MAX_NUMBERS, tasks, fingerprint: '',
   }
   manifest.fingerprint = fingerprint(manifest)
   return manifest
@@ -143,7 +147,7 @@ export async function loadManifest(directory: string): Promise<Manifest> {
   if (manifest.fingerprint !== fingerprint(manifest)) throw new Error('Manifest was modified. Create a new batch to change its configuration.')
   validateMetadata({ label: manifest.model.id, family: manifest.model.family, family_name: manifest.model.family_name, channel: manifest.source.channel, response_models: manifest.request.response_models })
   if (!manifest.tasks.length || new Set(manifest.tasks.map(task => task.id)).size !== manifest.tasks.length || !isDeepStrictEqual(manifest.plan.challenge_ids, manifest.tasks.map(task => task.id))) throw new Error('Challenges must be nonempty, unique, and match the batch plan.')
-  if (manifest.source.endpoint !== endpoint(apiConfig(manifest)) || !Number.isInteger(manifest.timeout_ms) || manifest.timeout_ms < 1) throw new Error('Invalid manifest request configuration.')
+  if (manifest.source.endpoint !== endpoint(apiConfig(manifest)) || !Number.isInteger(manifest.timeout_ms) || manifest.timeout_ms < 1 || (manifest.max_numbers !== undefined && (!Number.isInteger(manifest.max_numbers) || manifest.max_numbers < 1))) throw new Error('Invalid manifest request configuration.')
   for (const task of manifest.tasks) {
     if (!/^query-\d+$/.test(task.id) || !Number.isInteger(task.expected_count) || task.expected_count < 1 || typeof task.prompt !== 'string' || typeof task.system !== 'string') throw new Error('Invalid challenge ID, expected count, or prompt.')
     validateTask(manifest, task, task)
@@ -179,7 +183,7 @@ export async function loadAttempts(directory: string, manifest: Manifest): Promi
       validateTask(manifest, task, record.task, record.note)
       if (record.status === 'accepted') {
         validateAccepted(manifest, record.task, record)
-        if (record.completion !== 'complete') throw new Error('Automatically accepted responses must be complete.')
+        if (record.completion !== 'complete' && !capped(manifest, record)) throw new Error('Automatically accepted responses must be complete or capped.')
       }
       attempts.push(record)
     }
@@ -193,6 +197,10 @@ export async function loadAttempts(directory: string, manifest: Manifest): Promi
     } catch (error) { if (!missing(error)) throw error }
   }
   return attempts
+}
+/** 按批次上限截断的回答：readCompletion 只会在达到上限时把可接受的回答标为 truncated。 */
+function capped(manifest: Manifest, attempt: Attempt) {
+  return attempt.completion === 'truncated' && manifest.max_numbers !== undefined && attempt.parsed_count === manifest.max_numbers
 }
 export function validateAccepted(manifest: Manifest, task: Task, attempt: Attempt) {
   const text = attempt.selection?.text ?? attempt.text
@@ -212,7 +220,7 @@ export function selectedAttempts(manifest: Manifest, attempts: Attempt[]): (Atte
 export function referenceBatch(manifest: Manifest, attempts: Attempt[], requireComplete = true): ReferenceBatch {
   const selected = selectedAttempts(manifest, attempts)
   if (requireComplete && selected.some(row => !row)) throw new Error(`Collection incomplete: ${selected.filter(Boolean).length}/${manifest.tasks.length}. Resume collection first; partial enrollment is not allowed.`)
-  const { tasks: _tasks, timeout_ms: _timeout, codex: _codex, fingerprint: _fingerprint, ...batch } = manifest
+  const { tasks: _tasks, timeout_ms: _timeout, max_numbers: _maxNumbers, codex: _codex, fingerprint: _fingerprint, ...batch } = manifest
   return { ...batch, samples: selected.flatMap(row => {
     if (!row) return []
     validateAccepted(manifest, row.task, row)
@@ -294,7 +302,7 @@ export async function collect(directory: string, manifest: Manifest, apiKey: str
           record.http_status = response.status
           const result = await readCompletion(response, config.format, undefined, result => {
             applyCompletion(record, result, manifest); live.text = record.text; live.count = record.parsed_count; notify('progress', live)
-          })
+          }, manifest.max_numbers)
           applyCompletion(record, result, manifest); validateAccepted(manifest, task, record); record.status = 'accepted'
         } catch (error) {
           record.status = signal.aborted ? 'interrupted' : 'failed'
@@ -333,7 +341,7 @@ async function replayTrace(directory: string, manifest: Manifest, record: Attemp
   const bytes = await readFile(prefix + '.body.txt')
   const response = new Response(bytes, { status: info.status, headers: { 'content-type': info.content_type || (manifest.codex ? 'text/event-stream' : 'application/json') } })
   let result: CompletionResult = { text: '', completion: 'unknown' }
-  try { result = await readCompletion(response, apiConfig(manifest).format, undefined, value => { result = value }); return { result } }
+  try { result = await readCompletion(response, apiConfig(manifest).format, undefined, value => { result = value }, manifest.max_numbers); return { result } }
   catch (error) { return { result, error: error instanceof Error ? error : new Error(String(error)) } }
 }
 export async function verifyTrace(directory: string, manifest: Manifest, task: Task, attempt: Attempt) {

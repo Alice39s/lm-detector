@@ -1,8 +1,6 @@
 import type { ApiConfig } from './types.ts'
 
 export const COMPLETION_TIMEOUT_MS = 250000
-/** 宽松模式在收到这么多完整整数后结束取样，并裁掉之后的数字。 */
-export const RELAXED_MAX_NUMBERS = 500
 
 export function completionBody(config: Pick<ApiConfig, 'model' | 'format' | 'effort' | 'stream'>, prompt: string, system = '') {
   const messages: {role: string; content: string}[] = [{role: 'user', content: prompt}]
