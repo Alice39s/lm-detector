@@ -69,6 +69,19 @@ export function supportsSharedDetector(bank:Bank,artifact:SharedDetector):boolea
       m.id===artifact.model_ids[i] && m.response_count===artifact.response_counts[i])
 }
 
+/**
+ * Closest models by the ranker's k-nearest-reference distance. Distances are relative to the
+ * model's own leave-one-out spread, so 1 means as close as the model's own references.
+ */
+export function nearestModels(artifact:SharedDetector,count=5) {
+  const references=artifact.ranker.references
+  return references.map((own,a)=>{
+    const spread=median(own.map((x,i)=>nearest(x,own.filter((_,j)=>j!==i))))
+    return references.map((other,b)=>({model:artifact.model_ids[b],distance:median(own.map(x=>nearest(x,other)))/spread}))
+      .filter((_,b)=>b!==a).sort((x,y)=>x.distance-y.distance).slice(0,count)
+  })
+}
+
 /** Calibrate closed-set rankings; otherwise return the uncalibrated verifier sigmoid. */
 export function calibrateSharedScores(ranking:Vector,scores:Vector,artifact:SharedDetector) {
   const head=artifact.calibration,binding=head?.binding

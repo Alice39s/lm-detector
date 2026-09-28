@@ -16,6 +16,7 @@ import { describeError } from '@/lib/errors'
 import { cn } from '@/lib/utils'
 import { redactPrivateMetadata } from '@fingerpoint/shared/privacy'
 import type { ReferenceEntry } from '@/lib/client'
+import type { BankModel } from '@fingerpoint/shared/types'
 
 const PAGE = 12
 
@@ -38,6 +39,7 @@ export default function LibraryModelRoute() {
             <p className="text-body text-muted-foreground [overflow-wrap:anywhere]">
               {model.family_name} · {t('library.samplesCount', { n: model.response_count })} · {Object.keys(model.sources).join(' / ')}
             </p>
+            {model.nearest_models?.length ? <NearestModels neighbors={model.nearest_models} /> : null}
           </>
         ) : (
           <>
@@ -48,6 +50,27 @@ export default function LibraryModelRoute() {
       </div>
       {model && <ModelSamples key={model.id} modelId={model.id} />}
     </div>
+  )
+}
+
+function NearestModels({ neighbors }: { neighbors: NonNullable<BankModel['nearest_models']> }) {
+  const bank = useLoadedBank()
+  const { t } = useI18n()
+  return (
+    <section aria-labelledby="nearest-models" className="mt-2 flex min-w-0 flex-col gap-2">
+      <h2 id="nearest-models" className="text-meta text-muted-foreground">{t('library.nearest')}</h2>
+      <ol className="flex flex-wrap gap-2">
+        {neighbors.map(({ model, distance }) => (
+          <li key={model} className="min-w-0">
+            <Link to={`/library/${encodeURIComponent(model)}`} className="flex h-8 min-w-0 items-center gap-2 rounded-lg border border-border px-3 text-body hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
+              <span className="truncate">{bank.models.find(m => m.id === model)?.display_name ?? model}</span>
+              <span className="fp-mono shrink-0 text-meta text-muted-foreground">{distance.toFixed(2)}</span>
+            </Link>
+          </li>
+        ))}
+      </ol>
+      <p className="text-meta text-muted-foreground">{t('library.nearestHint')}</p>
+    </section>
   )
 }
 

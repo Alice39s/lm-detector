@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto'
 import { zstdCompressSync } from 'node:zlib'
 import { redactPrivateMetadata } from '@fingerpoint/shared/privacy'
 import { parseReference, referenceSamples } from '@fingerpoint/shared/reference'
+import { nearestModels, supportsSharedDetector } from '@fingerpoint/shared/shared-detector'
 
 try {
   await stat('data/.pending-enrollment')
@@ -20,8 +21,13 @@ if (sampleCounts.size !== bank.models.length || bank.models.some((model: { id: s
   throw new Error('参考样本数与派生库不匹配，不能发布。')
 }
 const references = batches.map(batch => JSON.stringify(redactPrivateMetadata(batch))).join('\n') + '\n'
+const detectorText = await readFile('data/shared_detector.json', 'utf8')
+const detector = JSON.parse(detectorText)
 const publicBank = redactPrivateMetadata(bank)
 publicBank.reference_sha256 = createHash('sha256').update(references).digest('hex')
+if (supportsSharedDetector(bank, detector)) {
+  nearestModels(detector).forEach((neighbors, i) => { publicBank.models[i].nearest_models = neighbors })
+}
 const chunkSize = 4 * 1024 * 1024
 const manifest: Record<string, string[]> = {}
 async function publish(name: string, content: string) {
@@ -40,7 +46,7 @@ await mkdir('web/public/data', { recursive: true })
 await mkdir('web/public/data/chunks')
 await publish('unified_reference.jsonl', references)
 await publish('unified_bank.json', JSON.stringify(publicBank))
-await publish('shared_detector.json', await readFile('data/shared_detector.json', 'utf8'))
+await publish('shared_detector.json', detectorText)
 await writeFile('web/public/data/manifest.json', JSON.stringify(manifest))
 await mkdir('web/.generated', { recursive: true })
 await writeFile('web/.generated/unified_bank.json', JSON.stringify(publicBank, null, 2) + '\n')

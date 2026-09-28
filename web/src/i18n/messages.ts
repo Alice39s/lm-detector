@@ -210,6 +210,8 @@ export const zh = {
     evidence: '原始证据',
     showMore: '再显示 {n} 条',
     notFound: '样本库中没有这个模型',
+    nearest: '指纹最相近',
+    nearestHint: '相对距离以本模型自身样本之间的距离为 1.00，越接近 1.00 越难区分。',
   },
   errors: {
     invalid_base_url: '接口地址无效，请填写以 https:// 开头的地址',
@@ -451,6 +453,8 @@ export const en: Messages = {
     evidence: 'Original evidence',
     showMore: 'Show {n} more',
     notFound: 'This model is not in the library',
+    nearest: 'Closest fingerprints',
+    nearestHint: 'Relative distance, where 1.00 is the spread between this model’s own samples. Values near 1.00 are hard to tell apart.',
   },
   errors: {
     invalid_base_url: 'Invalid base URL; it must start with https://',
