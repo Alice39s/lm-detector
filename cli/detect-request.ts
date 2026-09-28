@@ -2,6 +2,7 @@ import { stripVTControlCharacters } from 'node:util'
 import { completionBody } from '@fingerpoint/shared/completion-request'
 import { parseNumbers } from '@fingerpoint/shared/fingerprint-core.js'
 import type { Challenge } from '@fingerpoint/shared/types'
+import { readBefore, throughputMeter, USAGE_GRACE_MS, type Throughput, type ThroughputMeter } from '@fingerpoint/shared/throughput'
 import { requestEndpoint, type DetectOptions } from './detect-options'
 
 // Provider payloads have different shapes. Validate the fields used at this boundary.
@@ -15,6 +16,7 @@ export interface Sample {
   startedAt?: number
   finishedAt?: number
   firstByteMs?: number
+  throughput?: Throughput
   responseModel?: string
   responseId?: string
   error?: string
@@ -45,11 +47,14 @@ export async function requestSample(
   let timedOut = false
   const timer = setTimeout(() => { timedOut = true; controller.abort() }, options.timeoutMs)
   let reader: ReadableStreamDefaultReader<Uint8Array> | undefined
-  let finish = '', terminal = false, truncated = false
+  let finish = '', terminal = false, truncated = false, raw = '', usage: Payload | undefined
+  let meter: ThroughputMeter | undefined
   const report = () => update({ ...sample })
   const metadata = (data: Payload) => {
     if (typeof data.model === 'string') sample.responseModel = data.model
     if (typeof data.id === 'string') sample.responseId = data.id
+    // Messages streams split usage between message_start and message_delta.
+    if (data.usage) usage = { ...usage, ...record(data.usage) }
   }
   const acceptText = (text: string, final = false) => {
     sample.rawText = text
@@ -63,6 +68,12 @@ export async function requestSample(
       truncated = !final || numbers.length > challenge.expected_count
     }
     report()
+  }
+  // Text after the cap only feeds the meter while waiting for the usage report.
+  const appendText = (part: string) => {
+    raw += part
+    meter?.update(raw)
+    if (!truncated) acceptText(raw)
   }
   const upstreamError = (data: Payload) => {
     if (data.error || data.type === 'error') {
@@ -81,21 +92,20 @@ export async function requestSample(
     if (config.format === 'openai') {
       const choice = items(data.choices).find(choice => choice.index === 0) ?? items(data.choices)[0]
       if (choice?.delta?.refusal) throw new Error('The model refused the request.')
+      if (choice?.delta?.reasoning_content || choice?.delta?.reasoning) meter?.reasoning()
       if (choice?.finish_reason) finish = string(choice.finish_reason)
-      if (typeof choice?.delta?.content === 'string') acceptText(sample.rawText + choice.delta.content)
+      if (typeof choice?.delta?.content === 'string') appendText(choice.delta.content)
     } else if (config.format === 'anthropic') {
       if (data.type === 'message_start') metadata(record(data.message))
-      if (data.type === 'content_block_start' && data.content_block?.type === 'text') {
-        acceptText(sample.rawText + string(data.content_block.text))
-      }
-      if (data.type === 'content_block_delta' && data.delta?.type === 'text_delta') {
-        acceptText(sample.rawText + string(data.delta.text))
-      }
+      if (['thinking', 'redacted_thinking'].includes(data.content_block?.type) || data.delta?.type === 'thinking_delta') meter?.reasoning()
+      if (data.type === 'content_block_start' && data.content_block?.type === 'text') appendText(string(data.content_block.text))
+      if (data.type === 'content_block_delta' && data.delta?.type === 'text_delta') appendText(string(data.delta.text))
       if (data.type === 'message_delta') finish = string(data.delta?.stop_reason) || finish
       if (data.type === 'message_stop') terminal = true
     } else {
       if (data.type === 'response.created' || data.type === 'response.in_progress') metadata(record(data.response))
-      if (data.type === 'response.output_text.delta') acceptText(sample.rawText + string(data.delta))
+      if (string(data.type).startsWith('response.reasoning')) meter?.reasoning()
+      if (data.type === 'response.output_text.delta') appendText(string(data.delta))
       if (data.type === 'response.output_text.done' && !sample.rawText) acceptText(string(data.text), true)
       if (data.type === 'response.output_item.done' && !sample.rawText) {
         acceptText(responseText({ output: [data.item] }), true)
@@ -107,7 +117,7 @@ export async function requestSample(
         terminal = true
         finish = string(response.status) || 'completed'
         const full = responseText(response)
-        if (full) acceptText(full, true)
+        if (full && !truncated) acceptText(full, true)
       }
       if (data.type === 'response.failed' || data.type === 'response.incomplete') {
         throw new Error(`Responses request did not complete: ${string(data.response?.error?.message) || string(data.response?.incomplete_details?.reason) || data.type}.`)
@@ -127,12 +137,17 @@ export async function requestSample(
     } else headers.Authorization = `Bearer ${config.apiKey}`
     const body = completionBody(config, challenge.prompt)
     if (config.format === 'responses') delete body.max_output_tokens
-    else if (config.format === 'openai') delete body.max_tokens
+    else if (config.format === 'openai') {
+      delete body.max_tokens
+      // Chat Completions streams report usage only on request; usage gives exact output speed.
+      if (body.stream) body.stream_options = { include_usage: true }
+    }
     const init = {
       method: 'POST', headers, body: JSON.stringify(body),
       signal: combined, redirect: 'error' as const,
       timeout: false, // Disable Bun's socket idle timeout; only the first-byte timer applies.
     }
+    const requestStartedAt = performance.now()
     const response = await fetch(requestEndpoint(config), init)
     if (!response.ok) {
       const body = await response.text()
@@ -143,10 +158,17 @@ export async function requestSample(
     if (response.headers.get('content-type')?.toLowerCase().includes('text/event-stream')) {
       if (!response.body) throw new Error('The server returned an empty SSE body.')
       reader = response.body.getReader()
+      meter = throughputMeter(requestStartedAt)
       const decoder = new TextDecoder()
-      let buffer = ''
-      while (!terminal && !truncated) {
-        const { done, value } = await reader.read()
+      let buffer = '', deadline = Infinity, draining = true
+      const reading = () => !terminal && (!truncated || draining)
+      // After the cap, read briefly for the usage report. Later errors cannot affect the accepted text.
+      const handle = (frame: string) => { if (!truncated) return event(frame); try { event(frame) } catch { draining = false } }
+      while (reading()) {
+        if (truncated && deadline === Infinity) deadline = performance.now() + USAGE_GRACE_MS
+        const chunk = await readBefore(reader, deadline)
+        if (!chunk) break
+        const { done, value } = chunk
         if (value?.length && sample.firstByteMs === undefined) {
           clearTimeout(timer)
           sample.firstByteMs = Date.now() - sample.startedAt!
@@ -156,11 +178,11 @@ export async function requestSample(
         buffer += done ? decoder.decode() : decoder.decode(value, { stream: true })
         // Keep split CRLF delimiters buffered until the next chunk arrives.
         let boundary: RegExpExecArray | null
-        while (!terminal && !truncated && (boundary = /\r\n\r\n|\n\n|\r\r/.exec(buffer))) {
-          event(buffer.slice(0, boundary.index))
+        while (reading() && (boundary = /\r\n\r\n|\n\n|\r\r/.exec(buffer))) {
+          handle(buffer.slice(0, boundary.index))
           buffer = buffer.slice(boundary.index + boundary[0].length)
         }
-        if (done) { if (!terminal && !truncated && buffer.trim()) event(buffer); break }
+        if (done) { if (reading() && buffer.trim()) handle(buffer); break }
       }
     } else {
       let data: Payload
@@ -208,6 +230,7 @@ export async function requestSample(
     controller.abort()
     if (reader) { await reader.cancel().catch(() => {}); reader.releaseLock() }
     sample.finishedAt = Date.now()
+    sample.throughput = meter?.result(usage)
     report()
   }
   return { ...sample }

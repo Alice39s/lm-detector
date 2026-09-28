@@ -138,7 +138,7 @@ export default function DetectRoute() {
     const accepted = new Set<number>()
     setPhase('sampling')
     replaceSamples(samplesRef.current.map((sample, i) => indexes.includes(i)
-      ? { ...sample, draftText: '', state: 'pending', errorCode: undefined, httpStatus: undefined, errorText: undefined, elapsedMs: undefined }
+      ? { ...sample, draftText: '', state: 'pending', errorCode: undefined, httpStatus: undefined, errorText: undefined, elapsedMs: undefined, throughput: undefined }
       : sample))
 
     function applyProgress(progress: CollectionProgress) {
@@ -153,13 +153,13 @@ export default function DetectRoute() {
         if ((state === 'done' || state === 'capped') && challenge.text.trim()) {
           accepted.add(index)
           sampledConfigs.current[index] = frozenConfig
-          patch(index, { text: challenge.text, draftText: undefined, state, elapsedMs, errorCode: undefined, httpStatus: undefined, errorText: undefined })
+          patch(index, { text: challenge.text, draftText: undefined, state, elapsedMs, throughput: challenge.throughput, errorCode: undefined, httpStatus: undefined, errorText: undefined })
           clearResult()
         } else {
           const previous = samplesRef.current[index]
           patch(index, {
             draftText: state === 'rejected' && previous.text.trim() ? undefined : challenge.text,
-            state, elapsedMs,
+            state, elapsedMs, throughput: challenge.throughput,
             errorCode: state === 'rejected' ? challenge.errorCode : undefined,
             httpStatus: state === 'rejected' ? challenge.httpStatus : undefined,
             errorText: state === 'rejected' ? safeError(challenge.error, frozenConfig.apiKey) : undefined,
@@ -220,7 +220,7 @@ export default function DetectRoute() {
 
   function edit(i: number, text: string) {
     if (activeRun.current) return
-    patch(i, { text, draftText: undefined, state: 'idle', errorCode: undefined, httpStatus: undefined, errorText: undefined, elapsedMs: undefined })
+    patch(i, { text, draftText: undefined, state: 'idle', errorCode: undefined, httpStatus: undefined, errorText: undefined, elapsedMs: undefined, throughput: undefined })
     clearResult()
     setPhase('edit')
   }

@@ -1,6 +1,7 @@
 import { completionBody, COMPLETION_TIMEOUT_MS } from './completion-request'
 import { readCompletion } from './completion'
 import { parseNumbers } from './fingerprint-core.js'
+import { throughputMeter } from './throughput'
 import type { ApiConfig, Challenge, CodedError, CollectionProgress, ErrorCode, Output, SampleState } from './types'
 
 export type CompletionTransport = (url:string, config:ApiConfig, body:Record<string,unknown>, signal:AbortSignal) => Promise<Response>
@@ -25,10 +26,15 @@ export function endpoint(config:ApiConfig){
 }
 export async function complete(config:ApiConfig,prompt:string,system='',signal?:AbortSignal,onText?:(text:string)=>void,transport:CompletionTransport=directTransport,maxNumbers?:number){
   const body=completionBody(config,prompt,system)
+  // Chat Completions streams report usage only on request; usage gives exact output speed.
+  if(config.format==='openai'&&body.stream)body.stream_options={include_usage:true}
   const timeout=AbortSignal.timeout(COMPLETION_TIMEOUT_MS),combined=signal?AbortSignal.any([signal,timeout]):timeout
+  const meter=throughputMeter()
   try{
     const response=await transport(endpoint(config),config,body,combined)
-    return await readCompletion(response,config.format,onText,undefined,maxNumbers)
+    const streamed=response.headers.get('content-type')?.includes('text/event-stream')
+    const result=await readCompletion(response,config.format,onText,undefined,maxNumbers,streamed?meter:undefined)
+    return {...result,throughput:streamed?meter.result(result.usage):undefined}
   }catch(error){
     if(signal?.aborted)throw coded('已取消请求','aborted')
     if(timeout.aborted)throw coded('上游请求超时，请重试','timeout')
@@ -50,7 +56,7 @@ export async function testApi(config:ApiConfig,challenges:Challenge[],onProgress
     signal?.throwIfAborted();states[i]={...states[i],status:'正在请求',state:'requesting'};report(`正在请求挑战 ${i+1}`,i)
     try{
       const r=await complete(config,challenges[i].prompt,'',signal,text=>{states[i]={text,status:'正在接收输出',state:'streaming'};report(config.parallel?'三个挑战并行处理中':`挑战 ${i+1} 正在接收输出`,i)},transport,config.relaxed ? challenges[i].expected_count : undefined)
-      states[i].text=r.text
+      states[i].text=r.text;states[i].throughput=r.throughput
       if(parseNumbers(r.text).length<Math.max(80,Math.ceil(challenges[i].expected_count*.55)))throw coded('有效数字不足','insufficient_numbers')
       outputs[i]={text:r.text,expected_count:challenges[i].expected_count};accepted++;states[i]={...states[i],status:r.capped?'capped':'done',state:r.capped?'capped':'done'}
     }catch(error){

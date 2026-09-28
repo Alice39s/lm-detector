@@ -9,6 +9,13 @@ import type { UpdateNotice } from './detect-update'
 import { StarNote } from './detect-help'
 
 const seconds = (milliseconds: number) => `${(Math.max(0, milliseconds) / 1000).toFixed(1)}s`
+/** Narrow terminals keep only the decode rate. */
+function speed({ throughput }: Sample, wide: boolean) {
+  if (!throughput) return ''
+  const rate = throughput.tokensPerSecond === undefined ? '' : `${throughput.estimated ? '≈' : ''}${Math.round(throughput.tokensPerSecond)} tok/s`
+  const ttft = `TTFT ${seconds(throughput.ttftMs)}`
+  return wide || !rate ? [ttft, rate].filter(Boolean).join(' · ') : rate
+}
 const percentage = (value: number | null | undefined) => value == null ? '—' : `${(value * 100).toFixed(1)}%`
 const labels: Record<Sample['state'], string> = {
   queued: 'Queued', waiting: 'Waiting', streaming: 'Streaming', complete: 'Complete',
@@ -97,6 +104,7 @@ function Dashboard({ state, options, bankSize, cancel, saved, fatal, updateNotic
             <Box width={12}><Text color={colors[sample.state]}>{active ? spinner : acceptedSample(sample) ? '✓' : sample.state === 'failed' ? '×' : '·'} {labels[sample.state]}</Text></Box>
             {columns >= 75 && <Box width={15}><Text color={colors[sample.state]}>{'━'.repeat(filled)}<Text dimColor>{'─'.repeat(12 - filled)}</Text></Text></Box>}
             <Box flexGrow={1}><Text>{sample.count}/{sample.expectedCount}</Text></Box>
+            {!active && sample.throughput && <Text dimColor>{speed(sample, columns >= 75)} · </Text>}
             <Text dimColor>{time}</Text>
           </Box>
           {sample.error && <Text color="red" wrap="truncate-end">   {safe(sample.error)}</Text>}
@@ -150,7 +158,7 @@ export function createDisplay(options: DetectOptions, bankSize: number, cancel: 
           const id = `${round.index}:${index}`
           if (!sample.finishedAt || settled.has(id)) return
           settled.add(id)
-          process.stderr.write(`[${round.index}/${state.total}] Sample ${index + 1}: ${labels[sample.state]} (${sample.count}/${sample.expectedCount})${sample.error ? ` · ${sample.error}` : ''}\n`)
+          process.stderr.write(`[${round.index}/${state.total}] Sample ${index + 1}: ${labels[sample.state]} (${sample.count}/${sample.expectedCount})${sample.throughput ? ` · ${speed(sample, true)}` : ''}${sample.error ? ` · ${sample.error}` : ''}\n`)
         })
       }
       view.rerender(<Dashboard state={state} options={options} bankSize={bankSize} cancel={cancel} />)

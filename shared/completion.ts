@@ -1,6 +1,7 @@
 import type { CodedError, ErrorCode } from './types'
 import type { Completion } from './reference'
 import { parseNumbers } from './fingerprint-core.js'
+import { readBefore, USAGE_GRACE_MS, type ThroughputMeter } from './throughput'
 
 export type Format = 'openai' | 'responses' | 'anthropic'
 export interface CompletionResult {
@@ -26,8 +27,9 @@ function array(value: unknown): Record<string, unknown>[] {
 function string(value: unknown): string { return typeof value === 'string' ? value : '' }
 const outputText = (response: Record<string, unknown>): string => array(response.output).filter(x => x.type === 'message').flatMap(x => array(x.content)).filter(x => x.type === 'output_text').map(x => string(x.text)).join('')
 
-export async function readCompletion(response: Response, format: Format, onText?: (text: string) => void, onProgress?: (result: CompletionResult) => void, maxNumbers?: number): Promise<CompletionResult> {
-  let text = '', finish = '', terminal = false, ended = false, capped = false
+/** A meter also keeps reading for USAGE_GRACE_MS after the cap so that the usage report can arrive; the accepted text does not change. */
+export async function readCompletion(response: Response, format: Format, onText?: (text: string) => void, onProgress?: (result: CompletionResult) => void, maxNumbers?: number, meter?: ThroughputMeter): Promise<CompletionResult> {
+  let text = '', raw = '', finish = '', terminal = false, ended = false, capped = false
   let responseModel: string | undefined, responseId: string | undefined, providerReported: string | undefined, usage: unknown
   const snapshot = (): CompletionResult => ({ text, responseModel, responseId, usage, providerReported, finishReason: finish || undefined,
     capped, completion: capped ? 'truncated' : terminal && ['stop', 'end_turn', 'completed'].includes(finish) ? 'complete' : ['length', 'max_tokens', 'incomplete', 'max_output_tokens'].includes(finish) || (ended && !terminal && text.length > 0) ? 'truncated' : 'unknown' })
@@ -40,6 +42,9 @@ export async function readCompletion(response: Response, format: Format, onText?
     if (d.usage) usage = d.usage
   }
   const emit = (part: string) => {
+    raw += part
+    meter?.update(raw)
+    if (capped) return
     text += part
     onText?.(text)
     report()
@@ -81,37 +86,48 @@ export async function readCompletion(response: Response, format: Format, onText?
         if (d.error || d.type === 'error') throw coded(string(object(d.error).message) || string(d.message) || '上游流式调用失败', 'upstream_stream_error')
         if (format === 'openai') {
           const choices = array(d.choices), c = choices.find(c => c.index === 0) ?? choices[0] ?? {}, delta = object(c.delta)
+          if (delta.reasoning_content || delta.reasoning) meter?.reasoning()
           if (delta.refusal) finish = 'refusal'
           if (c.finish_reason) finish = string(c.finish_reason)
           if (typeof delta.content === 'string') emit(delta.content)
         } else if (format === 'anthropic') {
           const block = object(d.content_block), delta = object(d.delta)
           if (d.type === 'message_start') metadata(d.message)
+          if (block.type === 'thinking' || block.type === 'redacted_thinking' || delta.type === 'thinking_delta') meter?.reasoning()
           if (d.type === 'content_block_start' && block.type === 'text' && block.text) emit(string(block.text))
           if (d.type === 'content_block_delta' && delta.type === 'text_delta') emit(string(delta.text))
           if (d.type === 'message_delta') { finish = string(delta.stop_reason) || finish; usage = { ...object(previousUsage), ...object(d.usage) } }
           if (d.type === 'message_stop') terminal = true
         } else {
+          if (string(d.type).startsWith('response.reasoning')) meter?.reasoning()
           if (d.type === 'response.output_text.delta') emit(string(d.delta))
           if (d.type === 'response.output_item.done' && !text) { const fallback = outputText({ output: [d.item] }); if (fallback) emit(fallback) }
           const type = string(d.type), response = object(d.response)
           if (['response.completed', 'response.failed', 'response.incomplete'].includes(type)) {
             finish = string(response.status) || type.slice(9); terminal = type === 'response.completed'
-            const full = outputText(response); if (full) { text = full; onText?.(text) }
+            const full = outputText(response); if (full && !capped) { text = full; onText?.(text) }
             report()
             if (!terminal) throw coded(string(object(response.error).message) || 'Responses 输出未完整结束', 'responses_incomplete')
           }
         }
         report()
       }
+      let deadline = Infinity, draining = true, finishAtCap = ''
+      const reading = () => !terminal && (!capped || (!!meter && draining))
+      // Errors after the cap cannot affect the accepted text; they only end the wait for usage.
+      const handle = (frame: string) => { if (!capped) return event(frame); try { event(frame) } catch { draining = false } }
       try {
-        while (!terminal && !capped) {
-          const { done, value } = await reader.read()
+        while (reading()) {
+          if (capped && deadline === Infinity) { deadline = performance.now() + USAGE_GRACE_MS; finishAtCap = finish }
+          const chunk = await readBefore(reader, deadline)
+          if (!chunk) break
+          const { done, value } = chunk
           buffer += done ? decoder.decode() : decoder.decode(value, { stream: true })
           let match: RegExpExecArray | null
-          while (!terminal && !capped && (match = /\r?\n\r?\n/.exec(buffer))) { event(buffer.slice(0, match.index)); buffer = buffer.slice(match.index + match[0].length) }
-          if (done) { if (!terminal && !capped && buffer.trim()) event(buffer); break }
+          while (reading() && (match = /\r?\n\r?\n/.exec(buffer))) { handle(buffer.slice(0, match.index)); buffer = buffer.slice(match.index + match[0].length) }
+          if (done) { if (reading() && buffer.trim()) handle(buffer); break }
         }
+        if (deadline !== Infinity) finish = finishAtCap
       } finally { void reader.cancel().catch(() => {}); reader.releaseLock() }
     }
     ended = true

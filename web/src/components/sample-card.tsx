@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils'
 import { parseNumbers } from '@/lib/client'
 import { describe } from '@/lib/errors'
 import type { Challenge, ErrorCode, SampleState } from '@fingerpoint/shared/types'
+import type { Throughput } from '@fingerpoint/shared/throughput'
 
 export interface SampleUI {
   text: string
@@ -21,6 +22,7 @@ export interface SampleUI {
   httpStatus?: number
   errorText?: string
   elapsedMs?: number
+  throughput?: Throughput
 }
 
 export type Mode = 'manual' | 'api'
@@ -178,6 +180,16 @@ export function SampleCard({ index, challenge, sample, mode, canSample, locked, 
           {t('detect.numbers', { count })}
           {visibleText.trim() && count < min ? ` · ${t('detect.numbersNeeded', { min })}` : ''}
           {sample.elapsedMs !== undefined ? ` · ${t('detect.seconds', { s: (sample.elapsedMs / 1000).toFixed(1) })}` : ''}
+          {sample.throughput && !busy && <>
+            {' · '}
+            <Tooltip>
+              <TooltipTrigger render={<span className="cursor-help underline decoration-dotted underline-offset-2" />}>
+                {t('detect.ttft', { s: (sample.throughput.ttftMs / 1000).toFixed(1) })}
+                {sample.throughput.tokensPerSecond !== undefined && ` · ${t('detect.tps', { n: `${sample.throughput.estimated ? '≈' : ''}${Math.round(sample.throughput.tokensPerSecond)}` })}`}
+              </TooltipTrigger>
+              <TooltipContent className="max-w-64">{t('detect.throughputHelp')}</TooltipContent>
+            </Tooltip>
+          </>}
         </span>
         {busy ? (
           <Button variant="ghost" size="sm" className="h-6 px-2 text-primary hover:text-primary" onClick={onStop}>{t('detect.stop')}</Button>
