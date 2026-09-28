@@ -153,27 +153,30 @@ void main() {
 `
 
 /**
- * 像素画品牌标识：遮罩覆盖过半的格子取为实心像素，轮廓格满色、内部格半透明，右下方投一格阴影。
- * 像素按对角线次序逐格落位（落位瞬间高亮），之后斜向微光定期掠过。
+ * 彩色像素画品牌标识：图像覆盖过半的格子取为实心像素并沿用图像颜色，轮廓格压暗，右下方投一格黑色半透明阴影。
+ * 像素按对角线次序逐格落位（落位瞬间提亮），之后斜向微光定期掠过。
  */
 const logo = /* glsl */ `
-uniform sampler2D u_mask;
+uniform sampler2D u_image;
 uniform float u_age;
-float filled(vec2 p) {
-  if (p.x < 0. || p.y < 0. || p.x >= u_res.x || p.y >= u_res.y) return 0.;
-  return step(.45, texture2D(u_mask, vec2(p.x + .5, u_res.y - p.y - .5) / u_res).a);
+vec4 texel(vec2 p) {
+  if (p.x < 0. || p.y < 0. || p.x >= u_res.x || p.y >= u_res.y) return vec4(0.);
+  return texture2D(u_image, vec2(p.x + .5, u_res.y - p.y - .5) / u_res);
 }
+float filled(vec2 p) { return step(.45, texel(p).a); }
 void main() {
   vec2 p = floor(gl_FragCoord.xy);
-  float body = filled(p);
+  vec4 t = texel(p);
+  float body = step(.45, t.a);
   float inner = filled(p + vec2(1., 0.)) * filled(p - vec2(1., 0.)) * filled(p + vec2(0., 1.)) * filled(p - vec2(0., 1.));
   float shadow = (1. - body) * filled(p + vec2(-1., 1.));
-  float tone = body * (1. - inner * .5) + shadow * .25;
   float diag = (p.x + u_res.y - p.y) / (u_res.x + u_res.y);
   float land = u_age - diag * .5 - hash(p) * .3;
-  float fresh = body * step(land, .12);
-  float glint = body * step(abs(diag - fract(u_time * .3) * 4. + 1.5), .08);
-  ink(step(0., land) * max(tone + glint * .35, fresh));
+  float fresh = step(land, .12);
+  float glint = step(abs(diag - fract(u_time * .3) * 4. + 1.5), .08);
+  vec3 rgb = mix(t.rgb * mix(.75, 1., inner), vec3(1.), max(glint * .3, fresh * .6));
+  float a = step(0., land) * max(body, shadow * .2) * u_color.a;
+  gl_FragColor = vec4(rgb * body * a, a);
 }
 `
 

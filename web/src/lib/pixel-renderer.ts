@@ -23,9 +23,11 @@ interface View {
   colorSource: string
   color: Rgba
   dirty: boolean
-  /** 形状遮罩及其按网格尺寸光栅化后的画布。 */
-  mask: Path2D | null
-  maskCanvas: HTMLCanvasElement | null
+  /** 图像（24×24 视图框的 SVG 内容）及其光栅化画布；画布在图像载入后才存在。 */
+  image: string | null
+  imageCanvas: HTMLCanvasElement | null
+  /** 最近一次光栅化请求的序号，丢弃过期的载入结果。 */
+  imageRequest: number
   /** 首次绘制的时刻，用于入场动画。 */
   born: number
 }
@@ -45,10 +47,8 @@ const PLAYBACK_RATE = 0.5
 const STILL_TIME = 3.7
 /** 减少动效时入场动画直接取终态。 */
 const STILL_AGE = 60
-/** 遮罩路径的视图框边长。 */
-const MASK_VIEWBOX = 24
-/** 遮罩视图的网格边长（含四周各一格留白）。 */
-const MASK_GRID = 24
+/** 图像视图的网格边长（含四周各一格留白）。 */
+const IMAGE_GRID = 24
 const vertexSource = 'attribute vec2 a_pos; void main() { gl_Position = vec4(a_pos, 0., 1.); }'
 
 const colorProbe = document.createElement('canvas').getContext('2d', { willReadFrequently: true })
@@ -87,10 +87,10 @@ class PixelRenderer {
       const view = this.views.get(entry.target)
       if (!view) continue
       const { width, height } = entry.contentRect
-      // 遮罩视图固定为 MASK_GRID 见方的网格，像素边长随宿主尺寸缩放。
-      if (view.mask) view.cell = Math.min(width, height) / MASK_GRID
-      const columns = view.mask ? (view.cell ? MASK_GRID : 0) : Math.ceil(width / view.cell)
-      const rows = view.mask ? columns : Math.ceil(height / view.cell)
+      // 图像视图固定为 IMAGE_GRID 见方的网格，像素边长随宿主尺寸缩放。
+      if (view.image) view.cell = Math.min(width, height) / IMAGE_GRID
+      const columns = view.image ? (view.cell ? IMAGE_GRID : 0) : Math.ceil(width / view.cell)
+      const rows = view.image ? columns : Math.ceil(height / view.cell)
       view.canvas.style.width = `${columns * view.cell}px`
       view.canvas.style.height = `${rows * view.cell}px`
       if (columns === view.columns && rows === view.rows) continue
@@ -99,7 +99,7 @@ class PixelRenderer {
       view.dirty = true
       view.canvas.width = columns
       view.canvas.height = rows
-      this.paintMask(view)
+      this.paintImage(view)
     }
     this.schedule()
   })
@@ -141,14 +141,14 @@ class PixelRenderer {
     document.addEventListener('visibilitychange', () => this.schedule())
   }
 
-  attach(host: HTMLElement, effect: PixelEffect, cell: number, mask?: string): PixelViewHandle | null {
+  attach(host: HTMLElement, effect: PixelEffect, cell: number, image?: string): PixelViewHandle | null {
     const canvas = document.createElement('canvas')
     const context = canvas.getContext('2d')
     if (!context) return null
     canvas.width = 0
     canvas.height = 0
     host.append(canvas)
-    const view: View = { host, canvas, context, effect, cell, seed: Math.random() * 64, columns: 0, rows: 0, visible: false, colorSource: '', color: [0, 0, 0, 0], dirty: true, mask: mask ? new Path2D(mask) : null, maskCanvas: null, born: 0 }
+    const view: View = { host, canvas, context, effect, cell, seed: Math.random() * 64, columns: 0, rows: 0, visible: false, colorSource: '', color: [0, 0, 0, 0], dirty: true, image: image ?? null, imageCanvas: null, imageRequest: 0, born: 0 }
     this.views.set(host, view)
     this.readColor(view)
     this.resize.observe(host)
@@ -174,7 +174,7 @@ class PixelRenderer {
     gl.enableVertexAttribArray(0)
     gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0)
     this.vertex = this.compileShader(gl.VERTEX_SHADER, vertexSource)
-    // 遮罩纹理固定绑定在 0 号纹理单元，采样器 uniform 默认即指向它。
+    // 图像纹理固定绑定在 0 号纹理单元，采样器 uniform 默认即指向它。
     gl.bindTexture(gl.TEXTURE_2D, gl.createTexture())
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
@@ -182,17 +182,23 @@ class PixelRenderer {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
   }
 
-  /** 把遮罩路径按 contain 方式居中光栅化到与像素网格等大的画布，四周留一格给阴影，alpha 即覆盖率。 */
-  private paintMask(view: View) {
-    if (!view.mask || !view.columns || !view.rows) return
-    const canvas = view.maskCanvas ??= document.createElement('canvas')
-    canvas.width = view.columns
-    canvas.height = view.rows
-    const context = canvas.getContext('2d')
-    if (!context) return
-    const scale = Math.max(0, Math.min(view.columns, view.rows) - 2) / MASK_VIEWBOX
-    context.setTransform(scale, 0, 0, scale, (view.columns - MASK_VIEWBOX * scale) / 2, (view.rows - MASK_VIEWBOX * scale) / 2)
-    context.fill(view.mask, 'evenodd')
+  /** 把 SVG 光栅化到与像素网格等大的画布，四周留一格给阴影；currentColor 取宿主文字色。 */
+  private paintImage(view: View) {
+    if (!view.image || !view.columns) return
+    const size = view.columns, request = ++view.imageRequest
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" color="${view.colorSource}">${view.image}</svg>`
+    const image = new Image()
+    image.onload = () => {
+      if (request !== view.imageRequest) return
+      const canvas = view.imageCanvas ?? document.createElement('canvas')
+      canvas.width = size
+      canvas.height = size
+      canvas.getContext('2d')?.drawImage(image, 1, 1, size - 2, size - 2)
+      view.imageCanvas = canvas
+      view.dirty = true
+      this.schedule()
+    }
+    image.src = `data:image/svg+xml,${encodeURIComponent(svg)}`
   }
 
   /** 返回颜色是否变化；变化时标记重绘。 */
@@ -202,6 +208,7 @@ class PixelRenderer {
     view.colorSource = source
     view.color = parseColor(source)
     view.dirty = true
+    this.paintImage(view)
     return true
   }
 
@@ -231,7 +238,7 @@ class PixelRenderer {
     if (due) this.lastDraw = now
     const time = animate ? ((now - this.start) / 1000 * PLAYBACK_RATE) % 3600 : STILL_TIME
     for (const view of this.views.values()) {
-      if (!view.visible || !view.columns || !view.rows || !(due || view.dirty)) continue
+      if (!view.visible || !view.columns || !view.rows || !(due || view.dirty) || (view.image && !view.imageCanvas)) continue
       const age = animate ? (now - (view.born ||= now)) / 1000 : STILL_AGE
       this.draw(view, time, age)
     }
@@ -252,7 +259,7 @@ class PixelRenderer {
     gl.uniform1f(program.seed, view.seed)
     gl.uniform4fv(program.color, view.color)
     gl.uniform1f(program.age, age)
-    if (view.maskCanvas) gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA, gl.ALPHA, gl.UNSIGNED_BYTE, view.maskCanvas)
+    if (view.imageCanvas) gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, view.imageCanvas)
     gl.drawArrays(gl.TRIANGLES, 0, 3)
     view.context.clearRect(0, 0, view.columns, view.rows)
     // WebGL 原点在左下角，视口位于绘图缓冲的底部。
@@ -304,7 +311,7 @@ class PixelRenderer {
 let renderer: PixelRenderer | null | undefined
 
 /** 在宿主元素内挂载一个像素着色器画布；不支持 WebGL 时返回 null，装饰保持透明。 */
-export function attachPixelView(host: HTMLElement, effect: PixelEffect, cell: number, mask?: string) {
+export function attachPixelView(host: HTMLElement, effect: PixelEffect, cell: number, image?: string) {
   if (renderer === undefined) renderer = PixelRenderer.create()
-  return renderer?.attach(host, effect, cell, mask) ?? null
+  return renderer?.attach(host, effect, cell, image) ?? null
 }

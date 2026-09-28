@@ -1,3 +1,4 @@
+import { lazy } from 'react'
 import { HashRouter, Link, Route, Routes } from 'react-router'
 import { MotionConfig } from 'framer-motion'
 import { ThemeProvider } from 'next-themes'
@@ -5,8 +6,10 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import { AppShell } from '@/components/app-shell'
 import { I18nProvider, useI18n } from '@/i18n'
 import DetectRoute from '@/routes/detect'
-import LibraryRoute from '@/routes/library'
-import LibraryModelRoute from '@/routes/library-model'
+
+// 参考库页面不在首屏，按需加载。
+const LibraryRoute = lazy(() => import('@/routes/library'))
+const LibraryModelRoute = lazy(() => import('@/routes/library-model'))
 
 function NotFound() {
   const { t } = useI18n()

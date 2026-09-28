@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react'
+import { Suspense, useEffect, useLayoutEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react'
 import { flushSync } from 'react-dom'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router'
 import { motion } from 'framer-motion'
@@ -164,7 +164,7 @@ export function AppShell({ detect }: { detect: ReactNode }) {
           <div style={{ display: pathname === '/' ? 'contents' : 'none' }} aria-hidden={pathname !== '/'}>
             {detect}
           </div>
-          {pathname !== '/' && <Outlet />}
+          {pathname !== '/' && <Suspense fallback={null}><Outlet /></Suspense>}
         </BankBoundary>
       </main>
       <footer className="fp-footer text-meta text-muted-foreground">{t('app.footer')}</footer>

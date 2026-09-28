@@ -64,7 +64,7 @@ export function ResultPanel({ result }: { result: Analysis }) {
                 <span className="text-display [overflow-wrap:anywhere]">{top.display_name}</span>
                 {top.family_name && <span className="text-body text-muted-foreground">{top.family_name}</span>}
               </div>
-              {logo && <PixelShader effect="logo" mask={logo} className="size-12 shrink-0 text-muted-foreground sm:size-18" />}
+              {logo && <PixelShader effect="logo" image={logo} className="size-12 shrink-0 text-foreground sm:size-18" />}
             </div>
             <div className="fp-result-score flex flex-col items-end gap-1 text-right">
               {topConfidence === null
