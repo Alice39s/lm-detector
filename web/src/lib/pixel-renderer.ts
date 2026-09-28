@@ -47,6 +47,8 @@ const STILL_TIME = 3.7
 const STILL_AGE = 60
 /** 遮罩路径的视图框边长。 */
 const MASK_VIEWBOX = 24
+/** 遮罩视图的网格边长（含四周各一格留白）。 */
+const MASK_GRID = 24
 const vertexSource = 'attribute vec2 a_pos; void main() { gl_Position = vec4(a_pos, 0., 1.); }'
 
 const colorProbe = document.createElement('canvas').getContext('2d', { willReadFrequently: true })
@@ -84,16 +86,19 @@ class PixelRenderer {
     for (const entry of entries) {
       const view = this.views.get(entry.target)
       if (!view) continue
-      const columns = Math.ceil(entry.contentRect.width / view.cell)
-      const rows = Math.ceil(entry.contentRect.height / view.cell)
+      const { width, height } = entry.contentRect
+      // 遮罩视图固定为 MASK_GRID 见方的网格，像素边长随宿主尺寸缩放。
+      if (view.mask) view.cell = Math.min(width, height) / MASK_GRID
+      const columns = view.mask ? (view.cell ? MASK_GRID : 0) : Math.ceil(width / view.cell)
+      const rows = view.mask ? columns : Math.ceil(height / view.cell)
+      view.canvas.style.width = `${columns * view.cell}px`
+      view.canvas.style.height = `${rows * view.cell}px`
       if (columns === view.columns && rows === view.rows) continue
       view.columns = columns
       view.rows = rows
       view.dirty = true
       view.canvas.width = columns
       view.canvas.height = rows
-      view.canvas.style.width = `${columns * view.cell}px`
-      view.canvas.style.height = `${rows * view.cell}px`
       this.paintMask(view)
     }
     this.schedule()
@@ -177,7 +182,7 @@ class PixelRenderer {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
   }
 
-  /** 把遮罩路径按 contain 方式居中光栅化到与像素网格等大的画布，alpha 即覆盖率。 */
+  /** 把遮罩路径按 contain 方式居中光栅化到与像素网格等大的画布，四周留一格给阴影，alpha 即覆盖率。 */
   private paintMask(view: View) {
     if (!view.mask || !view.columns || !view.rows) return
     const canvas = view.maskCanvas ??= document.createElement('canvas')
@@ -185,7 +190,7 @@ class PixelRenderer {
     canvas.height = view.rows
     const context = canvas.getContext('2d')
     if (!context) return
-    const scale = Math.min(view.columns, view.rows) / MASK_VIEWBOX
+    const scale = Math.max(0, Math.min(view.columns, view.rows) - 2) / MASK_VIEWBOX
     context.setTransform(scale, 0, 0, scale, (view.columns - MASK_VIEWBOX * scale) / 2, (view.rows - MASK_VIEWBOX * scale) / 2)
     context.fill(view.mask, 'evenodd')
   }

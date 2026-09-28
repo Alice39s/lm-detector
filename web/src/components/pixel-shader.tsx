@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 
 type PixelShaderProps = Omit<ComponentProps<'span'>, 'children'> & {
   effect: PixelEffect
-  /** 每个像素格的 CSS 像素边长。 */
+  /** 每个像素格的 CSS 像素边长；传入 mask 时网格固定为 24×24，边长随宿主尺寸计算。 */
   cell?: number
   /** 24×24 视图框内的 SVG 路径（evenodd），供需要形状遮罩的效果使用。 */
   mask?: string

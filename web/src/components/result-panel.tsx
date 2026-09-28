@@ -58,13 +58,13 @@ export function ResultPanel({ result }: { result: Analysis }) {
           </>
         ) : (
           <div className="fp-result-summary">
-            <div className="flex min-w-0 items-center gap-4">
+            <div className="flex min-w-0 flex-col-reverse items-start gap-2 sm:flex-row sm:items-center sm:gap-4">
               <div className="flex min-w-0 flex-col gap-1">
                 <span className="text-meta text-muted-foreground">{t('detect.topLabel')}</span>
                 <span className="text-display [overflow-wrap:anywhere]">{top.display_name}</span>
                 {top.family_name && <span className="text-body text-muted-foreground">{top.family_name}</span>}
               </div>
-              {logo && <PixelShader effect="logo" cell={2} mask={logo} className="size-12 shrink-0 text-muted-foreground sm:size-16" />}
+              {logo && <PixelShader effect="logo" mask={logo} className="size-12 shrink-0 text-muted-foreground sm:size-18" />}
             </div>
             <div className="fp-result-score flex flex-col items-end gap-1 text-right">
               {topConfidence === null

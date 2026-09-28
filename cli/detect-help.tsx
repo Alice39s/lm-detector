@@ -69,7 +69,7 @@ function Help() {
     </Box>)}
     <Box flexDirection="column" marginTop={1}>
       <Text bold color="cyan">HOW ROUNDS WORK</Text>
-      <Text>Relaxed mode caps each sample at its requested number count. One or two valid samples can produce a ranking without confidence scores.</Text>
+      <Text>Relaxed mode caps each sample at 500 numbers. One or two valid samples can produce a ranking without confidence scores.</Text>
       <Text>Each round waits for all requested samples to settle before the next round starts. No automatic retries. Detection never enrolls samples.</Text>
       <Text dimColor>Use q or Ctrl+C to cancel. --base-url and --api-key are also accepted.</Text>
     </Box>

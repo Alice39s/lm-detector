@@ -1,5 +1,5 @@
 import { stripVTControlCharacters } from 'node:util'
-import { completionBody } from '@fingerpoint/shared/completion-request'
+import { completionBody, RELAXED_MAX_NUMBERS } from '@fingerpoint/shared/completion-request'
 import { parseNumbers } from '@fingerpoint/shared/fingerprint-core.js'
 import type { Challenge } from '@fingerpoint/shared/types'
 import { requestEndpoint, type DetectOptions } from './detect-options'
@@ -57,10 +57,10 @@ export async function requestSample(
     const numbers = parseNumbers(final ? text : text.replace(/\d+$/, '')) as number[]
     sample.count = numbers.length
     sample.text = text
-    if (!options.strict && numbers.length >= challenge.expected_count) {
-      sample.text = numbers.slice(0, challenge.expected_count).join(', ')
-      sample.count = challenge.expected_count
-      truncated = !final || numbers.length > challenge.expected_count
+    if (!options.strict && numbers.length >= RELAXED_MAX_NUMBERS) {
+      sample.text = numbers.slice(0, RELAXED_MAX_NUMBERS).join(', ')
+      sample.count = RELAXED_MAX_NUMBERS
+      truncated = !final || numbers.length > RELAXED_MAX_NUMBERS
     }
     report()
   }

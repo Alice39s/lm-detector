@@ -1,5 +1,6 @@
 import { readFile } from 'node:fs/promises'
 import { generateChallenges } from '@fingerpoint/shared/challenge-browser.js'
+import { RELAXED_MAX_NUMBERS } from '@fingerpoint/shared/completion-request'
 import { parseNumbers } from '@fingerpoint/shared/fingerprint-core.js'
 import { analyzeSharedOutputs, type SharedDetector } from '@fingerpoint/shared/shared-detector'
 import type { Analysis, Bank, Challenge, Output } from '@fingerpoint/shared/types'
@@ -165,13 +166,13 @@ export async function analyzeInput(options: DetectOptions, bank: Bank, detector:
         const savedSample = Array.isArray(entry?.samples) ? entry.samples[index] : undefined
         const wasTruncated = savedSample?.state === 'truncated' || savedSample?.completion === 'truncated'
         const strictRejection = options.strict && (wasTruncated || (savedSample?.completion !== undefined && savedSample.completion !== 'complete'))
-        const truncated = !options.strict && numbers.length > output.expected_count
+        const truncated = !options.strict && numbers.length > RELAXED_MAX_NUMBERS
         return {
           state: strictRejection || numbers.length < minimumNumbers(output.expected_count) ? 'failed'
             : truncated || wasTruncated ? 'truncated' : 'complete',
-          text: truncated ? numbers.slice(0, output.expected_count).join(', ') : output.text,
+          text: truncated ? numbers.slice(0, RELAXED_MAX_NUMBERS).join(', ') : output.text,
           rawText: typeof savedSample?.rawText === 'string' ? savedSample.rawText : output.text,
-          count: truncated ? output.expected_count : numbers.length, expectedCount: output.expected_count,
+          count: truncated ? RELAXED_MAX_NUMBERS : numbers.length, expectedCount: output.expected_count,
           error: strictRejection ? 'This saved sample has no confirmed complete response. Strict mode requires completion evidence.'
             : numbers.length < minimumNumbers(output.expected_count) ? 'Too few valid numbers.' : undefined,
         }
