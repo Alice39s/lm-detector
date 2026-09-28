@@ -11,3 +11,5 @@ Web 构建会将脱敏数据写入 `../web/public/data/`。该目录是生成产
 2026-09-26 将六个 DeepSeek 型号的 15 个未固定供应商批次（216 条）全部退出正式库，原始行保存在 `archive/deepseek-unpinned-20260926/unified_reference.rows.jsonl`，原采样尝试继续留在研究目录。新参考批次按型号独立保存在 `collections/deepseek-*-20260926/`：V4.1 Flash 与 V4 Pro 0813 各 36 条固定 `openrouter/deepseek`，Flash 0731、Pro 预览、Flash 预览、V3.2 各 36 条固定 `openrouter/novita`。Flash 0731 的 `query-11` 第 11 次和 `query-23` 第 12 次尝试只覆写 `reasoning_effort=low`，原始失败均保留；停用的 SiliconFlow 备用批次保留在 `collections/` 但没有入库。正式库只纳入完整且来源核对通过的批次，不让 OpenRouter 自动回退或混合供应商回答。
 
 格式迁移前的 1,804 条参考行原样保存在 `archive/schema-cutover/unified_reference.rows.jsonl`。新格式保留全部样本 ID、回答、提示词和顺序，未知完整性不会补成成功。旧格式不再由运行时读取，历史请求与失败尝试仍保留。
+
+2026-09-28 将原 `gpt-6-sol` 参考批次（2026-09-22 经 `openrouter/openai` 采集的 36 条回答）标为 `gpt-6-sol-20260922`，保留原请求模型名、渠道和采样证据。新 `gpt-6-sol` 批次在 Ikaleio-TYO 使用 OpenAI Key 直连 `api.openai.com` 的 Responses 接口，以 `reasoning_effort=low` 完成相同的 36 道固定挑战；34 条自然完成，2 条按采样上限截断。原始证据保存在 `collections/gpt-6-sol-openai-direct-20260928/`。首次 Chat Completions 请求因接口不支持 `max_tokens` 返回 HTTP 400，3 条失败记录保存在 `collections/gpt-6-sol-openai-direct-cc-20260928/`，未入库。两个标签分别参与评分；渠道和接口不同，不能仅凭参考库排名推断模型版本差异。

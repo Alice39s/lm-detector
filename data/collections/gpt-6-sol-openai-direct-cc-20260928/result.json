@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "purpose": "reference",
+  "id": "0cb3bd85-ff4b-4701-923e-e9f5c1e4d900",
+  "created_at": "2026-09-28T11:17:24.508Z",
+  "model": {
+    "id": "gpt-6-sol",
+    "family": "gpt",
+    "family_name": "GPT"
+  },
+  "source": {
+    "channel": "openai/direct",
+    "endpoint": "https://api.openai.com/v1/chat/completions"
+  },
+  "request": {
+    "model": "gpt-6-sol",
+    "format": "chat_completions",
+    "stream": true,
+    "reasoning_effort": "low",
+    "response_models": [
+      "gpt-6-sol"
+    ]
+  },
+  "plan": {
+    "suite_sha256": "5f0a58d4658db62d5249de25310b3ce796320db4d42b9f491c392abfa3ce5546",
+    "challenge_ids": [
+      "query-01",
+      "query-02",
+      "query-03",
+      "query-04",
+      "query-05",
+      "query-06",
+      "query-07",
+      "query-08",
+      "query-09",
+      "query-10",
+      "query-11",
+      "query-12",
+      "query-13",
+      "query-14",
+      "query-15",
+      "query-16",
+      "query-17",
+      "query-18",
+      "query-19",
+      "query-20",
+      "query-21",
+      "query-22",
+      "query-23",
+      "query-24",
+      "query-25",
+      "query-26",
+      "query-27",
+      "query-28",
+      "query-29",
+      "query-30",
+      "query-31",
+      "query-32",
+      "query-33",
+      "query-34",
+      "query-35",
+      "query-36"
+    ]
+  },
+  "samples": []
+}
