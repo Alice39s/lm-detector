@@ -33,7 +33,7 @@ function ConfidenceBar({ value }: { value: number | null }) {
   )
 }
 
-export function ResultPanel({ result }: { result: Analysis }) {
+export function ResultPanel({ result, anomalous }: { result: Analysis; anomalous: number[] }) {
   const { t, percent } = useI18n()
   const [all, setAll] = useState(false)
   const { reduced } = useMotionPreset()
@@ -78,6 +78,12 @@ export function ResultPanel({ result }: { result: Analysis }) {
           </div>
         )}
       </div>
+      {anomalous.length > 0 && (
+        <Alert variant="warning" className="p-4">
+          <TriangleAlert aria-hidden="true" />
+          <AlertTitle>{t('detect.anomalousSamples', { samples: anomalous.map(i => i + 1).join(', ') })}</AlertTitle>
+        </Alert>
+      )}
       {lowConfidence && (
         <Alert variant="warning" className="p-4">
           <TriangleAlert aria-hidden="true" />

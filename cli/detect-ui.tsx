@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Box, Text, render, useInput, useWindowSize } from 'ink'
 import terminalLink from 'terminal-link'
+import { anomalousSamples } from '@fingerpoint/shared/sample-distribution'
 import type { Analysis } from '@fingerpoint/shared/types'
 import type { DetectOptions } from './detect-options'
 import type { DetectionState } from './detect-run'
@@ -72,6 +73,7 @@ function Dashboard({ state, options, bankSize, cancel, saved, fatal, updateNotic
   const spinner = '⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏'[Math.floor(now / 100) % 10]
   const history = state.rounds.filter(round => round.finishedAt)
   const visibleHistory = history.slice(compact ? -3 : -5)
+  const anomalous = latest?.analysis?.results.length ? anomalousSamples(latest.outputs.map(output => output.text)) : []
   const winnerCounts = new Map<string, number>()
   for (const round of history) {
     if (round.analysis?.results.length) {
@@ -98,20 +100,24 @@ function Dashboard({ state, options, bankSize, cancel, saved, fatal, updateNotic
         const active = sample.state === 'waiting' || sample.state === 'streaming'
         const time = sample.startedAt ? seconds((sample.finishedAt ?? now) - sample.startedAt) : '—'
         const filled = Math.min(12, Math.round(12 * sample.count / sample.expectedCount))
+        const warning = anomalous.includes(index)
+        const color = warning ? 'yellow' : colors[sample.state]
         return <Box key={index} flexDirection="column">
           <Box>
             <Box width={5}><Text dimColor>#{index + 1}</Text></Box>
-            <Box width={12}><Text color={colors[sample.state]}>{active ? spinner : acceptedSample(sample) ? '✓' : sample.state === 'failed' ? '×' : '·'} {labels[sample.state]}</Text></Box>
-            {columns >= 75 && <Box width={15}><Text color={colors[sample.state]}>{'━'.repeat(filled)}<Text dimColor>{'─'.repeat(12 - filled)}</Text></Text></Box>}
+            <Box width={12}><Text color={color}>{active ? spinner : warning ? '!' : acceptedSample(sample) ? '✓' : sample.state === 'failed' ? '×' : '·'} {labels[sample.state]}</Text></Box>
+            {columns >= 75 && <Box width={15}><Text color={color}>{'━'.repeat(filled)}<Text dimColor>{'─'.repeat(12 - filled)}</Text></Text></Box>}
             <Box flexGrow={1}><Text>{sample.count}/{sample.expectedCount}</Text></Box>
             {!active && sample.throughput && <Text dimColor>{speed(sample, columns >= 75)} · </Text>}
             <Text dimColor>{time}</Text>
           </Box>
           {sample.error && <Text color="red" wrap="truncate-end">   {safe(sample.error)}</Text>}
+          {warning && <Text color="yellow" wrap="truncate-end">   Abnormal distribution · every number is 200 or higher</Text>}
         </Box>
       })}
     </Box>}
     {latest?.error && <Text color="yellow">{safe(latest.error)}</Text>}
+    {anomalous.length > 0 && <Text color="yellow">Sample {anomalous.map(index => index + 1).join(', ')}: abnormal distribution. This result is unreliable. Rerun the detection.</Text>}
     {latest?.analysis && latest.analysis.results.length > 0 && <Ranking analysis={latest.analysis} compact={compact} safe={safe} />}
     {state.total > 1 && history.length > 0 && <Box flexDirection="column" marginTop={1}>
       <Text bold color="cyan">ROUNDS <Text dimColor> · {completed}/{state.total} settled · {scored} scored</Text></Text>

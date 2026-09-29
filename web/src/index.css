@@ -228,6 +228,7 @@ html[data-page-direction]::view-transition-new(root) { animation-name: fp-page-i
 }
 
 .fp-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-card); }
+.fp-card[data-warning] { background: color-mix(in oklab, var(--warning) 10%, var(--card)); border-color: color-mix(in oklab, var(--warning) 60%, transparent); }
 .fp-api-summary { display: flex; align-items: center; gap: .75rem; width: 100%; min-height: 48px; padding: .75rem 1rem; border-radius: var(--radius-card); font-size: .875rem; line-height: 1.5; }
 .fp-api-summary:hover { background: var(--muted); }
 .fp-api-content { height: var(--collapsible-panel-height); overflow: hidden; transition: height 220ms ease-out, opacity 220ms ease-out; }

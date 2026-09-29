@@ -22,6 +22,7 @@ import { useModelMatchCelebration } from '@/lib/use-model-match-celebration'
 import { cn } from '@/lib/utils'
 import type { Analysis, Challenge, CodedError, CollectionProgress } from '@fingerpoint/shared/types'
 import { redactPrivateMetadata } from '@fingerpoint/shared/privacy'
+import { anomalousSamples } from '@fingerpoint/shared/sample-distribution'
 
 type Phase = 'edit' | 'sampling' | 'computing' | 'result'
 const idle = (): SampleUI => ({ text: '', state: 'idle' })
@@ -242,6 +243,9 @@ export default function DetectRoute() {
 
   const emptyIndexes = samples.map((s, i) => (s.text.trim() ? -1 : i)).filter(i => i >= 0)
   const showStrip = phase === 'computing' || phase === 'result'
+  const anomalous = phase === 'result' && result
+    ? anomalousSamples(samples.map((sample, i) => result.diagnostics[i]?.accepted ? sample.text : ''))
+    : []
 
   function collapseSample(index: number) {
     setExpanded(null)
@@ -262,6 +266,7 @@ export default function DetectRoute() {
       onStop={stop}
       onShowError={() => setErrorDetail(samples[index].errorText ?? null)}
       onCollapse={collapsible ? () => collapseSample(index) : undefined}
+      anomalous={anomalous.includes(index)}
     />
   }
 
@@ -304,7 +309,7 @@ export default function DetectRoute() {
       </AnimatePresence>
 
       <section className="flex flex-col gap-4" aria-label={t('detect.samples')}>
-        {showStrip && <SampleStrip samples={samples} challenges={challenges} expanded={expanded} onToggle={i => setExpanded(e => (e === i ? null : i))} />}
+        {showStrip && <SampleStrip samples={samples} challenges={challenges} expanded={expanded} anomalous={anomalous} onToggle={i => setExpanded(e => (e === i ? null : i))} />}
         {showStrip ? (
           <AnimatePresence initial={false}>
             {expanded !== null && <motion.div
@@ -328,7 +333,7 @@ export default function DetectRoute() {
           <PixelShader effect="scan" cell={3} className="h-6 min-w-0 flex-1 text-muted-foreground/60" />
         </div>
       )}
-      {phase === 'result' && result && <ResultPanel result={result} />}
+      {phase === 'result' && result && <ResultPanel result={result} anomalous={anomalous} />}
 
       <div className="fp-detect-footer">
         <a href="https://github.com/Ikaleio/lm-detector" target="_blank" rel="noopener noreferrer" className="fp-star-link">

@@ -1,5 +1,5 @@
 import { useId, useLayoutEffect, useRef, useState } from 'react'
-import { ChevronDown, Copy, Loader2, MoreVertical } from 'lucide-react'
+import { ChevronDown, Copy, Loader2, MoreVertical, TriangleAlert } from 'lucide-react'
 import { toast } from 'sonner'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -69,9 +69,10 @@ interface SampleCardProps {
   onStop: () => void
   onShowError: () => void
   onCollapse?: () => void
+  anomalous?: boolean
 }
 
-export function SampleCard({ index, challenge, sample, mode, canSample, locked, onChange, onResample, onStop, onShowError, onCollapse }: SampleCardProps) {
+export function SampleCard({ index, challenge, sample, mode, canSample, locked, onChange, onResample, onStop, onShowError, onCollapse, anomalous }: SampleCardProps) {
   const i18n = useI18n()
   const { t, number } = i18n
   const replyId = useId()
@@ -99,7 +100,7 @@ export function SampleCard({ index, challenge, sample, mode, canSample, locked, 
   }
 
   return (
-    <article id={`sample-panel-${index}`} className="fp-card flex min-w-0 flex-col gap-3 p-4" aria-label={t('detect.sample', { n: index + 1 })}>
+    <article id={`sample-panel-${index}`} className="fp-card flex min-w-0 flex-col gap-3 p-4" data-warning={anomalous || undefined} aria-label={t('detect.sample', { n: index + 1 })}>
       <div className="flex h-9 items-center justify-between gap-2">
         <span className="text-card-title">{t('detect.sample', { n: index + 1 })}</span>
         <div className="flex items-center gap-1">
@@ -218,7 +219,7 @@ function PromptText({ text }: { text: string }) {
 }
 
 
-export function SampleStrip({ samples, challenges, expanded, onToggle }: { samples: SampleUI[]; challenges: Challenge[]; expanded: number | null; onToggle: (i: number) => void }) {
+export function SampleStrip({ samples, challenges, expanded, anomalous, onToggle }: { samples: SampleUI[]; challenges: Challenge[]; expanded: number | null; anomalous: number[]; onToggle: (i: number) => void }) {
   const { t } = useI18n()
   return (
     <div className="grid grid-cols-3 gap-2">
@@ -228,6 +229,7 @@ export function SampleStrip({ samples, challenges, expanded, onToggle }: { sampl
           type="button"
           id={`sample-trigger-${i}`}
           className={cn('fp-card flex h-11 min-w-0 items-center justify-between gap-2 px-3 text-left text-body hover:bg-muted', expanded === i && 'bg-muted')}
+          data-warning={anomalous.includes(i) || undefined}
           aria-expanded={expanded === i}
           aria-controls={expanded === i ? `sample-panel-${i}` : undefined}
           onClick={() => onToggle(i)}
@@ -236,7 +238,10 @@ export function SampleStrip({ samples, challenges, expanded, onToggle }: { sampl
             {t('detect.sample', { n: i + 1 })}
             <span className="hidden text-muted-foreground sm:inline"> · {t('detect.numbers', { count: parseNumbers(sample.text).length })}</span>
           </span>
-          <ChevronDown className={cn('size-4 shrink-0 transition-transform', expanded === i && 'rotate-180')} />
+          <span className="flex shrink-0 items-center gap-1">
+            {anomalous.includes(i) && <TriangleAlert className="size-4 text-warning" aria-hidden="true" />}
+            <ChevronDown className={cn('size-4 transition-transform', expanded === i && 'rotate-180')} />
+          </span>
         </button>
       ))}
     </div>
