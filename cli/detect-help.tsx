@@ -55,6 +55,7 @@ function Help() {
       <Text>npx lmfpd@latest -b URL -k KEY -m MODEL [options]</Text>
       <Text dimColor>With Bun only: bunx --bun lmfpd@latest [options]</Text>
       <Text dimColor>Defaults: Responses · SSE · relaxed · count 3 · parallel 3 · one round</Text>
+      <Text>fpd tokenizer [options] · identify the tokenizer from usage counts</Text>
       <Text>fpd sample [options] · collect a portable reference batch</Text>
       <Text>fpd enroll RUN [options] · validate and enroll a batch</Text>
       <Text>fpd retrain --data-dir DIR · fit verifier and confidence offline</Text>

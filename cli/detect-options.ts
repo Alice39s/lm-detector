@@ -17,7 +17,7 @@ export interface DetectOptions {
   updateCheck: boolean
 }
 
-function positiveInteger(value: string, name: string, maximum = Number.MAX_SAFE_INTEGER) {
+export function positiveInteger(value: string, name: string, maximum = Number.MAX_SAFE_INTEGER) {
   const number = Number(value)
   if (!/^\d+$/.test(value) || !Number.isSafeInteger(number) || number < 1 || number > maximum) {
     throw new Error(`${name} must be an integer from 1 to ${maximum}.`)

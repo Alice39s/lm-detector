@@ -3,10 +3,13 @@
 import { runCollectionCommand } from './collection-command'
 import { runDetectionCommand } from './detect'
 import { runRetrainCommand } from './retrain-command'
+import { runTokenizerCommand } from './tokenizer-command'
 
 const [command, ...args] = process.argv.slice(2)
 if (command === 'sample' || command === 'enroll') {
   await runCollectionCommand(command, args)
+} else if (command === 'tokenizer') {
+  await runTokenizerCommand(args)
 } else if (command === 'retrain') {
   try { await runRetrainCommand(args) }
   catch (error) {
