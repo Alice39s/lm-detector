@@ -39,7 +39,8 @@ export function useTokenizerProbe(active: boolean) {
     setSession(idle)
   }, [discard])
 
-  const start = useCallback(async (config: ApiConfig) => {
+  /** Resolves with the settled run, or null when the run was discarded or failed before any request. */
+  const start = useCallback(async (config: ApiConfig, route: client.Route): Promise<TokenizerRun | null> => {
     discard()
     const run = new AbortController()
     controller.current = run
@@ -49,14 +50,17 @@ export function useTokenizerProbe(active: boolean) {
     setSession({ ...idle, phase: 'loading', config: frozen, startedAt })
     try {
       const bank = await client.loadTokenizerBank()
-      if (!current()) return
+      if (!current()) return null
       setSession(previous => ({ ...previous, phase: 'probing', bank }))
-      const result = await client.probeTokenizer(frozen, bank, run.signal, update => {
+      const result = await client.probeTokenizer(frozen, bank, route, run.signal, update => {
         if (current()) setSession(previous => ({ ...previous, run: update }))
       })
-      if (current()) setSession(previous => ({ ...previous, phase: 'result', run: result }))
+      if (!current()) return null
+      setSession(previous => ({ ...previous, phase: 'result', run: result }))
+      return result
     } catch (error) {
       if (current()) setSession(previous => ({ ...previous, phase: 'result', error: error as CodedError }))
+      return null
     } finally {
       if (current()) controller.current = null
     }

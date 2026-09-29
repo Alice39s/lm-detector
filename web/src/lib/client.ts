@@ -8,6 +8,7 @@ import { analyzeSharedOutputs, type SharedDetector } from '@fingerpoint/shared/s
 import type { Analysis, ApiConfig, Bank, Challenge, CollectionProgress, Output } from '@fingerpoint/shared/types'
 import { parseReference, referenceSamples } from '@fingerpoint/shared/reference'
 import type { ReferenceBatch, ReferenceSample } from '@fingerpoint/shared/reference'
+import { directHeaders, directInit } from './route'
 import { readStaticData } from './static-data'
 export { generateChallenges, parseNumbers }
 
@@ -71,15 +72,24 @@ export function exportAnalysis(result:Analysis){
   const candidates=result.results.map(r=>({model:r.model,name:r.display_name,confidence:r.verification_confidence??r.probability??null}))
   download('fingerpoint-result.json',JSON.stringify(candidates,null,2)+'\n')
 }
-const browserTransport:CompletionTransport = (url,config,body,signal) => {
-  const headers={'Content-Type':'application/json',Authorization:`Bearer ${config.apiKey}`,Accept:body.stream?'text/event-stream':'application/json'}
+/** Chat Completions and Responses omit their optional output limits on both routes. */
+function browserBody(config:ApiConfig,body:Record<string,unknown>){
   const requestBody={...body}
   if(config.format==='responses')delete requestBody.max_output_tokens
   else if(config.format==='openai')delete requestBody.max_tokens
-  return fetch('/api/proxy',{method:'POST',headers,body:JSON.stringify({url,format:config.format,body:requestBody}),signal,redirect:'error',credentials:'omit'})
+  return requestBody
 }
-export const testApi = (config:ApiConfig,challenges:Challenge[],onProgress:(p:CollectionProgress)=>void,signal?:AbortSignal) =>
-  testApiShared(config,challenges,onProgress,signal,browserTransport)
+const proxyTransport:CompletionTransport = (url,config,body,signal) => {
+  const headers={'Content-Type':'application/json',Authorization:`Bearer ${config.apiKey}`,Accept:body.stream?'text/event-stream':'application/json'}
+  return fetch('/api/proxy',{method:'POST',headers,body:JSON.stringify({url,format:config.format,body:browserBody(config,body)}),signal,redirect:'error',credentials:'omit'})
+}
+/** Calls a CORS-enabled endpoint from the browser with the header names the sniff already tested. */
+const directTransport:CompletionTransport = (url,config,body,signal) =>
+  fetch(url,{...directInit,method:'POST',headers:directHeaders(config.format,config.apiKey,Boolean(body.stream)),body:JSON.stringify(browserBody(config,body)),signal})
+export type Route = 'direct'|'proxy'
+export const transportFor = (route:Route):CompletionTransport => route==='direct'?directTransport:proxyTransport
+export const testApi = (config:ApiConfig,challenges:Challenge[],onProgress:(p:CollectionProgress)=>void,route:Route,signal?:AbortSignal) =>
+  testApiShared(config,challenges,onProgress,signal,transportFor(route))
 
 let tokenizerBankLoading:Promise<TokenizerBank>|undefined
 export function loadTokenizerBank():Promise<TokenizerBank>{
@@ -90,8 +100,8 @@ export function loadTokenizerBank():Promise<TokenizerBank>{
   }).catch(error=>{tokenizerBankLoading=undefined;throw error})
 }
 /** Four probes in flight when parallel requests are on, otherwise one at a time for the fewest requests. */
-export const probeTokenizer = (config:ApiConfig,bank:TokenizerBank,signal:AbortSignal,onUpdate:(run:TokenizerRun)=>void) =>
-  probeTokenizerShared(config,bank,{url:endpoint(config),transport:browserTransport,concurrency:config.parallel?4:1,signal,onUpdate})
+export const probeTokenizer = (config:ApiConfig,bank:TokenizerBank,route:Route,signal:AbortSignal,onUpdate:(run:TokenizerRun)=>void) =>
+  probeTokenizerShared(config,bank,{url:endpoint(config),transport:transportFor(route),concurrency:config.parallel?4:1,signal,onUpdate})
 /** Same format as `fpd tokenizer --output`, so the CLI can recompute a web result with `--input`. */
 export function exportTokenizerRun(run:TokenizerRun,bank:TokenizerBank,config:ApiConfig,createdAt:number){
   const request={baseUrl:config.baseUrl,model:config.model,effort:config.effort,format:config.format,stream:config.stream??true,parallel:config.parallel?4:1}

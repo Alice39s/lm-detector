@@ -13,6 +13,7 @@ import { useLoadedBank } from '@/lib/bank-context'
 import { ResultPanel } from '@/components/result-panel'
 import { SampleCard, SampleStrip, isBusyState, type Mode, type SampleUI } from '@/components/sample-card'
 import { TokenizerPanel } from '@/components/tokenizer-panel'
+import { ProxyConsentDialog } from '@/components/proxy-consent-dialog'
 import { useI18n } from '@/i18n'
 import * as client from '@/lib/client'
 import { configComplete, useApiConfig, type WebApiConfig } from '@/lib/config'
@@ -21,7 +22,10 @@ import { exportResultImage } from '@/lib/export-image'
 import { useMotionPreset } from '@/lib/motion'
 import { useModelMatchCelebration } from '@/lib/use-model-match-celebration'
 import { useTokenizerProbe } from '@/lib/use-tokenizer-probe'
+import { useConnectionRoute } from '@/lib/use-connection-route'
+import { forgetReachability } from '@/lib/route'
 import { cn } from '@/lib/utils'
+import { endpoint } from '@fingerpoint/shared/detection'
 import type { Analysis, Challenge, CodedError, CollectionProgress } from '@fingerpoint/shared/types'
 import { redactPrivateMetadata } from '@fingerpoint/shared/privacy'
 import { anomalousSamples } from '@fingerpoint/shared/sample-distribution'
@@ -61,6 +65,7 @@ export default function DetectRoute() {
     }
   }, [active, mode, params, setParams])
   const tokenizer = useTokenizerProbe(active)
+  const connection = useConnectionRoute()
   const cliCommand = cliCommands[mode].join(' ')
 
   const [challenges, setChallenges] = useState<Challenge[]>(() => client.generateChallenges(3))
@@ -96,7 +101,7 @@ export default function DetectRoute() {
   }, [])
 
   const filled = samples.filter(s => s.text.trim()).length
-  const locked = phase === 'sampling' || phase === 'computing' || tokenizer.busy
+  const locked = phase === 'sampling' || phase === 'computing' || tokenizer.busy || connection.checking || connection.request !== null
   const canSample = configComplete(config) && !locked
   useModelMatchCelebration(result, resultModel, active && mode === 'api' && phase === 'result')
 
@@ -149,14 +154,35 @@ export default function DetectRoute() {
     return false
   }
 
-  function startTokenizer() {
+  /** Sniffs CORS for the endpoint and asks for proxy consent when needed. Returns null when nothing may be sent. */
+  async function resolveRoute(requestConfig: WebApiConfig): Promise<client.Route | null> {
+    try {
+      return await connection.resolve(requestConfig)
+    } catch (error) {
+      toast.error(describeError(i18n, error))
+      return null
+    }
+  }
+
+  /** A direct request that failed at the network level re-sniffs the endpoint next time. */
+  function recheckAfter(route: client.Route, requestConfig: WebApiConfig, failed: boolean) {
+    if (route === 'direct' && failed) forgetReachability(endpoint(requestConfig), requestConfig.format)
+  }
+
+  async function startTokenizer() {
     if (locked || !requireConfig(config)) return
-    void tokenizer.start(config)
+    const frozen = { ...config }
+    const route = await resolveRoute(frozen)
+    if (!route || !mounted.current) return
+    const run = await tokenizer.start(frozen, route)
+    recheckAfter(route, frozen, run?.error?.code === 'network')
   }
 
   async function sampleIndexes(indexes: number[], requestConfig: WebApiConfig = config) {
-    if (!indexes.length || activeRun.current || !mounted.current) return
+    if (!indexes.length || activeRun.current || !mounted.current || connection.checking) return
     if (!requireConfig(requestConfig)) return
+    const route = await resolveRoute(requestConfig)
+    if (!route || activeRun.current || !mounted.current) return
     const frozenConfig = { ...requestConfig, parallel: indexes.length > 1 && (requestConfig.parallel ?? false) }
     const run: Run = { controller: new AbortController(), indexes: [...indexes] }
     activeRun.current = run
@@ -196,7 +222,7 @@ export default function DetectRoute() {
     }
 
     try {
-      await client.testApi(frozenConfig, indexes.map(i => challengesRef.current[i]), applyProgress, run.controller.signal)
+      await client.testApi(frozenConfig, indexes.map(i => challengesRef.current[i]), applyProgress, route, run.controller.signal)
     } catch (error) {
       if (!current()) return
       const coded = error as CodedError
@@ -204,6 +230,7 @@ export default function DetectRoute() {
         ? { ...sample, state: 'rejected', draftText: sample.text.trim() ? undefined : sample.draftText, errorCode: coded?.code, httpStatus: coded?.httpStatus, errorText: safeError(error instanceof Error ? error.message : undefined, frozenConfig.apiKey) }
         : sample))
     }
+    recheckAfter(route, frozenConfig, indexes.some(i => samplesRef.current[i].errorCode === 'network'))
     if (!current()) return
     activeRun.current = null
     setPhase(resultRef.current ? 'result' : 'edit')
@@ -399,10 +426,10 @@ export default function DetectRoute() {
                     if (run && bank && frozen) client.exportTokenizerRun(run, bank, frozen, startedAt)
                   }}>{t('detect.exportJson')}</DropdownMenuItem></DropdownMenuGroup></DropdownMenuContent>
                 </DropdownMenu>}
-                <Button className="h-9" onClick={startTokenizer}>{t('tokenizer.restart')}</Button>
+                <Button className="h-9" disabled={locked} onClick={startTokenizer}>{connection.checking ? <><Loader2 data-icon="inline-start" className="animate-spin" />{t('proxy.checking')}</> : t('tokenizer.restart')}</Button>
               </>
             ) : (
-              <Button className="h-9" onClick={startTokenizer}>{t('tokenizer.start')}</Button>
+              <Button className="h-9" disabled={locked} onClick={startTokenizer}>{connection.checking ? <><Loader2 data-icon="inline-start" className="animate-spin" />{t('proxy.checking')}</> : t('tokenizer.start')}</Button>
             )
           ) : phase === 'result' ? (
             <>
@@ -426,7 +453,7 @@ export default function DetectRoute() {
               {mode === 'api' && emptyIndexes.length > 0 ? (
                 <>
                   {filled > 0 && <Button variant="outline" className="h-9" onClick={() => verify()}>{t('detect.verifyPartial', { n: filled })}</Button>}
-                  <Button className="h-9" onClick={() => sampleIndexes(emptyIndexes)}>{t('detect.startSampling')}</Button>
+                  <Button className="h-9" disabled={locked} onClick={() => sampleIndexes(emptyIndexes)}>{connection.checking ? <><Loader2 data-icon="inline-start" className="animate-spin" />{t('proxy.checking')}</> : t('detect.startSampling')}</Button>
                 </>
               ) : (
                 <Button className="h-9" disabled={filled === 0} onClick={() => verify()}>{filled === 0 ? t('detect.verifyLocked') : filled < 3 ? t('detect.verifyPartial', { n: filled }) : t('detect.verify')}</Button>
@@ -435,6 +462,8 @@ export default function DetectRoute() {
           )}
         </div>
       </div>
+
+      <ProxyConsentDialog request={active ? connection.request : null} onAnswer={connection.answer} />
 
       <Dialog open={active && errorDetail !== null} onOpenChange={open => !open && setErrorDetail(null)}>
         <DialogContent>
