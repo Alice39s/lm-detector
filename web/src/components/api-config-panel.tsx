@@ -55,9 +55,11 @@ interface Props {
   profileManager: ApiProfileManager
   disabled: boolean
   containerRef: Ref<HTMLDivElement>
+  /** Tokenizer probing has no number samples, so it hides the sampling-only switches. */
+  variant: 'sampling' | 'tokenizer'
 }
 
-export function ApiConfigPanel({ open, onOpenChange, config, update, profileManager, disabled, containerRef }: Props) {
+export function ApiConfigPanel({ open, onOpenChange, config, update, profileManager, disabled, containerRef, variant }: Props) {
   const { t } = useI18n()
   const { reduced, snappy } = useMotionPreset()
   const [showKey, setShowKey] = useState(false)
@@ -363,9 +365,11 @@ export function ApiConfigPanel({ open, onOpenChange, config, update, profileMana
           <Separator />
           <FieldGroup className="grid gap-4 md:grid-cols-2">
             <SwitchRow id="api-stream" label={t('api.stream')} help={t('api.streamHelp')} checked={config.stream ?? true} onChange={stream => update({ stream })} disabled={disabled} />
-            <SwitchRow id="api-parallel" label={t('api.parallel')} help={t('api.parallelHelp')} checked={config.parallel ?? true} onChange={parallel => update({ parallel })} disabled={disabled} />
-            <SwitchRow id="api-relaxed" label={t('api.relaxed')} help={t('api.relaxedHelp')} checked={config.relaxed} onChange={relaxed => update({ relaxed })} disabled={disabled} />
-            <SwitchRow id="api-auto" label={t('api.autoVerify')} checked={config.autoVerify} onChange={autoVerify => update({ autoVerify })} disabled={disabled} />
+            <SwitchRow id="api-parallel" label={t('api.parallel')} help={t(variant === 'tokenizer' ? 'api.parallelProbeHelp' : 'api.parallelHelp')} checked={config.parallel ?? true} onChange={parallel => update({ parallel })} disabled={disabled} />
+            {variant === 'sampling' && <>
+              <SwitchRow id="api-relaxed" label={t('api.relaxed')} help={t('api.relaxedHelp')} checked={config.relaxed} onChange={relaxed => update({ relaxed })} disabled={disabled} />
+              <SwitchRow id="api-auto" label={t('api.autoVerify')} checked={config.autoVerify} onChange={autoVerify => update({ autoVerify })} disabled={disabled} />
+            </>}
           </FieldGroup>
         </FieldSet>
       </CollapsibleContent>

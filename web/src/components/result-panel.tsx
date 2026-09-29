@@ -13,7 +13,7 @@ import type { Analysis } from '@fingerpoint/shared/types'
 
 const VISIBLE = 8
 
-function AnimatedPercent({ value, className }: { value: number; className?: string }) {
+export function AnimatedPercent({ value, className }: { value: number; className?: string }) {
   const { percent } = useI18n()
   const { reduced } = useMotionPreset()
   const spring = useSpring(reduced ? value : 0, motionSpring.gentle)
@@ -23,7 +23,7 @@ function AnimatedPercent({ value, className }: { value: number; className?: stri
   return <span className={className} aria-label={percent(value)}>{percent(reduced ? value : Math.min(1, Math.max(0, shown)))}</span>
 }
 
-function ConfidenceBar({ value }: { value: number | null }) {
+export function ConfidenceBar({ value }: { value: number | null }) {
   const { gentle, reduced } = useMotionPreset()
   return (
     <div className="fp-bar" aria-hidden="true">

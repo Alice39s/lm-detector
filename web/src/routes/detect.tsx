@@ -12,6 +12,7 @@ import { Segmented } from '@/components/segmented'
 import { useLoadedBank } from '@/lib/bank-context'
 import { ResultPanel } from '@/components/result-panel'
 import { SampleCard, SampleStrip, isBusyState, type Mode, type SampleUI } from '@/components/sample-card'
+import { TokenizerPanel } from '@/components/tokenizer-panel'
 import { useI18n } from '@/i18n'
 import * as client from '@/lib/client'
 import { configComplete, useApiConfig, type WebApiConfig } from '@/lib/config'
@@ -19,14 +20,22 @@ import { describeError } from '@/lib/errors'
 import { exportResultImage } from '@/lib/export-image'
 import { useMotionPreset } from '@/lib/motion'
 import { useModelMatchCelebration } from '@/lib/use-model-match-celebration'
+import { useTokenizerProbe } from '@/lib/use-tokenizer-probe'
 import { cn } from '@/lib/utils'
 import type { Analysis, Challenge, CodedError, CollectionProgress } from '@fingerpoint/shared/types'
 import { redactPrivateMetadata } from '@fingerpoint/shared/privacy'
 import { anomalousSamples } from '@fingerpoint/shared/sample-distribution'
 
 type Phase = 'edit' | 'sampling' | 'computing' | 'result'
+/** Manual and API modes share the three samples; tokenizer mode probes the API with its own requests. */
+type DetectMode = Mode | 'tokenizer'
 const idle = (): SampleUI => ({ text: '', state: 'idle' })
-const cliCommand = 'bunx lmfpd@latest --help'
+const cliCommands: Record<DetectMode, string[]> = {
+  manual: ['bunx', 'lmfpd@latest', '--help'],
+  api: ['bunx', 'lmfpd@latest', '--help'],
+  tokenizer: ['bunx', 'lmfpd@latest tokenizer', '--help'],
+}
+const modeParam = (value: string | null): DetectMode => value === 'api' || value === 'tokenizer' ? value : 'manual'
 type Run = { controller: AbortController; indexes: number[] }
 
 function safeError(message: string | undefined, key: string): string | undefined {
@@ -45,12 +54,14 @@ export default function DetectRoute() {
   const { snappy, reduced } = useMotionPreset()
   const active = useLocation().pathname === '/'
   const [params, setParams] = useSearchParams()
-  const [mode, setMode] = useState<Mode>(() => params.get('mode') === 'api' ? 'api' : 'manual')
+  const [mode, setMode] = useState<DetectMode>(() => modeParam(params.get('mode')))
   useEffect(() => {
-    if (active && (params.get('mode') === 'api') !== (mode === 'api')) {
-      setParams(mode === 'api' ? { mode: 'api' } : {}, { replace: true })
+    if (active && modeParam(params.get('mode')) !== mode) {
+      setParams(mode === 'manual' ? {} : { mode }, { replace: true })
     }
   }, [active, mode, params, setParams])
+  const tokenizer = useTokenizerProbe(active)
+  const cliCommand = cliCommands[mode].join(' ')
 
   const [challenges, setChallenges] = useState<Challenge[]>(() => client.generateChallenges(3))
   const [samples, setSamples] = useState<SampleUI[]>(() => [idle(), idle(), idle()])
@@ -85,7 +96,7 @@ export default function DetectRoute() {
   }, [])
 
   const filled = samples.filter(s => s.text.trim()).length
-  const locked = phase === 'sampling' || phase === 'computing'
+  const locked = phase === 'sampling' || phase === 'computing' || tokenizer.busy
   const canSample = configComplete(config) && !locked
   useModelMatchCelebration(result, resultModel, active && mode === 'api' && phase === 'result')
 
@@ -126,17 +137,26 @@ export default function DetectRoute() {
     }
   }, [active])
 
+  /** Opens the API configuration and focuses the first missing field. Returns whether the configuration is usable. */
+  function requireConfig(requestConfig: WebApiConfig) {
+    if (configComplete(requestConfig)) return true
+    setApiConfigOpen(true)
+    requestAnimationFrame(() => {
+      const inputs = apiConfigRef.current?.querySelectorAll<HTMLInputElement>('[data-api-required]')
+      Array.from(inputs ?? []).find(input => !input.value.trim())?.focus()
+    })
+    toast.error(t('api.incomplete'))
+    return false
+  }
+
+  function startTokenizer() {
+    if (locked || !requireConfig(config)) return
+    void tokenizer.start(config)
+  }
+
   async function sampleIndexes(indexes: number[], requestConfig: WebApiConfig = config) {
     if (!indexes.length || activeRun.current || !mounted.current) return
-    if (!configComplete(requestConfig)) {
-      setApiConfigOpen(true)
-      requestAnimationFrame(() => {
-        const inputs = apiConfigRef.current?.querySelectorAll<HTMLInputElement>('[data-api-required]')
-        Array.from(inputs ?? []).find(input => !input.value.trim())?.focus()
-      })
-      toast.error(t('api.incomplete'))
-      return
-    }
+    if (!requireConfig(requestConfig)) return
     const frozenConfig = { ...requestConfig, parallel: indexes.length > 1 && (requestConfig.parallel ?? false) }
     const run: Run = { controller: new AbortController(), indexes: [...indexes] }
     activeRun.current = run
@@ -277,7 +297,7 @@ export default function DetectRoute() {
       index={index}
       challenge={challenges[index]}
       sample={samples[index]}
-      mode={mode}
+      mode={mode === 'api' ? 'api' : 'manual'}
       canSample={canSample}
       locked={locked}
       onChange={text => edit(index, text)}
@@ -293,7 +313,7 @@ export default function DetectRoute() {
     <div className={cn('fp-page', 'has-actionbar')}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-h1">{t('detect.title')}</h1>
-        <Segmented label={t('detect.modeLabel')} value={mode} onChange={m => { if (!activeRun.current) setMode(m) }} disabled={locked} options={[{ value: 'manual', label: t('detect.modeManual') }, { value: 'api', label: t('detect.modeApi') }]} />
+        <Segmented label={t('detect.modeLabel')} value={mode} onChange={m => { if (!activeRun.current && !tokenizer.busy) setMode(m) }} disabled={locked} options={[{ value: 'manual', label: t('detect.modeManual') }, { value: 'api', label: t('detect.modeApi') }, { value: 'tokenizer', label: t('detect.modeTokenizer') }]} />
       </div>
 
       <aside className="fp-cli-promo relative isolate overflow-hidden" aria-label={t('detect.cliTitle')}>
@@ -304,7 +324,7 @@ export default function DetectRoute() {
           <span className="text-muted-foreground">{t('detect.cliDescription')}</span>
         </div>
         <button type="button" className="fp-cli-command" onClick={copyCliCommand} aria-label={t('detect.cliCopy', { command: cliCommand })} title={t('detect.cliCopy', { command: cliCommand })}>
-          <code className="fp-mono text-meta"><span>bunx</span> lmfpd@latest <span>--help</span></code>
+          <code className="fp-mono text-meta"><span>{cliCommands[mode][0]}</span> {cliCommands[mode][1]} <span>{cliCommands[mode][2]}</span></code>
           <Copy className="size-3.5 shrink-0" aria-hidden="true" />
         </button>
         <a href="https://github.com/Ikaleio/lm-detector#%E6%A3%80%E6%B5%8B-cli" target="_blank" rel="noopener noreferrer" className="fp-cli-link">
@@ -315,7 +335,7 @@ export default function DetectRoute() {
       </aside>
 
       <AnimatePresence initial={false}>
-        {mode === 'api' && <motion.div
+        {mode !== 'manual' && <motion.div
           key="api-configuration"
           initial={{ height: 0, opacity: 0, marginBottom: -24 }}
           animate={{ height: 'auto', opacity: 1, marginBottom: 0 }}
@@ -323,10 +343,13 @@ export default function DetectRoute() {
           transition={snappy}
           className="shrink-0 overflow-hidden"
         >
-          <ApiConfigPanel containerRef={apiConfigRef} open={apiConfigOpen} onOpenChange={setApiConfigOpen} config={config} update={update} profileManager={profileManager} disabled={locked} />
+          <ApiConfigPanel containerRef={apiConfigRef} open={apiConfigOpen} onOpenChange={setApiConfigOpen} config={config} update={update} profileManager={profileManager} disabled={locked} variant={mode === 'tokenizer' ? 'tokenizer' : 'sampling'} />
         </motion.div>}
       </AnimatePresence>
 
+      {mode === 'tokenizer' ? (
+        <TokenizerPanel session={tokenizer.session} onShowError={detail => setErrorDetail(safeError(detail, tokenizer.session.config?.apiKey ?? config.apiKey) ?? '')} />
+      ) : <>
       <section className="flex flex-col gap-4" aria-label={t('detect.samples')}>
         {showStrip && <SampleStrip samples={samples} challenges={challenges} expanded={expanded} anomalous={anomalous} onToggle={i => setExpanded(e => (e === i ? null : i))} />}
         {showStrip ? (
@@ -353,6 +376,7 @@ export default function DetectRoute() {
         </div>
       )}
       {phase === 'result' && result && <ResultPanel result={result} anomalous={anomalous} mode={mode} onReplacePrompts={() => replacePrompts(anomalous)} />}
+      </>}
 
       <div className="fp-detect-footer">
         <a href="https://github.com/Ikaleio/lm-detector" target="_blank" rel="noopener noreferrer" className="fp-star-link">
@@ -360,7 +384,27 @@ export default function DetectRoute() {
           {t('detect.starRequest')}
         </a>
         <div className="fp-actionbar">
-          {phase === 'result' ? (
+          {mode === 'tokenizer' ? (
+            tokenizer.busy ? (
+              <>
+                <Button variant="outline" className="h-9" onClick={tokenizer.stop}>{t('detect.stop')}</Button>
+                <Button className="h-9" disabled><Loader2 data-icon="inline-start" className="animate-spin" />{t('tokenizer.running')}</Button>
+              </>
+            ) : tokenizer.session.phase === 'result' ? (
+              <>
+                {tokenizer.session.run && tokenizer.session.bank && tokenizer.session.config && <DropdownMenu>
+                  <DropdownMenuTrigger render={<Button variant="ghost" size="icon-lg" aria-label={t('detect.more')} />}><MoreVertical /></DropdownMenuTrigger>
+                  <DropdownMenuContent align="end"><DropdownMenuGroup><DropdownMenuItem onClick={() => {
+                    const { run, bank, config: frozen, startedAt } = tokenizer.session
+                    if (run && bank && frozen) client.exportTokenizerRun(run, bank, frozen, startedAt)
+                  }}>{t('detect.exportJson')}</DropdownMenuItem></DropdownMenuGroup></DropdownMenuContent>
+                </DropdownMenu>}
+                <Button className="h-9" onClick={startTokenizer}>{t('tokenizer.restart')}</Button>
+              </>
+            ) : (
+              <Button className="h-9" onClick={startTokenizer}>{t('tokenizer.start')}</Button>
+            )
+          ) : phase === 'result' ? (
             <>
               {result && <DropdownMenu>
                 <DropdownMenuTrigger render={<Button variant="ghost" size="icon-lg" aria-label={t('detect.more')} />}><MoreVertical /></DropdownMenuTrigger>

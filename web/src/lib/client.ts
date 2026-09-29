@@ -1,5 +1,7 @@
 import { redactPrivateMetadata } from '@fingerpoint/shared/privacy'
-import { testApi as testApiShared, type CompletionTransport } from '@fingerpoint/shared/detection'
+import { endpoint, testApi as testApiShared, type CompletionTransport } from '@fingerpoint/shared/detection'
+import { assertTokenizerBank, type TokenizerBank } from '@fingerpoint/shared/tokenizer-bank'
+import { probeTokenizer as probeTokenizerShared, serializeTokenizerReport, tokenizerReport, type TokenizerRun } from '@fingerpoint/shared/tokenizer-probe'
 import { generateChallenges } from '@fingerpoint/shared/challenge-browser.js'
 import { parseNumbers } from '@fingerpoint/shared/fingerprint-core.js'
 import { analyzeSharedOutputs, type SharedDetector } from '@fingerpoint/shared/shared-detector'
@@ -78,3 +80,21 @@ const browserTransport:CompletionTransport = (url,config,body,signal) => {
 }
 export const testApi = (config:ApiConfig,challenges:Challenge[],onProgress:(p:CollectionProgress)=>void,signal?:AbortSignal) =>
   testApiShared(config,challenges,onProgress,signal,browserTransport)
+
+let tokenizerBankLoading:Promise<TokenizerBank>|undefined
+export function loadTokenizerBank():Promise<TokenizerBank>{
+  return tokenizerBankLoading ??= readStaticData('tokenizer_bank.json').then(text=>{
+    const bank=JSON.parse(text) as unknown
+    assertTokenizerBank(bank)
+    return bank
+  }).catch(error=>{tokenizerBankLoading=undefined;throw error})
+}
+/** Four probes in flight when parallel requests are on, otherwise one at a time for the fewest requests. */
+export const probeTokenizer = (config:ApiConfig,bank:TokenizerBank,signal:AbortSignal,onUpdate:(run:TokenizerRun)=>void) =>
+  probeTokenizerShared(config,bank,{url:endpoint(config),transport:browserTransport,concurrency:config.parallel?4:1,signal,onUpdate})
+/** Same format as `fpd tokenizer --output`, so the CLI can recompute a web result with `--input`. */
+export function exportTokenizerRun(run:TokenizerRun,bank:TokenizerBank,config:ApiConfig,createdAt:number){
+  const request={baseUrl:config.baseUrl,model:config.model,effort:config.effort,format:config.format,stream:config.stream??true,parallel:config.parallel?4:1}
+  const report=tokenizerReport(run,bank,{createdAt,request,cancelled:run.error?.code==='aborted'})
+  download('fingerpoint-tokenizer.json',serializeTokenizerReport(report,config.apiKey))
+}

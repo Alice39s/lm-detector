@@ -1,14 +1,14 @@
 ---
 name: fingerpoint-design
-description: 用于 Fingerpoint 的三样本检测、API 配置、候选结果、图片导出和只读样本库。服务需要比较 LLM 指纹的用户，支持简体中文和英文、浅色和深色主题。
-version: 2026-09-28.4
+description: 用于 Fingerpoint 的三样本检测、词表探测、API 配置、候选结果、图片导出和只读样本库。服务需要比较 LLM 指纹的用户，支持简体中文和英文、浅色和深色主题。
+version: 2026-09-30.1
 ---
 
 # Fingerpoint design.md
 
 ## 1. 范围与优先级
 
-[必须] 将本文件用于 `web/` 的检测、样本库、反馈状态和结果图片。
+[必须] 将本文件用于 `web/` 的检测、词表探测、样本库、反馈状态和结果图片。
 [必须] 不参考旧站点的视觉外观。
 [必须] 按用户要求、真实算法输出、安全与无障碍、当前任务、视觉表达的顺序处理冲突。
 [必须] 保留三条算法生成的提示词和对应回复。
@@ -19,13 +19,14 @@ version: 2026-09-28.4
 
 ## 2. 品牌与读者
 
-读者需要完成三种任务：手动粘贴回复、通过 API 自动取得回复、浏览已有参考样本。
+读者需要完成四种任务：手动粘贴回复、通过 API 自动取得回复、通过 API 探测上游词表、浏览已有参考样本。
 
 [建议] 用中性表面和单一蓝色强调当前操作。（决策：突出检测任务，不复制已有产品 UI。）
 [建议] 用空间连续的弹簧动画连接卡片、摘要条和导航状态。（决策：用户要求苹果式非线性动画。）
 [建议] 使用内容决定高度，避免全屏宣传区。（决策：这是工具页，不是营销页。）
 [必须] 用文字和颜色共同表达取样状态。
 [必须] 区分“模型排名”和“身份已确认”。相似结果不能独立证明身份。
+[必须] 区分“词表一致”和“模型一致”。词表探测只说明上游使用哪一种分词器。
 
 ## 3. 页面结构与构图
 
@@ -96,6 +97,24 @@ version: 2026-09-28.4
 - 告知用户请求和密钥经本站代理转发到填写的服务，服务器不保存密钥。
 - API 设置支持本地多配置预设（Profiles）：收起时摘要条左侧提供快速切换菜单，展开后顶部工具栏支持配置重命名、新建、一键克隆副本与安全删除。设置（包括密钥）自动保存在 localStorage，刷新或重新打开浏览器后恢复，兼容迁移旧版单项配置与 sessionStorage 密钥。
 - “保存”只把当前配置确认保存到浏览器并清除未保存标记，不下载文件；JSON 配置文件通过配置菜单的“导出”生成，“加载”读取该文件。（来源：2026-09-27 用户要求保存按钮不下载 JSON。）
+- 词表探测模式复用同一份 `ApiConfigPanel`（`variant="tokenizer"`），隐藏宽松模式与自动验证两个取样专用开关；并行请求的说明改为“同时发送 4 个探针”。
+
+### 词表探测
+
+- 检测方式切换为“手动 / API / 词表探测”三项，`?mode=tokenizer` 进入词表探测。探测期间锁定切换与配置编辑。
+- 只在用户点击“开始探测”后发送请求。修改配置、切换模式或打开页面都不发送请求。
+- 空闲时在配置下方显示一张说明卡：标题、请求数量范围和输出上限说明；背景使用 `dither` 像素装饰。
+- 探测中显示与计算状态行相同的 `PixelSpinner` + `scan` 行，文案给出已完成的请求数。
+- 结果区在 1024px 起分两栏（约 3:2）：左栏依次为判定卡、与所填模型的一致性提示、候选词表列表、接口返回的模型名；右栏为请求记录。窄屏按同一顺序排成一列。
+- 判定卡沿用 `fp-result-summary`：左侧为判定标签（探测中为“暂定结果”）、系列名（`text-display`）、状态徽标与实验室名；右侧为后验概率（`text-display-number`，一位小数）、“后验概率”标签和结果来源说明。
+- 判定状态只有三种：完全一致（success）、未收录 · 最接近（warning）、未收录的词表（muted）。未收录时标题写“未收录的词表”，副行写“最接近：<系列名>”。
+- 判定卡的品牌标识沿用 `logo` 像素效果，按词表作者实验室映射到已有标识；没有映射时不显示。
+- 一致性提示：一致用默认 `Alert` 加 success 色图标；不一致用 `destructive`；尚不能确定用 `warning`；未登记该模型时只显示一行次级文字。
+- 候选列表复用 `fp-result-row` 与置信度条，显示前 6 类的“完全一致”概率，最后一行固定为“未收录的词表”。候选按后验概率排序，重排使用 smooth 弹簧的位置动画；减少动效时不做位置动画。
+- 请求记录在桌面限制最大高度并局部滚动；每行显示状态图标、探针类别、探针原文（单行省略，完整原文在标题提示中）、输入 token 数和相对基线的增量。失败行提供“失败”按钮打开错误详情；用户停止的请求标为“已停止”，不显示为错误。
+- 结果底部依次提供三个折叠项：此类包含的开源词表、各探针计数表（实测增量、预期增量、是否一致）、如何理解词表探测结果。计数表是原始证据，不是评分解释。
+- 判定为 o200k_base 或 cl100k_base 且与所填模型不一致时，用 `warning` 提示中转站可能用 tiktoken 在本地估算 usage。两次基线不同时用 `warning` 提示上游加入了会变化的隐藏内容。
+- 结果阶段操作栏：右侧主按钮为“重新探测”，更多菜单提供导出 JSON；导出文件与 CLI `fpd tokenizer --output` 同一格式，不含 API Key。
 
 ### 结果
 
@@ -216,6 +235,7 @@ version: 2026-09-28.4
 | 浮层 | Dialog、DropdownMenu、Tooltip、Sonner | `src/components/ui/` | 已实现 |
 | 数据反馈 | Table、Badge、Empty、Skeleton、Alert | `src/components/ui/` | 已实现 |
 | 检测对象 | SampleCard、SampleStrip、ResultPanel、ApiConfigPanel（摘要类 fp-api-summary） | `src/components/`、`src/index.css` | 已实现 |
+| 词表探测 | TokenizerPanel、TokenizerIdle、useTokenizerProbe；复用 AnimatedPercent、ConfidenceBar | `src/components/tokenizer-panel.tsx`、`src/lib/use-tokenizer-probe.ts`、`src/components/result-panel.tsx` | 已实现 |
 | 动效 | useMotionPreset、spring、listStagger、listItem | `src/lib/motion.ts` | 已实现 |
 | 像素装饰 | PixelShader、PixelSpinner、fp-pixel、fp-brand-mark | `src/components/pixel-shader.tsx`、`src/lib/pixel-effects.ts`、`src/lib/pixel-renderer.ts`、`src/index.css` | 已实现 |
 | 图标 | lucide-react | `package.json` | 已安装 |
@@ -241,6 +261,7 @@ version: 2026-09-28.4
 ## 7. 反模式
 
 [必须] 不把评分原因、内部特征向量或诊断对象作为黑盒结果解释。
+[必须] 不把词表一致写成“已确认模型身份”；同一词表常被多个模型复用。
 [必须] 不把未知置信度显示为 0%，不自行添加判定阈值。
 [必须] 不把密钥写入 URL、导出图片或日志。
 [必须] 不在设置草稿变化时自动发送模型请求。
@@ -263,6 +284,7 @@ version: 2026-09-28.4
 - 代理只转发允许的 HTTPS 域名和三种协议端点，不跟随重定向，不保存或记录密钥，不转发 Cookie。
 - Messages 由服务器发送 x-api-key 和 anthropic-version；上游不再需要支持浏览器 CORS。
 - `shared/detection.ts` 与 `shared/completion.ts` 负责请求和 JSON/SSE 解析；UI 使用结构化状态和错误 code。
+- 词表探测的请求、usage 解析、后验与探针选择在 `shared/tokenizer-*.ts`；`src/lib/client.ts` 从静态数据载入 `tokenizer_bank.json` 并经同一个代理发送探针。
 - `src/lib/export-image.ts` 在 Canvas 中生成 PNG，JSON 导出仅包含候选列表。
 - 构建命令为 `bun run typecheck` 和 `bun run build`；渲染检查直接运行网页，不用单元测试替代视觉检查。
 
@@ -276,3 +298,7 @@ version: 2026-09-28.4
 | 算法返回的候选集合 | 结果 / Result |
 | 历史参考数据 | 样本库 / Reference Library |
 | 算法给出的匹配估计 | 置信度 / Confidence |
+| 分词器及其行为等价类 | 词表 / Tokenizer |
+| 词表探测发送的一段短文本 | 探针 / Probe |
+| 只含固定包裹的请求 | 基线 / Baseline |
+| 词表探测给出的概率 | 后验概率 / Posterior probability |
