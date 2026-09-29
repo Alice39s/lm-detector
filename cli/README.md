@@ -109,6 +109,20 @@ The TUI shows the latest ranking and recent round summaries. After at least one 
 
 Exit codes: `0` when all requested rounds produce a ranking, `1` for invalid input or any unscored round, `130` after cancellation, and `143` after SIGTERM. A partial ranking is a successful relaxed-mode result.
 
+## Tokenizer probe
+
+```sh
+npx lmfpd@latest tokenizer -b https://api.example.com/v1 -k sk-xxx -m deepseek-chat -a cc
+npx lmfpd@latest tokenizer -a cc -p 1 --output tokenizer.json
+npx lmfpd@latest tokenizer --input tokenizer.json --json
+```
+
+`fpd tokenizer` sends a baseline with only the fixed wrapper, then probe texts chosen one batch at a time to separate the remaining tokenizer classes, and reads the input tokens from each response's usage. It stops once one class, or an unlisted tokenizer, reaches 99% posterior probability, then repeats the baseline to check that the hidden overhead is stable. A typical run takes 8–20 requests. Messages requests ask for at most 16 output tokens; the other protocols omit the output limit, like detection requests. Unlike the website, the CLI also accepts `http://` endpoints such as a local server.
+
+The connection flags match detection. `-p` sets the requests in flight (1–8, default 4; `-p 1` uses the fewest requests), `--max-probes` sets the probe budget (default 20), and `--timeout` bounds each request (default 90 seconds). The result names the tokenizer class, its authoring lab, the open tokenizers in the class, and whether it matches the tokenizer registered for `--model`. `--output` saves every request and count without credentials; `--input` recomputes a saved result against the current bank without sending requests.
+
+A match shows the tokenizer, not the model weights. Relays that estimate usage with tiktoken report o200k_base or cl100k_base counts. Exit codes: `0` with a result, `1` for invalid input, a failed request, or no result, and `130` after cancellation.
+
 ## Reference collection and enrollment
 
 ```sh

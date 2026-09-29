@@ -24,6 +24,7 @@
 - **两种入口**：[网页](https://lm.ikale.io)支持手动粘贴和直连 API；命令行 `fpd` 提供实时终端界面、多轮检测和 JSON 输出。
 - **三种协议**：OpenAI Responses、Chat Completions 和 Anthropic Messages，默认使用 SSE 流式响应。
 - **参考库**：覆盖 GPT、Claude、Gemini、Grok、Qwen、DeepSeek 等常见模型家族。网页的参考库页面可以只读浏览和导出。
+- **词表探测**：网页的“词表探测”模式和 `fpd tokenizer` 读取接口 usage 中的输入 token 数，与 290 个开源词表归并成的 62 类比对，判断上游使用哪一种分词器，并核对它与所填模型是否一致。
 - **可追溯的数据维护**：`fpd sample`、`fpd enroll`、`fpd retrain` 依次完成采样、入库和离线重训。失败记录和旧尝试全部保留。
 
 > [!IMPORTANT]
@@ -39,6 +40,7 @@
 | --- | --- | --- |
 | 手动 | 复制页面生成的三道挑战，分别发给目标模型，再把回答粘贴回页面 | 只有聊天界面，没有 API Key |
 | API | 填写 Base URL、API Key、模型名和协议，页面自动采样 | 检测 API 渠道 |
+| 词表探测 | 使用同一份 API 配置，页面发送一组短文本并读取 usage 中的输入 token 数 | 核对渠道背后的分词器 |
 
 每条回答至少需要 80 个有效整数，且不少于要求数量的 55%。三条回答都有效时，页面给出排名、核验分数和置信度。只有一两条有效时，页面只给出排名。
 
@@ -75,6 +77,7 @@ bun run fpd --help   # 在仓库内直接运行 CLI
 
 ```text
 fpd [detect] [options]        检测（默认命令）
+fpd tokenizer [options]       通过 usage 计数识别上游词表
 fpd sample [options]          采集一个可移植的参考批次
 fpd enroll DIR [options]      校验批次并写入参考库
 fpd retrain --data-dir DIR    离线重训核验器与置信度校准
@@ -165,6 +168,29 @@ npx lmfpd@latest retrain --data-dir ./data
 
 入库按模型、渠道、条件、题目和文本去重。重训的嵌套校准未通过时，现有的 `shared_detector.json` 保持不变。每次训练的计划、指标和冻结源码保存在数据目录的 `.training/` 下。
 
+### 词表探测
+
+```sh
+# 通常 8–20 个短请求；Messages 协议的每个请求最多输出 16 个 token
+npx lmfpd@latest tokenizer -b https://api.example.com/v1 -k sk-xxx -m deepseek-chat -a cc
+
+# 逐个发送探针（总请求数最少），保存结果供之后离线复算
+npx lmfpd@latest tokenizer -a cc -p 1 --output tokenizer.json
+npx lmfpd@latest tokenizer --input tokenizer.json
+```
+
+| 参数 | 说明 | 默认值 |
+| --- | --- | --- |
+| `-b`、`-k`、`-m`、`-a`、`-e`、`-ns` | 与检测命令相同 | 同检测 |
+| `-p, --parallel N` | 同时在途的请求数，1–8 | `4` |
+| `--max-probes N` | 探针数上限（另发两次基线） | `20` |
+| `--timeout SECONDS` | 单个请求的时限 | `90` |
+| `--bank FILE` | 使用自定义词表库 | 内置词表库 |
+| `--input FILE` | 用当前词表库离线复算保存的结果 | — |
+| `--output FILE`、`--json` | 保存或输出 JSON，不含凭据 | — |
+
+`-m` 填写的模型名同时用来核对声称的词表：例如声称 `gpt-5` 却测得 Qwen 词表，结果会标为“不一致”。网页端的“词表探测”模式与 CLI 使用同一套算法和导出格式。
+
 ## 原理
 
 ```mermaid
@@ -247,8 +273,31 @@ $$
 | `data/unified_bank.json` | 由参考批次派生的统计库 |
 | `data/shared_detector.json` | 冻结的排名器、核验器和校准参数，用 SHA-256 绑定参考数据 |
 | `data/enrollment-suite.json` | 36 道固定采样挑战 |
+| `data/tokenizer_bank.json` | 词表探测用的探针、词表类计数和型号映射 |
 
 如果参考库与检测器不匹配（例如用 `--bank` 指定自定义库），检测只给出传统排名，不计算核验分数和置信度。数据变更记录见 [data/README.md](./data/README.md)。
+
+### 8. 词表探测
+
+每个请求只含一条用户消息：固定前缀 $P$、探针文本 $t_j$、固定后缀 $S$。前缀以非空白字符开头、后缀以非空白字符结尾，聊天模板裁掉首尾空白也不影响计数。基线请求只发 $P + S$。于是
+
+$$
+x_j - x_0 = \operatorname{count}(P\,t_j\,S) - \operatorname{count}(P\,S)
+$$
+
+聊天模板、注入的系统提示和特殊 token 这些固定开销在差值中抵消。词表库对每个开源词表离线算出同一个差值：290 个词表在 280 条候选文本上计数完全相同的归为一个行为类，同一谱系下只差少数文本的再合并，得到 62 类；再按“每两类至少被 3 条探针区分”的条件贪心选出 72 条探针。
+
+后验分三类假设：已收录的某一类（测量偏差少见）、未收录但与某类相近的词表（相当一部分探针不同）、与所有类都无关的词表。每条探针的残差服从带下限的两段离散拉普拉斯混合，一次异常最多扣除有限的证据；污染率在一组取值上求边缘，隐藏开销在基线附近 ±3 的窗口上求边缘。
+
+下一批探针按成对 Bhattacharyya 上界选择：
+
+$$
+F(S) = \sum_{a<b} \sqrt{w_a w_b}\,\Bigl(1 - \prod_{j \in S} \mathrm{BC}_j(a, b)\Bigr)
+$$
+
+它是 MAP 错误率的上界，且单调次模，贪心批次不差于最优批次的 $1 - 1/e$；计数精确时退化为等价类边切割（EC²）。某一类或“未收录”的后验达到 99% 后停止，最后再测一次基线，检查隐藏开销是否稳定。
+
+词表一致只说明分词器相同。同一词表常被多个模型复用（例如小米 MiMo 与 MiniCPM-V 复用 Qwen2–Qwen3 词表），中转站若用 tiktoken 在本地估算 usage，也会测成 o200k_base 或 cl100k_base。
 
 ## 项目结构
 

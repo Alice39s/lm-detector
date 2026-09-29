@@ -25,6 +25,7 @@ An API relay or a third-party provider can claim to serve one model and actually
 - **Three protocols**: OpenAI Responses, Chat Completions, and Anthropic Messages. SSE streaming is the default.
 - **Reference bank**: covers common model families such as GPT, Claude, Gemini, Grok, Qwen, and DeepSeek. The library page on the website shows the bank in read-only mode and can export it.
 - **Traceable data maintenance**: `fpd sample`, `fpd enroll`, and `fpd retrain` collect, enroll, and refit offline. All failures and earlier attempts stay on record.
+- **Tokenizer probe**: the website's Tokenizer mode and `fpd tokenizer` read the input token count from the API usage and compare it with 62 classes merged from 290 open tokenizers. They report which tokenizer the upstream uses and whether it matches the model you entered.
 
 > [!IMPORTANT]
 > A result is a **closed-set ranking within the reference bank**. A model that is not in the bank still gets a "closest" candidate. Ranking scores and confidence values are not proof of identity. To judge whether a channel is trustworthy, fix the request parameters, repeat several rounds, and use other evidence too.
@@ -39,6 +40,7 @@ Open **[lm.ikale.io](https://lm.ikale.io)** and select a detection mode:
 | --- | --- | --- |
 | Manual | Copy the three generated challenges, send each one to the target model, and paste each answer back | You have a chat interface but no API key |
 | API | Enter the Base URL, API key, model name, and protocol. The page collects the samples | You want to check an API channel |
+| Tokenizer | Reuse the API configuration. The page sends short texts and reads the input tokens from usage | You want to check the tokenizer behind a channel |
 
 Each answer must contain at least 80 valid integers and at least 55% of the requested count. If all three answers are valid, the page shows the ranking, verification scores, and confidence. If only one or two answers are valid, the page shows the ranking only.
 
@@ -75,6 +77,7 @@ For deployment to Cloudflare Pages or GitHub Pages, see [docs/deployment.md](./d
 
 ```text
 fpd [detect] [options]        Detect a model (default command)
+fpd tokenizer [options]       Identify the upstream tokenizer from usage counts
 fpd sample [options]          Collect a portable reference batch
 fpd enroll DIR [options]      Validate a batch and write it to the reference bank
 fpd retrain --data-dir DIR    Refit the verifier and confidence calibration offline
@@ -165,6 +168,29 @@ Sampling stops reading an answer once it reaches 500 integers and truncates it t
 
 Enrollment deduplicates by model, channel, condition, challenge, and text. If nested calibration fails during retraining, the existing `shared_detector.json` stays unchanged. Each training run saves its plan, metrics, and frozen source code under `.training/` in the data directory.
 
+### Tokenizer probe
+
+```sh
+# Usually 8–20 short requests; Messages requests ask for at most 16 output tokens
+npx lmfpd@latest tokenizer -b https://api.example.com/v1 -k sk-xxx -m deepseek-chat -a cc
+
+# Send probes one at a time (fewest requests) and save the result for offline recomputation
+npx lmfpd@latest tokenizer -a cc -p 1 --output tokenizer.json
+npx lmfpd@latest tokenizer --input tokenizer.json
+```
+
+| Option | Description | Default |
+| --- | --- | --- |
+| `-b`, `-k`, `-m`, `-a`, `-e`, `-ns` | Same as detection | Same as detection |
+| `-p, --parallel N` | Requests in flight, 1–8 | `4` |
+| `--max-probes N` | Probe budget (two baselines are sent in addition) | `20` |
+| `--timeout SECONDS` | Deadline of each request | `90` |
+| `--bank FILE` | Use a custom tokenizer bank | Built-in bank |
+| `--input FILE` | Recompute a saved result against the current bank | — |
+| `--output FILE`, `--json` | Save or print JSON without credentials | — |
+
+The model from `-m` is also checked against the tokenizer it should use. For example, a channel that claims `gpt-5` but shows the Qwen tokenizer is marked inconsistent. The website's Tokenizer mode uses the same algorithm and export format as the CLI.
+
 ## How It Works
 
 ```mermaid
@@ -247,8 +273,31 @@ $$
 | `data/unified_bank.json` | Statistics derived from the reference batches |
 | `data/shared_detector.json` | Frozen ranker, verifier, and calibration, bound to the reference data by SHA-256 |
 | `data/enrollment-suite.json` | The 36 fixed sampling challenges |
+| `data/tokenizer_bank.json` | Tokenizer probes, per-class counts, and model id mappings |
 
 If the reference bank does not match the detector (for example, a custom bank from `--bank`), detection gives a legacy ranking only, without verification scores or confidence. See [data/README.md](./data/README.md) for the data change log.
+
+### 8. Tokenizer probe
+
+Each request holds one user message: a fixed prefix $P$, the probe text $t_j$, and a fixed suffix $S$. The prefix starts and the suffix ends with a non-whitespace character, so a chat template that trims the message does not change the count. The baseline request sends only $P + S$. Then
+
+$$
+x_j - x_0 = \operatorname{count}(P\,t_j\,S) - \operatorname{count}(P\,S)
+$$
+
+and the fixed overhead of the chat template, injected system prompts, and special tokens cancels out. The bank holds the same difference for every open tokenizer, computed offline. The 290 tokenizers that count identically on 280 candidate texts form behaviour classes, and classes of one lineage that differ on only a few texts are merged, giving 62 classes. A greedy cover then picks 72 probes so that every pair of classes differs on at least 3 of them.
+
+The posterior covers three kinds of hypotheses: a listed class (deviations are rare measurement errors), an unlisted tokenizer close to a class (a sizable share of probes differ), and a tokenizer unrelated to every class. Each probe residual follows a two-component discrete Laplace mixture with a floor, so one outlier costs a bounded amount of evidence. The contamination rate is marginalized over a grid, and the hidden overhead over a ±3 window around the baseline.
+
+The next batch maximizes the pairwise Bhattacharyya bound
+
+$$
+F(S) = \sum_{a<b} \sqrt{w_a w_b}\,\Bigl(1 - \prod_{j \in S} \mathrm{BC}_j(a, b)\Bigr)
+$$
+
+which bounds the MAP error from above and is monotone submodular, so the greedy batch is within $1 - 1/e$ of the best batch. With exact counts it reduces to equivalence-class edge cutting (EC²). Probing stops once one class or "unlisted" reaches 99% posterior probability, and a final baseline checks that the hidden overhead is stable.
+
+A tokenizer match shows only that the tokenizer is the same. One tokenizer often serves several models (for example, Xiaomi MiMo and MiniCPM-V reuse the Qwen2–Qwen3 tokenizer), and a relay that estimates usage locally with tiktoken also measures as o200k_base or cl100k_base.
 
 ## Project Structure
 
