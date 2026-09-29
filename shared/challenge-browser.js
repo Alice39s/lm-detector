@@ -9,14 +9,15 @@ function choose(values) {
   return values[randomIndex(values.length)];
 }
 
-function uniqueLengths(count) {
-  const available = Array.from({ length: 41 }, (_, index) => 292 + index);
+function uniqueLengths(count, usedLengths) {
+  const available = Array.from({ length: 41 }, (_, index) => 292 + index).filter(length => !usedLengths.includes(length));
   const output = [];
   while (output.length < count) output.push(available.splice(randomIndex(available.length), 1)[0]);
   return output;
 }
 
-export function generateChallenges(count = 3) {
+/** `usedLengths` keeps replacement prompts distinct from challenges that stay in the same round. */
+export function generateChallenges(count = 3, usedLengths = []) {
   const openings = [
     "这是一次独立的数值选择记录",
     "请完成下面的无语义整数选择任务",
@@ -44,7 +45,7 @@ export function generateChallenges(count = 3) {
     "可以用逗号、空格或换行分隔。",
     "只要每个整数边界清楚，格式可自行选择。",
   ];
-  return uniqueLengths(count).map((length, index) => ({
+  return uniqueLengths(count, usedLengths).map((length, index) => ({
     id: `probe-${index + 1}-${crypto.randomUUID()}`,
     expected_count: length,
     prompt: `${choose(openings)}。${choose(actions)} ${length} 个 1 到 355（含端点）的整数。`

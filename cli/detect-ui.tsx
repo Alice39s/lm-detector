@@ -117,7 +117,7 @@ function Dashboard({ state, options, bankSize, cancel, saved, fatal, updateNotic
       })}
     </Box>}
     {latest?.error && <Text color="yellow">{safe(latest.error)}</Text>}
-    {anomalous.length > 0 && <Text color="yellow">Sample {anomalous.map(index => index + 1).join(', ')}: abnormal distribution. This result is unreliable. Rerun the detection.</Text>}
+    {anomalous.length > 0 && <Text color="yellow">Sample {anomalous.map(index => index + 1).join(', ')}: abnormal distribution. This result is unreliable. The prompt causes it, so {options.challenges ? 'replace these prompts in the --challenges file' : 'rerun to draw new prompts'}.</Text>}
     {latest?.analysis && latest.analysis.results.length > 0 && <Ranking analysis={latest.analysis} compact={compact} safe={safe} />}
     {state.total > 1 && history.length > 0 && <Box flexDirection="column" marginTop={1}>
       <Text bold color="cyan">ROUNDS <Text dimColor> · {completed}/{state.total} settled · {scored} scored</Text></Text>

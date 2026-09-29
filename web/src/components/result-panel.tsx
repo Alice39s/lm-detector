@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react'
 import { motion, useMotionValueEvent, useSpring } from 'framer-motion'
 import { TriangleAlert } from 'lucide-react'
-import { Alert, AlertTitle } from '@/components/ui/alert'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { PixelShader } from '@/components/pixel-shader'
 import { useI18n } from '@/i18n'
 import { brandLogos } from '@/lib/brand-logos'
 import { listItem, listStagger, spring as motionSpring, useMotionPreset } from '@/lib/motion'
 import { confidenceOf, NORMAL_CONFIDENCE_THRESHOLD } from '@/lib/result-confidence'
+import type { Mode } from '@/components/sample-card'
 import type { Analysis } from '@fingerpoint/shared/types'
 
 const VISIBLE = 8
@@ -33,7 +34,7 @@ function ConfidenceBar({ value }: { value: number | null }) {
   )
 }
 
-export function ResultPanel({ result, anomalous }: { result: Analysis; anomalous: number[] }) {
+export function ResultPanel({ result, anomalous, mode, onReplacePrompts }: { result: Analysis; anomalous: number[]; mode: Mode; onReplacePrompts: () => void }) {
   const { t, percent } = useI18n()
   const [all, setAll] = useState(false)
   const { reduced } = useMotionPreset()
@@ -82,6 +83,10 @@ export function ResultPanel({ result, anomalous }: { result: Analysis; anomalous
         <Alert variant="warning" className="p-4">
           <TriangleAlert aria-hidden="true" />
           <AlertTitle>{t('detect.anomalousSamples', { samples: anomalous.map(i => i + 1).join(', ') })}</AlertTitle>
+          <AlertDescription>{t('detect.anomalousHelp')}</AlertDescription>
+          <div className="col-start-2 mt-3">
+            <Button variant="outline" size="sm" onClick={onReplacePrompts}>{t(mode === 'api' ? 'detect.anomalousReplace' : 'detect.anomalousReplaceManual')}</Button>
+          </div>
         </Alert>
       )}
       {lowConfidence && (

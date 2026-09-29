@@ -66,6 +66,7 @@ export default function DetectRoute() {
   const activeRun = useRef<Run | null>(null)
   const mounted = useRef(true)
   const samplesRef = useRef(samples)
+  const challengesRef = useRef(challenges)
   const sampledConfigs = useRef<(WebApiConfig | undefined)[]>([])
   const resultRef = useRef(result)
   useLayoutEffect(() => {
@@ -91,6 +92,11 @@ export default function DetectRoute() {
   function replaceSamples(next: SampleUI[]) {
     samplesRef.current = next
     setSamples(next)
+  }
+
+  function replaceChallenges(next: Challenge[]) {
+    challengesRef.current = next
+    setChallenges(next)
   }
 
   function patch(index: number, changes: Partial<SampleUI>) {
@@ -170,7 +176,7 @@ export default function DetectRoute() {
     }
 
     try {
-      await client.testApi(frozenConfig, indexes.map(i => challenges[i]), applyProgress, run.controller.signal)
+      await client.testApi(frozenConfig, indexes.map(i => challengesRef.current[i]), applyProgress, run.controller.signal)
     } catch (error) {
       if (!current()) return
       const coded = error as CodedError
@@ -190,7 +196,7 @@ export default function DetectRoute() {
     if (activeRun.current || !mounted.current || !samplesRef.current.some(sample => sample.text.trim())) return
     const run: Run = { controller: new AbortController(), indexes: [] }
     activeRun.current = run
-    const outputs = samplesRef.current.map((sample, i) => ({ text: sample.text, expected_count: challenges[i].expected_count }))
+    const outputs = samplesRef.current.map((sample, i) => ({ text: sample.text, expected_count: challengesRef.current[i].expected_count }))
     setPhase('computing')
     setExpanded(null)
     try {
@@ -211,12 +217,25 @@ export default function DetectRoute() {
 
   function restart() {
     stop()
-    setChallenges(client.generateChallenges(3))
+    replaceChallenges(client.generateChallenges(3))
     replaceSamples([idle(), idle(), idle()])
     sampledConfigs.current = []
     clearResult()
     setExpanded(null)
     setPhase('edit')
+  }
+
+  /** Abnormal distributions follow the prompt, so retrying them needs new prompts. */
+  function replacePrompts(indexes: number[]) {
+    if (activeRun.current) return
+    const kept = challengesRef.current.filter((_, i) => !indexes.includes(i)).map(challenge => challenge.expected_count)
+    const fresh = client.generateChallenges(indexes.length, kept)
+    replaceChallenges(challengesRef.current.map((challenge, i) => indexes.includes(i) ? fresh[indexes.indexOf(i)] : challenge))
+    replaceSamples(samplesRef.current.map((sample, i) => indexes.includes(i) ? idle() : sample))
+    clearResult()
+    setExpanded(null)
+    setPhase('edit')
+    if (mode === 'api') void sampleIndexes(indexes, sampledConfigs.current[indexes[0]] ?? config)
   }
 
   function edit(i: number, text: string) {
@@ -333,7 +352,7 @@ export default function DetectRoute() {
           <PixelShader effect="scan" cell={3} className="h-6 min-w-0 flex-1 text-muted-foreground/60" />
         </div>
       )}
-      {phase === 'result' && result && <ResultPanel result={result} anomalous={anomalous} />}
+      {phase === 'result' && result && <ResultPanel result={result} anomalous={anomalous} mode={mode} onReplacePrompts={() => replacePrompts(anomalous)} />}
 
       <div className="fp-detect-footer">
         <a href="https://github.com/Ikaleio/lm-detector" target="_blank" rel="noopener noreferrer" className="fp-star-link">
