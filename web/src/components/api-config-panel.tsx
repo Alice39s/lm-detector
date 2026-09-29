@@ -1,4 +1,5 @@
-import { useRef, useState, type Ref } from 'react'
+import { useRef, useState, useSyncExternalStore, type Ref } from 'react'
+import { endpoint } from '@fingerpoint/shared/detection'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronDown, Copy, Download, Eye, EyeOff, FolderOpen, Pencil, Plus, Save, Settings2, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -24,6 +25,7 @@ import { Segmented } from '@/components/segmented'
 import { useI18n } from '@/i18n'
 import type { ApiProfile, ApiProfileManager, WebApiConfig } from '@/lib/config'
 import { readProfileFile, saveProfileFile } from '@/lib/profile-file'
+import { hasProxyConsent, isConsentRemembered, knownReachability, revokeProxyConsent, routeVersion, subscribeRoute, upstreamOrigin } from '@/lib/route'
 import { cn } from '@/lib/utils'
 import { useMotionPreset } from '@/lib/motion'
 
@@ -44,6 +46,25 @@ function SwitchRow({ id, label, help, checked, onChange, disabled }: { id: strin
       </FieldContent>
       <Switch id={id} checked={checked} onCheckedChange={onChange} disabled={disabled} aria-describedby={help ? `${id}-help` : undefined} />
     </Field>
+  )
+}
+
+/** Shows how the next request reaches the endpoint, and lets the user revoke a remembered proxy consent. */
+function ConnectionStatus({ config }: { config: WebApiConfig }) {
+  const { t } = useI18n()
+  useSyncExternalStore(subscribeRoute, routeVersion, routeVersion)
+  let url: string
+  // An address that is still being typed has no route yet.
+  try { url = endpoint(config) } catch { return null }
+  const origin = upstreamOrigin(url), reachability = knownReachability(url, config.format)
+  const text = reachability === 'direct' ? t('proxy.statusDirect')
+    : reachability ? (hasProxyConsent(origin) ? t('proxy.statusProxy') : t(reachability === 'unreachable' ? 'proxy.statusUnreachable' : 'proxy.statusNeedsConsent'))
+    : t('proxy.statusUnknown')
+  return (
+    <FieldDescription id="api-route-status" className="flex flex-wrap items-center gap-x-2">
+      <span>{text}</span>
+      {isConsentRemembered(origin) && <Button type="button" variant="link" size="sm" className="h-auto p-0" onClick={() => revokeProxyConsent(origin)}>{t('proxy.revoke')}</Button>}
+    </FieldDescription>
   )
 }
 
@@ -326,7 +347,8 @@ export function ApiConfigPanel({ open, onOpenChange, config, update, profileMana
           <FieldGroup className="grid gap-4 md:grid-cols-2">
             <Field>
               <FieldLabel htmlFor="api-base-url">{t('api.baseUrl')}</FieldLabel>
-              <Input id="api-base-url" data-api-required className="fp-mono h-9" value={config.baseUrl} placeholder={placeholders[config.format]} autoComplete="off" spellCheck={false} onChange={e => update({ baseUrl: e.target.value })} onBlur={() => update({ baseUrl: config.baseUrl.trim() })} />
+              <Input id="api-base-url" data-api-required className="fp-mono h-9" value={config.baseUrl} placeholder={placeholders[config.format]} autoComplete="off" spellCheck={false} onChange={e => update({ baseUrl: e.target.value })} onBlur={() => update({ baseUrl: config.baseUrl.trim() })} aria-describedby="api-route-status" />
+              <ConnectionStatus config={config} />
             </Field>
             <Field>
               <FieldLabel htmlFor="api-model">{t('api.model')}</FieldLabel>

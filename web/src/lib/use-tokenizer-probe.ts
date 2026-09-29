@@ -49,7 +49,8 @@ export function useTokenizerProbe(active: boolean) {
     setSession(idle)
   }, [discard])
 
-  const start = useCallback((config: ApiConfig) => {
+  /** Starts a probe over the route the sampling requests use and resolves once it settles. */
+  const start = useCallback((config: ApiConfig, route: client.Route) => {
     discard()
     const run = new AbortController()
     controller.current = run
@@ -65,7 +66,7 @@ export function useTokenizerProbe(active: boolean) {
       try {
         bank = await client.loadTokenizerBank()
         if (current()) setSession(previous => ({ ...previous, phase: 'probing', bank }))
-        const result = await client.probeTokenizer(frozen, bank, run.signal, update => {
+        const result = await client.probeTokenizer(frozen, bank, route, run.signal, update => {
           if (current()) setSession(previous => ({ ...previous, run: update }))
         })
         if (current()) {
