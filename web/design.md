@@ -1,7 +1,7 @@
 ---
 name: fingerpoint-design
 description: 用于 Fingerpoint 的三样本检测、词表探测、API 配置、候选结果、图片导出和只读样本库。服务需要比较 LLM 指纹的用户，支持简体中文和英文、浅色和深色主题。
-version: 2026-09-30.1
+version: 2026-09-30.2
 ---
 
 # Fingerpoint design.md
@@ -14,7 +14,7 @@ version: 2026-09-30.1
 [必须] 保留三条算法生成的提示词和对应回复。
 [必须] 将评分算法视为黑盒。界面不生成特征命中、贡献分或推理解释。
 [必须] 不提供 URL 分享结果或网页端贡献样本功能。
-[必须] 前端发布静态资源。API 请求通过同源 `/api/proxy` 转发到用户指定且站点允许的 HTTPS 服务，仅该路径进入 Cloudflare Pages Function。
+[必须] 前端发布静态资源。接口允许浏览器跨域（CORS）时由浏览器直接请求；否则只在用户授权后经同源 `/api/proxy` 转发到用户指定且站点允许的 HTTPS 服务，仅该路径进入 Cloudflare Pages Function。
 [必须] 不使用固定评估集建库、校准或生成模型中心。
 
 ## 2. 品牌与读者
@@ -94,7 +94,9 @@ version: 2026-09-30.1
 - 表单修改直接更新配置；折叠或切换模式时保留填写内容。取样仍由主操作触发，修改字段不发送请求。
 - 配置不完整时默认展开。点击开始取样时若有缺项，展开并聚焦第一个缺失字段。
 - 取样及计算期间禁用配置编辑；重新展开配置时 Key 恢复隐藏。
-- 告知用户请求和密钥经本站代理转发到填写的服务，服务器不保存密钥。
+- 接口地址下方用次级文字显示连接方式：尚未检查、可直连、经代理（已授权）、需要授权、无法直连；记住的授权旁提供“撤销代理授权”链接按钮，撤销立即生效。
+- 代理授权对话框使用 `Dialog`：标题前放 warning 色 `ShieldAlert` 图标，正文写明接口主机和原因（拒绝跨域或无法连接），列表说明密钥与内容经代理转发、代理不保存、授权可撤销；底部按钮依次为取消（ghost，默认焦点）、仅本次允许（outline）、始终允许此接口（主按钮）。Esc、关闭按钮与点击遮罩都等同取消。
+- 嗅探期间主按钮禁用并显示 `Loader2` 与“检查连接…”，配置与模式切换同时锁定。
 - API 设置支持本地多配置预设（Profiles）：收起时摘要条左侧提供快速切换菜单，展开后顶部工具栏支持配置重命名、新建、一键克隆副本与安全删除。设置（包括密钥）自动保存在 localStorage，刷新或重新打开浏览器后恢复，兼容迁移旧版单项配置与 sessionStorage 密钥。
 - “保存”只把当前配置确认保存到浏览器并清除未保存标记，不下载文件；JSON 配置文件通过配置菜单的“导出”生成，“加载”读取该文件。（来源：2026-09-27 用户要求保存按钮不下载 JSON。）
 - 词表探测模式复用同一份 `ApiConfigPanel`（`variant="tokenizer"`），隐藏宽松模式与自动验证两个取样专用开关；并行请求的说明改为“同时发送 4 个探针”。
@@ -264,6 +266,7 @@ version: 2026-09-30.1
 [必须] 不把词表一致写成“已确认模型身份”；同一词表常被多个模型复用。
 [必须] 不把未知置信度显示为 0%，不自行添加判定阈值。
 [必须] 不把密钥写入 URL、导出图片或日志。
+[必须] 不在用户授权前把请求或密钥发给本站代理。
 [必须] 不在设置草稿变化时自动发送模型请求。
 [必须] 不自动向参考库写入检测回复。
 [必须] 不添加 URL 分享、贡献样本、登录等未请求入口。
@@ -280,9 +283,10 @@ version: 2026-09-30.1
 - `next-themes` 通过 html.dark 应用主题，`index.html` 在加载前恢复偏好。
 - 主题偏好保存到 `fp-theme`。存储不可用时，首屏按系统外观显示；原生控件和滚动条使用当前主题的 color-scheme。
 - `src/lib/client.ts` 载入静态参考库，在 Worker 中调用共享算法，Worker 不可用时使用同一实现回退。
-- 浏览器向同源 `/api/proxy` 发送请求及认证头，不携带 Cookie，不自动回退到直连。
-- 代理只转发允许的 HTTPS 域名和三种协议端点，不跟随重定向，不保存或记录密钥，不转发 Cookie。
-- Messages 由服务器发送 x-api-key 和 anthropic-version；上游不再需要支持浏览器 CORS。
+- 每次取样或探测前，`src/lib/route.ts` 用真实请求的方法与头名、假 Key 和 `{}` 请求体嗅探 CORS；读到任何 HTTP 状态即视为可直连。嗅探失败时再发 no-cors GET：收到不透明响应为“拒绝跨域”，仍失败为“无法连接”。结论在本页会话缓存 10 分钟；直连请求出现网络错误后下一次重新嗅探。
+- 直连请求与嗅探共用 `directHeaders` 与 `directInit`：不携带 Cookie 和 Referer，`redirect: 'error'`；Messages 附带 `anthropic-dangerous-direct-browser-access: true`。
+- 需要代理时按接口 origin 检查授权：仅本次允许只在本页会话有效，始终允许写入 localStorage 的 `fingerpoint-proxy-consent-v1`，其他标签页通过 storage 事件同步。不把失败的直连请求自动改走代理。
+- 经代理时浏览器向同源 `/api/proxy` 发送请求及认证头，不携带 Cookie。代理只转发允许的 HTTPS 域名和三种协议端点，不跟随重定向，不保存或记录密钥，不转发 Cookie；Messages 由服务器发送 x-api-key 和 anthropic-version。
 - `shared/detection.ts` 与 `shared/completion.ts` 负责请求和 JSON/SSE 解析；UI 使用结构化状态和错误 code。
 - 词表探测的请求、usage 解析、后验与探针选择在 `shared/tokenizer-*.ts`；`src/lib/client.ts` 从静态数据载入 `tokenizer_bank.json` 并经同一个代理发送探针。
 - `src/lib/export-image.ts` 在 Canvas 中生成 PNG，JSON 导出仅包含候选列表。

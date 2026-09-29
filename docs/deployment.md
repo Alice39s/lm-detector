@@ -2,7 +2,7 @@
 
 以下路径和命令均相对于产品根目录 `projects/`。当前 WebUI 位于 `web/`。
 
-前端统一请求 `/api/proxy`。`server/proxy.ts` 使用标准 Request/Response，JSON 和 SSE 响应直接透传，不等待完整流。请求超时为 250 秒，客户端取消会传给上游。使用 HashRouter，无需页面路由重写。
+接口允许浏览器跨域时，前端直接请求接口；否则在用户授权后请求 `/api/proxy`。`server/proxy.ts` 使用标准 Request/Response，JSON 和 SSE 响应直接透传，不等待完整流。请求超时为 250 秒，客户端取消会传给上游。使用 HashRouter，无需页面路由重写。
 
 ## Cloudflare Pages
 
@@ -34,4 +34,4 @@ bun run deploy:pages
 
 ## GitHub Pages
 
-`.github/workflows/pages.yml` 在推送时构建并保存静态产物，手动触发时发布到 GitHub Pages。手动发布前需在仓库设置中启用 GitHub Actions 作为 Pages 来源。GitHub Pages 没有服务器函数，仅支持手动检测和参考库查看。API 模式需要 Cloudflare Pages 或本地预览；不会自动回退到浏览器直连。
+`.github/workflows/pages.yml` 在推送时构建并保存静态产物，手动触发时发布到 GitHub Pages。手动发布前需在仓库设置中启用 GitHub Actions 作为 Pages 来源。GitHub Pages 没有服务器函数：允许浏览器跨域的接口仍可直连使用 API 模式和词表探测；需要代理的接口在授权后请求 `/api/proxy` 会失败，这类接口需要 Cloudflare Pages 或本地预览。

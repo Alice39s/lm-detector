@@ -44,7 +44,7 @@ Open **[lm.ikale.io](https://lm.ikale.io)** and select a detection mode:
 
 Each answer must contain at least 80 valid integers and at least 55% of the requested count. If all three answers are valid, the page shows the ranking, verification scores, and confidence. If only one or two answers are valid, the page shows the ranking only.
 
-In API mode, the same-origin `/api/proxy` endpoint forwards the requests, so the upstream does not need CORS support. The proxy accepts any provider, but only fully qualified domain names on the default HTTPS port. The browser keeps API settings in localStorage. Exported result images do not contain the key, the endpoint, or the answer text.
+Before API mode or a tokenizer probe starts, the page sends one request with the real shape and a dummy key to check whether the endpoint allows cross-origin browser calls (CORS). If it does, the browser calls the endpoint directly and your key never touches this site. If it does not, or the browser cannot reach it, a dialog explains why, and the same-origin `/api/proxy` endpoint forwards the requests only after you choose "Allow once" or "Always allow this API". You can revoke a remembered consent in the API configuration. The proxy accepts any provider, but only fully qualified domain names on the default HTTPS port. The browser keeps API settings in localStorage. Exported result images do not contain the key, the endpoint, or the answer text.
 
 ### Command line
 
