@@ -6,6 +6,8 @@
 
 Web 构建会将脱敏数据写入 `../web/public/data/`。该目录是生成产物，不能作为另一份正式库维护。
 
+`tokenizer_bank.json` 是词表探测的指纹库，由词表归档工具 llm-tokenizer-fingerprint 的 `token-fp export-api-bank` 从 290 个开源词表离线生成，`source.archive_manifest_sha256` 记录所用存档清单的哈希，`source.excluded` 列出因存档文件不可信而未导出的仓库及原因。文件包含请求包裹（`wrapper`）、探针原文（`probes`）、每类词表对每条探针的计数差（`classes[].counts`，成员分歧时另列 `alternatives`）以及第一方型号到词表类的映射（`api_models`，`class` 为 `null` 表示厂商未公开词表）。词表类按作者实验室与系列归并：行为完全相同的词表归为一类，同一谱系下只差少数文本的再合并。该文件与参考样本无关，更新时直接整体替换，不经过 `fpd enroll`。
+
 `archive/` 保存已退出参考库的历史批次，`collections/` 保存采样请求、尝试和来源核验记录。两者不参与评分，也不复制到 Web 公开数据。2026-09-14 的 K3 更新使用 36 条固定 MoonshotAI 来源、关闭思考的回答，替换此前未固定提供方的 36 条回答。新旧批次分别位于 `collections/kimi-k3-moonshotai-20260914/` 和 `archive/kimi-k3-unpinned-20260914/`；前缀版本及生效尝试见新批次 manifest。
 
 2026-09-26 将六个 DeepSeek 型号的 15 个未固定供应商批次（216 条）全部退出正式库，原始行保存在 `archive/deepseek-unpinned-20260926/unified_reference.rows.jsonl`，原采样尝试继续留在研究目录。新参考批次按型号独立保存在 `collections/deepseek-*-20260926/`：V4.1 Flash 与 V4 Pro 0813 各 36 条固定 `openrouter/deepseek`，Flash 0731、Pro 预览、Flash 预览、V3.2 各 36 条固定 `openrouter/novita`。Flash 0731 的 `query-11` 第 11 次和 `query-23` 第 12 次尝试只覆写 `reasoning_effort=low`，原始失败均保留；停用的 SiliconFlow 备用批次保留在 `collections/` 但没有入库。正式库只纳入完整且来源核对通过的批次，不让 OpenRouter 自动回退或混合供应商回答。
