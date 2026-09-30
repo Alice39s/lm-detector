@@ -1,5 +1,6 @@
 import type { ApiConfig } from './types.ts'
 
+/** Deadline of one upstream request. The proxy in `worker/main.js` must stay self-contained, so it repeats the value. */
 export const COMPLETION_TIMEOUT_MS = 250000
 
 export function completionBody(config: Pick<ApiConfig, 'model' | 'format' | 'effort' | 'stream'>, prompt: string, system = '') {

@@ -19,6 +19,8 @@
     "build:pages:upload": "bun run build:pages && cp .wrangler/pages/index.js web/dist/_worker.js",
     "preview:pages": "wrangler pages dev web/dist --ip 127.0.0.1 --port 8788",
     "deploy:pages": "wrangler pages deploy web/dist",
+    "dev:worker": "wrangler dev --config worker/wrangler.json --ip 127.0.0.1 --port 8787",
+    "deploy:worker": "wrangler deploy --config worker/wrangler.json",
     "sync-data": "bun web/scripts/sync-data.ts",
     "detect": "bun cli/fpd.ts",
     "fpd": "bun cli/fpd.ts",

@@ -1,4 +1,4 @@
-import { proxyRequest } from '../server/proxy.ts'
+import { proxyRequest } from '../worker/main.js'
 
 export default {
   fetch(request: Request) {
