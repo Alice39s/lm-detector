@@ -2,7 +2,7 @@ import { Readable } from 'node:stream'
 import { pipeline } from 'node:stream/promises'
 import type { ReadableStream as NodeReadableStream } from 'node:stream/web'
 import type { Connect, Plugin } from 'vite'
-import { proxyRequest } from '../../server/proxy.ts'
+import { proxyRequest } from '../../worker/main.js'
 
 export function apiProxy(): Plugin {
   const middleware: Connect.NextHandleFunction = async (incoming, outgoing, next) => {

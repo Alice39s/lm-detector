@@ -1,0 +1,13 @@
+{
+  "name": "fingerpoint-api-proxy",
+  "private": true,
+  "description": "Transparent HTTPS relay that lets the Fingerpoint web app call LLM APIs without browser CORS.",
+  "type": "module",
+  "cloudflare": {
+    "bindings": {
+      "ALLOWED_ORIGINS": {
+        "description": "Comma-separated origins of the pages that may call this proxy, such as `https://lm.ikale.io`. Add the origin of your own deployment of the web app, or use `*` to allow any site."
+      }
+    }
+  }
+}
