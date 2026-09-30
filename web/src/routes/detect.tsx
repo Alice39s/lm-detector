@@ -24,6 +24,7 @@ import { useModelMatchCelebration } from '@/lib/use-model-match-celebration'
 import { useTokenizerProbe } from '@/lib/use-tokenizer-probe'
 import { useConnectionRoute } from '@/lib/use-connection-route'
 import { forgetReachability } from '@/lib/route'
+import { docsHref } from '@/lib/docs'
 import { cn } from '@/lib/utils'
 import { endpoint } from '@fingerpoint/shared/detection'
 import type { Analysis, Challenge, CodedError, CollectionProgress } from '@fingerpoint/shared/types'
@@ -358,7 +359,7 @@ export default function DetectRoute() {
           <code className="fp-mono text-meta"><span>{cliCommands[mode][0]}</span> {cliCommands[mode][1]} <span>{cliCommands[mode][2]}</span></code>
           <Copy className="size-3.5 shrink-0" aria-hidden="true" />
         </button>
-        <a href="https://github.com/Ikaleio/lm-detector#%E6%A3%80%E6%B5%8B-cli" target="_blank" rel="noopener noreferrer" className="fp-cli-link">
+        <a href={docsHref(i18n.locale, mode === 'tokenizer' ? 'cli/tokenizer' : 'cli/detect')} target="_blank" rel="noopener" className="fp-cli-link">
           <span className="sm:hidden">{t('detect.cliGuideShort')}</span>
           <span className="hidden sm:inline">{t('detect.cliGuide')}</span>
           <ArrowUpRight className="size-3.5" aria-hidden="true" />
