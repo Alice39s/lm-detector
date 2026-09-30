@@ -1,0 +1,5424 @@
+{
+  "purpose": "Read-only diagnostic for a separately declared domain-development criterion; no fitting or new freeze",
+  "source_code_sha256": "f247bcf8708ddb5ad2cd46c148ac6f5737c0792aeaff1e85c8779108c436cd2a",
+  "reference_oof_sha256": "af338bf848cae40a4ce96713d8028f593505da825f9f5a1e88c10528c410ea70",
+  "development_oof_sha256": "b9a514df1842a6e7766e22e430f727af76583cf829dca19ad2127fc3e26135ee",
+  "domain_protocol": "research/studies/generic-refinement-20261001/DOMAIN_PROTOCOL.md",
+  "domain_protocol_sha256": "bda536e2c6c4f271530c3bde7a9ff42d3ef97caca3c2b9b58c1037db00df5b54",
+  "metric": "Uniform 53 labels, uniform observed acquisition channel within each label, uniform groups within each label/channel cell",
+  "actual_source_aggregation": "Reference sample actual_channel (falling back to batch source.channel); openrouter/* collapses to openrouter. Development endpoint openrouter.ai→openrouter, api.openai.com→openai/direct. Same acquisition channel batches merge; provider pins inside OpenRouter do not create extra cells.",
+  "raw_channel_training_counts": [
+    {
+      "actual_channel": "endpoint-derived:openai/direct",
+      "merged_domain": "openai/direct",
+      "rows": 120
+    },
+    {
+      "actual_channel": "endpoint-derived:openrouter",
+      "merged_domain": "openrouter",
+      "rows": 120
+    },
+    {
+      "actual_channel": "kimi-code-subscription",
+      "merged_domain": "kimi-code-subscription",
+      "rows": 36
+    },
+    {
+      "actual_channel": "mono",
+      "merged_domain": "mono",
+      "rows": 400
+    },
+    {
+      "actual_channel": "oaipro",
+      "merged_domain": "oaipro",
+      "rows": 216
+    },
+    {
+      "actual_channel": "openai/direct",
+      "merged_domain": "openai/direct",
+      "rows": 252
+    },
+    {
+      "actual_channel": "openrouter/anthropic",
+      "merged_domain": "openrouter",
+      "rows": 72
+    },
+    {
+      "actual_channel": "openrouter/deepseek",
+      "merged_domain": "openrouter",
+      "rows": 72
+    },
+    {
+      "actual_channel": "openrouter/moonshotai",
+      "merged_domain": "openrouter",
+      "rows": 36
+    },
+    {
+      "actual_channel": "openrouter/novita",
+      "merged_domain": "openrouter",
+      "rows": 144
+    },
+    {
+      "actual_channel": "openrouter/openai",
+      "merged_domain": "openrouter",
+      "rows": 72
+    },
+    {
+      "actual_channel": "openrouter/unknown",
+      "merged_domain": "openrouter",
+      "rows": 360
+    },
+    {
+      "actual_channel": "openrouter/xai",
+      "merged_domain": "openrouter",
+      "rows": 36
+    },
+    {
+      "actual_channel": "openrouter/xiaomi/fp8",
+      "merged_domain": "openrouter",
+      "rows": 144
+    },
+    {
+      "actual_channel": "openrouter/z-ai/fp8",
+      "merged_domain": "openrouter",
+      "rows": 72
+    },
+    {
+      "actual_channel": "stepfun-api",
+      "merged_domain": "stepfun-api",
+      "rows": 36
+    }
+  ],
+  "gallery_labels": 53,
+  "reference_groups": 636,
+  "development_groups": 80,
+  "source_cell_count": 55,
+  "source_cells": [
+    {
+      "model": "claude-haiku-4.5",
+      "domain": "openrouter",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "claude-haiku-4.5:environment-01",
+        "claude-haiku-4.5:environment-02",
+        "claude-haiku-4.5:environment-03",
+        "claude-haiku-4.5:environment-04",
+        "claude-haiku-4.5:environment-05",
+        "claude-haiku-4.5:environment-06",
+        "claude-haiku-4.5:environment-07",
+        "claude-haiku-4.5:environment-08",
+        "claude-haiku-4.5:environment-09",
+        "claude-haiku-4.5:environment-10",
+        "claude-haiku-4.5:environment-11",
+        "claude-haiku-4.5:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "claude-sonnet-4.6",
+      "domain": "oaipro",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "claude-sonnet-4.6:environment-01",
+        "claude-sonnet-4.6:environment-02",
+        "claude-sonnet-4.6:environment-03",
+        "claude-sonnet-4.6:environment-04",
+        "claude-sonnet-4.6:environment-05",
+        "claude-sonnet-4.6:environment-06",
+        "claude-sonnet-4.6:environment-07",
+        "claude-sonnet-4.6:environment-08",
+        "claude-sonnet-4.6:environment-09",
+        "claude-sonnet-4.6:environment-10",
+        "claude-sonnet-4.6:environment-11",
+        "claude-sonnet-4.6:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "claude-sonnet-5",
+      "domain": "oaipro",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "claude-sonnet-5:environment-01",
+        "claude-sonnet-5:environment-02",
+        "claude-sonnet-5:environment-03",
+        "claude-sonnet-5:environment-04",
+        "claude-sonnet-5:environment-05",
+        "claude-sonnet-5:environment-06",
+        "claude-sonnet-5:environment-07",
+        "claude-sonnet-5:environment-08",
+        "claude-sonnet-5:environment-09",
+        "claude-sonnet-5:environment-10",
+        "claude-sonnet-5:environment-11",
+        "claude-sonnet-5:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "claude-opus-4.6",
+      "domain": "oaipro",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "claude-opus-4.6:environment-01",
+        "claude-opus-4.6:environment-02",
+        "claude-opus-4.6:environment-03",
+        "claude-opus-4.6:environment-04",
+        "claude-opus-4.6:environment-05",
+        "claude-opus-4.6:environment-06",
+        "claude-opus-4.6:environment-07",
+        "claude-opus-4.6:environment-08",
+        "claude-opus-4.6:environment-09",
+        "claude-opus-4.6:environment-10",
+        "claude-opus-4.6:environment-11",
+        "claude-opus-4.6:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "claude-opus-4.7",
+      "domain": "oaipro",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "claude-opus-4.7:environment-01",
+        "claude-opus-4.7:environment-02",
+        "claude-opus-4.7:environment-03",
+        "claude-opus-4.7:environment-04",
+        "claude-opus-4.7:environment-05",
+        "claude-opus-4.7:environment-06",
+        "claude-opus-4.7:environment-07",
+        "claude-opus-4.7:environment-08",
+        "claude-opus-4.7:environment-09",
+        "claude-opus-4.7:environment-10",
+        "claude-opus-4.7:environment-11",
+        "claude-opus-4.7:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "claude-opus-4.8",
+      "domain": "oaipro",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "claude-opus-4.8:environment-01",
+        "claude-opus-4.8:environment-02",
+        "claude-opus-4.8:environment-03",
+        "claude-opus-4.8:environment-04",
+        "claude-opus-4.8:environment-05",
+        "claude-opus-4.8:environment-06",
+        "claude-opus-4.8:environment-07",
+        "claude-opus-4.8:environment-08",
+        "claude-opus-4.8:environment-09",
+        "claude-opus-4.8:environment-10",
+        "claude-opus-4.8:environment-11",
+        "claude-opus-4.8:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "claude-opus-5",
+      "domain": "oaipro",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "claude-opus-5:environment-01",
+        "claude-opus-5:environment-02",
+        "claude-opus-5:environment-03",
+        "claude-opus-5:environment-04",
+        "claude-opus-5:environment-05",
+        "claude-opus-5:environment-06",
+        "claude-opus-5:environment-07",
+        "claude-opus-5:environment-08",
+        "claude-opus-5:environment-09",
+        "claude-opus-5:environment-10",
+        "claude-opus-5:environment-11",
+        "claude-opus-5:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "claude-fable-5.1",
+      "domain": "mono",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "claude-fable-5.1:environment-01",
+        "claude-fable-5.1:environment-02",
+        "claude-fable-5.1:environment-03",
+        "claude-fable-5.1:environment-04",
+        "claude-fable-5.1:environment-05",
+        "claude-fable-5.1:environment-06",
+        "claude-fable-5.1:environment-07",
+        "claude-fable-5.1:environment-08",
+        "claude-fable-5.1:environment-09",
+        "claude-fable-5.1:environment-10",
+        "claude-fable-5.1:environment-11",
+        "claude-fable-5.1:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "claude-fable-5",
+      "domain": "mono",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "claude-fable-5:environment-01",
+        "claude-fable-5:environment-02",
+        "claude-fable-5:environment-03",
+        "claude-fable-5:environment-04",
+        "claude-fable-5:environment-05",
+        "claude-fable-5:environment-06",
+        "claude-fable-5:environment-07",
+        "claude-fable-5:environment-08",
+        "claude-fable-5:environment-09",
+        "claude-fable-5:environment-10",
+        "claude-fable-5:environment-11",
+        "claude-fable-5:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "gemini-2.5-pro",
+      "domain": "mono",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "gemini-2.5-pro:environment-01",
+        "gemini-2.5-pro:environment-02",
+        "gemini-2.5-pro:environment-03",
+        "gemini-2.5-pro:environment-04",
+        "gemini-2.5-pro:environment-05",
+        "gemini-2.5-pro:environment-06",
+        "gemini-2.5-pro:environment-07",
+        "gemini-2.5-pro:environment-08",
+        "gemini-2.5-pro:environment-09",
+        "gemini-2.5-pro:environment-10",
+        "gemini-2.5-pro:environment-11",
+        "gemini-2.5-pro:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "gemini-3.1-pro-preview",
+      "domain": "mono",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "gemini-3.1-pro-preview:environment-01",
+        "gemini-3.1-pro-preview:environment-02",
+        "gemini-3.1-pro-preview:environment-03",
+        "gemini-3.1-pro-preview:environment-04",
+        "gemini-3.1-pro-preview:environment-05",
+        "gemini-3.1-pro-preview:environment-06",
+        "gemini-3.1-pro-preview:environment-07",
+        "gemini-3.1-pro-preview:environment-08",
+        "gemini-3.1-pro-preview:environment-09",
+        "gemini-3.1-pro-preview:environment-10",
+        "gemini-3.1-pro-preview:environment-11",
+        "gemini-3.1-pro-preview:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "gemini-3.5-flash",
+      "domain": "mono",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "gemini-3.5-flash:environment-01",
+        "gemini-3.5-flash:environment-02",
+        "gemini-3.5-flash:environment-03",
+        "gemini-3.5-flash:environment-04",
+        "gemini-3.5-flash:environment-05",
+        "gemini-3.5-flash:environment-06",
+        "gemini-3.5-flash:environment-07",
+        "gemini-3.5-flash:environment-08",
+        "gemini-3.5-flash:environment-09",
+        "gemini-3.5-flash:environment-10",
+        "gemini-3.5-flash:environment-11",
+        "gemini-3.5-flash:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "gemini-3.6-flash",
+      "domain": "mono",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "gemini-3.6-flash:environment-01",
+        "gemini-3.6-flash:environment-02",
+        "gemini-3.6-flash:environment-03",
+        "gemini-3.6-flash:environment-04",
+        "gemini-3.6-flash:environment-05",
+        "gemini-3.6-flash:environment-06",
+        "gemini-3.6-flash:environment-07",
+        "gemini-3.6-flash:environment-08",
+        "gemini-3.6-flash:environment-09",
+        "gemini-3.6-flash:environment-10",
+        "gemini-3.6-flash:environment-11",
+        "gemini-3.6-flash:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "gemini-3.7-flash",
+      "domain": "mono",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "gemini-3.7-flash:environment-01",
+        "gemini-3.7-flash:environment-02",
+        "gemini-3.7-flash:environment-03",
+        "gemini-3.7-flash:environment-04",
+        "gemini-3.7-flash:environment-05",
+        "gemini-3.7-flash:environment-06",
+        "gemini-3.7-flash:environment-07",
+        "gemini-3.7-flash:environment-08",
+        "gemini-3.7-flash:environment-09",
+        "gemini-3.7-flash:environment-10",
+        "gemini-3.7-flash:environment-11",
+        "gemini-3.7-flash:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "gemini-3.8-flash",
+      "domain": "mono",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "gemini-3.8-flash:environment-01",
+        "gemini-3.8-flash:environment-02",
+        "gemini-3.8-flash:environment-03",
+        "gemini-3.8-flash:environment-04",
+        "gemini-3.8-flash:environment-05",
+        "gemini-3.8-flash:environment-06",
+        "gemini-3.8-flash:environment-07",
+        "gemini-3.8-flash:environment-08",
+        "gemini-3.8-flash:environment-09",
+        "gemini-3.8-flash:environment-10",
+        "gemini-3.8-flash:environment-11",
+        "gemini-3.8-flash:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "grok-4.5",
+      "domain": "mono",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "grok-4.5:environment-01",
+        "grok-4.5:environment-02",
+        "grok-4.5:environment-03",
+        "grok-4.5:environment-04",
+        "grok-4.5:environment-05",
+        "grok-4.5:environment-06",
+        "grok-4.5:environment-07",
+        "grok-4.5:environment-08",
+        "grok-4.5:environment-09",
+        "grok-4.5:environment-10",
+        "grok-4.5:environment-11",
+        "grok-4.5:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "grok-4.6",
+      "domain": "mono",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "grok-4.6:environment-01",
+        "grok-4.6:environment-02",
+        "grok-4.6:environment-03",
+        "grok-4.6:environment-04",
+        "grok-4.6:environment-05",
+        "grok-4.6:environment-06",
+        "grok-4.6:environment-07",
+        "grok-4.6:environment-08",
+        "grok-4.6:environment-09",
+        "grok-4.6:environment-10",
+        "grok-4.6:environment-11",
+        "grok-4.6:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "gpt-4o",
+      "domain": "openrouter",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "gpt-4o:environment-01",
+        "gpt-4o:environment-02",
+        "gpt-4o:environment-03",
+        "gpt-4o:environment-04",
+        "gpt-4o:environment-05",
+        "gpt-4o:environment-06",
+        "gpt-4o:environment-07",
+        "gpt-4o:environment-08",
+        "gpt-4o:environment-09",
+        "gpt-4o:environment-10",
+        "gpt-4o:environment-11",
+        "gpt-4o:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "glm-5.2",
+      "domain": "openrouter",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "glm-5.2:environment-01",
+        "glm-5.2:environment-02",
+        "glm-5.2:environment-03",
+        "glm-5.2:environment-04",
+        "glm-5.2:environment-05",
+        "glm-5.2:environment-06",
+        "glm-5.2:environment-07",
+        "glm-5.2:environment-08",
+        "glm-5.2:environment-09",
+        "glm-5.2:environment-10",
+        "glm-5.2:environment-11",
+        "glm-5.2:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "glm-5.3",
+      "domain": "openrouter",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "glm-5.3:environment-01",
+        "glm-5.3:environment-02",
+        "glm-5.3:environment-03",
+        "glm-5.3:environment-04",
+        "glm-5.3:environment-05",
+        "glm-5.3:environment-06",
+        "glm-5.3:environment-07",
+        "glm-5.3:environment-08",
+        "glm-5.3:environment-09",
+        "glm-5.3:environment-10",
+        "glm-5.3:environment-11",
+        "glm-5.3:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "qwen3.8-max-0902",
+      "domain": "openrouter",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "qwen3.8-max-0902:environment-01",
+        "qwen3.8-max-0902:environment-02",
+        "qwen3.8-max-0902:environment-03",
+        "qwen3.8-max-0902:environment-04",
+        "qwen3.8-max-0902:environment-05",
+        "qwen3.8-max-0902:environment-06",
+        "qwen3.8-max-0902:environment-07",
+        "qwen3.8-max-0902:environment-08",
+        "qwen3.8-max-0902:environment-09",
+        "qwen3.8-max-0902:environment-10",
+        "qwen3.8-max-0902:environment-11",
+        "qwen3.8-max-0902:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "qwen3.8-27b",
+      "domain": "openrouter",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "qwen3.8-27b:environment-01",
+        "qwen3.8-27b:environment-02",
+        "qwen3.8-27b:environment-03",
+        "qwen3.8-27b:environment-04",
+        "qwen3.8-27b:environment-05",
+        "qwen3.8-27b:environment-06",
+        "qwen3.8-27b:environment-07",
+        "qwen3.8-27b:environment-08",
+        "qwen3.8-27b:environment-09",
+        "qwen3.8-27b:environment-10",
+        "qwen3.8-27b:environment-11",
+        "qwen3.8-27b:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "kimi-k3",
+      "domain": "openrouter",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "kimi-k3:environment-01",
+        "kimi-k3:environment-02",
+        "kimi-k3:environment-03",
+        "kimi-k3:environment-04",
+        "kimi-k3:environment-05",
+        "kimi-k3:environment-06",
+        "kimi-k3:environment-07",
+        "kimi-k3:environment-08",
+        "kimi-k3:environment-09",
+        "kimi-k3:environment-10",
+        "kimi-k3:environment-11",
+        "kimi-k3:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "hy4-preview",
+      "domain": "openrouter",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "hy4-preview:environment-01",
+        "hy4-preview:environment-02",
+        "hy4-preview:environment-03",
+        "hy4-preview:environment-04",
+        "hy4-preview:environment-05",
+        "hy4-preview:environment-06",
+        "hy4-preview:environment-07",
+        "hy4-preview:environment-08",
+        "hy4-preview:environment-09",
+        "hy4-preview:environment-10",
+        "hy4-preview:environment-11",
+        "hy4-preview:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "muse-spark-1.2",
+      "domain": "openrouter",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "muse-spark-1.2:environment-01",
+        "muse-spark-1.2:environment-02",
+        "muse-spark-1.2:environment-03",
+        "muse-spark-1.2:environment-04",
+        "muse-spark-1.2:environment-05",
+        "muse-spark-1.2:environment-06",
+        "muse-spark-1.2:environment-07",
+        "muse-spark-1.2:environment-08",
+        "muse-spark-1.2:environment-09",
+        "muse-spark-1.2:environment-10",
+        "muse-spark-1.2:environment-11",
+        "muse-spark-1.2:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "muse-spark-1.3-contributor",
+      "domain": "openrouter",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "muse-spark-1.3-contributor:environment-01",
+        "muse-spark-1.3-contributor:environment-02",
+        "muse-spark-1.3-contributor:environment-03",
+        "muse-spark-1.3-contributor:environment-04",
+        "muse-spark-1.3-contributor:environment-05",
+        "muse-spark-1.3-contributor:environment-06",
+        "muse-spark-1.3-contributor:environment-07",
+        "muse-spark-1.3-contributor:environment-08",
+        "muse-spark-1.3-contributor:environment-09",
+        "muse-spark-1.3-contributor:environment-10",
+        "muse-spark-1.3-contributor:environment-11",
+        "muse-spark-1.3-contributor:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "muse-spark-1.3",
+      "domain": "openrouter",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "muse-spark-1.3:environment-01",
+        "muse-spark-1.3:environment-02",
+        "muse-spark-1.3:environment-03",
+        "muse-spark-1.3:environment-04",
+        "muse-spark-1.3:environment-05",
+        "muse-spark-1.3:environment-06",
+        "muse-spark-1.3:environment-07",
+        "muse-spark-1.3:environment-08",
+        "muse-spark-1.3:environment-09",
+        "muse-spark-1.3:environment-10",
+        "muse-spark-1.3:environment-11",
+        "muse-spark-1.3:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "kimi-k2.8-preview",
+      "domain": "kimi-code-subscription",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "kimi-k2.8-preview:environment-01",
+        "kimi-k2.8-preview:environment-02",
+        "kimi-k2.8-preview:environment-03",
+        "kimi-k2.8-preview:environment-04",
+        "kimi-k2.8-preview:environment-05",
+        "kimi-k2.8-preview:environment-06",
+        "kimi-k2.8-preview:environment-07",
+        "kimi-k2.8-preview:environment-08",
+        "kimi-k2.8-preview:environment-09",
+        "kimi-k2.8-preview:environment-10",
+        "kimi-k2.8-preview:environment-11",
+        "kimi-k2.8-preview:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "grok-4.7",
+      "domain": "openrouter",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "grok-4.7:environment-01",
+        "grok-4.7:environment-02",
+        "grok-4.7:environment-03",
+        "grok-4.7:environment-04",
+        "grok-4.7:environment-05",
+        "grok-4.7:environment-06",
+        "grok-4.7:environment-07",
+        "grok-4.7:environment-08",
+        "grok-4.7:environment-09",
+        "grok-4.7:environment-10",
+        "grok-4.7:environment-11",
+        "grok-4.7:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "mimo-v2.5",
+      "domain": "openrouter",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "mimo-v2.5:environment-01",
+        "mimo-v2.5:environment-02",
+        "mimo-v2.5:environment-03",
+        "mimo-v2.5:environment-04",
+        "mimo-v2.5:environment-05",
+        "mimo-v2.5:environment-06",
+        "mimo-v2.5:environment-07",
+        "mimo-v2.5:environment-08",
+        "mimo-v2.5:environment-09",
+        "mimo-v2.5:environment-10",
+        "mimo-v2.5:environment-11",
+        "mimo-v2.5:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "mimo-v2.5-pro",
+      "domain": "openrouter",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "mimo-v2.5-pro:environment-01",
+        "mimo-v2.5-pro:environment-02",
+        "mimo-v2.5-pro:environment-03",
+        "mimo-v2.5-pro:environment-04",
+        "mimo-v2.5-pro:environment-05",
+        "mimo-v2.5-pro:environment-06",
+        "mimo-v2.5-pro:environment-07",
+        "mimo-v2.5-pro:environment-08",
+        "mimo-v2.5-pro:environment-09",
+        "mimo-v2.5-pro:environment-10",
+        "mimo-v2.5-pro:environment-11",
+        "mimo-v2.5-pro:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "mimo-v2.6-flash",
+      "domain": "openrouter",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "mimo-v2.6-flash:environment-01",
+        "mimo-v2.6-flash:environment-02",
+        "mimo-v2.6-flash:environment-03",
+        "mimo-v2.6-flash:environment-04",
+        "mimo-v2.6-flash:environment-05",
+        "mimo-v2.6-flash:environment-06",
+        "mimo-v2.6-flash:environment-07",
+        "mimo-v2.6-flash:environment-08",
+        "mimo-v2.6-flash:environment-09",
+        "mimo-v2.6-flash:environment-10",
+        "mimo-v2.6-flash:environment-11",
+        "mimo-v2.6-flash:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "mimo-v2.6-pro",
+      "domain": "openrouter",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "mimo-v2.6-pro:environment-01",
+        "mimo-v2.6-pro:environment-02",
+        "mimo-v2.6-pro:environment-03",
+        "mimo-v2.6-pro:environment-04",
+        "mimo-v2.6-pro:environment-05",
+        "mimo-v2.6-pro:environment-06",
+        "mimo-v2.6-pro:environment-07",
+        "mimo-v2.6-pro:environment-08",
+        "mimo-v2.6-pro:environment-09",
+        "mimo-v2.6-pro:environment-10",
+        "mimo-v2.6-pro:environment-11",
+        "mimo-v2.6-pro:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "step-5-preview",
+      "domain": "stepfun-api",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "step-5-preview:environment-01",
+        "step-5-preview:environment-02",
+        "step-5-preview:environment-03",
+        "step-5-preview:environment-04",
+        "step-5-preview:environment-05",
+        "step-5-preview:environment-06",
+        "step-5-preview:environment-07",
+        "step-5-preview:environment-08",
+        "step-5-preview:environment-09",
+        "step-5-preview:environment-10",
+        "step-5-preview:environment-11",
+        "step-5-preview:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "claude-opus-5.5",
+      "domain": "openrouter",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "claude-opus-5.5:environment-01",
+        "claude-opus-5.5:environment-02",
+        "claude-opus-5.5:environment-03",
+        "claude-opus-5.5:environment-04",
+        "claude-opus-5.5:environment-05",
+        "claude-opus-5.5:environment-06",
+        "claude-opus-5.5:environment-07",
+        "claude-opus-5.5:environment-08",
+        "claude-opus-5.5:environment-09",
+        "claude-opus-5.5:environment-10",
+        "claude-opus-5.5:environment-11",
+        "claude-opus-5.5:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "gpt-6-luna",
+      "domain": "openrouter",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "gpt-6-luna:environment-01",
+        "gpt-6-luna:environment-02",
+        "gpt-6-luna:environment-03",
+        "gpt-6-luna:environment-04",
+        "gpt-6-luna:environment-05",
+        "gpt-6-luna:environment-06",
+        "gpt-6-luna:environment-07",
+        "gpt-6-luna:environment-08",
+        "gpt-6-luna:environment-09",
+        "gpt-6-luna:environment-10",
+        "gpt-6-luna:environment-11",
+        "gpt-6-luna:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "glm-5.3-flashx",
+      "domain": "openrouter",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "glm-5.3-flashx:environment-01",
+        "glm-5.3-flashx:environment-02",
+        "glm-5.3-flashx:environment-03",
+        "glm-5.3-flashx:environment-04",
+        "glm-5.3-flashx:environment-05",
+        "glm-5.3-flashx:environment-06",
+        "glm-5.3-flashx:environment-07",
+        "glm-5.3-flashx:environment-08",
+        "glm-5.3-flashx:environment-09",
+        "glm-5.3-flashx:environment-10",
+        "glm-5.3-flashx:environment-11",
+        "glm-5.3-flashx:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "glm-5.3-flash",
+      "domain": "openrouter",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "glm-5.3-flash:environment-01",
+        "glm-5.3-flash:environment-02",
+        "glm-5.3-flash:environment-03",
+        "glm-5.3-flash:environment-04",
+        "glm-5.3-flash:environment-05",
+        "glm-5.3-flash:environment-06",
+        "glm-5.3-flash:environment-07",
+        "glm-5.3-flash:environment-08",
+        "glm-5.3-flash:environment-09",
+        "glm-5.3-flash:environment-10",
+        "glm-5.3-flash:environment-11",
+        "glm-5.3-flash:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "deepseek-v4.1-flash",
+      "domain": "openrouter",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "deepseek-v4.1-flash:environment-01",
+        "deepseek-v4.1-flash:environment-02",
+        "deepseek-v4.1-flash:environment-03",
+        "deepseek-v4.1-flash:environment-04",
+        "deepseek-v4.1-flash:environment-05",
+        "deepseek-v4.1-flash:environment-06",
+        "deepseek-v4.1-flash:environment-07",
+        "deepseek-v4.1-flash:environment-08",
+        "deepseek-v4.1-flash:environment-09",
+        "deepseek-v4.1-flash:environment-10",
+        "deepseek-v4.1-flash:environment-11",
+        "deepseek-v4.1-flash:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "deepseek-v4-flash",
+      "domain": "openrouter",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "deepseek-v4-flash:environment-01",
+        "deepseek-v4-flash:environment-02",
+        "deepseek-v4-flash:environment-03",
+        "deepseek-v4-flash:environment-04",
+        "deepseek-v4-flash:environment-05",
+        "deepseek-v4-flash:environment-06",
+        "deepseek-v4-flash:environment-07",
+        "deepseek-v4-flash:environment-08",
+        "deepseek-v4-flash:environment-09",
+        "deepseek-v4-flash:environment-10",
+        "deepseek-v4-flash:environment-11",
+        "deepseek-v4-flash:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "deepseek-v4-pro-0813",
+      "domain": "openrouter",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "deepseek-v4-pro-0813:environment-01",
+        "deepseek-v4-pro-0813:environment-02",
+        "deepseek-v4-pro-0813:environment-03",
+        "deepseek-v4-pro-0813:environment-04",
+        "deepseek-v4-pro-0813:environment-05",
+        "deepseek-v4-pro-0813:environment-06",
+        "deepseek-v4-pro-0813:environment-07",
+        "deepseek-v4-pro-0813:environment-08",
+        "deepseek-v4-pro-0813:environment-09",
+        "deepseek-v4-pro-0813:environment-10",
+        "deepseek-v4-pro-0813:environment-11",
+        "deepseek-v4-pro-0813:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "deepseek-v4-pro",
+      "domain": "openrouter",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "deepseek-v4-pro:environment-01",
+        "deepseek-v4-pro:environment-02",
+        "deepseek-v4-pro:environment-03",
+        "deepseek-v4-pro:environment-04",
+        "deepseek-v4-pro:environment-05",
+        "deepseek-v4-pro:environment-06",
+        "deepseek-v4-pro:environment-07",
+        "deepseek-v4-pro:environment-08",
+        "deepseek-v4-pro:environment-09",
+        "deepseek-v4-pro:environment-10",
+        "deepseek-v4-pro:environment-11",
+        "deepseek-v4-pro:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "deepseek-v4-flash-0731",
+      "domain": "openrouter",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "deepseek-v4-flash-0731:environment-01",
+        "deepseek-v4-flash-0731:environment-02",
+        "deepseek-v4-flash-0731:environment-03",
+        "deepseek-v4-flash-0731:environment-04",
+        "deepseek-v4-flash-0731:environment-05",
+        "deepseek-v4-flash-0731:environment-06",
+        "deepseek-v4-flash-0731:environment-07",
+        "deepseek-v4-flash-0731:environment-08",
+        "deepseek-v4-flash-0731:environment-09",
+        "deepseek-v4-flash-0731:environment-10",
+        "deepseek-v4-flash-0731:environment-11",
+        "deepseek-v4-flash-0731:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "deepseek-v3.2",
+      "domain": "openrouter",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "deepseek-v3.2:environment-01",
+        "deepseek-v3.2:environment-02",
+        "deepseek-v3.2:environment-03",
+        "deepseek-v3.2:environment-04",
+        "deepseek-v3.2:environment-05",
+        "deepseek-v3.2:environment-06",
+        "deepseek-v3.2:environment-07",
+        "deepseek-v3.2:environment-08",
+        "deepseek-v3.2:environment-09",
+        "deepseek-v3.2:environment-10",
+        "deepseek-v3.2:environment-11",
+        "deepseek-v3.2:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "gpt-6-sol",
+      "domain": "openai/direct",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "gpt-6-sol:environment-01",
+        "gpt-6-sol:environment-02",
+        "gpt-6-sol:environment-03",
+        "gpt-6-sol:environment-04",
+        "gpt-6-sol:environment-05",
+        "gpt-6-sol:environment-06",
+        "gpt-6-sol:environment-07",
+        "gpt-6-sol:environment-08",
+        "gpt-6-sol:environment-09",
+        "gpt-6-sol:environment-10",
+        "gpt-6-sol:environment-11",
+        "gpt-6-sol:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "claude-sonnet-5.5",
+      "domain": "openrouter",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "claude-sonnet-5.5:environment-01",
+        "claude-sonnet-5.5:environment-02",
+        "claude-sonnet-5.5:environment-03",
+        "claude-sonnet-5.5:environment-04",
+        "claude-sonnet-5.5:environment-05",
+        "claude-sonnet-5.5:environment-06",
+        "claude-sonnet-5.5:environment-07",
+        "claude-sonnet-5.5:environment-08",
+        "claude-sonnet-5.5:environment-09",
+        "claude-sonnet-5.5:environment-10",
+        "claude-sonnet-5.5:environment-11",
+        "claude-sonnet-5.5:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "gpt-6.1-sol",
+      "domain": "openai/direct",
+      "groups": 20,
+      "reference_groups": 0,
+      "development_groups": 20,
+      "group_ids": [
+        "prospective_v1_reused:gpt-6.1-sol:round-01",
+        "prospective_v1_reused:gpt-6.1-sol:round-02",
+        "prospective_v1_reused:gpt-6.1-sol:round-03",
+        "prospective_v1_reused:gpt-6.1-sol:round-04",
+        "prospective_v1_reused:gpt-6.1-sol:round-05",
+        "prospective_v1_reused:gpt-6.1-sol:round-06",
+        "prospective_v1_reused:gpt-6.1-sol:round-07",
+        "prospective_v1_reused:gpt-6.1-sol:round-08",
+        "prospective_v1_reused:gpt-6.1-sol:round-09",
+        "prospective_v1_reused:gpt-6.1-sol:round-10",
+        "prospective_v1_reused:gpt-6.1-sol:round-11",
+        "prospective_v1_reused:gpt-6.1-sol:round-12",
+        "prospective_v1_reused:gpt-6.1-sol:round-13",
+        "prospective_v1_reused:gpt-6.1-sol:round-14",
+        "prospective_v1_reused:gpt-6.1-sol:round-15",
+        "prospective_v1_reused:gpt-6.1-sol:round-16",
+        "prospective_v1_reused:gpt-6.1-sol:round-17",
+        "prospective_v1_reused:gpt-6.1-sol:round-18",
+        "prospective_v1_reused:gpt-6.1-sol:round-19",
+        "prospective_v1_reused:gpt-6.1-sol:round-20"
+      ],
+      "per_group_selection_weight": "1/2120",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1/2"
+    },
+    {
+      "model": "gpt-6.1-sol",
+      "domain": "openrouter",
+      "groups": 32,
+      "reference_groups": 12,
+      "development_groups": 20,
+      "group_ids": [
+        "gpt-6.1-sol:environment-01",
+        "gpt-6.1-sol:environment-02",
+        "gpt-6.1-sol:environment-03",
+        "gpt-6.1-sol:environment-04",
+        "gpt-6.1-sol:environment-05",
+        "gpt-6.1-sol:environment-06",
+        "gpt-6.1-sol:environment-07",
+        "gpt-6.1-sol:environment-08",
+        "gpt-6.1-sol:environment-09",
+        "gpt-6.1-sol:environment-10",
+        "gpt-6.1-sol:environment-11",
+        "gpt-6.1-sol:environment-12",
+        "previous_pair:gpt-6.1-sol:round-01",
+        "previous_pair:gpt-6.1-sol:round-02",
+        "previous_pair:gpt-6.1-sol:round-03",
+        "previous_pair:gpt-6.1-sol:round-04",
+        "previous_pair:gpt-6.1-sol:round-05",
+        "previous_pair:gpt-6.1-sol:round-06",
+        "previous_pair:gpt-6.1-sol:round-07",
+        "previous_pair:gpt-6.1-sol:round-08",
+        "previous_pair:gpt-6.1-sol:round-09",
+        "previous_pair:gpt-6.1-sol:round-10",
+        "previous_pair:gpt-6.1-sol:round-11",
+        "previous_pair:gpt-6.1-sol:round-12",
+        "previous_pair:gpt-6.1-sol:round-13",
+        "previous_pair:gpt-6.1-sol:round-14",
+        "previous_pair:gpt-6.1-sol:round-15",
+        "previous_pair:gpt-6.1-sol:round-16",
+        "previous_pair:gpt-6.1-sol:round-17",
+        "previous_pair:gpt-6.1-sol:round-18",
+        "previous_pair:gpt-6.1-sol:round-19",
+        "previous_pair:gpt-6.1-sol:round-20"
+      ],
+      "per_group_selection_weight": "1/3392",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1/2"
+    },
+    {
+      "model": "gpt-6-astra",
+      "domain": "openai/direct",
+      "groups": 32,
+      "reference_groups": 12,
+      "development_groups": 20,
+      "group_ids": [
+        "gpt-6-astra:environment-01",
+        "gpt-6-astra:environment-02",
+        "gpt-6-astra:environment-03",
+        "gpt-6-astra:environment-04",
+        "gpt-6-astra:environment-05",
+        "gpt-6-astra:environment-06",
+        "gpt-6-astra:environment-07",
+        "gpt-6-astra:environment-08",
+        "gpt-6-astra:environment-09",
+        "gpt-6-astra:environment-10",
+        "gpt-6-astra:environment-11",
+        "gpt-6-astra:environment-12",
+        "prospective_v1_reused:gpt-6-astra:round-01",
+        "prospective_v1_reused:gpt-6-astra:round-02",
+        "prospective_v1_reused:gpt-6-astra:round-03",
+        "prospective_v1_reused:gpt-6-astra:round-04",
+        "prospective_v1_reused:gpt-6-astra:round-05",
+        "prospective_v1_reused:gpt-6-astra:round-06",
+        "prospective_v1_reused:gpt-6-astra:round-07",
+        "prospective_v1_reused:gpt-6-astra:round-08",
+        "prospective_v1_reused:gpt-6-astra:round-09",
+        "prospective_v1_reused:gpt-6-astra:round-10",
+        "prospective_v1_reused:gpt-6-astra:round-11",
+        "prospective_v1_reused:gpt-6-astra:round-12",
+        "prospective_v1_reused:gpt-6-astra:round-13",
+        "prospective_v1_reused:gpt-6-astra:round-14",
+        "prospective_v1_reused:gpt-6-astra:round-15",
+        "prospective_v1_reused:gpt-6-astra:round-16",
+        "prospective_v1_reused:gpt-6-astra:round-17",
+        "prospective_v1_reused:gpt-6-astra:round-18",
+        "prospective_v1_reused:gpt-6-astra:round-19",
+        "prospective_v1_reused:gpt-6-astra:round-20"
+      ],
+      "per_group_selection_weight": "1/3392",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1/2"
+    },
+    {
+      "model": "gpt-6-astra",
+      "domain": "openrouter",
+      "groups": 20,
+      "reference_groups": 0,
+      "development_groups": 20,
+      "group_ids": [
+        "previous_pair:gpt-6-astra:round-01",
+        "previous_pair:gpt-6-astra:round-02",
+        "previous_pair:gpt-6-astra:round-03",
+        "previous_pair:gpt-6-astra:round-04",
+        "previous_pair:gpt-6-astra:round-05",
+        "previous_pair:gpt-6-astra:round-06",
+        "previous_pair:gpt-6-astra:round-07",
+        "previous_pair:gpt-6-astra:round-08",
+        "previous_pair:gpt-6-astra:round-09",
+        "previous_pair:gpt-6-astra:round-10",
+        "previous_pair:gpt-6-astra:round-11",
+        "previous_pair:gpt-6-astra:round-12",
+        "previous_pair:gpt-6-astra:round-13",
+        "previous_pair:gpt-6-astra:round-14",
+        "previous_pair:gpt-6-astra:round-15",
+        "previous_pair:gpt-6-astra:round-16",
+        "previous_pair:gpt-6-astra:round-17",
+        "previous_pair:gpt-6-astra:round-18",
+        "previous_pair:gpt-6-astra:round-19",
+        "previous_pair:gpt-6-astra:round-20"
+      ],
+      "per_group_selection_weight": "1/2120",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1/2"
+    },
+    {
+      "model": "gpt-5.4",
+      "domain": "openai/direct",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "gpt-5.4:environment-01",
+        "gpt-5.4:environment-02",
+        "gpt-5.4:environment-03",
+        "gpt-5.4:environment-04",
+        "gpt-5.4:environment-05",
+        "gpt-5.4:environment-06",
+        "gpt-5.4:environment-07",
+        "gpt-5.4:environment-08",
+        "gpt-5.4:environment-09",
+        "gpt-5.4:environment-10",
+        "gpt-5.4:environment-11",
+        "gpt-5.4:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "gpt-5.5",
+      "domain": "openai/direct",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "gpt-5.5:environment-01",
+        "gpt-5.5:environment-02",
+        "gpt-5.5:environment-03",
+        "gpt-5.5:environment-04",
+        "gpt-5.5:environment-05",
+        "gpt-5.5:environment-06",
+        "gpt-5.5:environment-07",
+        "gpt-5.5:environment-08",
+        "gpt-5.5:environment-09",
+        "gpt-5.5:environment-10",
+        "gpt-5.5:environment-11",
+        "gpt-5.5:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "gpt-5.6-sol",
+      "domain": "openai/direct",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "gpt-5.6-sol:environment-01",
+        "gpt-5.6-sol:environment-02",
+        "gpt-5.6-sol:environment-03",
+        "gpt-5.6-sol:environment-04",
+        "gpt-5.6-sol:environment-05",
+        "gpt-5.6-sol:environment-06",
+        "gpt-5.6-sol:environment-07",
+        "gpt-5.6-sol:environment-08",
+        "gpt-5.6-sol:environment-09",
+        "gpt-5.6-sol:environment-10",
+        "gpt-5.6-sol:environment-11",
+        "gpt-5.6-sol:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "gpt-5.6-terra",
+      "domain": "openai/direct",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "gpt-5.6-terra:environment-01",
+        "gpt-5.6-terra:environment-02",
+        "gpt-5.6-terra:environment-03",
+        "gpt-5.6-terra:environment-04",
+        "gpt-5.6-terra:environment-05",
+        "gpt-5.6-terra:environment-06",
+        "gpt-5.6-terra:environment-07",
+        "gpt-5.6-terra:environment-08",
+        "gpt-5.6-terra:environment-09",
+        "gpt-5.6-terra:environment-10",
+        "gpt-5.6-terra:environment-11",
+        "gpt-5.6-terra:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    },
+    {
+      "model": "gpt-5.6-luna",
+      "domain": "openai/direct",
+      "groups": 12,
+      "reference_groups": 12,
+      "development_groups": 0,
+      "group_ids": [
+        "gpt-5.6-luna:environment-01",
+        "gpt-5.6-luna:environment-02",
+        "gpt-5.6-luna:environment-03",
+        "gpt-5.6-luna:environment-04",
+        "gpt-5.6-luna:environment-05",
+        "gpt-5.6-luna:environment-06",
+        "gpt-5.6-luna:environment-07",
+        "gpt-5.6-luna:environment-08",
+        "gpt-5.6-luna:environment-09",
+        "gpt-5.6-luna:environment-10",
+        "gpt-5.6-luna:environment-11",
+        "gpt-5.6-luna:environment-12"
+      ],
+      "per_group_selection_weight": "1/636",
+      "label_total_weight": "1/53",
+      "domain_weight_within_label": "1"
+    }
+  ],
+  "training_multisource_labels": {
+    "claude-opus-5": {
+      "mono": 25,
+      "oaipro": 36
+    },
+    "gpt-6.1-sol": {
+      "openai/direct": 60,
+      "openrouter": 96
+    },
+    "gpt-6-astra": {
+      "openai/direct": 96,
+      "openrouter": 60
+    }
+  },
+  "evaluation_multisource_labels": {
+    "gpt-6.1-sol": {
+      "openai/direct": 20,
+      "openrouter": 32
+    },
+    "gpt-6-astra": {
+      "openai/direct": 32,
+      "openrouter": 20
+    }
+  },
+  "candidates": [
+    {
+      "index": 0,
+      "id": "first_frozen_fusion",
+      "head_index": null,
+      "candidate_weight": 0.0,
+      "label_source_macro_top1": 0.9082940251572327,
+      "label_source_macro_top1_exact_fraction": "23107/25440",
+      "label_source_macro_mrr": 0.9533608490566038,
+      "label_source_macro_mrr_exact_fraction": "16169/16960",
+      "reference_hits": 580,
+      "reference_groups": 636,
+      "reference_delta_vs_first": 0,
+      "development_hits": 40,
+      "development_groups": 80,
+      "raw_hits": 620,
+      "raw_groups": 716,
+      "raw_top1": 0.8659217877094972,
+      "raw_top1_exact_fraction": "155/179",
+      "source_cell_hits": [
+        {
+          "model": "claude-haiku-4.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-sonnet-4.6",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-sonnet-5",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-4.6",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-4.7",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-4.8",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-5",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-fable-5.1",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-fable-5",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-2.5-pro",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.1-pro-preview",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.5-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.6-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.7-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "gemini-3.8-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 8
+        },
+        {
+          "model": "grok-4.5",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 10
+        },
+        {
+          "model": "grok-4.6",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 10
+        },
+        {
+          "model": "gpt-4o",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "glm-5.2",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "glm-5.3",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "qwen3.8-max-0902",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "qwen3.8-27b",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "kimi-k3",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "hy4-preview",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "muse-spark-1.2",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "muse-spark-1.3-contributor",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "muse-spark-1.3",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "kimi-k2.8-preview",
+          "domain": "kimi-code-subscription",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "grok-4.7",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "mimo-v2.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 11
+        },
+        {
+          "model": "mimo-v2.5-pro",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 10
+        },
+        {
+          "model": "mimo-v2.6-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "mimo-v2.6-pro",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "step-5-preview",
+          "domain": "stepfun-api",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-5.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-6-luna",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "glm-5.3-flashx",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "glm-5.3-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 8
+        },
+        {
+          "model": "deepseek-v4.1-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "deepseek-v4-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 9
+        },
+        {
+          "model": "deepseek-v4-pro-0813",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "deepseek-v4-pro",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 9
+        },
+        {
+          "model": "deepseek-v4-flash-0731",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 11
+        },
+        {
+          "model": "deepseek-v3.2",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-6-sol",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-sonnet-5.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-6.1-sol",
+          "domain": "openai/direct",
+          "groups": 20,
+          "hits": 9
+        },
+        {
+          "model": "gpt-6.1-sol",
+          "domain": "openrouter",
+          "groups": 32,
+          "hits": 15
+        },
+        {
+          "model": "gpt-6-astra",
+          "domain": "openai/direct",
+          "groups": 32,
+          "hits": 19
+        },
+        {
+          "model": "gpt-6-astra",
+          "domain": "openrouter",
+          "groups": 20,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.4",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.5",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.6-sol",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.6-terra",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.6-luna",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        }
+      ],
+      "macro_delta_vs_first": 0.0,
+      "macro_delta_vs_first_exact_fraction": "0",
+      "macro_delta_percentage_points": 0.0,
+      "raw_delta_vs_first": 0.0
+    },
+    {
+      "index": 1,
+      "id": "balanced_lda_zero",
+      "head_index": 0,
+      "candidate_weight": 1.0,
+      "label_source_macro_top1": 0.9052869496855346,
+      "label_source_macro_top1_exact_fraction": "46061/50880",
+      "label_source_macro_mrr": 0.9515952568134172,
+      "label_source_macro_mrr_exact_fraction": "290503/305280",
+      "reference_hits": 574,
+      "reference_groups": 636,
+      "reference_delta_vs_first": -6,
+      "development_hits": 57,
+      "development_groups": 80,
+      "raw_hits": 631,
+      "raw_groups": 716,
+      "raw_top1": 0.8812849162011173,
+      "raw_top1_exact_fraction": "631/716",
+      "source_cell_hits": [
+        {
+          "model": "claude-haiku-4.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-sonnet-4.6",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-sonnet-5",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-4.6",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-4.7",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-4.8",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-5",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-fable-5.1",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-fable-5",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-2.5-pro",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.1-pro-preview",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.5-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.6-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.7-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "gemini-3.8-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 5
+        },
+        {
+          "model": "grok-4.5",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 11
+        },
+        {
+          "model": "grok-4.6",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 10
+        },
+        {
+          "model": "gpt-4o",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "glm-5.2",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "glm-5.3",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "qwen3.8-max-0902",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "qwen3.8-27b",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "kimi-k3",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "hy4-preview",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "muse-spark-1.2",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "muse-spark-1.3-contributor",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 6
+        },
+        {
+          "model": "muse-spark-1.3",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 6
+        },
+        {
+          "model": "kimi-k2.8-preview",
+          "domain": "kimi-code-subscription",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "grok-4.7",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "mimo-v2.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "mimo-v2.5-pro",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 11
+        },
+        {
+          "model": "mimo-v2.6-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 11
+        },
+        {
+          "model": "mimo-v2.6-pro",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "step-5-preview",
+          "domain": "stepfun-api",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-5.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-6-luna",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "glm-5.3-flashx",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 5
+        },
+        {
+          "model": "glm-5.3-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "deepseek-v4.1-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "deepseek-v4-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 10
+        },
+        {
+          "model": "deepseek-v4-pro-0813",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "deepseek-v4-pro",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 8
+        },
+        {
+          "model": "deepseek-v4-flash-0731",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 11
+        },
+        {
+          "model": "deepseek-v3.2",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-6-sol",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-sonnet-5.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-6.1-sol",
+          "domain": "openai/direct",
+          "groups": 20,
+          "hits": 13
+        },
+        {
+          "model": "gpt-6.1-sol",
+          "domain": "openrouter",
+          "groups": 32,
+          "hits": 23
+        },
+        {
+          "model": "gpt-6-astra",
+          "domain": "openai/direct",
+          "groups": 32,
+          "hits": 20
+        },
+        {
+          "model": "gpt-6-astra",
+          "domain": "openrouter",
+          "groups": 20,
+          "hits": 16
+        },
+        {
+          "model": "gpt-5.4",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.5",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.6-sol",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.6-terra",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.6-luna",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        }
+      ],
+      "macro_delta_vs_first": -0.0030070754716981134,
+      "macro_delta_vs_first_exact_fraction": "-51/16960",
+      "macro_delta_percentage_points": -0.30070754716981135,
+      "raw_delta_vs_first": 0.015363128491620111
+    },
+    {
+      "index": 2,
+      "id": "balanced_lda_rank1_half",
+      "head_index": 1,
+      "candidate_weight": 1.0,
+      "label_source_macro_top1": 0.9040094339622642,
+      "label_source_macro_top1_exact_fraction": "3833/4240",
+      "label_source_macro_mrr": 0.950956498951782,
+      "label_source_macro_mrr_exact_fraction": "72577/76320",
+      "reference_hits": 574,
+      "reference_groups": 636,
+      "reference_delta_vs_first": -6,
+      "development_hits": 57,
+      "development_groups": 80,
+      "raw_hits": 631,
+      "raw_groups": 716,
+      "raw_top1": 0.8812849162011173,
+      "raw_top1_exact_fraction": "631/716",
+      "source_cell_hits": [
+        {
+          "model": "claude-haiku-4.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-sonnet-4.6",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-sonnet-5",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-4.6",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-4.7",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-4.8",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-5",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-fable-5.1",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-fable-5",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-2.5-pro",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.1-pro-preview",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.5-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.6-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.7-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "gemini-3.8-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 5
+        },
+        {
+          "model": "grok-4.5",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 11
+        },
+        {
+          "model": "grok-4.6",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 10
+        },
+        {
+          "model": "gpt-4o",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "glm-5.2",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "glm-5.3",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "qwen3.8-max-0902",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "qwen3.8-27b",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "kimi-k3",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 11
+        },
+        {
+          "model": "hy4-preview",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "muse-spark-1.2",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "muse-spark-1.3-contributor",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 6
+        },
+        {
+          "model": "muse-spark-1.3",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 6
+        },
+        {
+          "model": "kimi-k2.8-preview",
+          "domain": "kimi-code-subscription",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "grok-4.7",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "mimo-v2.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "mimo-v2.5-pro",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 11
+        },
+        {
+          "model": "mimo-v2.6-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 11
+        },
+        {
+          "model": "mimo-v2.6-pro",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "step-5-preview",
+          "domain": "stepfun-api",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-5.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-6-luna",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "glm-5.3-flashx",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 5
+        },
+        {
+          "model": "glm-5.3-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "deepseek-v4.1-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "deepseek-v4-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 10
+        },
+        {
+          "model": "deepseek-v4-pro-0813",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "deepseek-v4-pro",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 8
+        },
+        {
+          "model": "deepseek-v4-flash-0731",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 11
+        },
+        {
+          "model": "deepseek-v3.2",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-6-sol",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-sonnet-5.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-6.1-sol",
+          "domain": "openai/direct",
+          "groups": 20,
+          "hits": 13
+        },
+        {
+          "model": "gpt-6.1-sol",
+          "domain": "openrouter",
+          "groups": 32,
+          "hits": 23
+        },
+        {
+          "model": "gpt-6-astra",
+          "domain": "openai/direct",
+          "groups": 32,
+          "hits": 21
+        },
+        {
+          "model": "gpt-6-astra",
+          "domain": "openrouter",
+          "groups": 20,
+          "hits": 16
+        },
+        {
+          "model": "gpt-5.4",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.5",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.6-sol",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.6-terra",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.6-luna",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        }
+      ],
+      "macro_delta_vs_first": -0.004284591194968553,
+      "macro_delta_vs_first_exact_fraction": "-109/25440",
+      "macro_delta_percentage_points": -0.42845911949685533,
+      "raw_delta_vs_first": 0.015363128491620111
+    },
+    {
+      "index": 3,
+      "id": "balanced_lda_rank2_full",
+      "head_index": 2,
+      "candidate_weight": 1.0,
+      "label_source_macro_top1": 0.9008647798742139,
+      "label_source_macro_top1_exact_fraction": "11459/12720",
+      "label_source_macro_mrr": 0.9493841719077568,
+      "label_source_macro_mrr_exact_fraction": "72457/76320",
+      "reference_hits": 572,
+      "reference_groups": 636,
+      "reference_delta_vs_first": -8,
+      "development_hits": 57,
+      "development_groups": 80,
+      "raw_hits": 629,
+      "raw_groups": 716,
+      "raw_top1": 0.8784916201117319,
+      "raw_top1_exact_fraction": "629/716",
+      "source_cell_hits": [
+        {
+          "model": "claude-haiku-4.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-sonnet-4.6",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-sonnet-5",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-4.6",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-4.7",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-4.8",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-5",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-fable-5.1",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-fable-5",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-2.5-pro",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.1-pro-preview",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.5-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.6-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.7-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "gemini-3.8-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 4
+        },
+        {
+          "model": "grok-4.5",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 11
+        },
+        {
+          "model": "grok-4.6",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 10
+        },
+        {
+          "model": "gpt-4o",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "glm-5.2",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "glm-5.3",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "qwen3.8-max-0902",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "qwen3.8-27b",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "kimi-k3",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 11
+        },
+        {
+          "model": "hy4-preview",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "muse-spark-1.2",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "muse-spark-1.3-contributor",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 6
+        },
+        {
+          "model": "muse-spark-1.3",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 6
+        },
+        {
+          "model": "kimi-k2.8-preview",
+          "domain": "kimi-code-subscription",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "grok-4.7",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "mimo-v2.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "mimo-v2.5-pro",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 11
+        },
+        {
+          "model": "mimo-v2.6-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 11
+        },
+        {
+          "model": "mimo-v2.6-pro",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "step-5-preview",
+          "domain": "stepfun-api",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-5.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-6-luna",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "glm-5.3-flashx",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 5
+        },
+        {
+          "model": "glm-5.3-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "deepseek-v4.1-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "deepseek-v4-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 10
+        },
+        {
+          "model": "deepseek-v4-pro-0813",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 6
+        },
+        {
+          "model": "deepseek-v4-pro",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 8
+        },
+        {
+          "model": "deepseek-v4-flash-0731",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 11
+        },
+        {
+          "model": "deepseek-v3.2",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-6-sol",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-sonnet-5.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-6.1-sol",
+          "domain": "openai/direct",
+          "groups": 20,
+          "hits": 13
+        },
+        {
+          "model": "gpt-6.1-sol",
+          "domain": "openrouter",
+          "groups": 32,
+          "hits": 23
+        },
+        {
+          "model": "gpt-6-astra",
+          "domain": "openai/direct",
+          "groups": 32,
+          "hits": 21
+        },
+        {
+          "model": "gpt-6-astra",
+          "domain": "openrouter",
+          "groups": 20,
+          "hits": 16
+        },
+        {
+          "model": "gpt-5.4",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.5",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.6-sol",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.6-terra",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.6-luna",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        }
+      ],
+      "macro_delta_vs_first": -0.007429245283018868,
+      "macro_delta_vs_first_exact_fraction": "-63/8480",
+      "macro_delta_percentage_points": -0.7429245283018868,
+      "raw_delta_vs_first": 0.012569832402234637
+    },
+    {
+      "index": 4,
+      "id": "balanced_mixture_zero",
+      "head_index": 3,
+      "candidate_weight": 1.0,
+      "label_source_macro_top1": 0.9063482704402516,
+      "label_source_macro_top1_exact_fraction": "9223/10176",
+      "label_source_macro_mrr": 0.9521259171907757,
+      "label_source_macro_mrr_exact_fraction": "58133/61056",
+      "reference_hits": 576,
+      "reference_groups": 636,
+      "reference_delta_vs_first": -4,
+      "development_hits": 58,
+      "development_groups": 80,
+      "raw_hits": 634,
+      "raw_groups": 716,
+      "raw_top1": 0.8854748603351955,
+      "raw_top1_exact_fraction": "317/358",
+      "source_cell_hits": [
+        {
+          "model": "claude-haiku-4.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-sonnet-4.6",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-sonnet-5",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-4.6",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-4.7",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-4.8",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-5",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-fable-5.1",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-fable-5",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-2.5-pro",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.1-pro-preview",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.5-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.6-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.7-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "gemini-3.8-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 5
+        },
+        {
+          "model": "grok-4.5",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 11
+        },
+        {
+          "model": "grok-4.6",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 10
+        },
+        {
+          "model": "gpt-4o",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "glm-5.2",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "glm-5.3",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "qwen3.8-max-0902",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "qwen3.8-27b",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "kimi-k3",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "hy4-preview",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "muse-spark-1.2",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "muse-spark-1.3-contributor",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 6
+        },
+        {
+          "model": "muse-spark-1.3",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 6
+        },
+        {
+          "model": "kimi-k2.8-preview",
+          "domain": "kimi-code-subscription",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "grok-4.7",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "mimo-v2.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "mimo-v2.5-pro",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 11
+        },
+        {
+          "model": "mimo-v2.6-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 11
+        },
+        {
+          "model": "mimo-v2.6-pro",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "step-5-preview",
+          "domain": "stepfun-api",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-5.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-6-luna",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "glm-5.3-flashx",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 5
+        },
+        {
+          "model": "glm-5.3-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "deepseek-v4.1-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "deepseek-v4-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 10
+        },
+        {
+          "model": "deepseek-v4-pro-0813",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "deepseek-v4-pro",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 8
+        },
+        {
+          "model": "deepseek-v4-flash-0731",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 11
+        },
+        {
+          "model": "deepseek-v3.2",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-6-sol",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-sonnet-5.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-6.1-sol",
+          "domain": "openai/direct",
+          "groups": 20,
+          "hits": 14
+        },
+        {
+          "model": "gpt-6.1-sol",
+          "domain": "openrouter",
+          "groups": 32,
+          "hits": 24
+        },
+        {
+          "model": "gpt-6-astra",
+          "domain": "openai/direct",
+          "groups": 32,
+          "hits": 21
+        },
+        {
+          "model": "gpt-6-astra",
+          "domain": "openrouter",
+          "groups": 20,
+          "hits": 16
+        },
+        {
+          "model": "gpt-5.4",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.5",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.6-sol",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.6-terra",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.6-luna",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        }
+      ],
+      "macro_delta_vs_first": -0.001945754716981132,
+      "macro_delta_vs_first_exact_fraction": "-33/16960",
+      "macro_delta_percentage_points": -0.1945754716981132,
+      "raw_delta_vs_first": 0.019553072625698324
+    },
+    {
+      "index": 5,
+      "id": "balanced_mixture_rank1_half",
+      "head_index": 4,
+      "candidate_weight": 1.0,
+      "label_source_macro_top1": 0.9047759433962265,
+      "label_source_macro_top1_exact_fraction": "3069/3392",
+      "label_source_macro_mrr": 0.9513397536687631,
+      "label_source_macro_mrr_exact_fraction": "58085/61056",
+      "reference_hits": 575,
+      "reference_groups": 636,
+      "reference_delta_vs_first": -5,
+      "development_hits": 58,
+      "development_groups": 80,
+      "raw_hits": 633,
+      "raw_groups": 716,
+      "raw_top1": 0.8840782122905028,
+      "raw_top1_exact_fraction": "633/716",
+      "source_cell_hits": [
+        {
+          "model": "claude-haiku-4.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-sonnet-4.6",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-sonnet-5",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-4.6",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-4.7",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-4.8",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-5",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-fable-5.1",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-fable-5",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-2.5-pro",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.1-pro-preview",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.5-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.6-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.7-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "gemini-3.8-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 5
+        },
+        {
+          "model": "grok-4.5",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 10
+        },
+        {
+          "model": "grok-4.6",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 10
+        },
+        {
+          "model": "gpt-4o",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "glm-5.2",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "glm-5.3",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "qwen3.8-max-0902",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "qwen3.8-27b",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "kimi-k3",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "hy4-preview",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "muse-spark-1.2",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "muse-spark-1.3-contributor",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 6
+        },
+        {
+          "model": "muse-spark-1.3",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 6
+        },
+        {
+          "model": "kimi-k2.8-preview",
+          "domain": "kimi-code-subscription",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "grok-4.7",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "mimo-v2.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "mimo-v2.5-pro",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 11
+        },
+        {
+          "model": "mimo-v2.6-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 11
+        },
+        {
+          "model": "mimo-v2.6-pro",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "step-5-preview",
+          "domain": "stepfun-api",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-5.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-6-luna",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "glm-5.3-flashx",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 5
+        },
+        {
+          "model": "glm-5.3-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "deepseek-v4.1-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "deepseek-v4-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 10
+        },
+        {
+          "model": "deepseek-v4-pro-0813",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "deepseek-v4-pro",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 8
+        },
+        {
+          "model": "deepseek-v4-flash-0731",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 11
+        },
+        {
+          "model": "deepseek-v3.2",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-6-sol",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-sonnet-5.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-6.1-sol",
+          "domain": "openai/direct",
+          "groups": 20,
+          "hits": 14
+        },
+        {
+          "model": "gpt-6.1-sol",
+          "domain": "openrouter",
+          "groups": 32,
+          "hits": 24
+        },
+        {
+          "model": "gpt-6-astra",
+          "domain": "openai/direct",
+          "groups": 32,
+          "hits": 21
+        },
+        {
+          "model": "gpt-6-astra",
+          "domain": "openrouter",
+          "groups": 20,
+          "hits": 16
+        },
+        {
+          "model": "gpt-5.4",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.5",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.6-sol",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.6-terra",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.6-luna",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        }
+      ],
+      "macro_delta_vs_first": -0.0035180817610062894,
+      "macro_delta_vs_first_exact_fraction": "-179/50880",
+      "macro_delta_percentage_points": -0.3518081761006289,
+      "raw_delta_vs_first": 0.018156424581005588
+    },
+    {
+      "index": 6,
+      "id": "half_frozen_balanced_lda_zero",
+      "head_index": 0,
+      "candidate_weight": 0.5,
+      "label_source_macro_top1": 0.9084316037735849,
+      "label_source_macro_top1_exact_fraction": "15407/16960",
+      "label_source_macro_mrr": 0.9536916928721174,
+      "label_source_macro_mrr_exact_fraction": "291143/305280",
+      "reference_hits": 577,
+      "reference_groups": 636,
+      "reference_delta_vs_first": -3,
+      "development_hits": 56,
+      "development_groups": 80,
+      "raw_hits": 633,
+      "raw_groups": 716,
+      "raw_top1": 0.8840782122905028,
+      "raw_top1_exact_fraction": "633/716",
+      "source_cell_hits": [
+        {
+          "model": "claude-haiku-4.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-sonnet-4.6",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-sonnet-5",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-4.6",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-4.7",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-4.8",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-5",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-fable-5.1",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-fable-5",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-2.5-pro",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.1-pro-preview",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.5-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.6-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.7-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "gemini-3.8-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 6
+        },
+        {
+          "model": "grok-4.5",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 10
+        },
+        {
+          "model": "grok-4.6",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 10
+        },
+        {
+          "model": "gpt-4o",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "glm-5.2",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "glm-5.3",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "qwen3.8-max-0902",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "qwen3.8-27b",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "kimi-k3",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "hy4-preview",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "muse-spark-1.2",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "muse-spark-1.3-contributor",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 6
+        },
+        {
+          "model": "muse-spark-1.3",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "kimi-k2.8-preview",
+          "domain": "kimi-code-subscription",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "grok-4.7",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "mimo-v2.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 11
+        },
+        {
+          "model": "mimo-v2.5-pro",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 11
+        },
+        {
+          "model": "mimo-v2.6-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "mimo-v2.6-pro",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "step-5-preview",
+          "domain": "stepfun-api",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-5.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-6-luna",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "glm-5.3-flashx",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 6
+        },
+        {
+          "model": "glm-5.3-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "deepseek-v4.1-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "deepseek-v4-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 9
+        },
+        {
+          "model": "deepseek-v4-pro-0813",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "deepseek-v4-pro",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 9
+        },
+        {
+          "model": "deepseek-v4-flash-0731",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 11
+        },
+        {
+          "model": "deepseek-v3.2",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-6-sol",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-sonnet-5.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-6.1-sol",
+          "domain": "openai/direct",
+          "groups": 20,
+          "hits": 13
+        },
+        {
+          "model": "gpt-6.1-sol",
+          "domain": "openrouter",
+          "groups": 32,
+          "hits": 19
+        },
+        {
+          "model": "gpt-6-astra",
+          "domain": "openai/direct",
+          "groups": 32,
+          "hits": 24
+        },
+        {
+          "model": "gpt-6-astra",
+          "domain": "openrouter",
+          "groups": 20,
+          "hits": 16
+        },
+        {
+          "model": "gpt-5.4",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.5",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.6-sol",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.6-terra",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.6-luna",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        }
+      ],
+      "macro_delta_vs_first": 0.00013757861635220125,
+      "macro_delta_vs_first_exact_fraction": "7/50880",
+      "macro_delta_percentage_points": 0.013757861635220126,
+      "raw_delta_vs_first": 0.018156424581005588
+    },
+    {
+      "index": 7,
+      "id": "half_frozen_balanced_lda_rank1_half",
+      "head_index": 1,
+      "candidate_weight": 0.5,
+      "label_source_macro_top1": 0.9084316037735849,
+      "label_source_macro_top1_exact_fraction": "15407/16960",
+      "label_source_macro_mrr": 0.9536916928721174,
+      "label_source_macro_mrr_exact_fraction": "291143/305280",
+      "reference_hits": 577,
+      "reference_groups": 636,
+      "reference_delta_vs_first": -3,
+      "development_hits": 56,
+      "development_groups": 80,
+      "raw_hits": 633,
+      "raw_groups": 716,
+      "raw_top1": 0.8840782122905028,
+      "raw_top1_exact_fraction": "633/716",
+      "source_cell_hits": [
+        {
+          "model": "claude-haiku-4.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-sonnet-4.6",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-sonnet-5",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-4.6",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-4.7",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-4.8",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-5",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-fable-5.1",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-fable-5",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-2.5-pro",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.1-pro-preview",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.5-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.6-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.7-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "gemini-3.8-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 6
+        },
+        {
+          "model": "grok-4.5",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 10
+        },
+        {
+          "model": "grok-4.6",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 10
+        },
+        {
+          "model": "gpt-4o",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "glm-5.2",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "glm-5.3",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "qwen3.8-max-0902",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "qwen3.8-27b",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "kimi-k3",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "hy4-preview",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "muse-spark-1.2",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "muse-spark-1.3-contributor",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 6
+        },
+        {
+          "model": "muse-spark-1.3",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "kimi-k2.8-preview",
+          "domain": "kimi-code-subscription",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "grok-4.7",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "mimo-v2.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 11
+        },
+        {
+          "model": "mimo-v2.5-pro",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 11
+        },
+        {
+          "model": "mimo-v2.6-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "mimo-v2.6-pro",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "step-5-preview",
+          "domain": "stepfun-api",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-5.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-6-luna",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "glm-5.3-flashx",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 6
+        },
+        {
+          "model": "glm-5.3-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "deepseek-v4.1-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "deepseek-v4-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 9
+        },
+        {
+          "model": "deepseek-v4-pro-0813",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "deepseek-v4-pro",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 9
+        },
+        {
+          "model": "deepseek-v4-flash-0731",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 11
+        },
+        {
+          "model": "deepseek-v3.2",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-6-sol",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-sonnet-5.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-6.1-sol",
+          "domain": "openai/direct",
+          "groups": 20,
+          "hits": 13
+        },
+        {
+          "model": "gpt-6.1-sol",
+          "domain": "openrouter",
+          "groups": 32,
+          "hits": 19
+        },
+        {
+          "model": "gpt-6-astra",
+          "domain": "openai/direct",
+          "groups": 32,
+          "hits": 24
+        },
+        {
+          "model": "gpt-6-astra",
+          "domain": "openrouter",
+          "groups": 20,
+          "hits": 16
+        },
+        {
+          "model": "gpt-5.4",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.5",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.6-sol",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.6-terra",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.6-luna",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        }
+      ],
+      "macro_delta_vs_first": 0.00013757861635220125,
+      "macro_delta_vs_first_exact_fraction": "7/50880",
+      "macro_delta_percentage_points": 0.013757861635220126,
+      "raw_delta_vs_first": 0.018156424581005588
+    },
+    {
+      "index": 8,
+      "id": "half_frozen_balanced_lda_rank2_full",
+      "head_index": 2,
+      "candidate_weight": 0.5,
+      "label_source_macro_top1": 0.9068592767295598,
+      "label_source_macro_top1_exact_fraction": "46141/50880",
+      "label_source_macro_mrr": 0.9529055293501049,
+      "label_source_macro_mrr_exact_fraction": "290903/305280",
+      "reference_hits": 576,
+      "reference_groups": 636,
+      "reference_delta_vs_first": -4,
+      "development_hits": 56,
+      "development_groups": 80,
+      "raw_hits": 632,
+      "raw_groups": 716,
+      "raw_top1": 0.88268156424581,
+      "raw_top1_exact_fraction": "158/179",
+      "source_cell_hits": [
+        {
+          "model": "claude-haiku-4.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-sonnet-4.6",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-sonnet-5",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-4.6",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-4.7",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-4.8",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-5",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-fable-5.1",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-fable-5",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-2.5-pro",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.1-pro-preview",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.5-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.6-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.7-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "gemini-3.8-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 5
+        },
+        {
+          "model": "grok-4.5",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 10
+        },
+        {
+          "model": "grok-4.6",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 10
+        },
+        {
+          "model": "gpt-4o",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "glm-5.2",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "glm-5.3",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "qwen3.8-max-0902",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "qwen3.8-27b",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "kimi-k3",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "hy4-preview",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "muse-spark-1.2",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "muse-spark-1.3-contributor",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 6
+        },
+        {
+          "model": "muse-spark-1.3",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "kimi-k2.8-preview",
+          "domain": "kimi-code-subscription",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "grok-4.7",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "mimo-v2.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 11
+        },
+        {
+          "model": "mimo-v2.5-pro",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 11
+        },
+        {
+          "model": "mimo-v2.6-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "mimo-v2.6-pro",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "step-5-preview",
+          "domain": "stepfun-api",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-5.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-6-luna",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "glm-5.3-flashx",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 6
+        },
+        {
+          "model": "glm-5.3-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "deepseek-v4.1-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "deepseek-v4-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 9
+        },
+        {
+          "model": "deepseek-v4-pro-0813",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "deepseek-v4-pro",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 9
+        },
+        {
+          "model": "deepseek-v4-flash-0731",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 11
+        },
+        {
+          "model": "deepseek-v3.2",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-6-sol",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-sonnet-5.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-6.1-sol",
+          "domain": "openai/direct",
+          "groups": 20,
+          "hits": 13
+        },
+        {
+          "model": "gpt-6.1-sol",
+          "domain": "openrouter",
+          "groups": 32,
+          "hits": 19
+        },
+        {
+          "model": "gpt-6-astra",
+          "domain": "openai/direct",
+          "groups": 32,
+          "hits": 24
+        },
+        {
+          "model": "gpt-6-astra",
+          "domain": "openrouter",
+          "groups": 20,
+          "hits": 16
+        },
+        {
+          "model": "gpt-5.4",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.5",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.6-sol",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.6-terra",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.6-luna",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        }
+      ],
+      "macro_delta_vs_first": -0.0014347484276729559,
+      "macro_delta_vs_first_exact_fraction": "-73/50880",
+      "macro_delta_percentage_points": -0.14347484276729558,
+      "raw_delta_vs_first": 0.01675977653631285
+    },
+    {
+      "index": 9,
+      "id": "half_frozen_balanced_mixture_zero",
+      "head_index": 3,
+      "candidate_weight": 0.5,
+      "label_source_macro_top1": 0.9059551886792453,
+      "label_source_macro_top1_exact_fraction": "3073/3392",
+      "label_source_macro_mrr": 0.9524534853249476,
+      "label_source_macro_mrr_exact_fraction": "58153/61056",
+      "reference_hits": 576,
+      "reference_groups": 636,
+      "reference_delta_vs_first": -4,
+      "development_hits": 51,
+      "development_groups": 80,
+      "raw_hits": 627,
+      "raw_groups": 716,
+      "raw_top1": 0.8756983240223464,
+      "raw_top1_exact_fraction": "627/716",
+      "source_cell_hits": [
+        {
+          "model": "claude-haiku-4.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-sonnet-4.6",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-sonnet-5",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-4.6",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-4.7",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-4.8",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-5",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-fable-5.1",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-fable-5",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-2.5-pro",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.1-pro-preview",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.5-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.6-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.7-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "gemini-3.8-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 6
+        },
+        {
+          "model": "grok-4.5",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 10
+        },
+        {
+          "model": "grok-4.6",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 10
+        },
+        {
+          "model": "gpt-4o",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "glm-5.2",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "glm-5.3",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "qwen3.8-max-0902",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "qwen3.8-27b",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "kimi-k3",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "hy4-preview",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "muse-spark-1.2",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "muse-spark-1.3-contributor",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 6
+        },
+        {
+          "model": "muse-spark-1.3",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "kimi-k2.8-preview",
+          "domain": "kimi-code-subscription",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "grok-4.7",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "mimo-v2.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 11
+        },
+        {
+          "model": "mimo-v2.5-pro",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 11
+        },
+        {
+          "model": "mimo-v2.6-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "mimo-v2.6-pro",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "step-5-preview",
+          "domain": "stepfun-api",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-5.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-6-luna",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "glm-5.3-flashx",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 6
+        },
+        {
+          "model": "glm-5.3-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "deepseek-v4.1-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "deepseek-v4-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 9
+        },
+        {
+          "model": "deepseek-v4-pro-0813",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "deepseek-v4-pro",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 9
+        },
+        {
+          "model": "deepseek-v4-flash-0731",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 11
+        },
+        {
+          "model": "deepseek-v3.2",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-6-sol",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-sonnet-5.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-6.1-sol",
+          "domain": "openai/direct",
+          "groups": 20,
+          "hits": 11
+        },
+        {
+          "model": "gpt-6.1-sol",
+          "domain": "openrouter",
+          "groups": 32,
+          "hits": 19
+        },
+        {
+          "model": "gpt-6-astra",
+          "domain": "openai/direct",
+          "groups": 32,
+          "hits": 22
+        },
+        {
+          "model": "gpt-6-astra",
+          "domain": "openrouter",
+          "groups": 20,
+          "hits": 14
+        },
+        {
+          "model": "gpt-5.4",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.5",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.6-sol",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.6-terra",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.6-luna",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        }
+      ],
+      "macro_delta_vs_first": -0.0023388364779874213,
+      "macro_delta_vs_first_exact_fraction": "-119/50880",
+      "macro_delta_percentage_points": -0.23388364779874213,
+      "raw_delta_vs_first": 0.009776536312849162
+    },
+    {
+      "index": 10,
+      "id": "half_frozen_balanced_mixture_rank1_half",
+      "head_index": 4,
+      "candidate_weight": 0.5,
+      "label_source_macro_top1": 0.9059551886792453,
+      "label_source_macro_top1_exact_fraction": "3073/3392",
+      "label_source_macro_mrr": 0.9524534853249476,
+      "label_source_macro_mrr_exact_fraction": "58153/61056",
+      "reference_hits": 576,
+      "reference_groups": 636,
+      "reference_delta_vs_first": -4,
+      "development_hits": 51,
+      "development_groups": 80,
+      "raw_hits": 627,
+      "raw_groups": 716,
+      "raw_top1": 0.8756983240223464,
+      "raw_top1_exact_fraction": "627/716",
+      "source_cell_hits": [
+        {
+          "model": "claude-haiku-4.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-sonnet-4.6",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-sonnet-5",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-4.6",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-4.7",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-4.8",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-5",
+          "domain": "oaipro",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-fable-5.1",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-fable-5",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-2.5-pro",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.1-pro-preview",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.5-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.6-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gemini-3.7-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "gemini-3.8-flash",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 6
+        },
+        {
+          "model": "grok-4.5",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 10
+        },
+        {
+          "model": "grok-4.6",
+          "domain": "mono",
+          "groups": 12,
+          "hits": 10
+        },
+        {
+          "model": "gpt-4o",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "glm-5.2",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "glm-5.3",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "qwen3.8-max-0902",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "qwen3.8-27b",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "kimi-k3",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "hy4-preview",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "muse-spark-1.2",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "muse-spark-1.3-contributor",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 6
+        },
+        {
+          "model": "muse-spark-1.3",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "kimi-k2.8-preview",
+          "domain": "kimi-code-subscription",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "grok-4.7",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "mimo-v2.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 11
+        },
+        {
+          "model": "mimo-v2.5-pro",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 11
+        },
+        {
+          "model": "mimo-v2.6-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "mimo-v2.6-pro",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "step-5-preview",
+          "domain": "stepfun-api",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-opus-5.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-6-luna",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "glm-5.3-flashx",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 6
+        },
+        {
+          "model": "glm-5.3-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "deepseek-v4.1-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "deepseek-v4-flash",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 9
+        },
+        {
+          "model": "deepseek-v4-pro-0813",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 7
+        },
+        {
+          "model": "deepseek-v4-pro",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 9
+        },
+        {
+          "model": "deepseek-v4-flash-0731",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 11
+        },
+        {
+          "model": "deepseek-v3.2",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-6-sol",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "claude-sonnet-5.5",
+          "domain": "openrouter",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-6.1-sol",
+          "domain": "openai/direct",
+          "groups": 20,
+          "hits": 11
+        },
+        {
+          "model": "gpt-6.1-sol",
+          "domain": "openrouter",
+          "groups": 32,
+          "hits": 19
+        },
+        {
+          "model": "gpt-6-astra",
+          "domain": "openai/direct",
+          "groups": 32,
+          "hits": 22
+        },
+        {
+          "model": "gpt-6-astra",
+          "domain": "openrouter",
+          "groups": 20,
+          "hits": 14
+        },
+        {
+          "model": "gpt-5.4",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.5",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.6-sol",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.6-terra",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        },
+        {
+          "model": "gpt-5.6-luna",
+          "domain": "openai/direct",
+          "groups": 12,
+          "hits": 12
+        }
+      ],
+      "macro_delta_vs_first": -0.0023388364779874213,
+      "macro_delta_vs_first_exact_fraction": "-119/50880",
+      "macro_delta_percentage_points": -0.23388364779874213,
+      "raw_delta_vs_first": 0.009776536312849162
+    }
+  ],
+  "diagnostic_ordering": [
+    6,
+    7,
+    0,
+    8,
+    4,
+    9,
+    10,
+    1,
+    5,
+    2,
+    3
+  ],
+  "new_selected_artifact": null,
+  "interpretation": "The highest macro result gains only 7/50880 (+0.0137579 percentage points), while reference declines by 3/636. This is a tiny developmental tradeoff, not evidence of a substantive generalization improvement; raw group accuracy overweights the two oversampled labels.",
+  "training_performed": false,
+  "original_11_selection_changed": false,
+  "fixed_holdout_opened": false,
+  "api_requests": 0
+}

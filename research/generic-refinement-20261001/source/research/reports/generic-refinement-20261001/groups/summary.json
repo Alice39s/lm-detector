@@ -1,0 +1,1130 @@
+{
+  "selected": {
+    "index": 17,
+    "spec": {
+      "id": "selected_position_mean_lda0.85",
+      "layout": "selected_position",
+      "summary": "mean",
+      "kind": "lda",
+      "parameter": 0.85
+    },
+    "cv": {
+      "groups": 636,
+      "correct": 567,
+      "top1": 0.8915094339622641,
+      "macro_top1": 0.8915094339622641,
+      "top3": 1.0,
+      "mrr": 0.9449685534591195,
+      "pair": {
+        "groups": 24,
+        "all_library_correct": 12,
+        "conditional_correct": 12,
+        "per_model": {
+          "gpt-6-astra": {
+            "groups": 12,
+            "all_library_correct": 6
+          },
+          "gpt-6.1-sol": {
+            "groups": 12,
+            "all_library_correct": 6
+          }
+        }
+      }
+    }
+  },
+  "candidate_count": 30,
+  "leaderboard": [
+    {
+      "index": 17,
+      "spec": {
+        "id": "selected_position_mean_lda0.85",
+        "layout": "selected_position",
+        "summary": "mean",
+        "kind": "lda",
+        "parameter": 0.85
+      },
+      "cv": {
+        "groups": 636,
+        "correct": 567,
+        "top1": 0.8915094339622641,
+        "macro_top1": 0.8915094339622641,
+        "top3": 1.0,
+        "mrr": 0.9449685534591195,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 12,
+          "conditional_correct": 12,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 6
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 6
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 25,
+      "spec": {
+        "id": "selected_position_mean_std_distance_lda0.15",
+        "layout": "selected_position",
+        "summary": "mean_std_distance",
+        "kind": "lda",
+        "parameter": 0.15
+      },
+      "cv": {
+        "groups": 636,
+        "correct": 566,
+        "top1": 0.889937106918239,
+        "macro_top1": 0.8899371069182391,
+        "top3": 0.9984276729559748,
+        "mrr": 0.9430031446540881,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 17,
+          "conditional_correct": 17,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 8
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 9
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 1,
+      "spec": {
+        "id": "existing_mean_lda0.5",
+        "layout": "existing",
+        "summary": "mean",
+        "kind": "lda",
+        "parameter": 0.5
+      },
+      "cv": {
+        "groups": 636,
+        "correct": 565,
+        "top1": 0.8883647798742138,
+        "macro_top1": 0.8883647798742137,
+        "top3": 1.0,
+        "mrr": 0.9433962264150944,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 10,
+          "conditional_correct": 10,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 6
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 4
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 22,
+      "spec": {
+        "id": "selected_position_mean_std_lda0.85",
+        "layout": "selected_position",
+        "summary": "mean_std",
+        "kind": "lda",
+        "parameter": 0.85
+      },
+      "cv": {
+        "groups": 636,
+        "correct": 565,
+        "top1": 0.8883647798742138,
+        "macro_top1": 0.8883647798742137,
+        "top3": 1.0,
+        "mrr": 0.9431341719077567,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 13,
+          "conditional_correct": 13,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 6
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 7
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 26,
+      "spec": {
+        "id": "selected_position_mean_std_distance_lda0.5",
+        "layout": "selected_position",
+        "summary": "mean_std_distance",
+        "kind": "lda",
+        "parameter": 0.5
+      },
+      "cv": {
+        "groups": 636,
+        "correct": 564,
+        "top1": 0.8867924528301887,
+        "macro_top1": 0.8867924528301887,
+        "top3": 1.0,
+        "mrr": 0.9420859538784067,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 15,
+          "conditional_correct": 15,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 8
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 20,
+      "spec": {
+        "id": "selected_position_mean_std_lda0.15",
+        "layout": "selected_position",
+        "summary": "mean_std",
+        "kind": "lda",
+        "parameter": 0.15
+      },
+      "cv": {
+        "groups": 636,
+        "correct": 564,
+        "top1": 0.8867924528301887,
+        "macro_top1": 0.8867924528301887,
+        "top3": 0.9984276729559748,
+        "mrr": 0.9414308176100629,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 17,
+          "conditional_correct": 17,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 8
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 9
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 16,
+      "spec": {
+        "id": "selected_position_mean_lda0.5",
+        "layout": "selected_position",
+        "summary": "mean",
+        "kind": "lda",
+        "parameter": 0.5
+      },
+      "cv": {
+        "groups": 636,
+        "correct": 563,
+        "top1": 0.8852201257861635,
+        "macro_top1": 0.8852201257861635,
+        "top3": 1.0,
+        "mrr": 0.9420859538784067,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 12,
+          "conditional_correct": 12,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 5
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 21,
+      "spec": {
+        "id": "selected_position_mean_std_lda0.5",
+        "layout": "selected_position",
+        "summary": "mean_std",
+        "kind": "lda",
+        "parameter": 0.5
+      },
+      "cv": {
+        "groups": 636,
+        "correct": 563,
+        "top1": 0.8852201257861635,
+        "macro_top1": 0.8852201257861636,
+        "top3": 1.0,
+        "mrr": 0.9415618448637315,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 14,
+          "conditional_correct": 14,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 6
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 8
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 5,
+      "spec": {
+        "id": "existing_mean_std_lda0.15",
+        "layout": "existing",
+        "summary": "mean_std",
+        "kind": "lda",
+        "parameter": 0.15
+      },
+      "cv": {
+        "groups": 636,
+        "correct": 562,
+        "top1": 0.8836477987421384,
+        "macro_top1": 0.8836477987421383,
+        "top3": 0.9984276729559748,
+        "mrr": 0.940251572327044,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 11,
+          "conditional_correct": 11,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 6
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 5
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 6,
+      "spec": {
+        "id": "existing_mean_std_lda0.5",
+        "layout": "existing",
+        "summary": "mean_std",
+        "kind": "lda",
+        "parameter": 0.5
+      },
+      "cv": {
+        "groups": 636,
+        "correct": 561,
+        "top1": 0.8820754716981132,
+        "macro_top1": 0.8820754716981132,
+        "top3": 0.9984276729559748,
+        "mrr": 0.940041928721174,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 11,
+          "conditional_correct": 11,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 6
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 5
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 23,
+      "spec": {
+        "id": "selected_position_mean_std_ridge1",
+        "layout": "selected_position",
+        "summary": "mean_std",
+        "kind": "ridge",
+        "parameter": 1.0
+      },
+      "cv": {
+        "groups": 636,
+        "correct": 561,
+        "top1": 0.8820754716981132,
+        "macro_top1": 0.8820754716981132,
+        "top3": 0.9905660377358491,
+        "mrr": 0.9363207547169812,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 16,
+          "conditional_correct": 16,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 8
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 8
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 27,
+      "spec": {
+        "id": "selected_position_mean_std_distance_lda0.85",
+        "layout": "selected_position",
+        "summary": "mean_std_distance",
+        "kind": "lda",
+        "parameter": 0.85
+      },
+      "cv": {
+        "groups": 636,
+        "correct": 560,
+        "top1": 0.8805031446540881,
+        "macro_top1": 0.8805031446540882,
+        "top3": 0.9968553459119497,
+        "mrr": 0.9387229210342418,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 11,
+          "conditional_correct": 11,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 5
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 6
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 28,
+      "spec": {
+        "id": "selected_position_mean_std_distance_ridge1",
+        "layout": "selected_position",
+        "summary": "mean_std_distance",
+        "kind": "ridge",
+        "parameter": 1.0
+      },
+      "cv": {
+        "groups": 636,
+        "correct": 560,
+        "top1": 0.8805031446540881,
+        "macro_top1": 0.880503144654088,
+        "top3": 0.9905660377358491,
+        "mrr": 0.9360674353598883,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 15,
+          "conditional_correct": 15,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 8
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 0,
+      "spec": {
+        "id": "existing_mean_lda0.15",
+        "layout": "existing",
+        "summary": "mean",
+        "kind": "lda",
+        "parameter": 0.15
+      },
+      "cv": {
+        "groups": 636,
+        "correct": 559,
+        "top1": 0.8789308176100629,
+        "macro_top1": 0.8789308176100628,
+        "top3": 1.0,
+        "mrr": 0.9384171907756812,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 9,
+          "conditional_correct": 9,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 5
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 4
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 11,
+      "spec": {
+        "id": "existing_mean_std_distance_lda0.5",
+        "layout": "existing",
+        "summary": "mean_std_distance",
+        "kind": "lda",
+        "parameter": 0.5
+      },
+      "cv": {
+        "groups": 636,
+        "correct": 559,
+        "top1": 0.8789308176100629,
+        "macro_top1": 0.878930817610063,
+        "top3": 0.9984276729559748,
+        "mrr": 0.9382075471698114,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 12,
+          "conditional_correct": 12,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 5
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 2,
+      "spec": {
+        "id": "existing_mean_lda0.85",
+        "layout": "existing",
+        "summary": "mean",
+        "kind": "lda",
+        "parameter": 0.85
+      },
+      "cv": {
+        "groups": 636,
+        "correct": 559,
+        "top1": 0.8789308176100629,
+        "macro_top1": 0.8789308176100628,
+        "top3": 0.9984276729559748,
+        "mrr": 0.9380241090146749,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 9,
+          "conditional_correct": 9,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 5
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 4
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 10,
+      "spec": {
+        "id": "existing_mean_std_distance_lda0.15",
+        "layout": "existing",
+        "summary": "mean_std_distance",
+        "kind": "lda",
+        "parameter": 0.15
+      },
+      "cv": {
+        "groups": 636,
+        "correct": 559,
+        "top1": 0.8789308176100629,
+        "macro_top1": 0.878930817610063,
+        "top3": 0.9984276729559748,
+        "mrr": 0.9378930817610063,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 11,
+          "conditional_correct": 11,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 6
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 5
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 15,
+      "spec": {
+        "id": "selected_position_mean_lda0.15",
+        "layout": "selected_position",
+        "summary": "mean",
+        "kind": "lda",
+        "parameter": 0.15
+      },
+      "cv": {
+        "groups": 636,
+        "correct": 558,
+        "top1": 0.8773584905660378,
+        "macro_top1": 0.8773584905660378,
+        "top3": 1.0,
+        "mrr": 0.9373689727463311,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 10,
+          "conditional_correct": 10,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 6
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 4
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 12,
+      "spec": {
+        "id": "existing_mean_std_distance_lda0.85",
+        "layout": "existing",
+        "summary": "mean_std_distance",
+        "kind": "lda",
+        "parameter": 0.85
+      },
+      "cv": {
+        "groups": 636,
+        "correct": 558,
+        "top1": 0.8773584905660378,
+        "macro_top1": 0.8773584905660378,
+        "top3": 0.9968553459119497,
+        "mrr": 0.9368347847121432,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 12,
+          "conditional_correct": 12,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 8
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 4
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 14,
+      "spec": {
+        "id": "existing_mean_std_distance_ridge10",
+        "layout": "existing",
+        "summary": "mean_std_distance",
+        "kind": "ridge",
+        "parameter": 10.0
+      },
+      "cv": {
+        "groups": 636,
+        "correct": 556,
+        "top1": 0.8742138364779874,
+        "macro_top1": 0.8742138364779873,
+        "top3": 0.9968553459119497,
+        "mrr": 0.9339291308224295,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 10,
+          "conditional_correct": 10,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 3
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 4,
+      "spec": {
+        "id": "existing_mean_ridge10",
+        "layout": "existing",
+        "summary": "mean",
+        "kind": "ridge",
+        "parameter": 10.0
+      },
+      "cv": {
+        "groups": 636,
+        "correct": 556,
+        "top1": 0.8742138364779874,
+        "macro_top1": 0.8742138364779873,
+        "top3": 0.9905660377358491,
+        "mrr": 0.9325908455625436,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 10,
+          "conditional_correct": 10,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 6
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 4
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 7,
+      "spec": {
+        "id": "existing_mean_std_lda0.85",
+        "layout": "existing",
+        "summary": "mean_std",
+        "kind": "lda",
+        "parameter": 0.85
+      },
+      "cv": {
+        "groups": 636,
+        "correct": 555,
+        "top1": 0.8726415094339622,
+        "macro_top1": 0.8726415094339622,
+        "top3": 0.9984276729559748,
+        "mrr": 0.9354035639412999,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 10,
+          "conditional_correct": 10,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 3
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 29,
+      "spec": {
+        "id": "selected_position_mean_std_distance_ridge10",
+        "layout": "selected_position",
+        "summary": "mean_std_distance",
+        "kind": "ridge",
+        "parameter": 10.0
+      },
+      "cv": {
+        "groups": 636,
+        "correct": 555,
+        "top1": 0.8726415094339622,
+        "macro_top1": 0.8726415094339622,
+        "top3": 0.9937106918238994,
+        "mrr": 0.9322152341020264,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 13,
+          "conditional_correct": 13,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 6
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 24,
+      "spec": {
+        "id": "selected_position_mean_std_ridge10",
+        "layout": "selected_position",
+        "summary": "mean_std",
+        "kind": "ridge",
+        "parameter": 10.0
+      },
+      "cv": {
+        "groups": 636,
+        "correct": 554,
+        "top1": 0.8710691823899371,
+        "macro_top1": 0.8710691823899372,
+        "top3": 0.9952830188679245,
+        "mrr": 0.9320597484276729,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 12,
+          "conditional_correct": 12,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 5
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 19,
+      "spec": {
+        "id": "selected_position_mean_ridge10",
+        "layout": "selected_position",
+        "summary": "mean",
+        "kind": "ridge",
+        "parameter": 10.0
+      },
+      "cv": {
+        "groups": 636,
+        "correct": 552,
+        "top1": 0.8679245283018868,
+        "macro_top1": 0.8679245283018868,
+        "top3": 0.9968553459119497,
+        "mrr": 0.9304707732149463,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 12,
+          "conditional_correct": 12,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 5
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 9,
+      "spec": {
+        "id": "existing_mean_std_ridge10",
+        "layout": "existing",
+        "summary": "mean_std",
+        "kind": "ridge",
+        "parameter": 10.0
+      },
+      "cv": {
+        "groups": 636,
+        "correct": 551,
+        "top1": 0.8663522012578616,
+        "macro_top1": 0.8663522012578616,
+        "top3": 0.9968553459119497,
+        "mrr": 0.930275633695445,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 10,
+          "conditional_correct": 10,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 3
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 18,
+      "spec": {
+        "id": "selected_position_mean_ridge1",
+        "layout": "selected_position",
+        "summary": "mean",
+        "kind": "ridge",
+        "parameter": 1.0
+      },
+      "cv": {
+        "groups": 636,
+        "correct": 550,
+        "top1": 0.8647798742138365,
+        "macro_top1": 0.8647798742138364,
+        "top3": 0.9842767295597484,
+        "mrr": 0.9257315012031992,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 10,
+          "conditional_correct": 10,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 6
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 4
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 13,
+      "spec": {
+        "id": "existing_mean_std_distance_ridge1",
+        "layout": "existing",
+        "summary": "mean_std_distance",
+        "kind": "ridge",
+        "parameter": 1.0
+      },
+      "cv": {
+        "groups": 636,
+        "correct": 549,
+        "top1": 0.8632075471698113,
+        "macro_top1": 0.8632075471698113,
+        "top3": 0.9827044025157232,
+        "mrr": 0.923767152658662,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 11,
+          "conditional_correct": 11,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 6
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 5
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 3,
+      "spec": {
+        "id": "existing_mean_ridge1",
+        "layout": "existing",
+        "summary": "mean",
+        "kind": "ridge",
+        "parameter": 1.0
+      },
+      "cv": {
+        "groups": 636,
+        "correct": 546,
+        "top1": 0.8584905660377359,
+        "macro_top1": 0.8584905660377359,
+        "top3": 0.9858490566037735,
+        "mrr": 0.9226201376632058,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 9,
+          "conditional_correct": 9,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 5
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 4
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 8,
+      "spec": {
+        "id": "existing_mean_std_ridge1",
+        "layout": "existing",
+        "summary": "mean_std",
+        "kind": "ridge",
+        "parameter": 1.0
+      },
+      "cv": {
+        "groups": 636,
+        "correct": 545,
+        "top1": 0.8569182389937107,
+        "macro_top1": 0.8569182389937107,
+        "top3": 0.9811320754716981,
+        "mrr": 0.9202961215932915,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 11,
+          "conditional_correct": 11,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 6
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 5
+            }
+          }
+        }
+      }
+    }
+  ],
+  "baseline": {
+    "groups": 636,
+    "correct": 580,
+    "top1": 0.9119496855345912,
+    "macro_top1": 0.9119496855345912,
+    "top3": 1.0,
+    "mrr": 0.9551886792452831,
+    "pair": {
+      "groups": 24,
+      "all_library_correct": 15,
+      "conditional_correct": 15,
+      "per_model": {
+        "gpt-6-astra": {
+          "groups": 12,
+          "all_library_correct": 7
+        },
+        "gpt-6.1-sol": {
+          "groups": 12,
+          "all_library_correct": 8
+        }
+      }
+    }
+  },
+  "reference_sha256": "5a86bb2409f7e132f4bb98456d54996014782fa531c6e670ce46f16d213b11d4",
+  "source_hashes": {
+    "research/studies/generic-refinement-20261001/group_models.py": "d8aaad24900b150c0521bb3271b4ee57f887314a534ca197d7e701676960cd19",
+    "projects/data/unified_reference.jsonl": "5a86bb2409f7e132f4bb98456d54996014782fa531c6e670ce46f16d213b11d4",
+    "projects/data/unified_bank.json": "47b8ad67e8ad32095ac650b3a384420c06ef88bb6e78206be478a8cd62029968",
+    "research/studies/sequence-generalization/classifiers.py": "2334dd964e4c1c36e5c3943df5f1711de49bf82acdd10d61098dda520a14ff38",
+    "research/studies/sequence-generalization/positional.py": "06cfec8faa7d626b08ccd8ab50444e5ad0ce47a5d14cad849c29e16723829af4",
+    "projects/offline/fingerprint.py": "df136eaee890332878a20a35dae7854e4218abe490e49c27b03b96332f7a9918",
+    "projects/offline/bank_builder.py": "2854fd459b445046c5c5f56f56302c943d5a462a857694789acccf5d7353a27d",
+    "projects/offline/reference_data.py": "d322eb015e0eb765440c77c4d713dd09eff649bff19e0de582820b0cbb8a01ef",
+    "projects/offline/shared_verifier_core.py": "6afc453489dafc3c17705dcc55f9046fc93ae0761e94409f531ac33de11102ec"
+  },
+  "gains": 16,
+  "losses": 29,
+  "calibration": {
+    "beta": 0.07079664201016402,
+    "nll": 0.2224432270796205,
+    "thresholds": [
+      {
+        "threshold": 0.5,
+        "accepted": 630,
+        "correct": 562,
+        "coverage": 0.9905660377358491,
+        "precision": 0.8920634920634921,
+        "pair_accepted": 24,
+        "pair_correct": 12
+      },
+      {
+        "threshold": 0.7,
+        "accepted": 544,
+        "correct": 518,
+        "coverage": 0.8553459119496856,
+        "precision": 0.9522058823529411,
+        "pair_accepted": 9,
+        "pair_correct": 4
+      },
+      {
+        "threshold": 0.8,
+        "accepted": 503,
+        "correct": 492,
+        "coverage": 0.7908805031446541,
+        "precision": 0.9781312127236581,
+        "pair_accepted": 5,
+        "pair_correct": 2
+      },
+      {
+        "threshold": 0.9,
+        "accepted": 461,
+        "correct": 455,
+        "coverage": 0.7248427672955975,
+        "precision": 0.9869848156182213,
+        "pair_accepted": 2,
+        "pair_correct": 0
+      },
+      {
+        "threshold": 0.95,
+        "accepted": 428,
+        "correct": 426,
+        "coverage": 0.6729559748427673,
+        "precision": 0.9953271028037384,
+        "pair_accepted": 0,
+        "pair_correct": 0
+      },
+      {
+        "threshold": 0.99,
+        "accepted": 352,
+        "correct": 352,
+        "coverage": 0.5534591194968553,
+        "precision": 1.0,
+        "pair_accepted": 0,
+        "pair_correct": 0
+      }
+    ]
+  },
+  "artifact_sha256": "b3e605921e6508379293ed9a062822794028437cbf96638dc1e24647efe8ed76",
+  "artifact_bytes": 333005,
+  "inference_features": 751,
+  "elapsed_seconds": 17.321409541997127,
+  "limitation": "Reference-only development selection and synthetic bootstrap; no external validation or high-confidence identity claim."
+}

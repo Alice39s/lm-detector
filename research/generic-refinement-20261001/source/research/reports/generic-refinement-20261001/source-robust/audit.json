@@ -1,0 +1,52 @@
+{
+  "errors": [],
+  "gallery_labels": 53,
+  "reference_rows": 1948,
+  "derived_development_rows": 240,
+  "reference_folds": 12,
+  "matched_development_folds": 40,
+  "clean_transfer_folds": 2,
+  "all_folds_text_sequence_disjoint": true,
+  "all_folds_class_and_source_balance_checked": true,
+  "reference_oof_shape": [
+    11,
+    636,
+    53
+  ],
+  "development_oof_shape": [
+    11,
+    80,
+    53
+  ],
+  "original_dataset_bindings": [
+    {
+      "path": "projects/research/sequence-generalization-20260930/source/research/reports/astra-sol-separation/paired-low-01/manifest.json",
+      "sha256": "e0b9cdd6c088518a587d3092e30f3bd2402572b3866b73ed7bd730f1cbcad543",
+      "first_bundle_hash_matches": true
+    },
+    {
+      "path": "projects/research/sequence-generalization-20260930/source/research/reports/astra-sol-separation/paired-low-01/samples.jsonl",
+      "sha256": "3f615be95a2bbcd65c350f4e9b414303507b2e0b8f1384767cc8759edbd98955",
+      "first_bundle_hash_matches": true
+    },
+    {
+      "path": "projects/research/sequence-generalization-20260930/source/research/reports/sequence-generalization/20260930/prospective/manifest.json",
+      "sha256": "ff48b49bf4f99c1e702ae3086ae0357760b73ac16b423e63c8c55078f4a17402",
+      "first_bundle_hash_matches": true
+    },
+    {
+      "path": "projects/research/sequence-generalization-20260930/source/research/reports/sequence-generalization/20260930/prospective/samples.jsonl",
+      "sha256": "acefa9f99b6793c07edb500853d935abef8dae0cbe20e7ecbea9683bf51f8f2f",
+      "first_bundle_hash_matches": true
+    }
+  ],
+  "original_input_registry_modified": false,
+  "aggregation_fix_main_scores_unchanged": true,
+  "aggregation_fix_raw_candidate_transfer_scores_unchanged": true,
+  "selected_artifact_first_frozen_complete_score_vector_identical": true,
+  "synthetic_predicted_label": "deepseek-v3.2",
+  "fixed_holdout_opened": false,
+  "api_requests": 0,
+  "code_sha256": "f247bcf8708ddb5ad2cd46c148ac6f5737c0792aeaff1e85c8779108c436cd2a",
+  "artifact_sha256": "d80b532ea015f56a7315859bfd4eccc1dad507184957f6044c13e717baca70e1"
+}

@@ -1,0 +1,467 @@
+{
+  "schema": "generic-refinement-blind-collection-v2",
+  "id": "generic-refinement-direct-low-v2-20261001",
+  "purpose": "prospective-evaluation-v2",
+  "created_at": "2026-09-30T18:28:34.840Z",
+  "training_allowed": false,
+  "selection_influenced_by_classifier_results": false,
+  "endpoint": "https://api.openai.com/v1/responses",
+  "models": [
+    "gpt-6-astra",
+    "gpt-6.1-sol"
+  ],
+  "profile": {
+    "format": "responses",
+    "reasoning": {
+      "effort": "low"
+    },
+    "stream": true,
+    "store": false,
+    "max_output_tokens": 8192,
+    "timeout_ms": 600000,
+    "concurrency": 4,
+    "max_attempts": 2
+  },
+  "neutral_prefix": "此条记录属于一次新的独立采样。",
+  "challenge_generation": "Existing generateChallenges; 20 rounds of 3 independently randomized challenges, with distinct lengths inside each round; identical frozen prompts for both models.",
+  "candidate_freeze_default": "research/reports/generic-refinement-20261001/fusion/freeze.json",
+  "candidate_freeze_override": "CANDIDATE_FREEZE_FILE; bound immutably at first manifest creation",
+  "selection": {
+    "policy": "first eligible attempt, never classification-based retries",
+    "completion": "complete or user-authorized expected-count cap",
+    "minimum_numbers": "max(80, ceil(0.55 * expected_count))",
+    "cap": "first expected_count complete parsed integers, preserve original request output limit",
+    "model_identity": "exact requested ID or requested ID followed by a YYYY-MM-DD or YYYYMMDD date suffix; preserve actual ID",
+    "duplicates": "Reject exact response-text or parsed-integer-sequence duplicates of any historical attempt or earlier v2 attempt; compare sequences only if at least 80 parsed values.",
+    "retry": "At most 2 physical attempts per model/challenge, including recovered interrupted traces; skip first eligible accepted slot.",
+    "auth_failure": "Pause new requests on HTTP 401/402/403; an explicit --resume may continue only remaining attempts without scoring."
+  },
+  "trace": {
+    "transport": "projects/cli/trace.ts",
+    "authentication_headers_saved": false,
+    "raw_bytes": "Save exact response body bytes received, including failure and capped partial streams, with SHA256/byte count and safe response metadata.",
+    "interrupted_resume": "Recover existing unrecorded trace offline using the same parser and eligibility rules before issuing another attempt; never request a replacement for a recovered eligible trace."
+  },
+  "deduplication": {
+    "source_hashes": {
+      "projects/research/sequence-generalization-20260930/source/projects/data/unified_reference.jsonl": "5a86bb2409f7e132f4bb98456d54996014782fa531c6e670ce46f16d213b11d4",
+      "projects/research/sequence-generalization-20260930/source/research/evaluation/holdout/manifest.json": "9bc45797fae31b5972205a50818cc168f5ce5ff048ef4a17445ee7d8ef7743e9",
+      "projects/research/sequence-generalization-20260930/source/research/evaluation/holdout/samples.jsonl": "84e19921aedbc23e5f0f5b283e17493a2e33d363477230c084e2f5d08bb09683",
+      "projects/research/sequence-generalization-20260930/source/research/reports/astra-sol-separation/paired-low-01/manifest.json": "e0b9cdd6c088518a587d3092e30f3bd2402572b3866b73ed7bd730f1cbcad543",
+      "projects/research/sequence-generalization-20260930/source/research/reports/astra-sol-separation/paired-low-01/samples.jsonl": "3f615be95a2bbcd65c350f4e9b414303507b2e0b8f1384767cc8759edbd98955",
+      "projects/research/sequence-generalization-20260930/source/research/reports/sequence-generalization/20260930/prospective/manifest.json": "ff48b49bf4f99c1e702ae3086ae0357760b73ac16b423e63c8c55078f4a17402",
+      "projects/research/sequence-generalization-20260930/source/research/reports/sequence-generalization/20260930/prospective/samples.jsonl": "acefa9f99b6793c07edb500853d935abef8dae0cbe20e7ecbea9683bf51f8f2f"
+    },
+    "historical_prompt_count": 279,
+    "historical_text_sha_count": 2700,
+    "historical_sequence_sha_count": 2685,
+    "comparison_scope": "Prompt/text/integer sequence only; no prediction or classification outputs are read.",
+    "challenge_prompt_duplicates": 0
+  },
+  "aggregation": {
+    "primary": "20 paired rounds, 3 replies per model per round",
+    "optional_predeclared": "4 nonoverlapping blocks of 5 successive rounds, 15 replies per model per block; no adaptive grouping or score-based exclusions"
+  },
+  "rounds": [
+    {
+      "id": "round-01",
+      "challenges": [
+        {
+          "id": "v2-round-01-challenge-1",
+          "expected_count": 316,
+          "prompt": "此条记录属于一次新的独立采样。\nVeuillez accomplir la tâche suivante de choix d’entiers sans signification sémantique. Donnez séparément au premier réflexe 316 entiers compris entre 1 et 355, bornes incluses. Choisissez séparément pour chaque position ; ne comptez pas à partir de 1, ne produisez pas de valeurs consécutives croissantes ou décroissantes, et ne suivez pas de progression arithmétique, de cycle, de blocs répétés ou d’autre motif systématique. Le modèle de langage actuel doit accomplir cette tâche directement : n’appelez et n’utilisez aucun outil, notamment Python, un exécuteur de code, une calculatrice, une recherche, une API ou un générateur externe de nombres aléatoires ; n’écrivez et n’exécutez pas de code au préalable. Les répétitions accidentelles sont valides ; ne réorganisez et ne corrigez pas les éléments déjà écrits. Séparez les nombres par des virgules ou des espaces. Commencez directement par la première valeur choisie, sans répéter le nombre d’éléments, l’intervalle ou les consignes avant la séquence."
+        },
+        {
+          "id": "v2-round-01-challenge-2",
+          "expected_count": 295,
+          "prompt": "此条记录属于一次新的独立采样。\n첫 직감에 따른 값 선택을 한 번 기록하세요. 하나씩 바로 1부터 355까지(양 끝 포함)의 정수 295개를 고르세요. 각 위치의 값은 따로 고르세요. 1부터 차례로 세지 말고, 연속으로 증가하거나 감소하지 말며, 등차수열, 순환, 반복되는 블록 또는 그 밖의 규칙적인 패턴도 사용하지 마세요. 이 과제는 현재 언어 모델이 직접 수행해야 합니다. Python, 코드 실행기, 계산기, 검색, API, 외부 난수 생성기를 포함한 어떤 도구도 호출하거나 이용하지 마세요. 미리 코드를 작성하거나 실행하지도 마세요. 같은 숫자가 다시 나와도 됩니다. 각 항목을 쓴 뒤 되돌아가서 정렬하거나 중복을 제거하거나 바꾸지 마세요. 쉼표, 공백 또는 줄바꿈으로 구분할 수 있습니다. 고른 첫 번째 값부터 바로 출력하고, 수열 앞에 개수, 범위 또는 과제 설명을 반복하지 마세요."
+        },
+        {
+          "id": "v2-round-01-challenge-3",
+          "expected_count": 330,
+          "prompt": "此条记录属于一次新的独立采样。\nComplete the following integer-choice task, which carries no semantic meaning. Choose, item by item, 330 integers from 1 to 355, inclusive. Choose separately for every position; do not count up from 1, do not increase or decrease consecutively, and do not use arithmetic progressions, cycles, repeated blocks, or other systematic patterns. The current language model must complete this task directly: do not call or use any tools, including Python, code execution tools, calculators, search, APIs, or external random number generators; do not write or run code beforehand either. Accidental repetitions are valid; do not rearrange or correct items already written. Choose any format that clearly separates each integer. Start the output directly with the first chosen value; do not repeat the count, range, or task instructions before the sequence."
+        }
+      ]
+    },
+    {
+      "id": "round-02",
+      "challenges": [
+        {
+          "id": "v2-round-02-challenge-1",
+          "expected_count": 332,
+          "prompt": "此条记录属于一次新的独立采样。\nVeuillez accomplir la tâche suivante de choix d’entiers sans signification sémantique. Pour chaque position, choisissez séparément au premier réflexe 332 entiers compris entre 1 et 355, bornes incluses. Choisissez séparément pour chaque position ; ne comptez pas à partir de 1, ne produisez pas de valeurs consécutives croissantes ou décroissantes, et ne suivez pas de progression arithmétique, de cycle, de blocs répétés ou d’autre motif systématique. Le modèle de langage actuel doit accomplir cette tâche directement : n’appelez et n’utilisez aucun outil, notamment Python, un exécuteur de code, une calculatrice, une recherche, une API ou un générateur externe de nombres aléatoires ; n’écrivez et n’exécutez pas de code au préalable. Un nombre peut réapparaître ; après avoir écrit chaque élément, ne revenez pas en arrière pour le trier, supprimer les doublons ou le remplacer. Séparez les nombres par des virgules ou des espaces. Commencez directement par la première valeur choisie, sans répéter le nombre d’éléments, l’intervalle ou les consignes avant la séquence."
+        },
+        {
+          "id": "v2-round-02-challenge-2",
+          "expected_count": 326,
+          "prompt": "此条记录属于一次新的独立采样。\n다음의 의미 없는 정수 선택 과제를 완료하세요. 매번 현재 항목 하나만 정하면서 1부터 355까지(양 끝 포함)의 정수 326개를 고르세요. 각 위치의 값은 따로 고르세요. 1부터 차례로 세지 말고, 연속으로 증가하거나 감소하지 말며, 등차수열, 순환, 반복되는 블록 또는 그 밖의 규칙적인 패턴도 사용하지 마세요. 이 과제는 현재 언어 모델이 직접 수행해야 합니다. Python, 코드 실행기, 계산기, 검색, API, 외부 난수 생성기를 포함한 어떤 도구도 호출하거나 이용하지 마세요. 미리 코드를 작성하거나 실행하지도 마세요. 같은 숫자가 다시 나와도 됩니다. 각 항목을 쓴 뒤 되돌아가서 정렬하거나 중복을 제거하거나 바꾸지 마세요. 쉼표, 공백 또는 줄바꿈으로 구분할 수 있습니다. 고른 첫 번째 값부터 바로 출력하고, 수열 앞에 개수, 범위 또는 과제 설명을 반복하지 마세요."
+        },
+        {
+          "id": "v2-round-02-challenge-3",
+          "expected_count": 299,
+          "prompt": "此条记录属于一次新的独立采样。\n意味を持たない整数の選択を一組生成してください。毎回その時点の一項目だけを決めて、1 から 355 まで（両端を含む）の整数を 299 個選んでください。各位置の値は個別に選んでください。1 から順に数えたり、連続して増加または減少させたりせず、等差数列、周期、同じブロックの繰り返し、その他の規則的なパターンも使わないでください。この課題は現在の言語モデル自身が直接行ってください。Python、コード実行ツール、計算機、検索、API、外部の乱数生成器など、いかなるツールも呼び出したり利用したりしないでください。事前にコードを書いたり実行したりすることも禁止します。数字に意味を持たせる必要はありません。すでに出した値は変えないでください。コンマ、空白、改行のいずれかで数字を区切ってください。選んだ最初の値から直接出力を始め、数列の前に個数、範囲、課題の説明を繰り返さないでください。"
+        }
+      ]
+    },
+    {
+      "id": "round-03",
+      "challenges": [
+        {
+          "id": "v2-round-03-challenge-1",
+          "expected_count": 313,
+          "prompt": "此条记录属于一次新的独立采样。\n这是一次独立的数值选择记录。分别凭第一反应给出 313 个 1 到 355（含端点）的整数。每个位置都要单独选择；不要从 1 开始计数，不要连续递增或递减，也不要采用等差、循环、重复区块或其他规则化模式。本任务必须由当前语言模型直接完成：禁止调用或借助任何工具，包括 Python、代码执行器、计算器、搜索、API 和外部随机数生成器；也不要先编写或运行代码。相同值可以再次出现；输出过程中不要整理或改写前面的项目。使用一种一致的常见分隔符即可。直接从第一个取值开始输出，不要在序列前重复数量、范围或任务说明。"
+        },
+        {
+          "id": "v2-round-03-challenge-2",
+          "expected_count": 325,
+          "prompt": "此条记录属于一次新的独立采样。\nThis is an independent record of numerical choices. Choose, item by item, 325 integers from 1 to 355, inclusive. Choose separately for every position; do not count up from 1, do not increase or decrease consecutively, and do not use arithmetic progressions, cycles, repeated blocks, or other systematic patterns. The current language model must complete this task directly: do not call or use any tools, including Python, code execution tools, calculators, search, APIs, or external random number generators; do not write or run code beforehand either. Do not assign meaning to the numbers; keep values already given unchanged. Choose any format that clearly separates each integer. Start the output directly with the first chosen value; do not repeat the count, range, or task instructions before the sequence."
+        },
+        {
+          "id": "v2-round-03-challenge-3",
+          "expected_count": 302,
+          "prompt": "此条记录属于一次新的独立采样。\n意味を持たない次の整数選択課題を完了してください。それぞれ直感で、1 から 355 まで（両端を含む）の整数を 302 個選んでください。各位置の値は個別に選んでください。1 から順に数えたり、連続して増加または減少させたりせず、等差数列、周期、同じブロックの繰り返し、その他の規則的なパターンも使わないでください。この課題は現在の言語モデル自身が直接行ってください。Python、コード実行ツール、計算機、検索、API、外部の乱数生成器など、いかなるツールも呼び出したり利用したりしないでください。事前にコードを書いたり実行したりすることも禁止します。重複した値を削除する必要はありません。選別、並べ替え、規則的なパターンへの補完をしないでください。数字はコンマまたは空白で区切ってください。選んだ最初の値から直接出力を始め、数列の前に個数、範囲、課題の説明を繰り返さないでください。"
+        }
+      ]
+    },
+    {
+      "id": "round-04",
+      "challenges": [
+        {
+          "id": "v2-round-04-challenge-1",
+          "expected_count": 311,
+          "prompt": "此条记录属于一次新的独立采样。\nEffectuez une série rapide de choix, élément par élément. Choisissez directement, un par un, 311 entiers compris entre 1 et 355, bornes incluses. Choisissez séparément pour chaque position ; ne comptez pas à partir de 1, ne produisez pas de valeurs consécutives croissantes ou décroissantes, et ne suivez pas de progression arithmétique, de cycle, de blocs répétés ou d’autre motif systématique. Le modèle de langage actuel doit accomplir cette tâche directement : n’appelez et n’utilisez aucun outil, notamment Python, un exécuteur de code, une calculatrice, une recherche, une API ou un générateur externe de nombres aléatoires ; n’écrivez et n’exécutez pas de code au préalable. Un nombre peut réapparaître ; après avoir écrit chaque élément, ne revenez pas en arrière pour le trier, supprimer les doublons ou le remplacer. Séparez les nombres par des virgules ou des espaces. Commencez directement par la première valeur choisie, sans répéter le nombre d’éléments, l’intervalle ou les consignes avant la séquence."
+        },
+        {
+          "id": "v2-round-04-challenge-2",
+          "expected_count": 320,
+          "prompt": "此条记录属于一次新的独立采样。\n意味を持たない次の整数選択課題を完了してください。一つずつ直接、1 から 355 まで（両端を含む）の整数を 320 個選んでください。各位置の値は個別に選んでください。1 から順に数えたり、連続して増加または減少させたりせず、等差数列、周期、同じブロックの繰り返し、その他の規則的なパターンも使わないでください。この課題は現在の言語モデル自身が直接行ってください。Python、コード実行ツール、計算機、検索、API、外部の乱数生成器など、いかなるツールも呼び出したり利用したりしないでください。事前にコードを書いたり実行したりすることも禁止します。偶然の重複は有効です。すでに書いた項目を並べ替えたり修正したりしないでください。各整数の区切りが明確であれば、形式は自由です。選んだ最初の値から直接出力を始め、数列の前に個数、範囲、課題の説明を繰り返さないでください。"
+        },
+        {
+          "id": "v2-round-04-challenge-3",
+          "expected_count": 292,
+          "prompt": "此条记录属于一次新的独立采样。\n이것은 독립적인 수치 선택 기록입니다. 각 위치마다 첫 직감으로 따로 1부터 355까지(양 끝 포함)의 정수 292개를 고르세요. 각 위치의 값은 따로 고르세요. 1부터 차례로 세지 말고, 연속으로 증가하거나 감소하지 말며, 등차수열, 순환, 반복되는 블록 또는 그 밖의 규칙적인 패턴도 사용하지 마세요. 이 과제는 현재 언어 모델이 직접 수행해야 합니다. Python, 코드 실행기, 계산기, 검색, API, 외부 난수 생성기를 포함한 어떤 도구도 호출하거나 이용하지 마세요. 미리 코드를 작성하거나 실행하지도 마세요. 같은 숫자가 다시 나와도 됩니다. 각 항목을 쓴 뒤 되돌아가서 정렬하거나 중복을 제거하거나 바꾸지 마세요. 일반적인 구분 기호 하나를 일관되게 사용하세요. 고른 첫 번째 값부터 바로 출력하고, 수열 앞에 개수, 범위 또는 과제 설명을 반복하지 마세요."
+        }
+      ]
+    },
+    {
+      "id": "round-05",
+      "challenges": [
+        {
+          "id": "v2-round-05-challenge-1",
+          "expected_count": 332,
+          "prompt": "此条记录属于一次新的独立采样。\nCeci est un relevé indépendant de choix numériques. Pour chaque position, choisissez séparément au premier réflexe 332 entiers compris entre 1 et 355, bornes incluses. Choisissez séparément pour chaque position ; ne comptez pas à partir de 1, ne produisez pas de valeurs consécutives croissantes ou décroissantes, et ne suivez pas de progression arithmétique, de cycle, de blocs répétés ou d’autre motif systématique. Le modèle de langage actuel doit accomplir cette tâche directement : n’appelez et n’utilisez aucun outil, notamment Python, un exécuteur de code, une calculatrice, une recherche, une API ou un générateur externe de nombres aléatoires ; n’écrivez et n’exécutez pas de code au préalable. Les répétitions accidentelles sont valides ; ne réorganisez et ne corrigez pas les éléments déjà écrits. Séparez les nombres par des virgules ou des espaces. Commencez directement par la première valeur choisie, sans répéter le nombre d’éléments, l’intervalle ou les consignes avant la séquence."
+        },
+        {
+          "id": "v2-round-05-challenge-2",
+          "expected_count": 304,
+          "prompt": "此条记录属于一次新的独立采样。\n一項目ずつ素早く値を選んでください。一つずつ直接、1 から 355 まで（両端を含む）の整数を 304 個選んでください。各位置の値は個別に選んでください。1 から順に数えたり、連続して増加または減少させたりせず、等差数列、周期、同じブロックの繰り返し、その他の規則的なパターンも使わないでください。この課題は現在の言語モデル自身が直接行ってください。Python、コード実行ツール、計算機、検索、API、外部の乱数生成器など、いかなるツールも呼び出したり利用したりしないでください。事前にコードを書いたり実行したりすることも禁止します。同じ数字が再び現れてもかまいません。各項目を書いた後に戻って、並べ替え、重複の削除、置き換えをしないでください。各整数の区切りが明確であれば、形式は自由です。選んだ最初の値から直接出力を始め、数列の前に個数、範囲、課題の説明を繰り返さないでください。"
+        },
+        {
+          "id": "v2-round-05-challenge-3",
+          "expected_count": 319,
+          "prompt": "此条记录属于一次新的独立采样。\nRecord a round of first-instinct choices. Give, each by first instinct, 319 integers from 1 to 355, inclusive. Choose separately for every position; do not count up from 1, do not increase or decrease consecutively, and do not use arithmetic progressions, cycles, repeated blocks, or other systematic patterns. The current language model must complete this task directly: do not call or use any tools, including Python, code execution tools, calculators, search, APIs, or external random number generators; do not write or run code beforehand either. Repeated values do not need to be removed; do not filter, reorder, or fill the sequence into a pattern. You may separate the numbers with commas, spaces, or line breaks. Start the output directly with the first chosen value; do not repeat the count, range, or task instructions before the sequence."
+        }
+      ]
+    },
+    {
+      "id": "round-06",
+      "challenges": [
+        {
+          "id": "v2-round-06-challenge-1",
+          "expected_count": 320,
+          "prompt": "此条记录属于一次新的独立采样。\n请完成下面的无语义整数选择任务。逐项选择 320 个 1 到 355（含端点）的整数。每个位置都要单独选择；不要从 1 开始计数，不要连续递增或递减，也不要采用等差、循环、重复区块或其他规则化模式。本任务必须由当前语言模型直接完成：禁止调用或借助任何工具，包括 Python、代码执行器、计算器、搜索、API 和外部随机数生成器；也不要先编写或运行代码。重复值无需删除；不要筛选、重排或补成某种规律。使用一种一致的常见分隔符即可。直接从第一个取值开始输出，不要在序列前重复数量、范围或任务说明。"
+        },
+        {
+          "id": "v2-round-06-challenge-2",
+          "expected_count": 294,
+          "prompt": "此条记录属于一次新的独立采样。\nGénérez une série de choix d’entiers dépourvus de sens. Choisissez, élément par élément, 294 entiers compris entre 1 et 355, bornes incluses. Choisissez séparément pour chaque position ; ne comptez pas à partir de 1, ne produisez pas de valeurs consécutives croissantes ou décroissantes, et ne suivez pas de progression arithmétique, de cycle, de blocs répétés ou d’autre motif systématique. Le modèle de langage actuel doit accomplir cette tâche directement : n’appelez et n’utilisez aucun outil, notamment Python, un exécuteur de code, une calculatrice, une recherche, une API ou un générateur externe de nombres aléatoires ; n’écrivez et n’exécutez pas de code au préalable. Une même valeur peut réapparaître ; pendant la sortie, ne réorganisez et ne réécrivez pas les éléments précédents. Séparez les nombres par des virgules ou des espaces. Commencez directement par la première valeur choisie, sans répéter le nombre d’éléments, l’intervalle ou les consignes avant la séquence."
+        },
+        {
+          "id": "v2-round-06-challenge-3",
+          "expected_count": 293,
+          "prompt": "此条记录属于一次新的独立采样。\nEffectuez une série rapide de choix, élément par élément. Pour chaque position, choisissez séparément au premier réflexe 293 entiers compris entre 1 et 355, bornes incluses. Choisissez séparément pour chaque position ; ne comptez pas à partir de 1, ne produisez pas de valeurs consécutives croissantes ou décroissantes, et ne suivez pas de progression arithmétique, de cycle, de blocs répétés ou d’autre motif systématique. Le modèle de langage actuel doit accomplir cette tâche directement : n’appelez et n’utilisez aucun outil, notamment Python, un exécuteur de code, une calculatrice, une recherche, une API ou un générateur externe de nombres aléatoires ; n’écrivez et n’exécutez pas de code au préalable. Les valeurs répétées n’ont pas besoin d’être supprimées ; ne filtrez pas, ne réordonnez pas et ne complétez pas la séquence pour former un motif. Choisissez librement le format, pourvu que la limite de chaque entier soit claire. Commencez directement par la première valeur choisie, sans répéter le nombre d’éléments, l’intervalle ou les consignes avant la séquence."
+        }
+      ]
+    },
+    {
+      "id": "round-07",
+      "challenges": [
+        {
+          "id": "v2-round-07-challenge-1",
+          "expected_count": 301,
+          "prompt": "此条记录属于一次新的独立采样。\n意味を持たない整数の選択を一組生成してください。各位置について個別に直感で、1 から 355 まで（両端を含む）の整数を 301 個選んでください。各位置の値は個別に選んでください。1 から順に数えたり、連続して増加または減少させたりせず、等差数列、周期、同じブロックの繰り返し、その他の規則的なパターンも使わないでください。この課題は現在の言語モデル自身が直接行ってください。Python、コード実行ツール、計算機、検索、API、外部の乱数生成器など、いかなるツールも呼び出したり利用したりしないでください。事前にコードを書いたり実行したりすることも禁止します。重複した値を削除する必要はありません。選別、並べ替え、規則的なパターンへの補完をしないでください。数字はコンマまたは空白で区切ってください。選んだ最初の値から直接出力を始め、数列の前に個数、範囲、課題の説明を繰り返さないでください。"
+        },
+        {
+          "id": "v2-round-07-challenge-2",
+          "expected_count": 310,
+          "prompt": "此条记录属于一次新的独立采样。\n의미를 담지 않은 정수 선택을 한 세트 생성하세요. 항목별로 1부터 355까지(양 끝 포함)의 정수 310개를 고르세요. 각 위치의 값은 따로 고르세요. 1부터 차례로 세지 말고, 연속으로 증가하거나 감소하지 말며, 등차수열, 순환, 반복되는 블록 또는 그 밖의 규칙적인 패턴도 사용하지 마세요. 이 과제는 현재 언어 모델이 직접 수행해야 합니다. Python, 코드 실행기, 계산기, 검색, API, 외부 난수 생성기를 포함한 어떤 도구도 호출하거나 이용하지 마세요. 미리 코드를 작성하거나 실행하지도 마세요. 숫자에 어떤 의미도 부여할 필요가 없습니다. 이미 제시한 값은 그대로 두세요. 각 정수의 경계만 분명하면 형식은 자유롭게 정해도 됩니다. 고른 첫 번째 값부터 바로 출력하고, 수열 앞에 개수, 범위 또는 과제 설명을 반복하지 마세요."
+        },
+        {
+          "id": "v2-round-07-challenge-3",
+          "expected_count": 312,
+          "prompt": "此条记录属于一次新的独立采样。\nこれは独立した数値選択の記録です。それぞれ直感で、1 から 355 まで（両端を含む）の整数を 312 個選んでください。各位置の値は個別に選んでください。1 から順に数えたり、連続して増加または減少させたりせず、等差数列、周期、同じブロックの繰り返し、その他の規則的なパターンも使わないでください。この課題は現在の言語モデル自身が直接行ってください。Python、コード実行ツール、計算機、検索、API、外部の乱数生成器など、いかなるツールも呼び出したり利用したりしないでください。事前にコードを書いたり実行したりすることも禁止します。数字に意味を持たせる必要はありません。すでに出した値は変えないでください。一般的な区切り文字を一種類、統一して使ってください。選んだ最初の値から直接出力を始め、数列の前に個数、範囲、課題の説明を繰り返さないでください。"
+        }
+      ]
+    },
+    {
+      "id": "round-08",
+      "challenges": [
+        {
+          "id": "v2-round-08-challenge-1",
+          "expected_count": 311,
+          "prompt": "此条记录属于一次新的独立采样。\nGenerate a set of integer choices that carry no meaning. Decide only the current item each time, giving a total of 311 integers from 1 to 355, inclusive. Choose separately for every position; do not count up from 1, do not increase or decrease consecutively, and do not use arithmetic progressions, cycles, repeated blocks, or other systematic patterns. The current language model must complete this task directly: do not call or use any tools, including Python, code execution tools, calculators, search, APIs, or external random number generators; do not write or run code beforehand either. Do not assign meaning to the numbers; keep values already given unchanged. You may separate the numbers with commas, spaces, or line breaks. Start the output directly with the first chosen value; do not repeat the count, range, or task instructions before the sequence."
+        },
+        {
+          "id": "v2-round-08-challenge-2",
+          "expected_count": 303,
+          "prompt": "此条记录属于一次新的独立采样。\n다음의 의미 없는 정수 선택 과제를 완료하세요. 하나씩 바로 1부터 355까지(양 끝 포함)의 정수 303개를 고르세요. 각 위치의 값은 따로 고르세요. 1부터 차례로 세지 말고, 연속으로 증가하거나 감소하지 말며, 등차수열, 순환, 반복되는 블록 또는 그 밖의 규칙적인 패턴도 사용하지 마세요. 이 과제는 현재 언어 모델이 직접 수행해야 합니다. Python, 코드 실행기, 계산기, 검색, API, 외부 난수 생성기를 포함한 어떤 도구도 호출하거나 이용하지 마세요. 미리 코드를 작성하거나 실행하지도 마세요. 숫자에 어떤 의미도 부여할 필요가 없습니다. 이미 제시한 값은 그대로 두세요. 각 정수의 경계만 분명하면 형식은 자유롭게 정해도 됩니다. 고른 첫 번째 값부터 바로 출력하고, 수열 앞에 개수, 범위 또는 과제 설명을 반복하지 마세요."
+        },
+        {
+          "id": "v2-round-08-challenge-3",
+          "expected_count": 292,
+          "prompt": "此条记录属于一次新的独立采样。\nこれは独立した数値選択の記録です。一つずつ直接、1 から 355 まで（両端を含む）の整数を 292 個選んでください。各位置の値は個別に選んでください。1 から順に数えたり、連続して増加または減少させたりせず、等差数列、周期、同じブロックの繰り返し、その他の規則的なパターンも使わないでください。この課題は現在の言語モデル自身が直接行ってください。Python、コード実行ツール、計算機、検索、API、外部の乱数生成器など、いかなるツールも呼び出したり利用したりしないでください。事前にコードを書いたり実行したりすることも禁止します。数字に意味を持たせる必要はありません。すでに出した値は変えないでください。各整数の区切りが明確であれば、形式は自由です。選んだ最初の値から直接出力を始め、数列の前に個数、範囲、課題の説明を繰り返さないでください。"
+        }
+      ]
+    },
+    {
+      "id": "round-09",
+      "challenges": [
+        {
+          "id": "v2-round-09-challenge-1",
+          "expected_count": 297,
+          "prompt": "此条记录属于一次新的独立采样。\n의미를 담지 않은 정수 선택을 한 세트 생성하세요. 매번 현재 항목 하나만 정하면서 1부터 355까지(양 끝 포함)의 정수 297개를 고르세요. 각 위치의 값은 따로 고르세요. 1부터 차례로 세지 말고, 연속으로 증가하거나 감소하지 말며, 등차수열, 순환, 반복되는 블록 또는 그 밖의 규칙적인 패턴도 사용하지 마세요. 이 과제는 현재 언어 모델이 직접 수행해야 합니다. Python, 코드 실행기, 계산기, 검색, API, 외부 난수 생성기를 포함한 어떤 도구도 호출하거나 이용하지 마세요. 미리 코드를 작성하거나 실행하지도 마세요. 중복된 값을 지울 필요는 없습니다. 걸러 내거나 다시 배열하거나 어떤 규칙에 맞춰 채우지 마세요. 각 정수의 경계만 분명하면 형식은 자유롭게 정해도 됩니다. 고른 첫 번째 값부터 바로 출력하고, 수열 앞에 개수, 범위 또는 과제 설명을 반복하지 마세요."
+        },
+        {
+          "id": "v2-round-09-challenge-2",
+          "expected_count": 310,
+          "prompt": "此条记录属于一次新的独立采样。\n这是一次独立的数值选择记录。逐个直接选择 310 个 1 到 355（含端点）的整数。每个位置都要单独选择；不要从 1 开始计数，不要连续递增或递减，也不要采用等差、循环、重复区块或其他规则化模式。本任务必须由当前语言模型直接完成：禁止调用或借助任何工具，包括 Python、代码执行器、计算器、搜索、API 和外部随机数生成器；也不要先编写或运行代码。重复值无需删除；不要筛选、重排或补成某种规律。只要每个整数边界清楚，格式可自行选择。直接从第一个取值开始输出，不要在序列前重复数量、范围或任务说明。"
+        },
+        {
+          "id": "v2-round-09-challenge-3",
+          "expected_count": 296,
+          "prompt": "此条记录属于一次新的独立采样。\nRecord a round of first-instinct choices. Decide only the current item each time, giving a total of 296 integers from 1 to 355, inclusive. Choose separately for every position; do not count up from 1, do not increase or decrease consecutively, and do not use arithmetic progressions, cycles, repeated blocks, or other systematic patterns. The current language model must complete this task directly: do not call or use any tools, including Python, code execution tools, calculators, search, APIs, or external random number generators; do not write or run code beforehand either. Do not assign meaning to the numbers; keep values already given unchanged. Choose any format that clearly separates each integer. Start the output directly with the first chosen value; do not repeat the count, range, or task instructions before the sequence."
+        }
+      ]
+    },
+    {
+      "id": "round-10",
+      "challenges": [
+        {
+          "id": "v2-round-10-challenge-1",
+          "expected_count": 295,
+          "prompt": "此条记录属于一次新的独立采样。\n请完成下面的无语义整数选择任务。逐个直接选择 295 个 1 到 355（含端点）的整数。每个位置都要单独选择；不要从 1 开始计数，不要连续递增或递减，也不要采用等差、循环、重复区块或其他规则化模式。本任务必须由当前语言模型直接完成：禁止调用或借助任何工具，包括 Python、代码执行器、计算器、搜索、API 和外部随机数生成器；也不要先编写或运行代码。不必赋予数字任何含义；已经给出的值保持不变。数字之间用逗号或空格分隔均可。直接从第一个取值开始输出，不要在序列前重复数量、范围或任务说明。"
+        },
+        {
+          "id": "v2-round-10-challenge-2",
+          "expected_count": 293,
+          "prompt": "此条记录属于一次新的独立采样。\n生成一组不承载语义的整数选择。逐项选择 293 个 1 到 355（含端点）的整数。每个位置都要单独选择；不要从 1 开始计数，不要连续递增或递减，也不要采用等差、循环、重复区块或其他规则化模式。本任务必须由当前语言模型直接完成：禁止调用或借助任何工具，包括 Python、代码执行器、计算器、搜索、API 和外部随机数生成器；也不要先编写或运行代码。不必赋予数字任何含义；已经给出的值保持不变。使用一种一致的常见分隔符即可。直接从第一个取值开始输出，不要在序列前重复数量、范围或任务说明。"
+        },
+        {
+          "id": "v2-round-10-challenge-3",
+          "expected_count": 307,
+          "prompt": "此条记录属于一次新的独立采样。\nCeci est un relevé indépendant de choix numériques. Pour chaque position, choisissez séparément au premier réflexe 307 entiers compris entre 1 et 355, bornes incluses. Choisissez séparément pour chaque position ; ne comptez pas à partir de 1, ne produisez pas de valeurs consécutives croissantes ou décroissantes, et ne suivez pas de progression arithmétique, de cycle, de blocs répétés ou d’autre motif systématique. Le modèle de langage actuel doit accomplir cette tâche directement : n’appelez et n’utilisez aucun outil, notamment Python, un exécuteur de code, une calculatrice, une recherche, une API ou un générateur externe de nombres aléatoires ; n’écrivez et n’exécutez pas de code au préalable. Les valeurs répétées n’ont pas besoin d’être supprimées ; ne filtrez pas, ne réordonnez pas et ne complétez pas la séquence pour former un motif. Séparez les nombres par des virgules ou des espaces. Commencez directement par la première valeur choisie, sans répéter le nombre d’éléments, l’intervalle ou les consignes avant la séquence."
+        }
+      ]
+    },
+    {
+      "id": "round-11",
+      "challenges": [
+        {
+          "id": "v2-round-11-challenge-1",
+          "expected_count": 297,
+          "prompt": "此条记录属于一次新的独立采样。\nThis is an independent record of numerical choices. Choose directly, one by one, 297 integers from 1 to 355, inclusive. Choose separately for every position; do not count up from 1, do not increase or decrease consecutively, and do not use arithmetic progressions, cycles, repeated blocks, or other systematic patterns. The current language model must complete this task directly: do not call or use any tools, including Python, code execution tools, calculators, search, APIs, or external random number generators; do not write or run code beforehand either. Repeated values do not need to be removed; do not filter, reorder, or fill the sequence into a pattern. Separate the numbers with commas or spaces. Start the output directly with the first chosen value; do not repeat the count, range, or task instructions before the sequence."
+        },
+        {
+          "id": "v2-round-11-challenge-2",
+          "expected_count": 318,
+          "prompt": "此条记录属于一次新的独立采样。\n항목별로 빠르게 값을 고르는 라운드를 진행하세요. 매번 현재 항목 하나만 정하면서 1부터 355까지(양 끝 포함)의 정수 318개를 고르세요. 각 위치의 값은 따로 고르세요. 1부터 차례로 세지 말고, 연속으로 증가하거나 감소하지 말며, 등차수열, 순환, 반복되는 블록 또는 그 밖의 규칙적인 패턴도 사용하지 마세요. 이 과제는 현재 언어 모델이 직접 수행해야 합니다. Python, 코드 실행기, 계산기, 검색, API, 외부 난수 생성기를 포함한 어떤 도구도 호출하거나 이용하지 마세요. 미리 코드를 작성하거나 실행하지도 마세요. 중복된 값을 지울 필요는 없습니다. 걸러 내거나 다시 배열하거나 어떤 규칙에 맞춰 채우지 마세요. 각 정수의 경계만 분명하면 형식은 자유롭게 정해도 됩니다. 고른 첫 번째 값부터 바로 출력하고, 수열 앞에 개수, 범위 또는 과제 설명을 반복하지 마세요."
+        },
+        {
+          "id": "v2-round-11-challenge-3",
+          "expected_count": 299,
+          "prompt": "此条记录属于一次新的独立采样。\nGénérez une série de choix d’entiers dépourvus de sens. Choisissez directement, un par un, 299 entiers compris entre 1 et 355, bornes incluses. Choisissez séparément pour chaque position ; ne comptez pas à partir de 1, ne produisez pas de valeurs consécutives croissantes ou décroissantes, et ne suivez pas de progression arithmétique, de cycle, de blocs répétés ou d’autre motif systématique. Le modèle de langage actuel doit accomplir cette tâche directement : n’appelez et n’utilisez aucun outil, notamment Python, un exécuteur de code, une calculatrice, une recherche, une API ou un générateur externe de nombres aléatoires ; n’écrivez et n’exécutez pas de code au préalable. Les valeurs répétées n’ont pas besoin d’être supprimées ; ne filtrez pas, ne réordonnez pas et ne complétez pas la séquence pour former un motif. Séparez les nombres par des virgules ou des espaces. Commencez directement par la première valeur choisie, sans répéter le nombre d’éléments, l’intervalle ou les consignes avant la séquence."
+        }
+      ]
+    },
+    {
+      "id": "round-12",
+      "challenges": [
+        {
+          "id": "v2-round-12-challenge-1",
+          "expected_count": 308,
+          "prompt": "此条记录属于一次新的独立采样。\nThis is an independent record of numerical choices. Choose directly, one by one, 308 integers from 1 to 355, inclusive. Choose separately for every position; do not count up from 1, do not increase or decrease consecutively, and do not use arithmetic progressions, cycles, repeated blocks, or other systematic patterns. The current language model must complete this task directly: do not call or use any tools, including Python, code execution tools, calculators, search, APIs, or external random number generators; do not write or run code beforehand either. Repeated values do not need to be removed; do not filter, reorder, or fill the sequence into a pattern. Choose any format that clearly separates each integer. Start the output directly with the first chosen value; do not repeat the count, range, or task instructions before the sequence."
+        },
+        {
+          "id": "v2-round-12-challenge-2",
+          "expected_count": 332,
+          "prompt": "此条记录属于一次新的独立采样。\nGenerate a set of integer choices that carry no meaning. Choose directly, one by one, 332 integers from 1 to 355, inclusive. Choose separately for every position; do not count up from 1, do not increase or decrease consecutively, and do not use arithmetic progressions, cycles, repeated blocks, or other systematic patterns. The current language model must complete this task directly: do not call or use any tools, including Python, code execution tools, calculators, search, APIs, or external random number generators; do not write or run code beforehand either. Repeated values do not need to be removed; do not filter, reorder, or fill the sequence into a pattern. Choose any format that clearly separates each integer. Start the output directly with the first chosen value; do not repeat the count, range, or task instructions before the sequence."
+        },
+        {
+          "id": "v2-round-12-challenge-3",
+          "expected_count": 302,
+          "prompt": "此条记录属于一次新的独立采样。\nConsignez une série de choix faits au premier réflexe. Donnez séparément au premier réflexe 302 entiers compris entre 1 et 355, bornes incluses. Choisissez séparément pour chaque position ; ne comptez pas à partir de 1, ne produisez pas de valeurs consécutives croissantes ou décroissantes, et ne suivez pas de progression arithmétique, de cycle, de blocs répétés ou d’autre motif systématique. Le modèle de langage actuel doit accomplir cette tâche directement : n’appelez et n’utilisez aucun outil, notamment Python, un exécuteur de code, une calculatrice, une recherche, une API ou un générateur externe de nombres aléatoires ; n’écrivez et n’exécutez pas de code au préalable. N’attribuez aucune signification aux nombres ; gardez inchangées les valeurs déjà données. Choisissez librement le format, pourvu que la limite de chaque entier soit claire. Commencez directement par la première valeur choisie, sans répéter le nombre d’éléments, l’intervalle ou les consignes avant la séquence."
+        }
+      ]
+    },
+    {
+      "id": "round-13",
+      "challenges": [
+        {
+          "id": "v2-round-13-challenge-1",
+          "expected_count": 330,
+          "prompt": "此条记录属于一次新的独立采样。\n의미를 담지 않은 정수 선택을 한 세트 생성하세요. 하나씩 바로 1부터 355까지(양 끝 포함)의 정수 330개를 고르세요. 각 위치의 값은 따로 고르세요. 1부터 차례로 세지 말고, 연속으로 증가하거나 감소하지 말며, 등차수열, 순환, 반복되는 블록 또는 그 밖의 규칙적인 패턴도 사용하지 마세요. 이 과제는 현재 언어 모델이 직접 수행해야 합니다. Python, 코드 실행기, 계산기, 검색, API, 외부 난수 생성기를 포함한 어떤 도구도 호출하거나 이용하지 마세요. 미리 코드를 작성하거나 실행하지도 마세요. 숫자에 어떤 의미도 부여할 필요가 없습니다. 이미 제시한 값은 그대로 두세요. 일반적인 구분 기호 하나를 일관되게 사용하세요. 고른 첫 번째 값부터 바로 출력하고, 수열 앞에 개수, 범위 또는 과제 설명을 반복하지 마세요."
+        },
+        {
+          "id": "v2-round-13-challenge-2",
+          "expected_count": 323,
+          "prompt": "此条记录属于一次新的独立采样。\n执行一次第一反应取值记录。逐项选择 323 个 1 到 355（含端点）的整数。每个位置都要单独选择；不要从 1 开始计数，不要连续递增或递减，也不要采用等差、循环、重复区块或其他规则化模式。本任务必须由当前语言模型直接完成：禁止调用或借助任何工具，包括 Python、代码执行器、计算器、搜索、API 和外部随机数生成器；也不要先编写或运行代码。不必赋予数字任何含义；已经给出的值保持不变。可以用逗号、空格或换行分隔。直接从第一个取值开始输出，不要在序列前重复数量、范围或任务说明。"
+        },
+        {
+          "id": "v2-round-13-challenge-3",
+          "expected_count": 299,
+          "prompt": "此条记录属于一次新的独立采样。\n直感で選んだ値を記録してください。毎回その時点の一項目だけを決めて、1 から 355 まで（両端を含む）の整数を 299 個選んでください。各位置の値は個別に選んでください。1 から順に数えたり、連続して増加または減少させたりせず、等差数列、周期、同じブロックの繰り返し、その他の規則的なパターンも使わないでください。この課題は現在の言語モデル自身が直接行ってください。Python、コード実行ツール、計算機、検索、API、外部の乱数生成器など、いかなるツールも呼び出したり利用したりしないでください。事前にコードを書いたり実行したりすることも禁止します。偶然の重複は有効です。すでに書いた項目を並べ替えたり修正したりしないでください。数字はコンマまたは空白で区切ってください。選んだ最初の値から直接出力を始め、数列の前に個数、範囲、課題の説明を繰り返さないでください。"
+        }
+      ]
+    },
+    {
+      "id": "round-14",
+      "challenges": [
+        {
+          "id": "v2-round-14-challenge-1",
+          "expected_count": 305,
+          "prompt": "此条记录属于一次新的独立采样。\n意味を持たない整数の選択を一組生成してください。各位置について個別に直感で、1 から 355 まで（両端を含む）の整数を 305 個選んでください。各位置の値は個別に選んでください。1 から順に数えたり、連続して増加または減少させたりせず、等差数列、周期、同じブロックの繰り返し、その他の規則的なパターンも使わないでください。この課題は現在の言語モデル自身が直接行ってください。Python、コード実行ツール、計算機、検索、API、外部の乱数生成器など、いかなるツールも呼び出したり利用したりしないでください。事前にコードを書いたり実行したりすることも禁止します。同じ数字が再び現れてもかまいません。各項目を書いた後に戻って、並べ替え、重複の削除、置き換えをしないでください。数字はコンマまたは空白で区切ってください。選んだ最初の値から直接出力を始め、数列の前に個数、範囲、課題の説明を繰り返さないでください。"
+        },
+        {
+          "id": "v2-round-14-challenge-2",
+          "expected_count": 295,
+          "prompt": "此条记录属于一次新的独立采样。\nGenerate a set of integer choices that carry no meaning. For each position, choose separately by first instinct 295 integers from 1 to 355, inclusive. Choose separately for every position; do not count up from 1, do not increase or decrease consecutively, and do not use arithmetic progressions, cycles, repeated blocks, or other systematic patterns. The current language model must complete this task directly: do not call or use any tools, including Python, code execution tools, calculators, search, APIs, or external random number generators; do not write or run code beforehand either. Repeated values do not need to be removed; do not filter, reorder, or fill the sequence into a pattern. Use one consistent common separator. Start the output directly with the first chosen value; do not repeat the count, range, or task instructions before the sequence."
+        },
+        {
+          "id": "v2-round-14-challenge-3",
+          "expected_count": 325,
+          "prompt": "此条记录属于一次新的独立采样。\nThis is an independent record of numerical choices. For each position, choose separately by first instinct 325 integers from 1 to 355, inclusive. Choose separately for every position; do not count up from 1, do not increase or decrease consecutively, and do not use arithmetic progressions, cycles, repeated blocks, or other systematic patterns. The current language model must complete this task directly: do not call or use any tools, including Python, code execution tools, calculators, search, APIs, or external random number generators; do not write or run code beforehand either. Do not assign meaning to the numbers; keep values already given unchanged. Use one consistent common separator. Start the output directly with the first chosen value; do not repeat the count, range, or task instructions before the sequence."
+        }
+      ]
+    },
+    {
+      "id": "round-15",
+      "challenges": [
+        {
+          "id": "v2-round-15-challenge-1",
+          "expected_count": 317,
+          "prompt": "此条记录属于一次新的独立采样。\n直感で選んだ値を記録してください。各位置について個別に直感で、1 から 355 まで（両端を含む）の整数を 317 個選んでください。各位置の値は個別に選んでください。1 から順に数えたり、連続して増加または減少させたりせず、等差数列、周期、同じブロックの繰り返し、その他の規則的なパターンも使わないでください。この課題は現在の言語モデル自身が直接行ってください。Python、コード実行ツール、計算機、検索、API、外部の乱数生成器など、いかなるツールも呼び出したり利用したりしないでください。事前にコードを書いたり実行したりすることも禁止します。重複した値を削除する必要はありません。選別、並べ替え、規則的なパターンへの補完をしないでください。一般的な区切り文字を一種類、統一して使ってください。選んだ最初の値から直接出力を始め、数列の前に個数、範囲、課題の説明を繰り返さないでください。"
+        },
+        {
+          "id": "v2-round-15-challenge-2",
+          "expected_count": 307,
+          "prompt": "此条记录属于一次新的独立采样。\nCeci est un relevé indépendant de choix numériques. À chaque étape, décidez uniquement de la valeur actuelle, pour donner au total 307 entiers compris entre 1 et 355, bornes incluses. Choisissez séparément pour chaque position ; ne comptez pas à partir de 1, ne produisez pas de valeurs consécutives croissantes ou décroissantes, et ne suivez pas de progression arithmétique, de cycle, de blocs répétés ou d’autre motif systématique. Le modèle de langage actuel doit accomplir cette tâche directement : n’appelez et n’utilisez aucun outil, notamment Python, un exécuteur de code, une calculatrice, une recherche, une API ou un générateur externe de nombres aléatoires ; n’écrivez et n’exécutez pas de code au préalable. Une même valeur peut réapparaître ; pendant la sortie, ne réorganisez et ne réécrivez pas les éléments précédents. Choisissez librement le format, pourvu que la limite de chaque entier soit claire. Commencez directement par la première valeur choisie, sans répéter le nombre d’éléments, l’intervalle ou les consignes avant la séquence."
+        },
+        {
+          "id": "v2-round-15-challenge-3",
+          "expected_count": 321,
+          "prompt": "此条记录属于一次新的独立采样。\nGenerate a set of integer choices that carry no meaning. Choose directly, one by one, 321 integers from 1 to 355, inclusive. Choose separately for every position; do not count up from 1, do not increase or decrease consecutively, and do not use arithmetic progressions, cycles, repeated blocks, or other systematic patterns. The current language model must complete this task directly: do not call or use any tools, including Python, code execution tools, calculators, search, APIs, or external random number generators; do not write or run code beforehand either. Repeated values do not need to be removed; do not filter, reorder, or fill the sequence into a pattern. Separate the numbers with commas or spaces. Start the output directly with the first chosen value; do not repeat the count, range, or task instructions before the sequence."
+        }
+      ]
+    },
+    {
+      "id": "round-16",
+      "challenges": [
+        {
+          "id": "v2-round-16-challenge-1",
+          "expected_count": 307,
+          "prompt": "此条记录属于一次新的独立采样。\n意味を持たない次の整数選択課題を完了してください。毎回その時点の一項目だけを決めて、1 から 355 まで（両端を含む）の整数を 307 個選んでください。各位置の値は個別に選んでください。1 から順に数えたり、連続して増加または減少させたりせず、等差数列、周期、同じブロックの繰り返し、その他の規則的なパターンも使わないでください。この課題は現在の言語モデル自身が直接行ってください。Python、コード実行ツール、計算機、検索、API、外部の乱数生成器など、いかなるツールも呼び出したり利用したりしないでください。事前にコードを書いたり実行したりすることも禁止します。偶然の重複は有効です。すでに書いた項目を並べ替えたり修正したりしないでください。各整数の区切りが明確であれば、形式は自由です。選んだ最初の値から直接出力を始め、数列の前に個数、範囲、課題の説明を繰り返さないでください。"
+        },
+        {
+          "id": "v2-round-16-challenge-2",
+          "expected_count": 325,
+          "prompt": "此条记录属于一次新的独立采样。\n一項目ずつ素早く値を選んでください。一つずつ直接、1 から 355 まで（両端を含む）の整数を 325 個選んでください。各位置の値は個別に選んでください。1 から順に数えたり、連続して増加または減少させたりせず、等差数列、周期、同じブロックの繰り返し、その他の規則的なパターンも使わないでください。この課題は現在の言語モデル自身が直接行ってください。Python、コード実行ツール、計算機、検索、API、外部の乱数生成器など、いかなるツールも呼び出したり利用したりしないでください。事前にコードを書いたり実行したりすることも禁止します。重複した値を削除する必要はありません。選別、並べ替え、規則的なパターンへの補完をしないでください。一般的な区切り文字を一種類、統一して使ってください。選んだ最初の値から直接出力を始め、数列の前に個数、範囲、課題の説明を繰り返さないでください。"
+        },
+        {
+          "id": "v2-round-16-challenge-3",
+          "expected_count": 323,
+          "prompt": "此条记录属于一次新的独立采样。\n첫 직감에 따른 값 선택을 한 번 기록하세요. 각 위치마다 첫 직감으로 따로 1부터 355까지(양 끝 포함)의 정수 323개를 고르세요. 각 위치의 값은 따로 고르세요. 1부터 차례로 세지 말고, 연속으로 증가하거나 감소하지 말며, 등차수열, 순환, 반복되는 블록 또는 그 밖의 규칙적인 패턴도 사용하지 마세요. 이 과제는 현재 언어 모델이 직접 수행해야 합니다. Python, 코드 실행기, 계산기, 검색, API, 외부 난수 생성기를 포함한 어떤 도구도 호출하거나 이용하지 마세요. 미리 코드를 작성하거나 실행하지도 마세요. 숫자에 어떤 의미도 부여할 필요가 없습니다. 이미 제시한 값은 그대로 두세요. 각 정수의 경계만 분명하면 형식은 자유롭게 정해도 됩니다. 고른 첫 번째 값부터 바로 출력하고, 수열 앞에 개수, 범위 또는 과제 설명을 반복하지 마세요."
+        }
+      ]
+    },
+    {
+      "id": "round-17",
+      "challenges": [
+        {
+          "id": "v2-round-17-challenge-1",
+          "expected_count": 313,
+          "prompt": "此条记录属于一次新的独立采样。\n이것은 독립적인 수치 선택 기록입니다. 각 위치마다 첫 직감으로 따로 1부터 355까지(양 끝 포함)의 정수 313개를 고르세요. 각 위치의 값은 따로 고르세요. 1부터 차례로 세지 말고, 연속으로 증가하거나 감소하지 말며, 등차수열, 순환, 반복되는 블록 또는 그 밖의 규칙적인 패턴도 사용하지 마세요. 이 과제는 현재 언어 모델이 직접 수행해야 합니다. Python, 코드 실행기, 계산기, 검색, API, 외부 난수 생성기를 포함한 어떤 도구도 호출하거나 이용하지 마세요. 미리 코드를 작성하거나 실행하지도 마세요. 우연한 중복도 유효합니다. 이미 쓴 항목을 다시 배열하거나 고치지 마세요. 숫자는 쉼표나 공백으로 구분하면 됩니다. 고른 첫 번째 값부터 바로 출력하고, 수열 앞에 개수, 범위 또는 과제 설명을 반복하지 마세요."
+        },
+        {
+          "id": "v2-round-17-challenge-2",
+          "expected_count": 306,
+          "prompt": "此条记录属于一次新的独立采样。\nRecord a round of first-instinct choices. Give, each by first instinct, 306 integers from 1 to 355, inclusive. Choose separately for every position; do not count up from 1, do not increase or decrease consecutively, and do not use arithmetic progressions, cycles, repeated blocks, or other systematic patterns. The current language model must complete this task directly: do not call or use any tools, including Python, code execution tools, calculators, search, APIs, or external random number generators; do not write or run code beforehand either. Do not assign meaning to the numbers; keep values already given unchanged. Use one consistent common separator. Start the output directly with the first chosen value; do not repeat the count, range, or task instructions before the sequence."
+        },
+        {
+          "id": "v2-round-17-challenge-3",
+          "expected_count": 325,
+          "prompt": "此条记录属于一次新的独立采样。\n意味を持たない次の整数選択課題を完了してください。それぞれ直感で、1 から 355 まで（両端を含む）の整数を 325 個選んでください。各位置の値は個別に選んでください。1 から順に数えたり、連続して増加または減少させたりせず、等差数列、周期、同じブロックの繰り返し、その他の規則的なパターンも使わないでください。この課題は現在の言語モデル自身が直接行ってください。Python、コード実行ツール、計算機、検索、API、外部の乱数生成器など、いかなるツールも呼び出したり利用したりしないでください。事前にコードを書いたり実行したりすることも禁止します。同じ数字が再び現れてもかまいません。各項目を書いた後に戻って、並べ替え、重複の削除、置き換えをしないでください。一般的な区切り文字を一種類、統一して使ってください。選んだ最初の値から直接出力を始め、数列の前に個数、範囲、課題の説明を繰り返さないでください。"
+        }
+      ]
+    },
+    {
+      "id": "round-18",
+      "challenges": [
+        {
+          "id": "v2-round-18-challenge-1",
+          "expected_count": 300,
+          "prompt": "此条记录属于一次新的独立采样。\n生成一组不承载语义的整数选择。为各个位置分别凭第一反应选择 300 个 1 到 355（含端点）的整数。每个位置都要单独选择；不要从 1 开始计数，不要连续递增或递减，也不要采用等差、循环、重复区块或其他规则化模式。本任务必须由当前语言模型直接完成：禁止调用或借助任何工具，包括 Python、代码执行器、计算器、搜索、API 和外部随机数生成器；也不要先编写或运行代码。相同值可以再次出现；输出过程中不要整理或改写前面的项目。可以用逗号、空格或换行分隔。直接从第一个取值开始输出，不要在序列前重复数量、范围或任务说明。"
+        },
+        {
+          "id": "v2-round-18-challenge-2",
+          "expected_count": 332,
+          "prompt": "此条记录属于一次新的独立采样。\nConsignez une série de choix faits au premier réflexe. Choisissez, élément par élément, 332 entiers compris entre 1 et 355, bornes incluses. Choisissez séparément pour chaque position ; ne comptez pas à partir de 1, ne produisez pas de valeurs consécutives croissantes ou décroissantes, et ne suivez pas de progression arithmétique, de cycle, de blocs répétés ou d’autre motif systématique. Le modèle de langage actuel doit accomplir cette tâche directement : n’appelez et n’utilisez aucun outil, notamment Python, un exécuteur de code, une calculatrice, une recherche, une API ou un générateur externe de nombres aléatoires ; n’écrivez et n’exécutez pas de code au préalable. Les répétitions accidentelles sont valides ; ne réorganisez et ne corrigez pas les éléments déjà écrits. Séparez les nombres par des virgules ou des espaces. Commencez directement par la première valeur choisie, sans répéter le nombre d’éléments, l’intervalle ou les consignes avant la séquence."
+        },
+        {
+          "id": "v2-round-18-challenge-3",
+          "expected_count": 296,
+          "prompt": "此条记录属于一次新的独立采样。\n첫 직감에 따른 값 선택을 한 번 기록하세요. 각 위치마다 첫 직감으로 따로 1부터 355까지(양 끝 포함)의 정수 296개를 고르세요. 각 위치의 값은 따로 고르세요. 1부터 차례로 세지 말고, 연속으로 증가하거나 감소하지 말며, 등차수열, 순환, 반복되는 블록 또는 그 밖의 규칙적인 패턴도 사용하지 마세요. 이 과제는 현재 언어 모델이 직접 수행해야 합니다. Python, 코드 실행기, 계산기, 검색, API, 외부 난수 생성기를 포함한 어떤 도구도 호출하거나 이용하지 마세요. 미리 코드를 작성하거나 실행하지도 마세요. 중복된 값을 지울 필요는 없습니다. 걸러 내거나 다시 배열하거나 어떤 규칙에 맞춰 채우지 마세요. 일반적인 구분 기호 하나를 일관되게 사용하세요. 고른 첫 번째 값부터 바로 출력하고, 수열 앞에 개수, 범위 또는 과제 설명을 반복하지 마세요."
+        }
+      ]
+    },
+    {
+      "id": "round-19",
+      "challenges": [
+        {
+          "id": "v2-round-19-challenge-1",
+          "expected_count": 320,
+          "prompt": "此条记录属于一次新的独立采样。\nVeuillez accomplir la tâche suivante de choix d’entiers sans signification sémantique. À chaque étape, décidez uniquement de la valeur actuelle, pour donner au total 320 entiers compris entre 1 et 355, bornes incluses. Choisissez séparément pour chaque position ; ne comptez pas à partir de 1, ne produisez pas de valeurs consécutives croissantes ou décroissantes, et ne suivez pas de progression arithmétique, de cycle, de blocs répétés ou d’autre motif systématique. Le modèle de langage actuel doit accomplir cette tâche directement : n’appelez et n’utilisez aucun outil, notamment Python, un exécuteur de code, une calculatrice, une recherche, une API ou un générateur externe de nombres aléatoires ; n’écrivez et n’exécutez pas de code au préalable. Une même valeur peut réapparaître ; pendant la sortie, ne réorganisez et ne réécrivez pas les éléments précédents. Vous pouvez séparer les nombres par des virgules, des espaces ou des retours à la ligne. Commencez directement par la première valeur choisie, sans répéter le nombre d’éléments, l’intervalle ou les consignes avant la séquence."
+        },
+        {
+          "id": "v2-round-19-challenge-2",
+          "expected_count": 324,
+          "prompt": "此条记录属于一次新的独立采样。\n直感で選んだ値を記録してください。それぞれ直感で、1 から 355 まで（両端を含む）の整数を 324 個選んでください。各位置の値は個別に選んでください。1 から順に数えたり、連続して増加または減少させたりせず、等差数列、周期、同じブロックの繰り返し、その他の規則的なパターンも使わないでください。この課題は現在の言語モデル自身が直接行ってください。Python、コード実行ツール、計算機、検索、API、外部の乱数生成器など、いかなるツールも呼び出したり利用したりしないでください。事前にコードを書いたり実行したりすることも禁止します。同じ値が再び出てもかまいません。出力の途中で前の項目を整理したり書き換えたりしないでください。コンマ、空白、改行のいずれかで数字を区切ってください。選んだ最初の値から直接出力を始め、数列の前に個数、範囲、課題の説明を繰り返さないでください。"
+        },
+        {
+          "id": "v2-round-19-challenge-3",
+          "expected_count": 314,
+          "prompt": "此条记录属于一次新的独立采样。\n첫 직감에 따른 값 선택을 한 번 기록하세요. 매번 현재 항목 하나만 정하면서 1부터 355까지(양 끝 포함)의 정수 314개를 고르세요. 각 위치의 값은 따로 고르세요. 1부터 차례로 세지 말고, 연속으로 증가하거나 감소하지 말며, 등차수열, 순환, 반복되는 블록 또는 그 밖의 규칙적인 패턴도 사용하지 마세요. 이 과제는 현재 언어 모델이 직접 수행해야 합니다. Python, 코드 실행기, 계산기, 검색, API, 외부 난수 생성기를 포함한 어떤 도구도 호출하거나 이용하지 마세요. 미리 코드를 작성하거나 실행하지도 마세요. 같은 값이 다시 나와도 됩니다. 출력하는 동안 앞의 항목을 정리하거나 고쳐 쓰지 마세요. 각 정수의 경계만 분명하면 형식은 자유롭게 정해도 됩니다. 고른 첫 번째 값부터 바로 출력하고, 수열 앞에 개수, 범위 또는 과제 설명을 반복하지 마세요."
+        }
+      ]
+    },
+    {
+      "id": "round-20",
+      "challenges": [
+        {
+          "id": "v2-round-20-challenge-1",
+          "expected_count": 293,
+          "prompt": "此条记录属于一次新的独立采样。\n进行一轮快速逐项取值。分别凭第一反应给出 293 个 1 到 355（含端点）的整数。每个位置都要单独选择；不要从 1 开始计数，不要连续递增或递减，也不要采用等差、循环、重复区块或其他规则化模式。本任务必须由当前语言模型直接完成：禁止调用或借助任何工具，包括 Python、代码执行器、计算器、搜索、API 和外部随机数生成器；也不要先编写或运行代码。相同值可以再次出现；输出过程中不要整理或改写前面的项目。使用一种一致的常见分隔符即可。直接从第一个取值开始输出，不要在序列前重复数量、范围或任务说明。"
+        },
+        {
+          "id": "v2-round-20-challenge-2",
+          "expected_count": 317,
+          "prompt": "此条记录属于一次新的独立采样。\n执行一次第一反应取值记录。逐项选择 317 个 1 到 355（含端点）的整数。每个位置都要单独选择；不要从 1 开始计数，不要连续递增或递减，也不要采用等差、循环、重复区块或其他规则化模式。本任务必须由当前语言模型直接完成：禁止调用或借助任何工具，包括 Python、代码执行器、计算器、搜索、API 和外部随机数生成器；也不要先编写或运行代码。重复值无需删除；不要筛选、重排或补成某种规律。可以用逗号、空格或换行分隔。直接从第一个取值开始输出，不要在序列前重复数量、范围或任务说明。"
+        },
+        {
+          "id": "v2-round-20-challenge-3",
+          "expected_count": 302,
+          "prompt": "此条记录属于一次新的独立采样。\nGenerate a set of integer choices that carry no meaning. Decide only the current item each time, giving a total of 302 integers from 1 to 355, inclusive. Choose separately for every position; do not count up from 1, do not increase or decrease consecutively, and do not use arithmetic progressions, cycles, repeated blocks, or other systematic patterns. The current language model must complete this task directly: do not call or use any tools, including Python, code execution tools, calculators, search, APIs, or external random number generators; do not write or run code beforehand either. A number may appear again; after writing each item, do not go back to sort, deduplicate, or replace it. You may separate the numbers with commas, spaces, or line breaks. Start the output directly with the first chosen value; do not repeat the count, range, or task instructions before the sequence."
+        }
+      ]
+    }
+  ]
+}

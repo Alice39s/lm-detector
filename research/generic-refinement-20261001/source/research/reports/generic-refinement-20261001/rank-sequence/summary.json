@@ -1,0 +1,236 @@
+{
+  "winner": {
+    "index": 21,
+    "spec": {
+      "id": "all_sequence_heavy_lda_0.5",
+      "layout": "all_sequence_heavy",
+      "weights": {
+        "frequency": 0.35,
+        "order": 0.1,
+        "ordinal": 0.2,
+        "recurrence": 0.15,
+        "spectral": 0.2
+      },
+      "kind": "lda",
+      "parameter": 0.5
+    },
+    "cv": {
+      "groups": 636,
+      "correct": 567,
+      "top1": 0.8915094339622641,
+      "macro_top1": 0.8915094339622641,
+      "top3": 1.0,
+      "mrr": 0.9444444444444445,
+      "pair": {
+        "groups": 24,
+        "all_library_correct": 13,
+        "conditional_correct": 13,
+        "per_model": {
+          "gpt-6-astra": {
+            "groups": 12,
+            "all_library_correct": 6
+          },
+          "gpt-6.1-sol": {
+            "groups": 12,
+            "all_library_correct": 7
+          }
+        }
+      }
+    }
+  },
+  "confidence": {
+    "beta": 0.31160263239811886,
+    "nll": 0.21342140746641755,
+    "thresholds": [
+      {
+        "threshold": 0.5,
+        "accepted": 630,
+        "correct": 565,
+        "coverage": 0.9905660377358491,
+        "precision": 0.8968253968253969,
+        "pair_accepted": 24,
+        "pair_correct": 13
+      },
+      {
+        "threshold": 0.7,
+        "accepted": 545,
+        "correct": 516,
+        "coverage": 0.8569182389937107,
+        "precision": 0.9467889908256881,
+        "pair_accepted": 10,
+        "pair_correct": 6
+      },
+      {
+        "threshold": 0.8,
+        "accepted": 513,
+        "correct": 496,
+        "coverage": 0.8066037735849056,
+        "precision": 0.9668615984405458,
+        "pair_accepted": 4,
+        "pair_correct": 2
+      },
+      {
+        "threshold": 0.9,
+        "accepted": 456,
+        "correct": 454,
+        "coverage": 0.7169811320754716,
+        "precision": 0.9956140350877193,
+        "pair_accepted": 1,
+        "pair_correct": 1
+      },
+      {
+        "threshold": 0.95,
+        "accepted": 433,
+        "correct": 433,
+        "coverage": 0.6808176100628931,
+        "precision": 1.0,
+        "pair_accepted": 0,
+        "pair_correct": 0
+      },
+      {
+        "threshold": 0.99,
+        "accepted": 377,
+        "correct": 377,
+        "coverage": 0.5927672955974843,
+        "precision": 1.0,
+        "pair_accepted": 0,
+        "pair_correct": 0
+      }
+    ]
+  },
+  "artifacts": [
+    {
+      "name": "winner",
+      "path": "research/reports/generic-refinement-20261001/rank-sequence/fitted.joblib",
+      "sha256": "dad78826df7612954135c71ff46fb1e6ebe55b40054f1e8cf320a4c5a99b322e",
+      "index": 21,
+      "spec": {
+        "id": "all_sequence_heavy_lda_0.5",
+        "layout": "all_sequence_heavy",
+        "weights": {
+          "frequency": 0.35,
+          "order": 0.1,
+          "ordinal": 0.2,
+          "recurrence": 0.15,
+          "spectral": 0.2
+        },
+        "kind": "lda",
+        "parameter": 0.5
+      },
+      "cv": {
+        "groups": 636,
+        "correct": 567,
+        "top1": 0.8915094339622641,
+        "macro_top1": 0.8915094339622641,
+        "top3": 1.0,
+        "mrr": 0.9444444444444445,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 13,
+          "conditional_correct": 13,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 6
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 7
+            }
+          }
+        }
+      },
+      "beta": 0.31160263239811886
+    },
+    {
+      "name": "lda",
+      "path": "research/reports/generic-refinement-20261001/rank-sequence/fitted-lda.joblib",
+      "sha256": "dad78826df7612954135c71ff46fb1e6ebe55b40054f1e8cf320a4c5a99b322e",
+      "index": 21,
+      "spec": {
+        "id": "all_sequence_heavy_lda_0.5",
+        "layout": "all_sequence_heavy",
+        "weights": {
+          "frequency": 0.35,
+          "order": 0.1,
+          "ordinal": 0.2,
+          "recurrence": 0.15,
+          "spectral": 0.2
+        },
+        "kind": "lda",
+        "parameter": 0.5
+      },
+      "cv": {
+        "groups": 636,
+        "correct": 567,
+        "top1": 0.8915094339622641,
+        "macro_top1": 0.8915094339622641,
+        "top3": 1.0,
+        "mrr": 0.9444444444444445,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 13,
+          "conditional_correct": 13,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 6
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 7
+            }
+          }
+        }
+      },
+      "beta": 0.31160263239811886
+    },
+    {
+      "name": "ridge",
+      "path": "research/reports/generic-refinement-20261001/rank-sequence/fitted-ridge.joblib",
+      "sha256": "530d14cd450fcd5a66ca94e0db7bd6336bcff9d236f196709bdb1532c8b1279c",
+      "index": 18,
+      "spec": {
+        "id": "all_balanced_ridge_1",
+        "layout": "all_balanced",
+        "weights": {
+          "frequency": 0.5,
+          "order": 0.1,
+          "ordinal": 0.15,
+          "recurrence": 0.1,
+          "spectral": 0.15
+        },
+        "kind": "ridge",
+        "parameter": 1.0
+      },
+      "cv": {
+        "groups": 636,
+        "correct": 565,
+        "top1": 0.8883647798742138,
+        "macro_top1": 0.8883647798742137,
+        "top3": 0.9937106918238994,
+        "mrr": 0.940087788259958,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 11,
+          "conditional_correct": 11,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 5
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 6
+            }
+          }
+        }
+      },
+      "beta": 41.40921476499973
+    }
+  ],
+  "plan_sha256": "6cdb03868dccbf6f4a15a5532fddacc7a3fcb5f81d58a93366e6aa9c9aeca96a",
+  "elapsed_seconds": 19.652966022491455,
+  "external_data_opened": false,
+  "limitations": "Winner temperature fitted to reference OOF development scores only; post-selection, not independently authenticated identity probability.; candidate selection shares the reference folds and retains collection-channel confounding."
+}

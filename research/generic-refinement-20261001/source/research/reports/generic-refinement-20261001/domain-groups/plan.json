@@ -1,0 +1,237 @@
+{
+  "schema": "generic-domain-group-plan-v1",
+  "reference_sha256": "5a86bb2409f7e132f4bb98456d54996014782fa531c6e670ce46f16d213b11d4",
+  "model_ids": [
+    "claude-haiku-4.5",
+    "claude-sonnet-4.6",
+    "claude-sonnet-5",
+    "claude-opus-4.6",
+    "claude-opus-4.7",
+    "claude-opus-4.8",
+    "claude-opus-5",
+    "claude-fable-5.1",
+    "claude-fable-5",
+    "gemini-2.5-pro",
+    "gemini-3.1-pro-preview",
+    "gemini-3.5-flash",
+    "gemini-3.6-flash",
+    "gemini-3.7-flash",
+    "gemini-3.8-flash",
+    "grok-4.5",
+    "grok-4.6",
+    "gpt-4o",
+    "glm-5.2",
+    "glm-5.3",
+    "qwen3.8-max-0902",
+    "qwen3.8-27b",
+    "kimi-k3",
+    "hy4-preview",
+    "muse-spark-1.2",
+    "muse-spark-1.3-contributor",
+    "muse-spark-1.3",
+    "kimi-k2.8-preview",
+    "grok-4.7",
+    "mimo-v2.5",
+    "mimo-v2.5-pro",
+    "mimo-v2.6-flash",
+    "mimo-v2.6-pro",
+    "step-5-preview",
+    "claude-opus-5.5",
+    "gpt-6-luna",
+    "glm-5.3-flashx",
+    "glm-5.3-flash",
+    "deepseek-v4.1-flash",
+    "deepseek-v4-flash",
+    "deepseek-v4-pro-0813",
+    "deepseek-v4-pro",
+    "deepseek-v4-flash-0731",
+    "deepseek-v3.2",
+    "gpt-6-sol",
+    "claude-sonnet-5.5",
+    "gpt-6.1-sol",
+    "gpt-6-astra",
+    "gpt-5.4",
+    "gpt-5.5",
+    "gpt-5.6-sol",
+    "gpt-5.6-terra",
+    "gpt-5.6-luna"
+  ],
+  "reference_rows": 1948,
+  "derived_development_rows": 240,
+  "total_rows": 2188,
+  "reference_groups": 636,
+  "development_groups": 80,
+  "source_hashes": {
+    "research/studies/generic-refinement-20261001/domain_groups.py": "83e39040a924beb1c43a6a64d59f2d99f239b470cf9a289329ee0ccc1195e4d2",
+    "research/studies/generic-refinement-20261001/DOMAIN_PROTOCOL.md": "bda536e2c6c4f271530c3bde7a9ff42d3ef97caca3c2b9b58c1037db00df5b54",
+    "research/studies/generic-refinement-20261001/group_models.py": "d8aaad24900b150c0521bb3271b4ee57f887314a534ca197d7e701676960cd19",
+    "research/studies/generic-refinement-20261001/source_robust.py": "f247bcf8708ddb5ad2cd46c148ac6f5737c0792aeaff1e85c8779108c436cd2a",
+    "projects/research/sequence-generalization-20260930/source/projects/data/unified_reference.jsonl": "5a86bb2409f7e132f4bb98456d54996014782fa531c6e670ce46f16d213b11d4",
+    "projects/research/sequence-generalization-20260930/source/projects/data/unified_bank.json": "47b8ad67e8ad32095ac650b3a384420c06ef88bb6e78206be478a8cd62029968",
+    "projects/research/sequence-generalization-20260930/bundle.json": "5f0a3a9965efbcc1acb196525b7939e6f966dd8eb87aef4c2c0514b70cae2244",
+    "projects/research/sequence-generalization-20260930/requirements.txt": "019bd8864d363104371181921955efc3c50f028946099269794b198d0893ec6a",
+    "projects/research/sequence-generalization-20260930/source/research/studies/sequence-generalization/positional.py": "06cfec8faa7d626b08ccd8ab50444e5ad0ce47a5d14cad849c29e16723829af4",
+    "projects/research/sequence-generalization-20260930/source/projects/offline/fingerprint.py": "df136eaee890332878a20a35dae7854e4218abe490e49c27b03b96332f7a9918",
+    "projects/research/sequence-generalization-20260930/source/projects/offline/bank_builder.py": "2854fd459b445046c5c5f56f56302c943d5a462a857694789acccf5d7353a27d",
+    "projects/research/sequence-generalization-20260930/source/projects/offline/reference_data.py": "d322eb015e0eb765440c77c4d713dd09eff649bff19e0de582820b0cbb8a01ef",
+    "projects/research/sequence-generalization-20260930/source/projects/offline/shared_verifier_core.py": "6afc453489dafc3c17705dcc55f9046fc93ae0761e94409f531ac33de11102ec",
+    "research/reports/generic-refinement-20261001/source-robust/reference-oof.npz": "af338bf848cae40a4ce96713d8028f593505da825f9f5a1e88c10528c410ea70",
+    "research/reports/generic-refinement-20261001/source-robust/development-oof.npz": "b9a514df1842a6e7766e22e430f727af76583cf829dca19ad2127fc3e26135ee",
+    "research/reports/generic-refinement-20261001/source-robust/folds.json": "ce5fd6a6a777c022f22ad58ec1ada6f5fb4e536fb3adf13de3c65d5353861c92",
+    "research/reports/generic-refinement-20261001/source-robust/groups.json": "d84792966a9ff6b71b1e05c1db821386bb307eaa31c52c44707871fd8bf6d879",
+    "research/reports/generic-refinement-20261001/source-robust/derived-development-manifest.json": "46da4508719d136b8761b7dec6a9ed97fdd3dd8ca0833ad2ef041fc0bdb0fe56",
+    "projects/research/sequence-generalization-20260930/source/research/reports/astra-sol-separation/paired-low-01/manifest.json": "e0b9cdd6c088518a587d3092e30f3bd2402572b3866b73ed7bd730f1cbcad543",
+    "projects/research/sequence-generalization-20260930/source/research/reports/astra-sol-separation/paired-low-01/samples.jsonl": "3f615be95a2bbcd65c350f4e9b414303507b2e0b8f1384767cc8759edbd98955",
+    "projects/research/sequence-generalization-20260930/source/research/reports/sequence-generalization/20260930/prospective/manifest.json": "ff48b49bf4f99c1e702ae3086ae0357760b73ac16b423e63c8c55078f4a17402",
+    "projects/research/sequence-generalization-20260930/source/research/reports/sequence-generalization/20260930/prospective/samples.jsonl": "acefa9f99b6793c07edb500853d935abef8dae0cbe20e7ecbea9683bf51f8f2f"
+  },
+  "configs": [
+    {
+      "id": "first_frozen_fusion",
+      "head": null,
+      "candidate_weight": 0.0
+    },
+    {
+      "id": "mean_lda0.15",
+      "head": 0,
+      "candidate_weight": 1.0
+    },
+    {
+      "id": "mean_lda0.5",
+      "head": 1,
+      "candidate_weight": 1.0
+    },
+    {
+      "id": "mean_lda0.85",
+      "head": 2,
+      "candidate_weight": 1.0
+    },
+    {
+      "id": "mean_std_distance_lda0.15",
+      "head": 3,
+      "candidate_weight": 1.0
+    },
+    {
+      "id": "mean_std_distance_lda0.5",
+      "head": 4,
+      "candidate_weight": 1.0
+    },
+    {
+      "id": "mean_std_distance_lda0.85",
+      "head": 5,
+      "candidate_weight": 1.0
+    },
+    {
+      "id": "half_first_mean_lda0.15",
+      "head": 0,
+      "candidate_weight": 0.5
+    },
+    {
+      "id": "half_first_mean_lda0.5",
+      "head": 1,
+      "candidate_weight": 0.5
+    },
+    {
+      "id": "half_first_mean_lda0.85",
+      "head": 2,
+      "candidate_weight": 0.5
+    },
+    {
+      "id": "half_first_mean_std_distance_lda0.15",
+      "head": 3,
+      "candidate_weight": 0.5
+    },
+    {
+      "id": "half_first_mean_std_distance_lda0.5",
+      "head": 4,
+      "candidate_weight": 0.5
+    },
+    {
+      "id": "half_first_mean_std_distance_lda0.85",
+      "head": 5,
+      "candidate_weight": 0.5
+    }
+  ],
+  "heads": [
+    {
+      "id": "mean_lda0.15",
+      "summary": "mean",
+      "layout": "selected_position",
+      "kind": "lda",
+      "parameter": 0.15
+    },
+    {
+      "id": "mean_lda0.5",
+      "summary": "mean",
+      "layout": "selected_position",
+      "kind": "lda",
+      "parameter": 0.5
+    },
+    {
+      "id": "mean_lda0.85",
+      "summary": "mean",
+      "layout": "selected_position",
+      "kind": "lda",
+      "parameter": 0.85
+    },
+    {
+      "id": "mean_std_distance_lda0.15",
+      "summary": "mean_std_distance",
+      "layout": "selected_position",
+      "kind": "lda",
+      "parameter": 0.15
+    },
+    {
+      "id": "mean_std_distance_lda0.5",
+      "summary": "mean_std_distance",
+      "layout": "selected_position",
+      "kind": "lda",
+      "parameter": 0.5
+    },
+    {
+      "id": "mean_std_distance_lda0.85",
+      "summary": "mean_std_distance",
+      "layout": "selected_position",
+      "kind": "lda",
+      "parameter": 0.85
+    }
+  ],
+  "seed": 2026100102,
+  "bootstrap_per_label_source": 64,
+  "feature_layout": {
+    "frequency": 0.6,
+    "ordered": 0.15,
+    "kernel": 0.125,
+    "sequence": 0.125
+  },
+  "summaries": {
+    "mean": {
+      "mean": 1.0
+    },
+    "mean_std_distance": {
+      "mean": 0.6,
+      "std": 0.3,
+      "distance": 0.1
+    }
+  },
+  "summary_dimensions": {
+    "mean": 751,
+    "mean_std_distance": 1518
+  },
+  "group_distance": "Each of four blocks: mean/std/min/max of the three pairwise Euclidean distances; population std.",
+  "bootstrap": "Distinct same-label/same-actual-source replies, retain eligible formal triples, cover all available rows, then random draws; 64 groups per cell, not 64 independent observations.",
+  "selection": "53 labels equal; each label actual sources equal; Top1 then equally weighted MRR then fixed index. Same-source batches merge. No named-pair metric in selection.",
+  "preprocessing": "Label/source-balanced fold-training-only reply/group mean/std, centres and pooled covariance; static group dimension scaling preserves dispersion.",
+  "folds": "Reuse 12 reference environment + 40 both-label matched-round exclusion sets and frozen first-ranker baseline scores. Exact held text/sequence/query/environment rows removed.",
+  "calibration": null,
+  "fixed_holdout_opened": false,
+  "independent_validation": false,
+  "diagnostics": "Original636 and matched80 cohorts reported separately; clean-transfer is not added as another sample.",
+  "versions": {
+    "python": "3.13.15 (main, Aug 25 2026, 13:50:12) [Clang 22.1.3 ]",
+    "numpy": "2.5.3",
+    "scipy": "1.17.1",
+    "joblib": "1.5.3"
+  },
+  "threads": 1
+}

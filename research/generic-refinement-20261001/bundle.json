@@ -1,0 +1,938 @@
+{
+  "schema": "generic-refinement-research-bundle-v1",
+  "created_at": "2026-09-30T19:56:09.734Z",
+  "first_bundle": "../sequence-generalization-20260930",
+  "first_bundle_sha256": "5f0a3a9965efbcc1acb196525b7939e6f966dd8eb87aef4c2c0514b70cae2244",
+  "reference_sha256": "5a86bb2409f7e132f4bb98456d54996014782fa531c6e670ce46f16d213b11d4",
+  "reference_labels": 53,
+  "formal_reference_answers": 1948,
+  "derived_development_answers": 240,
+  "scope": "Research snapshot; no product scoring or data changed.",
+  "files": [
+    {
+      "path": "source/research/studies/generic-refinement-20261001/verify-overload.ts",
+      "sha256": "f740f4957ed100946ff8de5484b5c84c3bb4ace99a2923badc95b1fbe1d302d2",
+      "bytes": 7315,
+      "original_source": "research/studies/generic-refinement-20261001/verify-overload.ts"
+    },
+    {
+      "path": "source/research/studies/generic-refinement-20261001/evaluate-blind.py",
+      "sha256": "ece2b9d93f149e820c288d8d1bdaa771fb0441a5440f14aa762512c7bd64db55",
+      "bytes": 8573,
+      "original_source": "research/studies/generic-refinement-20261001/evaluate-blind.py"
+    },
+    {
+      "path": "source/research/studies/generic-refinement-20261001/source-revisions/verify-overload-continuation-final-f740f4957ed1.ts",
+      "sha256": "f740f4957ed100946ff8de5484b5c84c3bb4ace99a2923badc95b1fbe1d302d2",
+      "bytes": 7315,
+      "original_source": "research/studies/generic-refinement-20261001/source-revisions/verify-overload-continuation-final-f740f4957ed1.ts"
+    },
+    {
+      "path": "source/research/studies/generic-refinement-20261001/source-revisions/retry-overload-protocol-continuation-final-5200063023b1.json",
+      "sha256": "5200063023b1c5c7e96f0a413642b4514a4b1c04f1d83d1799523d97050427b8",
+      "bytes": 7043,
+      "original_source": "research/studies/generic-refinement-20261001/source-revisions/retry-overload-protocol-continuation-final-5200063023b1.json"
+    },
+    {
+      "path": "source/research/studies/generic-refinement-20261001/source-revisions/retry-overload-protocol-before-secret-audit-391def4273c4.json",
+      "sha256": "391def4273c4fe3d0c0b54643e4b78aa69335ab3e79285c6d041d3645865dd9e",
+      "bytes": 3804,
+      "original_source": "research/studies/generic-refinement-20261001/source-revisions/retry-overload-protocol-before-secret-audit-391def4273c4.json"
+    },
+    {
+      "path": "source/research/studies/generic-refinement-20261001/source-revisions/collect-bd277abd86b0.ts",
+      "sha256": "bd277abd86b0821d62b04590c07a04013b0d11cb8511466120e72fe74beb93e4",
+      "bytes": 20444,
+      "original_source": "research/studies/generic-refinement-20261001/source-revisions/collect-bd277abd86b0.ts"
+    },
+    {
+      "path": "source/research/studies/generic-refinement-20261001/source-revisions/verify-prospective-audit-final-b3f313b48e35.ts",
+      "sha256": "b3f313b48e35bee831dd443547b9066dd9b47e54fc8e3109ccb583c0072d94f9",
+      "bytes": 22950,
+      "original_source": "research/studies/generic-refinement-20261001/source-revisions/verify-prospective-audit-final-b3f313b48e35.ts"
+    },
+    {
+      "path": "source/research/studies/generic-refinement-20261001/source-revisions/retry-overload-continuation-final-132abf5ba23f.ts",
+      "sha256": "132abf5ba23fc404fcee8c558cb7330269b2eac0d52599af70373392dbec589e",
+      "bytes": 43862,
+      "original_source": "research/studies/generic-refinement-20261001/source-revisions/retry-overload-continuation-final-132abf5ba23f.ts"
+    },
+    {
+      "path": "source/research/studies/generic-refinement-20261001/source-revisions/verify-overload-before-secret-audit-fffe6ba73bc3.ts",
+      "sha256": "fffe6ba73bc318e55d7b2314a4cef260a5d6eca049f7d733922e9c44aedff320",
+      "bytes": 7140,
+      "original_source": "research/studies/generic-refinement-20261001/source-revisions/verify-overload-before-secret-audit-fffe6ba73bc3.ts"
+    },
+    {
+      "path": "source/research/studies/generic-refinement-20261001/source-revisions/collect-audit-final-eeae98572adc.ts",
+      "sha256": "eeae98572adc006b867a5faf6def2b3e44a61c4149b7b971d1f4227d3fb17ad4",
+      "bytes": 23432,
+      "original_source": "research/studies/generic-refinement-20261001/source-revisions/collect-audit-final-eeae98572adc.ts"
+    },
+    {
+      "path": "source/research/studies/generic-refinement-20261001/source-revisions/retry-overload-before-secret-audit-c59229a826d7.ts",
+      "sha256": "c59229a826d7919fde04aca8141baaad60edac9410d55190e720c05ac175a1c1",
+      "bytes": 36111,
+      "original_source": "research/studies/generic-refinement-20261001/source-revisions/retry-overload-before-secret-audit-c59229a826d7.ts"
+    },
+    {
+      "path": "source/research/studies/generic-refinement-20261001/group_models.py",
+      "sha256": "d8aaad24900b150c0521bb3271b4ee57f887314a534ca197d7e701676960cd19",
+      "bytes": 18987,
+      "original_source": "research/studies/generic-refinement-20261001/group_models.py"
+    },
+    {
+      "path": "source/research/studies/generic-refinement-20261001/PORTFOLIO_PROTOCOL.md",
+      "sha256": "33191e4abb3c7a067e77e4bf412a557a77aaa6813cebd7888e28a8a16fee51e2",
+      "bytes": 1570,
+      "original_source": "research/studies/generic-refinement-20261001/PORTFOLIO_PROTOCOL.md"
+    },
+    {
+      "path": "source/research/studies/generic-refinement-20261001/source_robust.py",
+      "sha256": "f247bcf8708ddb5ad2cd46c148ac6f5737c0792aeaff1e85c8779108c436cd2a",
+      "bytes": 31211,
+      "original_source": "research/studies/generic-refinement-20261001/source_robust.py"
+    },
+    {
+      "path": "source/research/studies/generic-refinement-20261001/retry-overload-protocol.json",
+      "sha256": "5200063023b1c5c7e96f0a413642b4514a4b1c04f1d83d1799523d97050427b8",
+      "bytes": 7043,
+      "original_source": "research/studies/generic-refinement-20261001/retry-overload-protocol.json"
+    },
+    {
+      "path": "source/research/studies/generic-refinement-20261001/DOMAIN_PROTOCOL.md",
+      "sha256": "bda536e2c6c4f271530c3bde7a9ff42d3ef97caca3c2b9b58c1037db00df5b54",
+      "bytes": 2744,
+      "original_source": "research/studies/generic-refinement-20261001/DOMAIN_PROTOCOL.md"
+    },
+    {
+      "path": "source/research/studies/generic-refinement-20261001/freeze.ts",
+      "sha256": "7b60ed2f803c2dad35d25a82db8da95549679d1a762a3fcfe186ab19b480ec1d",
+      "bytes": 3138,
+      "original_source": "research/studies/generic-refinement-20261001/freeze.ts"
+    },
+    {
+      "path": "source/research/studies/generic-refinement-20261001/CALIBRATION_PROTOCOL.md",
+      "sha256": "282253087eaf7339fc537883b2622f13a299d789e458c406d7285711dd9d4772",
+      "bytes": 629,
+      "original_source": "research/studies/generic-refinement-20261001/CALIBRATION_PROTOCOL.md"
+    },
+    {
+      "path": "source/research/studies/generic-refinement-20261001/domain_groups.py",
+      "sha256": "83e39040a924beb1c43a6a64d59f2d99f239b470cf9a289329ee0ccc1195e4d2",
+      "bytes": 22153,
+      "original_source": "research/studies/generic-refinement-20261001/domain_groups.py"
+    },
+    {
+      "path": "source/research/studies/generic-refinement-20261001/verify-prospective.ts",
+      "sha256": "b3f313b48e35bee831dd443547b9066dd9b47e54fc8e3109ccb583c0072d94f9",
+      "bytes": 22950,
+      "original_source": "research/studies/generic-refinement-20261001/verify-prospective.ts"
+    },
+    {
+      "path": "source/research/studies/generic-refinement-20261001/evaluate.py",
+      "sha256": "4595201ec6fb86cb80f069d4c722a09345eb19d0c381fcdfd22bd00c5f3abce2",
+      "bytes": 10242,
+      "original_source": "research/studies/generic-refinement-20261001/evaluate.py"
+    },
+    {
+      "path": "source/research/studies/generic-refinement-20261001/calibrate.py",
+      "sha256": "af23c277dd96f22d07bb3a6e2b1abb0e69c275d6482b559065b1e5a8b1032708",
+      "bytes": 4857,
+      "original_source": "research/studies/generic-refinement-20261001/calibrate.py"
+    },
+    {
+      "path": "source/research/studies/generic-refinement-20261001/rank_sequence.py",
+      "sha256": "9cfc2538c03f4958ad3764016d82d2f9829cf0cfd13f87af584cf9a83b3d9dff",
+      "bytes": 21657,
+      "original_source": "research/studies/generic-refinement-20261001/rank_sequence.py"
+    },
+    {
+      "path": "source/research/studies/generic-refinement-20261001/fuse.py",
+      "sha256": "f032a193cc88a78fded2f43de73fd3b16a11a1808da34b07038d1b579b3e4160",
+      "bytes": 8660,
+      "original_source": "research/studies/generic-refinement-20261001/fuse.py"
+    },
+    {
+      "path": "source/research/studies/generic-refinement-20261001/portfolio.py",
+      "sha256": "5b93d64ad625122ab544cd6f66eb8778739290429c873ef8d6a744fe3f3c1e62",
+      "bytes": 9354,
+      "original_source": "research/studies/generic-refinement-20261001/portfolio.py"
+    },
+    {
+      "path": "source/research/studies/generic-refinement-20261001/collect.ts",
+      "sha256": "eeae98572adc006b867a5faf6def2b3e44a61c4149b7b971d1f4227d3fb17ad4",
+      "bytes": 23432,
+      "original_source": "research/studies/generic-refinement-20261001/collect.ts"
+    },
+    {
+      "path": "source/research/studies/generic-refinement-20261001/source_local.py",
+      "sha256": "1d0b71c5cf9d45f905d011dc220b192b58907ac9e387308817cbc77dcfa8c8f2",
+      "bytes": 20721,
+      "original_source": "research/studies/generic-refinement-20261001/source_local.py"
+    },
+    {
+      "path": "source/research/studies/generic-refinement-20261001/retry-overload.ts",
+      "sha256": "132abf5ba23fc404fcee8c558cb7330269b2eac0d52599af70373392dbec589e",
+      "bytes": 43862,
+      "original_source": "research/studies/generic-refinement-20261001/retry-overload.ts"
+    },
+    {
+      "path": "source/research/studies/generic-refinement-20261001/collection-protocol.json",
+      "sha256": "4ad53fad0eb1cdd1eb62a83c64ffd0042486a1865f456de5eea291270d97494f",
+      "bytes": 73657,
+      "original_source": "research/studies/generic-refinement-20261001/collection-protocol.json"
+    },
+    {
+      "path": "source/research/studies/generic-refinement-20261001/PROTOCOL.md",
+      "sha256": "ffb01aaea5534b3e4ec963e2087d47b4325d197fb36e59ea168efc562fbc5b6b",
+      "bytes": 3225,
+      "original_source": "research/studies/generic-refinement-20261001/PROTOCOL.md"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/fusion/plan.json",
+      "sha256": "25a513b63a857c804c2876195f8f15070fd07d14d4f95cc37a234499ea11e03b",
+      "bytes": 3917,
+      "original_source": "research/reports/generic-refinement-20261001/fusion/plan.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/fusion/selection.json",
+      "sha256": "3d5fa89c4dda1394dd4f1ffa9329529b3a6f8ba3b93d6b688b4862a8eb661b67",
+      "bytes": 33719,
+      "original_source": "research/reports/generic-refinement-20261001/fusion/selection.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/fusion/reference-oof.npz",
+      "sha256": "399aa86e71050fe9dd2a44944cbeacfad846ffde5a24575b94025b4079b87b66",
+      "bytes": 263966,
+      "original_source": "research/reports/generic-refinement-20261001/fusion/reference-oof.npz"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/fusion/freeze.json",
+      "sha256": "aae89e24c4a64707219c897329c5c7f4ce55223d1063eac9cdf548018676a2b9",
+      "bytes": 2481,
+      "original_source": "research/reports/generic-refinement-20261001/fusion/freeze.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/REPORT.md",
+      "sha256": "c1f786f4dea46a5b33a31ebcaabe5c6b79c5c651097d628f0adb4845a4fa8576",
+      "bytes": 8604,
+      "original_source": "research/reports/generic-refinement-20261001/REPORT.md"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/source-robust/transfer-folds.json",
+      "sha256": "19235c662a1b666f3b9040bfc832c08c7e762c8ea50c9433713da7733b3cf49c",
+      "bytes": 230727,
+      "original_source": "research/reports/generic-refinement-20261001/source-robust/transfer-folds.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/source-robust/audit.json",
+      "sha256": "49d590271ce656685a9cef08e8599c09d1f464e7fbc27515f1ddd278bcd9551f",
+      "bytes": 2084,
+      "original_source": "research/reports/generic-refinement-20261001/source-robust/audit.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/source-robust/before-aggregation-fix-report.md",
+      "sha256": "2d48f1f5367b4aec49eefb0500b23b11b359bb840e72031acc5bd0ee1888d7e7",
+      "bytes": 2893,
+      "original_source": "research/reports/generic-refinement-20261001/source-robust/before-aggregation-fix-report.md"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/source-robust/domain-diagnostic.json",
+      "sha256": "17526f38a1ea7f0ec8c9b1d7288df1da10e5fa7dc30e5724ebb671e29303731c",
+      "bytes": 142477,
+      "original_source": "research/reports/generic-refinement-20261001/source-robust/domain-diagnostic.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/source-robust/plan.json",
+      "sha256": "42fe5f38be99a709b308092b87bf5504ca1d79e24a319282b6e22f9be1b23916",
+      "bytes": 4991,
+      "original_source": "research/reports/generic-refinement-20261001/source-robust/plan.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/source-robust/before-aggregation-fix-development-oof.npz",
+      "sha256": "ed9254b9dee247255b3c7f11a348befada066d21261a01248d6cc0a5d64cdf76",
+      "bytes": 719715,
+      "original_source": "research/reports/generic-refinement-20261001/source-robust/before-aggregation-fix-development-oof.npz"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/source-robust/report.md",
+      "sha256": "9b52f7759b9b6717715af6b2db95c9e2a117a3a15d82abb9b773d5d2b9fb3f25",
+      "bytes": 2893,
+      "original_source": "research/reports/generic-refinement-20261001/source-robust/report.md"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/source-robust/aggregation-fix.json",
+      "sha256": "6dfb68ec57d5677fbcd14e3c97f55347bf7ecbcd162e0d727d4aebe4467e8fe2",
+      "bytes": 530,
+      "original_source": "research/reports/generic-refinement-20261001/source-robust/aggregation-fix.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/source-robust/derived-development-manifest.json",
+      "sha256": "46da4508719d136b8761b7dec6a9ed97fdd3dd8ca0833ad2ef041fc0bdb0fe56",
+      "bytes": 110173,
+      "original_source": "research/reports/generic-refinement-20261001/source-robust/derived-development-manifest.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/source-robust/results.json",
+      "sha256": "2ad38e88b242d49e37a597fbfd5e7bda27d7a4ee73c698e9bd70e71bf53917e1",
+      "bytes": 90601,
+      "original_source": "research/reports/generic-refinement-20261001/source-robust/results.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/source-robust/development-oof.npz",
+      "sha256": "b9a514df1842a6e7766e22e430f727af76583cf829dca19ad2127fc3e26135ee",
+      "bytes": 719716,
+      "original_source": "research/reports/generic-refinement-20261001/source-robust/development-oof.npz"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/source-robust/before-aggregation-fix-plan.json",
+      "sha256": "b1b60c2eb28bae4bc504d797567f278b2d765a2755f89ea434eda1286c07322d",
+      "bytes": 4991,
+      "original_source": "research/reports/generic-refinement-20261001/source-robust/before-aggregation-fix-plan.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/source-robust/fusion-freeze-audit.json",
+      "sha256": "ceaffd3d978dcd037f7d174f9d5abd6c177bb3b79af149b3bbce030b89d78ee3",
+      "bytes": 4880,
+      "original_source": "research/reports/generic-refinement-20261001/source-robust/fusion-freeze-audit.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/source-robust/domain-group-audit.json",
+      "sha256": "855b7b8950da0ac399e394e5a29618818da869d881485f75b1fc262754f91f96",
+      "bytes": 1420,
+      "original_source": "research/reports/generic-refinement-20261001/source-robust/domain-group-audit.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/source-robust/groups.json",
+      "sha256": "d84792966a9ff6b71b1e05c1db821386bb307eaa31c52c44707871fd8bf6d879",
+      "bytes": 346962,
+      "original_source": "research/reports/generic-refinement-20261001/source-robust/groups.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/source-robust/domain-diagnostic.md",
+      "sha256": "9f55271ca115bce0f9295c14eab775f72780a6b4b1bcb7a92e829341314f5565",
+      "bytes": 2886,
+      "original_source": "research/reports/generic-refinement-20261001/source-robust/domain-diagnostic.md"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/source-robust/freeze.json",
+      "sha256": "af972071ec709a0b54be648d9ac65559bf6775b7fac0077176b2c2f117248175",
+      "bytes": 1763,
+      "original_source": "research/reports/generic-refinement-20261001/source-robust/freeze.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/source-robust/before-aggregation-fix-results.json",
+      "sha256": "b6b7e1d608d451d496edcdd5d8bdef0a47a8250a6ff64a97ec67e1eae4136f00",
+      "bytes": 90595,
+      "original_source": "research/reports/generic-refinement-20261001/source-robust/before-aggregation-fix-results.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/continuation-protocol-audit.md",
+      "sha256": "0e4411df7cb9ba17c93b742d8ea8eb0fb6a98244c2babe2d77cbec5dfcf22b80",
+      "bytes": 4736,
+      "original_source": "research/reports/generic-refinement-20261001/continuation-protocol-audit.md"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/domain-groups/selected-oof.npz",
+      "sha256": "7cccb3043b0b21fd2484baf097306e70765b9ece95e53f82e39b85233fd05dff",
+      "bytes": 297119,
+      "original_source": "research/reports/generic-refinement-20261001/domain-groups/selected-oof.npz"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/domain-groups/audit.json",
+      "sha256": "682f85d70ddfd6575ca674ff4567e650224ccba0e9177a113b853468a1b8a4d0",
+      "bytes": 1461,
+      "original_source": "research/reports/generic-refinement-20261001/domain-groups/audit.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/domain-groups/plan.json",
+      "sha256": "4bc235e0206b50279d9d70af4379fcfee12dee710a1196934374fb74a248d150",
+      "bytes": 9003,
+      "original_source": "research/reports/generic-refinement-20261001/domain-groups/plan.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/domain-groups/report.md",
+      "sha256": "45ce60b16ae7af1c90b73df4390c13833ae9720f1876f8ec5553e29ae3898614",
+      "bytes": 1968,
+      "original_source": "research/reports/generic-refinement-20261001/domain-groups/report.md"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/domain-groups/development-oof.npz",
+      "sha256": "6755713861634805cd9f16e1978d8620421325654839d7f5aeed6067d29531ce",
+      "bytes": 34636,
+      "original_source": "research/reports/generic-refinement-20261001/domain-groups/development-oof.npz"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/domain-groups/selection.json",
+      "sha256": "e5259042936ff5099083f2d2a45bf765fdde732062de6107bc13490b4204b576",
+      "bytes": 311591,
+      "original_source": "research/reports/generic-refinement-20261001/domain-groups/selection.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/domain-groups/groups.json",
+      "sha256": "bfc9559f83f2b0ee9566a529f62765863b67af5595747c430fe2bac100d74ef0",
+      "bytes": 400962,
+      "original_source": "research/reports/generic-refinement-20261001/domain-groups/groups.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/domain-groups/bootstrap-triplets.npz",
+      "sha256": "fe4221cbf096c2a1deb004cf1034a1e9c073b68d1463f1c5076c7d5946493e84",
+      "bytes": 781655,
+      "original_source": "research/reports/generic-refinement-20261001/domain-groups/bootstrap-triplets.npz"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/domain-groups/reference-oof.npz",
+      "sha256": "96de98c52ac384529caa95ed29c453322910cbe63a381135d9ed81ad625cc537",
+      "bytes": 264053,
+      "original_source": "research/reports/generic-refinement-20261001/domain-groups/reference-oof.npz"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/domain-groups/freeze.json",
+      "sha256": "a29468f1b93121fc13d423d32e977c2665cebcc4ec3d5f5e984b7da6e8167f19",
+      "bytes": 5468,
+      "original_source": "research/reports/generic-refinement-20261001/domain-groups/freeze.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/groups/summary.json",
+      "sha256": "058cbef6051c2de22e85ce8cbd7fe9bb4c5af2f866b13efd8342eec3cd5a2f13",
+      "bytes": 28886,
+      "original_source": "research/reports/generic-refinement-20261001/groups/summary.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/groups/plan.json",
+      "sha256": "2dfb2a048d256d4308cdd790df74f301a81d60df6082bce1941ddbdd9b4e33ba",
+      "bytes": 338316,
+      "original_source": "research/reports/generic-refinement-20261001/groups/plan.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/groups/report.md",
+      "sha256": "1000a96fa82c7aed3cae19e09b8c03086ef9145e2cf0974d0ad86f4860a97b44",
+      "bytes": 1706,
+      "original_source": "research/reports/generic-refinement-20261001/groups/report.md"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/groups/blind-evaluator-audit.md",
+      "sha256": "a44122417719cc991ca41099942ca894e2edfc53079240655d6a257967fcf2bd",
+      "bytes": 8092,
+      "original_source": "research/reports/generic-refinement-20261001/groups/blind-evaluator-audit.md"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/groups/folds.json",
+      "sha256": "0ad89c34939abc25dbb4ad42ff549682afbd031053f043e3c6f5e14beefa1cd5",
+      "bytes": 1332167,
+      "original_source": "research/reports/generic-refinement-20261001/groups/folds.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/groups/audit.md",
+      "sha256": "a57864a20da1ef63e0f1b4e208271608820670c387031b625fc7646c2e25b424",
+      "bytes": 8858,
+      "original_source": "research/reports/generic-refinement-20261001/groups/audit.md"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/groups/portfolio-audit.json",
+      "sha256": "dcdf57123975c94873e1b452d9c2728a7de13eb0566dc5d4368a30c814aa7509",
+      "bytes": 1386,
+      "original_source": "research/reports/generic-refinement-20261001/groups/portfolio-audit.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/groups/bootstrap-triplets.npz",
+      "sha256": "5e4cc9e3c45a3b330715272431b1cf1f72cef94e962a19759b8927e1fa004f15",
+      "bytes": 206194,
+      "original_source": "research/reports/generic-refinement-20261001/groups/bootstrap-triplets.npz"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/groups/reference-oof.npz",
+      "sha256": "f2c80dea3be786641b59e551f7aa9995b9b26644769792f63e591e03d2d80ad2",
+      "bytes": 259171,
+      "original_source": "research/reports/generic-refinement-20261001/groups/reference-oof.npz"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/portfolio/selected-oof.npz",
+      "sha256": "64a8798ad53cb8bc7a23840c1f0395f9e11b0566b1729fba2b9ac0f9e8630554",
+      "bytes": 297162,
+      "original_source": "research/reports/generic-refinement-20261001/portfolio/selected-oof.npz"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/portfolio/plan.json",
+      "sha256": "7cffec69b5659c4d5cae6d6e8f23480bec9f3201435ce08fe0f8aad591427a7b",
+      "bytes": 2003,
+      "original_source": "research/reports/generic-refinement-20261001/portfolio/plan.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/portfolio/calibration.json",
+      "sha256": "04a0c0f0567c4281c202db981c7d9ab4295c71e470b91085547d86100b8a1d6b",
+      "bytes": 8279,
+      "original_source": "research/reports/generic-refinement-20261001/portfolio/calibration.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/portfolio/selection.json",
+      "sha256": "6de8083252311fcc4e2ea634e8af145fc49aac150644c9bdf94db79c02215e14",
+      "bytes": 624876,
+      "original_source": "research/reports/generic-refinement-20261001/portfolio/selection.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/portfolio/groups.json",
+      "sha256": "bfc9559f83f2b0ee9566a529f62765863b67af5595747c430fe2bac100d74ef0",
+      "bytes": 400962,
+      "original_source": "research/reports/generic-refinement-20261001/portfolio/groups.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/portfolio/freeze-inputs.json",
+      "sha256": "d2eacde684278ea8b042ff9919a746aa29a47a591b3805d8ed2b1f639bbfb65e",
+      "bytes": 2511,
+      "original_source": "research/reports/generic-refinement-20261001/portfolio/freeze-inputs.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/portfolio/freeze.json",
+      "sha256": "63365f1b27657bb3d42137e44931a95320fedcad8c1330d104300f31f4fd5b4d",
+      "bytes": 10074,
+      "original_source": "research/reports/generic-refinement-20261001/portfolio/freeze.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/portfolio/calibration-plan.json",
+      "sha256": "da1565291698c85b794f2a0a5266b464bed7effd06ef3aa51ce61e5af269939d",
+      "bytes": 1035,
+      "original_source": "research/reports/generic-refinement-20261001/portfolio/calibration-plan.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/prospective-v2/combined-integrity.json",
+      "sha256": "c49e99ba2ee639ff4bff35a493d364a216d320641aab13d73b93e121674003b8",
+      "bytes": 102505,
+      "original_source": "research/reports/generic-refinement-20261001/prospective-v2/combined-integrity.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/prospective-v2/overload-preparation-original-integrity.json",
+      "sha256": "2b69435633daea7fc5ff5ee0b282c158ba62fb5a8cef4f8d32430a3eecb480db",
+      "bytes": 50928,
+      "original_source": "research/reports/generic-refinement-20261001/prospective-v2/overload-preparation-original-integrity.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/prospective-v2/supplemental-secret-audit.json",
+      "sha256": "7310358b31a33df80f5036300d3b0b2533c13e769bac4fcd29969ca0183acb54",
+      "bytes": 217,
+      "original_source": "research/reports/generic-refinement-20261001/prospective-v2/supplemental-secret-audit.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/prospective-v2/original-integrity-before-secret-reclassification.json",
+      "sha256": "9549e4a6ddadfbadb8264a4c9250245747b0d759e4bb3900b01cdf7bc8c0a46d",
+      "bytes": 50928,
+      "original_source": "research/reports/generic-refinement-20261001/prospective-v2/original-integrity-before-secret-reclassification.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/prospective-v2/supplemental-samples.jsonl",
+      "sha256": "0db027301a717f7854995b05060db716c53fae387a5b2ff5ea1b018c28aab447",
+      "bytes": 30578,
+      "original_source": "research/reports/generic-refinement-20261001/prospective-v2/supplemental-samples.jsonl"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/prospective-v2/supplemental-manifest.json",
+      "sha256": "83061c0c9fa232a4f7ed12d3038086b7f1ffb608a41f4cafe504ab13958c34be",
+      "bytes": 109506,
+      "original_source": "research/reports/generic-refinement-20261001/prospective-v2/supplemental-manifest.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/prospective-v2/overload-verification-original-integrity.json",
+      "sha256": "b1115757055b5079cda1830f05db052c44b659535135080255eaa5f38f2ce786",
+      "bytes": 50928,
+      "original_source": "research/reports/generic-refinement-20261001/prospective-v2/overload-verification-original-integrity.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/prospective-v2/manifest.json",
+      "sha256": "31bc9fe13d7e0a359edd68fce444e7a0913e6bd0d3391873245937d55bf0383d",
+      "bytes": 86140,
+      "original_source": "research/reports/generic-refinement-20261001/prospective-v2/manifest.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/prospective-v2/secret-shape-audit.json",
+      "sha256": "68a8a86c7e8c7d5d2e6e9be8736639665a2cd088dc236b13d702de57310af41f",
+      "bytes": 3374,
+      "original_source": "research/reports/generic-refinement-20261001/prospective-v2/secret-shape-audit.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/prospective-v2/samples.jsonl",
+      "sha256": "41baff87a0532c9459e661533c30cafc3f56c794a4df65412635d5cd551a347b",
+      "bytes": 901897,
+      "original_source": "research/reports/generic-refinement-20261001/prospective-v2/samples.jsonl"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/prospective-v2/adoption.json",
+      "sha256": "1b018f0c3635b0f81c3bfbcbec29ad9a5596490d57b48db39d89d3aeb9d93463",
+      "bytes": 51379,
+      "original_source": "research/reports/generic-refinement-20261001/prospective-v2/adoption.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/prospective-v2/overload-current-original-integrity.json",
+      "sha256": "4f7882294bf102f6657a6ab2933dd968f18dafd92751e39a56a8ad60996808b9",
+      "bytes": 50928,
+      "original_source": "research/reports/generic-refinement-20261001/prospective-v2/overload-current-original-integrity.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/prospective-v2/transport-secret-audit.json",
+      "sha256": "933c5592519ece3ca5308c2886dd0bc253e7e5b403df590a681ed2ed8385cd74",
+      "bytes": 4192,
+      "original_source": "research/reports/generic-refinement-20261001/prospective-v2/transport-secret-audit.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/prospective-v2/integrity.json",
+      "sha256": "9549e4a6ddadfbadb8264a4c9250245747b0d759e4bb3900b01cdf7bc8c0a46d",
+      "bytes": 50928,
+      "original_source": "research/reports/generic-refinement-20261001/prospective-v2/integrity.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/evaluation/blind-v2.json",
+      "sha256": "5fc5e5faadb0a03e2cb81a506e37cd66bbeab72f184fac08dcbf276069ef3f43",
+      "bytes": 400463,
+      "original_source": "research/reports/generic-refinement-20261001/evaluation/blind-v2.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/protocol-audit.md",
+      "sha256": "e1774d2b065994f39e1cacb8651f2793c8eafc90d8b119ae88417053f5333bce",
+      "bytes": 6633,
+      "original_source": "research/reports/generic-refinement-20261001/protocol-audit.md"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/rank-sequence/summary.json",
+      "sha256": "812e3ec50ad85f82a790493582543f47d6a4e0c521c0647be02ef767ac514f52",
+      "bytes": 6294,
+      "original_source": "research/reports/generic-refinement-20261001/rank-sequence/summary.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/rank-sequence/plan.json",
+      "sha256": "6cdb03868dccbf6f4a15a5532fddacc7a3fcb5f81d58a93366e6aa9c9aeca96a",
+      "bytes": 340858,
+      "original_source": "research/reports/generic-refinement-20261001/rank-sequence/plan.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/rank-sequence/report.md",
+      "sha256": "ea3a56dcea764c447fbbe7ffde854d9d85c53d9e174061565f4715a203dac1c2",
+      "bytes": 2326,
+      "original_source": "research/reports/generic-refinement-20261001/rank-sequence/report.md"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/rank-sequence/prospective-preflight-integrity.json",
+      "sha256": "4644f92fb2d12c0f329b1451e306f3b037537fc2f7b4ca6b64756d95451f27d5",
+      "bytes": 1399,
+      "original_source": "research/reports/generic-refinement-20261001/rank-sequence/prospective-preflight-integrity.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/rank-sequence/folds.json",
+      "sha256": "01d7cd785b73cc06f375875f169fa5d59fcae9d625f170d6badadf40332d819e",
+      "bytes": 109518,
+      "original_source": "research/reports/generic-refinement-20261001/rank-sequence/folds.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/rank-sequence/leaderboard.json",
+      "sha256": "d2a7599e7fd61cf634f0b5d1462ddfafff5b65ef72e433f1fbf433cf80b40c2b",
+      "bytes": 24841,
+      "original_source": "research/reports/generic-refinement-20261001/rank-sequence/leaderboard.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/rank-sequence/inference-verification.json",
+      "sha256": "5b369c9d158df0b1e808e7a5096a7f20e3766ac6c44cbb96233dfd6e0b1e24e3",
+      "bytes": 2913,
+      "original_source": "research/reports/generic-refinement-20261001/rank-sequence/inference-verification.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/rank-sequence/reference-oof.npz",
+      "sha256": "362085dbea1c325a5ba8b2ec4a980a1390afcab2ad2cd0b15fba32f46df17cf3",
+      "bytes": 1034965,
+      "original_source": "research/reports/generic-refinement-20261001/rank-sequence/reference-oof.npz"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/source-local/audit.json",
+      "sha256": "d67d18f53ed061b075898e1b2d3941481a852798176502250c3c331589b97cf5",
+      "bytes": 566,
+      "original_source": "research/reports/generic-refinement-20261001/source-local/audit.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/source-local/plan.json",
+      "sha256": "cee521d62793233b4d72cd92a73edc95c68fa484cfb2234b40c6de66fd21fef7",
+      "bytes": 4684,
+      "original_source": "research/reports/generic-refinement-20261001/source-local/plan.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/source-local/report.md",
+      "sha256": "f4aed222ae1afd6023c5393e96460f72488b32dc1878db6265bd53943a95b21e",
+      "bytes": 2084,
+      "original_source": "research/reports/generic-refinement-20261001/source-local/report.md"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/source-local/derived-development-manifest.json",
+      "sha256": "4b0bc212512b14e8f9075df800cad30c2cc8ad08c5ae30ef39628a13eca83feb",
+      "bytes": 109926,
+      "original_source": "research/reports/generic-refinement-20261001/source-local/derived-development-manifest.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/source-local/selection.json",
+      "sha256": "99142e0a780478d8d819b674918f9cfe20da5ff7a88569d973ae41a132a97037",
+      "bytes": 215956,
+      "original_source": "research/reports/generic-refinement-20261001/source-local/selection.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/source-local/groups.json",
+      "sha256": "a60985da975e648d12e2e109936eeee81e68f4eff281ebfe6b57e75afbed4b43",
+      "bytes": 366530,
+      "original_source": "research/reports/generic-refinement-20261001/source-local/groups.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/source-local/reference-oof.npz",
+      "sha256": "e47811d6c9822dc57b63bf54fcf0b5cb47cee9e63c507c2fb58117c6b49b3578",
+      "bytes": 263772,
+      "original_source": "research/reports/generic-refinement-20261001/source-local/reference-oof.npz"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/source-local/freeze.json",
+      "sha256": "2f4cbb5a930804c658ccd2bd9fd7bedb39d2b2b900b7d13d49487ca7173120b0",
+      "bytes": 1860,
+      "original_source": "research/reports/generic-refinement-20261001/source-local/freeze.json"
+    },
+    {
+      "path": "source/research/reports/generic-refinement-20261001/source-local/protocol.md",
+      "sha256": "439a67d1482197071c0d96300dcb5f825b062a72f8615b951024012651a4d48a",
+      "bytes": 1275,
+      "original_source": "research/reports/generic-refinement-20261001/source-local/protocol.md"
+    },
+    {
+      "path": "source/tsconfig.json",
+      "sha256": "80a0b1e69f09dbaa1f966c1a1d89ecb1a772305c1c66d638493f1703774b4e66",
+      "bytes": 219,
+      "original_source": "first bundle"
+    }
+  ],
+  "compressed": [
+    {
+      "path": "frozen/research/reports/generic-refinement-20261001/fusion/fitted.joblib.gz",
+      "targets": [
+        "source/research/reports/generic-refinement-20261001/fusion/fitted.joblib"
+      ],
+      "sha256": "e6265455cadf1bb1b1abae8d665df4c3ba094c227901e3bff83661772087cd79",
+      "compressed_sha256": "f21badc88809d2df115a58fdddcd4db4666ea4ce4574ca416af4744853d69ede",
+      "bytes": 1907,
+      "compressed_bytes": 1930,
+      "original_source": "research/reports/generic-refinement-20261001/fusion/fitted.joblib"
+    },
+    {
+      "path": "frozen/research/reports/generic-refinement-20261001/fusion/candidates.npz.gz",
+      "targets": [
+        "source/research/reports/generic-refinement-20261001/fusion/candidates.npz"
+      ],
+      "sha256": "b478669a17af633c9f1a9c15d83baf0b5cb3d5c5a669c92c6ab48d2a5b7cadb8",
+      "compressed_sha256": "f5f4c2b1b812c55772e8de263c2bbaef3d875103daa536a8db81562eb88cc6ff",
+      "bytes": 10097570,
+      "compressed_bytes": 10099755,
+      "original_source": "research/reports/generic-refinement-20261001/fusion/candidates.npz"
+    },
+    {
+      "path": "frozen/research/reports/generic-refinement-20261001/source-robust/fitted.joblib.gz",
+      "targets": [
+        "source/research/reports/generic-refinement-20261001/source-robust/fitted.joblib"
+      ],
+      "sha256": "d80b532ea015f56a7315859bfd4eccc1dad507184957f6044c13e717baca70e1",
+      "compressed_sha256": "cf2fd794a4af229db97d98b85a4a102c238c0b206130cc496528f6192435d9b9",
+      "bytes": 13533548,
+      "compressed_bytes": 13503166,
+      "original_source": "research/reports/generic-refinement-20261001/source-robust/fitted.joblib"
+    },
+    {
+      "path": "frozen/research/reports/generic-refinement-20261001/source-robust/folds.json.gz",
+      "targets": [
+        "source/research/reports/generic-refinement-20261001/source-robust/folds.json"
+      ],
+      "sha256": "ce5fd6a6a777c022f22ad58ec1ada6f5fb4e536fb3adf13de3c65d5353861c92",
+      "compressed_sha256": "256a609d06521c7b7f13a97d67b4650a4cefb1054363b2c5041891a291b951b0",
+      "bytes": 6342360,
+      "compressed_bytes": 480543,
+      "original_source": "research/reports/generic-refinement-20261001/source-robust/folds.json"
+    },
+    {
+      "path": "frozen/research/reports/generic-refinement-20261001/source-robust/reference-oof.npz.gz",
+      "targets": [
+        "source/research/reports/generic-refinement-20261001/source-robust/reference-oof.npz"
+      ],
+      "sha256": "af338bf848cae40a4ce96713d8028f593505da825f9f5a1e88c10528c410ea70",
+      "compressed_sha256": "673e5d725c689fa5b895888702f4b79427155957caa41bab02135775b58e81e3",
+      "bytes": 2854440,
+      "compressed_bytes": 2854369,
+      "original_source": "research/reports/generic-refinement-20261001/source-robust/reference-oof.npz"
+    },
+    {
+      "path": "frozen/research/reports/generic-refinement-20261001/domain-groups/fitted.joblib.gz",
+      "targets": [
+        "source/research/reports/generic-refinement-20261001/domain-groups/fitted.joblib"
+      ],
+      "sha256": "25d13bdd6a2886104a271bcc227e1f592e9a91947875ae2a55496f90228768f7",
+      "compressed_sha256": "2028ab64486f54eb10c760b03cf527e49e35df6ff5440a7e478898bf474c8401",
+      "bytes": 2082,
+      "compressed_bytes": 2105,
+      "original_source": "research/reports/generic-refinement-20261001/domain-groups/fitted.joblib"
+    },
+    {
+      "path": "frozen/research/reports/generic-refinement-20261001/domain-groups/candidates.npz.gz",
+      "targets": [
+        "source/research/reports/generic-refinement-20261001/domain-groups/candidates.npz"
+      ],
+      "sha256": "da8a7c014b5b30f093f4dbb102a77e0e102c2e27095b0c42a7b70c01060b8c8a",
+      "compressed_sha256": "55daf86fdbadfb819ae596d1b31e85fcf7b0f5b87e44046e12ffd74c7608191a",
+      "bytes": 5514268,
+      "compressed_bytes": 5514553,
+      "original_source": "research/reports/generic-refinement-20261001/domain-groups/candidates.npz"
+    },
+    {
+      "path": "frozen/research/reports/generic-refinement-20261001/domain-groups/folds.json.gz",
+      "targets": [
+        "source/research/reports/generic-refinement-20261001/domain-groups/folds.json"
+      ],
+      "sha256": "54f7eb08ac43a51455c59cbab70c5c1737c42142cb978454b698bbe232c6a0b5",
+      "compressed_sha256": "5344016380133da4340e5752e643b0210e61ca8dde8a0f51242e3c3a995cd011",
+      "bytes": 6335580,
+      "compressed_bytes": 477162,
+      "original_source": "research/reports/generic-refinement-20261001/domain-groups/folds.json"
+    },
+    {
+      "path": "frozen/research/reports/generic-refinement-20261001/groups/fitted.joblib.gz",
+      "targets": [
+        "source/research/reports/generic-refinement-20261001/groups/fitted.joblib"
+      ],
+      "sha256": "b3e605921e6508379293ed9a062822794028437cbf96638dc1e24647efe8ed76",
+      "compressed_sha256": "26a104e772988a3ca58359163e64fdb36b5f55438ab289a3b6914e319be24cf5",
+      "bytes": 333005,
+      "compressed_bytes": 333128,
+      "original_source": "research/reports/generic-refinement-20261001/groups/fitted.joblib"
+    },
+    {
+      "path": "frozen/research/reports/generic-refinement-20261001/groups/candidates.npz.gz",
+      "targets": [
+        "source/research/reports/generic-refinement-20261001/groups/candidates.npz"
+      ],
+      "sha256": "5b386a69b8c3dda9bec9e80bfbb0956fbbc4b3ebb1448a50cbf5090340a6c404",
+      "compressed_sha256": "16fb3965b853314b9c351e5cf9b60a9d7a773c99ee0243a3a728d2719473be07",
+      "bytes": 7681638,
+      "compressed_bytes": 7683048,
+      "original_source": "research/reports/generic-refinement-20261001/groups/candidates.npz"
+    },
+    {
+      "path": "frozen/research/reports/generic-refinement-20261001/portfolio/fitted.joblib.gz",
+      "targets": [
+        "source/research/reports/generic-refinement-20261001/portfolio/fitted.joblib"
+      ],
+      "sha256": "f23e699857ac6d8e19461236ca9ccc83e827cf569e461896da413057196a8cdc",
+      "compressed_sha256": "e326b627d9a804f396fadd4b67c1aadcfbaa172294ecab33bf231f4f2d45a265",
+      "bytes": 1583,
+      "compressed_bytes": 1606,
+      "original_source": "research/reports/generic-refinement-20261001/portfolio/fitted.joblib"
+    },
+    {
+      "path": "frozen/research/reports/generic-refinement-20261001/portfolio/selected-source.joblib.gz",
+      "targets": [
+        "source/research/reports/generic-refinement-20261001/portfolio/selected-source.joblib"
+      ],
+      "sha256": "ad1bf5e40bd695da91e951d947d05aab156b801784dab6448031d2cddf189360",
+      "compressed_sha256": "8e31a4f882fb34ef6d45f48e21b4bf3241faf52b34c3f862ab4579324721ae6c",
+      "bytes": 323028,
+      "compressed_bytes": 323146,
+      "original_source": "research/reports/generic-refinement-20261001/portfolio/selected-source.joblib"
+    },
+    {
+      "path": "frozen/research/reports/generic-refinement-20261001/evaluation/seen-regression.json.gz",
+      "targets": [
+        "source/research/reports/generic-refinement-20261001/evaluation/seen-regression.json"
+      ],
+      "sha256": "5db17845612f1a37b7dabb1c6567b2401c6dfbdc451aa2140653fccb285d852f",
+      "compressed_sha256": "2bbd3edd790ee97fe8b39eb18ce9b175cf8e80908eabf262c6bb9692dd5e7ff7",
+      "bytes": 2155729,
+      "compressed_bytes": 533111,
+      "original_source": "research/reports/generic-refinement-20261001/evaluation/seen-regression.json"
+    },
+    {
+      "path": "frozen/research/reports/generic-refinement-20261001/rank-sequence/fitted.joblib.gz",
+      "targets": [
+        "source/research/reports/generic-refinement-20261001/rank-sequence/fitted.joblib"
+      ],
+      "sha256": "dad78826df7612954135c71ff46fb1e6ebe55b40054f1e8cf320a4c5a99b322e",
+      "compressed_sha256": "4566cb49f4db4aff8b63bafe2a8f78b4eb0ae2bc296daed2c98f5c1a53af923e",
+      "bytes": 300270,
+      "compressed_bytes": 298971,
+      "original_source": "research/reports/generic-refinement-20261001/rank-sequence/fitted.joblib"
+    },
+    {
+      "path": "frozen/research/reports/generic-refinement-20261001/rank-sequence/candidates.npz.gz",
+      "targets": [
+        "source/research/reports/generic-refinement-20261001/rank-sequence/candidates.npz"
+      ],
+      "sha256": "ad3bb64305cd0451bc55919c17f0e45abed8e1c9d47cb0484ca41f35845639dd",
+      "compressed_sha256": "e102459dfaf6bf73cc1d13f9fc0a883a4a57404dc4b78a0d41d0a2a9d5e81ba5",
+      "bytes": 30763148,
+      "compressed_bytes": 30766118,
+      "original_source": "research/reports/generic-refinement-20261001/rank-sequence/candidates.npz"
+    },
+    {
+      "path": "frozen/research/reports/generic-refinement-20261001/rank-sequence/fitted-lda.joblib.gz",
+      "targets": [
+        "source/research/reports/generic-refinement-20261001/rank-sequence/fitted-lda.joblib"
+      ],
+      "sha256": "dad78826df7612954135c71ff46fb1e6ebe55b40054f1e8cf320a4c5a99b322e",
+      "compressed_sha256": "4566cb49f4db4aff8b63bafe2a8f78b4eb0ae2bc296daed2c98f5c1a53af923e",
+      "bytes": 300270,
+      "compressed_bytes": 298971,
+      "original_source": "research/reports/generic-refinement-20261001/rank-sequence/fitted-lda.joblib"
+    },
+    {
+      "path": "frozen/research/reports/generic-refinement-20261001/rank-sequence/fitted-ridge.joblib.gz",
+      "targets": [
+        "source/research/reports/generic-refinement-20261001/rank-sequence/fitted-ridge.joblib"
+      ],
+      "sha256": "530d14cd450fcd5a66ca94e0db7bd6336bcff9d236f196709bdb1532c8b1279c",
+      "compressed_sha256": "2d547774df9c45a8d209599e832ec640328d34d6e72c1a1186955d374cd48a5c",
+      "bytes": 297405,
+      "compressed_bytes": 296333,
+      "original_source": "research/reports/generic-refinement-20261001/rank-sequence/fitted-ridge.joblib"
+    },
+    {
+      "path": "frozen/research/reports/generic-refinement-20261001/source-local/fitted.joblib.gz",
+      "targets": [
+        "source/research/reports/generic-refinement-20261001/source-local/fitted.joblib"
+      ],
+      "sha256": "494cc7edb6853d156f918b3ebd5dd337889bae290978014478e9d8ce35652d6b",
+      "compressed_sha256": "ddafb5a311eafdccdbc8a40058ce0b194974a4eee12a85492fa6e4c308e946a9",
+      "bytes": 13526714,
+      "compressed_bytes": 13495396,
+      "original_source": "research/reports/generic-refinement-20261001/source-local/fitted.joblib"
+    },
+    {
+      "path": "frozen/research/reports/generic-refinement-20261001/source-local/candidates.npz.gz",
+      "targets": [
+        "source/research/reports/generic-refinement-20261001/source-local/candidates.npz"
+      ],
+      "sha256": "808c9cc42c755355d7ddfbe5479f79b98719b7403a977e52a51b246b80bff1c6",
+      "compressed_sha256": "14914efe432dc3699de581c5b25200a5cf6a0c8aa335f849f203c1ab85fbcefc",
+      "bytes": 3795456,
+      "compressed_bytes": 3795412,
+      "original_source": "research/reports/generic-refinement-20261001/source-local/candidates.npz"
+    },
+    {
+      "path": "frozen/research/reports/generic-refinement-20261001/source-local/folds.json.gz",
+      "targets": [
+        "source/research/reports/generic-refinement-20261001/source-local/folds.json"
+      ],
+      "sha256": "32a96286bc13bab12e64908a9290515ef7a5f30537c7f2b3789d820b822d4c75",
+      "compressed_sha256": "6a69ac510b2be34d136346e258c0d91bbccca99890519713235a5565db8ec185",
+      "bytes": 6330016,
+      "compressed_bytes": 473449,
+      "original_source": "research/reports/generic-refinement-20261001/source-local/folds.json"
+    }
+  ],
+  "omitted": [
+    {
+      "source": "research/reports/generic-refinement-20261001/prospective-v2/supplemental-raw-traces",
+      "reason": "Raw completion streams remain in the original workspace."
+    },
+    {
+      "source": "research/reports/generic-refinement-20261001/prospective-v2/raw-traces",
+      "reason": "Raw completion streams remain in the original workspace."
+    }
+  ],
+  "source_root_basename": ".",
+  "dependencies": "The immutable first bundle supplies original code, reference, baseline and seen regression data.",
+  "raw_network_evidence": "All JSONL attempts are preserved; completion raw-stream bytes are local only. Omission is explicit."
+}

@@ -1,0 +1,121 @@
+{
+  "schema": "source-robust-development-plan-v1",
+  "created_at": "2026-09-30T18:15:55Z",
+  "hashes": {
+    "projects/research/sequence-generalization-20260930/source/projects/data/unified_reference.jsonl": "5a86bb2409f7e132f4bb98456d54996014782fa531c6e670ce46f16d213b11d4",
+    "projects/research/sequence-generalization-20260930/source/projects/data/unified_bank.json": "47b8ad67e8ad32095ac650b3a384420c06ef88bb6e78206be478a8cd62029968",
+    "projects/research/sequence-generalization-20260930/bundle.json": "5f0a3a9965efbcc1acb196525b7939e6f966dd8eb87aef4c2c0514b70cae2244",
+    "research/studies/generic-refinement-20261001/source_robust.py": "f247bcf8708ddb5ad2cd46c148ac6f5737c0792aeaff1e85c8779108c436cd2a",
+    "projects/research/sequence-generalization-20260930/source/research/studies/sequence-generalization/positional.py": "06cfec8faa7d626b08ccd8ab50444e5ad0ce47a5d14cad849c29e16723829af4",
+    "projects/research/sequence-generalization-20260930/source/research/studies/sequence-generalization/rerank.py": "b7310ce58047c32686eedb3b0ff7facf2ca036ad327e10598702ff6ce3c3d962",
+    "projects/research/sequence-generalization-20260930/source/research/studies/sequence-generalization/fusion.py": "e49923e1ffc445696f7977f720ddcb11462801a1223c4bf3d1960ee062d1b6a5",
+    "projects/research/sequence-generalization-20260930/source/research/reports/sequence-generalization/20260930/fusion/reference-oof.npz": "e47811d6c9822dc57b63bf54fcf0b5cb47cee9e63c507c2fb58117c6b49b3578"
+  },
+  "configs": [
+    {
+      "id": "first_frozen_fusion",
+      "head": null,
+      "candidate_weight": 0.0
+    },
+    {
+      "id": "balanced_lda_zero",
+      "head": 0,
+      "candidate_weight": 1.0
+    },
+    {
+      "id": "balanced_lda_rank1_half",
+      "head": 1,
+      "candidate_weight": 1.0
+    },
+    {
+      "id": "balanced_lda_rank2_full",
+      "head": 2,
+      "candidate_weight": 1.0
+    },
+    {
+      "id": "balanced_mixture_zero",
+      "head": 3,
+      "candidate_weight": 1.0
+    },
+    {
+      "id": "balanced_mixture_rank1_half",
+      "head": 4,
+      "candidate_weight": 1.0
+    },
+    {
+      "id": "half_frozen_balanced_lda_zero",
+      "head": 0,
+      "candidate_weight": 0.5
+    },
+    {
+      "id": "half_frozen_balanced_lda_rank1_half",
+      "head": 1,
+      "candidate_weight": 0.5
+    },
+    {
+      "id": "half_frozen_balanced_lda_rank2_full",
+      "head": 2,
+      "candidate_weight": 0.5
+    },
+    {
+      "id": "half_frozen_balanced_mixture_zero",
+      "head": 3,
+      "candidate_weight": 0.5
+    },
+    {
+      "id": "half_frozen_balanced_mixture_rank1_half",
+      "head": 4,
+      "candidate_weight": 0.5
+    }
+  ],
+  "heads": [
+    {
+      "id": "balanced_lda_zero",
+      "method": "lda",
+      "rank": 0,
+      "removal": 0.0
+    },
+    {
+      "id": "balanced_lda_rank1_half",
+      "method": "lda",
+      "rank": 1,
+      "removal": 0.5
+    },
+    {
+      "id": "balanced_lda_rank2_full",
+      "method": "lda",
+      "rank": 2,
+      "removal": 1.0
+    },
+    {
+      "id": "balanced_mixture_zero",
+      "method": "mixture",
+      "rank": 0,
+      "removal": 0.0
+    },
+    {
+      "id": "balanced_mixture_rank1_half",
+      "method": "mixture",
+      "rank": 1,
+      "removal": 0.5
+    }
+  ],
+  "weights": {
+    "frequency": 0.6,
+    "ordered": 0.15,
+    "kernel": 0.125,
+    "sequence": 0.125
+  },
+  "shrinkage": 0.5,
+  "prototype_shrinkage": 0.5,
+  "selection": "Highest all-library 636-group reference Top1; then MRR; then predeclared grid order. No pair metric in selection.",
+  "reference_cv": "12 environments; matching reference query IDs, condition variants and duplicate texts/sequences excluded; developmental cohorts are additional training rows.",
+  "reference_baseline": "Original first-fusion reference-only OOF scores, aligned by gallery and group ID; never refitted using held reference answers.",
+  "development_cv": "Leave cohort+round across both labels (6 matched answers), removing exact held text/sequence duplicates from every source.",
+  "clean_transfer": "Leave one entire cohort and all primary reference rows of every label in that cohort; affected labels use only the opposite developmental cohort. Other labels remain gallery references. Baseline algorithm is refitted on this clean gallery.",
+  "balance": "Each label receives equal total weight; its acquisition channels receive equal weight; answers divide their label/channel cell weight equally. Prototypes have equal source mixture weights and uniform class priors.",
+  "nuisance": "Top1/2 SVD directions of training within-label source centroid offsets; only labels with multiple observed sources contribute; equal weight per such label and source. No held-source centroid enters fitting.",
+  "inference": "Only parsed integer outputs; no provider/channel/time/endpoint/label-specific branches. All transforms fit training rows only.",
+  "fixed_holdout": "Never opened, trained on, calibrated on or selected against by this study.",
+  "independent_validation": false
+}

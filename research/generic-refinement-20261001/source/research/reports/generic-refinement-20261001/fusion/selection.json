@@ -1,0 +1,1560 @@
+{
+  "plan": {
+    "component_names": [
+      "first_frozen",
+      "groups",
+      "rank_sequence",
+      "source_robust"
+    ],
+    "weights": [
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.25,
+        0.75
+      ],
+      [
+        0.0,
+        0.0,
+        0.5,
+        0.5
+      ],
+      [
+        0.0,
+        0.0,
+        0.75,
+        0.25
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.25,
+        0.0,
+        0.75
+      ],
+      [
+        0.0,
+        0.25,
+        0.25,
+        0.5
+      ],
+      [
+        0.0,
+        0.25,
+        0.5,
+        0.25
+      ],
+      [
+        0.0,
+        0.25,
+        0.75,
+        0.0
+      ],
+      [
+        0.0,
+        0.5,
+        0.0,
+        0.5
+      ],
+      [
+        0.0,
+        0.5,
+        0.25,
+        0.25
+      ],
+      [
+        0.0,
+        0.5,
+        0.5,
+        0.0
+      ],
+      [
+        0.0,
+        0.75,
+        0.0,
+        0.25
+      ],
+      [
+        0.0,
+        0.75,
+        0.25,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.25,
+        0.0,
+        0.0,
+        0.75
+      ],
+      [
+        0.25,
+        0.0,
+        0.25,
+        0.5
+      ],
+      [
+        0.25,
+        0.0,
+        0.5,
+        0.25
+      ],
+      [
+        0.25,
+        0.0,
+        0.75,
+        0.0
+      ],
+      [
+        0.25,
+        0.25,
+        0.0,
+        0.5
+      ],
+      [
+        0.25,
+        0.25,
+        0.25,
+        0.25
+      ],
+      [
+        0.25,
+        0.25,
+        0.5,
+        0.0
+      ],
+      [
+        0.25,
+        0.5,
+        0.0,
+        0.25
+      ],
+      [
+        0.25,
+        0.5,
+        0.25,
+        0.0
+      ],
+      [
+        0.25,
+        0.75,
+        0.0,
+        0.0
+      ],
+      [
+        0.5,
+        0.0,
+        0.0,
+        0.5
+      ],
+      [
+        0.5,
+        0.0,
+        0.25,
+        0.25
+      ],
+      [
+        0.5,
+        0.0,
+        0.5,
+        0.0
+      ],
+      [
+        0.5,
+        0.25,
+        0.0,
+        0.25
+      ],
+      [
+        0.5,
+        0.25,
+        0.25,
+        0.0
+      ],
+      [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      [
+        0.75,
+        0.0,
+        0.0,
+        0.25
+      ],
+      [
+        0.75,
+        0.0,
+        0.25,
+        0.0
+      ],
+      [
+        0.75,
+        0.25,
+        0.0,
+        0.0
+      ],
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    ],
+    "selection": "Highest all-gallery Top1; then fewer nonzero components, then fixed grid order.",
+    "source_hashes": {
+      "research/studies/generic-refinement-20261001/fuse.py": "f032a193cc88a78fded2f43de73fd3b16a11a1808da34b07038d1b579b3e4160",
+      "research/studies/generic-refinement-20261001/PROTOCOL.md": "ffb01aaea5534b3e4ec963e2087d47b4325d197fb36e59ea168efc562fbc5b6b",
+      "projects/research/sequence-generalization-20260930/bundle.json": "5f0a3a9965efbcc1acb196525b7939e6f966dd8eb87aef4c2c0514b70cae2244",
+      "projects/research/sequence-generalization-20260930/requirements.txt": "019bd8864d363104371181921955efc3c50f028946099269794b198d0893ec6a",
+      "research/studies/generic-refinement-20261001/group_models.py": "d8aaad24900b150c0521bb3271b4ee57f887314a534ca197d7e701676960cd19",
+      "research/studies/generic-refinement-20261001/rank_sequence.py": "9cfc2538c03f4958ad3764016d82d2f9829cf0cfd13f87af584cf9a83b3d9dff",
+      "research/studies/generic-refinement-20261001/source_robust.py": "f247bcf8708ddb5ad2cd46c148ac6f5737c0792aeaff1e85c8779108c436cd2a"
+    },
+    "oof_hashes": {
+      "research/reports/sequence-generalization/20260930/fusion/reference-oof.npz": "e47811d6c9822dc57b63bf54fcf0b5cb47cee9e63c507c2fb58117c6b49b3578",
+      "research/reports/generic-refinement-20261001/groups/reference-oof.npz": "f2c80dea3be786641b59e551f7aa9995b9b26644769792f63e591e03d2d80ad2",
+      "research/reports/generic-refinement-20261001/rank-sequence/reference-oof.npz": "362085dbea1c325a5ba8b2ec4a980a1390afcab2ad2cd0b15fba32f46df17cf3",
+      "research/reports/generic-refinement-20261001/source-robust/reference-oof.npz": "af338bf848cae40a4ce96713d8028f593505da825f9f5a1e88c10528c410ea70"
+    },
+    "fixed_holdout_opened": false,
+    "paired_cohort_used_for_weight_selection": false
+  },
+  "candidates": [
+    {
+      "index": 0,
+      "weights": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 580,
+        "top1": 0.9119496855345912,
+        "macro_top1": 0.9119496855345912,
+        "top3": 1.0,
+        "mrr": 0.9551886792452831,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 15,
+          "conditional_correct": 15,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 8
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 1,
+      "weights": [
+        0.0,
+        0.0,
+        0.25,
+        0.75
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 575,
+        "top1": 0.9040880503144654,
+        "macro_top1": 0.9040880503144654,
+        "top3": 1.0,
+        "mrr": 0.9515199161425578,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 13,
+          "conditional_correct": 13,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 6
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 7
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 2,
+      "weights": [
+        0.0,
+        0.0,
+        0.5,
+        0.5
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 572,
+        "top1": 0.89937106918239,
+        "macro_top1": 0.8993710691823901,
+        "top3": 1.0,
+        "mrr": 0.9491614255765201,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 12,
+          "conditional_correct": 12,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 6
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 6
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 3,
+      "weights": [
+        0.0,
+        0.0,
+        0.75,
+        0.25
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 569,
+        "top1": 0.8946540880503144,
+        "macro_top1": 0.8946540880503145,
+        "top3": 1.0,
+        "mrr": 0.9468029350104821,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 12,
+          "conditional_correct": 12,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 6
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 6
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 4,
+      "weights": [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 567,
+        "top1": 0.8915094339622641,
+        "macro_top1": 0.8915094339622641,
+        "top3": 1.0,
+        "mrr": 0.9444444444444445,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 13,
+          "conditional_correct": 13,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 6
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 7
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 5,
+      "weights": [
+        0.0,
+        0.25,
+        0.0,
+        0.75
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 577,
+        "top1": 0.9072327044025157,
+        "macro_top1": 0.9072327044025157,
+        "top3": 1.0,
+        "mrr": 0.9530922431865829,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 14,
+          "conditional_correct": 14,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 7
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 6,
+      "weights": [
+        0.0,
+        0.25,
+        0.25,
+        0.5
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 569,
+        "top1": 0.8946540880503144,
+        "macro_top1": 0.8946540880503145,
+        "top3": 1.0,
+        "mrr": 0.9470649895178198,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 12,
+          "conditional_correct": 12,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 5
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 7,
+      "weights": [
+        0.0,
+        0.25,
+        0.5,
+        0.25
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 569,
+        "top1": 0.8946540880503144,
+        "macro_top1": 0.8946540880503145,
+        "top3": 1.0,
+        "mrr": 0.9470649895178196,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 12,
+          "conditional_correct": 12,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 5
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 8,
+      "weights": [
+        0.0,
+        0.25,
+        0.75,
+        0.0
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 562,
+        "top1": 0.8836477987421384,
+        "macro_top1": 0.8836477987421383,
+        "top3": 1.0,
+        "mrr": 0.940775681341719,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 12,
+          "conditional_correct": 12,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 5
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 9,
+      "weights": [
+        0.0,
+        0.5,
+        0.0,
+        0.5
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 575,
+        "top1": 0.9040880503144654,
+        "macro_top1": 0.9040880503144654,
+        "top3": 1.0,
+        "mrr": 0.9520440251572327,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 13,
+          "conditional_correct": 13,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 6
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 10,
+      "weights": [
+        0.0,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 565,
+        "top1": 0.8883647798742138,
+        "macro_top1": 0.8883647798742139,
+        "top3": 1.0,
+        "mrr": 0.9439203354297693,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 11,
+          "conditional_correct": 11,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 4
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 11,
+      "weights": [
+        0.0,
+        0.5,
+        0.5,
+        0.0
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 559,
+        "top1": 0.8789308176100629,
+        "macro_top1": 0.878930817610063,
+        "top3": 1.0,
+        "mrr": 0.9389412997903563,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 12,
+          "conditional_correct": 12,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 5
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 12,
+      "weights": [
+        0.0,
+        0.75,
+        0.0,
+        0.25
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 570,
+        "top1": 0.8962264150943396,
+        "macro_top1": 0.8962264150943396,
+        "top3": 1.0,
+        "mrr": 0.9478511530398321,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 13,
+          "conditional_correct": 13,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 6
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 13,
+      "weights": [
+        0.0,
+        0.75,
+        0.25,
+        0.0
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 563,
+        "top1": 0.8852201257861635,
+        "macro_top1": 0.8852201257861636,
+        "top3": 1.0,
+        "mrr": 0.9420859538784067,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 11,
+          "conditional_correct": 11,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 6
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 5
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 14,
+      "weights": [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 567,
+        "top1": 0.8915094339622641,
+        "macro_top1": 0.8915094339622641,
+        "top3": 1.0,
+        "mrr": 0.9449685534591195,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 12,
+          "conditional_correct": 12,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 6
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 6
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 15,
+      "weights": [
+        0.25,
+        0.0,
+        0.0,
+        0.75
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 580,
+        "top1": 0.9119496855345912,
+        "macro_top1": 0.9119496855345912,
+        "top3": 1.0,
+        "mrr": 0.9551886792452831,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 15,
+          "conditional_correct": 15,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 8
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 16,
+      "weights": [
+        0.25,
+        0.0,
+        0.25,
+        0.5
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 575,
+        "top1": 0.9040880503144654,
+        "macro_top1": 0.9040880503144654,
+        "top3": 1.0,
+        "mrr": 0.9515199161425578,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 13,
+          "conditional_correct": 13,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 6
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 7
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 17,
+      "weights": [
+        0.25,
+        0.0,
+        0.5,
+        0.25
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 572,
+        "top1": 0.89937106918239,
+        "macro_top1": 0.8993710691823901,
+        "top3": 1.0,
+        "mrr": 0.9491614255765201,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 12,
+          "conditional_correct": 12,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 6
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 6
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 18,
+      "weights": [
+        0.25,
+        0.0,
+        0.75,
+        0.0
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 569,
+        "top1": 0.8946540880503144,
+        "macro_top1": 0.8946540880503145,
+        "top3": 1.0,
+        "mrr": 0.9468029350104821,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 12,
+          "conditional_correct": 12,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 6
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 6
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 19,
+      "weights": [
+        0.25,
+        0.25,
+        0.0,
+        0.5
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 577,
+        "top1": 0.9072327044025157,
+        "macro_top1": 0.9072327044025157,
+        "top3": 1.0,
+        "mrr": 0.9530922431865829,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 14,
+          "conditional_correct": 14,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 7
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 20,
+      "weights": [
+        0.25,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 569,
+        "top1": 0.8946540880503144,
+        "macro_top1": 0.8946540880503145,
+        "top3": 1.0,
+        "mrr": 0.9470649895178198,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 12,
+          "conditional_correct": 12,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 5
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 21,
+      "weights": [
+        0.25,
+        0.25,
+        0.5,
+        0.0
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 569,
+        "top1": 0.8946540880503144,
+        "macro_top1": 0.8946540880503145,
+        "top3": 1.0,
+        "mrr": 0.9470649895178196,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 12,
+          "conditional_correct": 12,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 5
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 22,
+      "weights": [
+        0.25,
+        0.5,
+        0.0,
+        0.25
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 575,
+        "top1": 0.9040880503144654,
+        "macro_top1": 0.9040880503144654,
+        "top3": 1.0,
+        "mrr": 0.9520440251572327,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 13,
+          "conditional_correct": 13,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 6
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 23,
+      "weights": [
+        0.25,
+        0.5,
+        0.25,
+        0.0
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 565,
+        "top1": 0.8883647798742138,
+        "macro_top1": 0.8883647798742139,
+        "top3": 1.0,
+        "mrr": 0.9439203354297693,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 11,
+          "conditional_correct": 11,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 4
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 24,
+      "weights": [
+        0.25,
+        0.75,
+        0.0,
+        0.0
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 570,
+        "top1": 0.8962264150943396,
+        "macro_top1": 0.8962264150943396,
+        "top3": 1.0,
+        "mrr": 0.9478511530398321,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 13,
+          "conditional_correct": 13,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 6
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 25,
+      "weights": [
+        0.5,
+        0.0,
+        0.0,
+        0.5
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 580,
+        "top1": 0.9119496855345912,
+        "macro_top1": 0.9119496855345912,
+        "top3": 1.0,
+        "mrr": 0.9551886792452831,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 15,
+          "conditional_correct": 15,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 8
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 26,
+      "weights": [
+        0.5,
+        0.0,
+        0.25,
+        0.25
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 575,
+        "top1": 0.9040880503144654,
+        "macro_top1": 0.9040880503144654,
+        "top3": 1.0,
+        "mrr": 0.9515199161425578,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 13,
+          "conditional_correct": 13,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 6
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 7
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 27,
+      "weights": [
+        0.5,
+        0.0,
+        0.5,
+        0.0
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 572,
+        "top1": 0.89937106918239,
+        "macro_top1": 0.8993710691823901,
+        "top3": 1.0,
+        "mrr": 0.9491614255765201,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 12,
+          "conditional_correct": 12,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 6
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 6
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 28,
+      "weights": [
+        0.5,
+        0.25,
+        0.0,
+        0.25
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 577,
+        "top1": 0.9072327044025157,
+        "macro_top1": 0.9072327044025157,
+        "top3": 1.0,
+        "mrr": 0.9530922431865829,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 14,
+          "conditional_correct": 14,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 7
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 29,
+      "weights": [
+        0.5,
+        0.25,
+        0.25,
+        0.0
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 569,
+        "top1": 0.8946540880503144,
+        "macro_top1": 0.8946540880503145,
+        "top3": 1.0,
+        "mrr": 0.9470649895178198,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 12,
+          "conditional_correct": 12,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 5
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 30,
+      "weights": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 575,
+        "top1": 0.9040880503144654,
+        "macro_top1": 0.9040880503144654,
+        "top3": 1.0,
+        "mrr": 0.9520440251572327,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 13,
+          "conditional_correct": 13,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 6
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 31,
+      "weights": [
+        0.75,
+        0.0,
+        0.0,
+        0.25
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 580,
+        "top1": 0.9119496855345912,
+        "macro_top1": 0.9119496855345912,
+        "top3": 1.0,
+        "mrr": 0.9551886792452831,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 15,
+          "conditional_correct": 15,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 8
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 32,
+      "weights": [
+        0.75,
+        0.0,
+        0.25,
+        0.0
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 575,
+        "top1": 0.9040880503144654,
+        "macro_top1": 0.9040880503144654,
+        "top3": 1.0,
+        "mrr": 0.9515199161425578,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 13,
+          "conditional_correct": 13,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 6
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 7
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 33,
+      "weights": [
+        0.75,
+        0.25,
+        0.0,
+        0.0
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 577,
+        "top1": 0.9072327044025157,
+        "macro_top1": 0.9072327044025157,
+        "top3": 1.0,
+        "mrr": 0.9530922431865829,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 14,
+          "conditional_correct": 14,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 7
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 34,
+      "weights": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 580,
+        "top1": 0.9119496855345912,
+        "macro_top1": 0.9119496855345912,
+        "top3": 1.0,
+        "mrr": 0.9551886792452831,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 15,
+          "conditional_correct": 15,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 8
+            }
+          }
+        }
+      }
+    }
+  ],
+  "winner": {
+    "index": 0,
+    "weights": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "metrics": {
+      "groups": 636,
+      "correct": 580,
+      "top1": 0.9119496855345912,
+      "macro_top1": 0.9119496855345912,
+      "top3": 1.0,
+      "mrr": 0.9551886792452831,
+      "pair": {
+        "groups": 24,
+        "all_library_correct": 15,
+        "conditional_correct": 15,
+        "per_model": {
+          "gpt-6-astra": {
+            "groups": 12,
+            "all_library_correct": 7
+          },
+          "gpt-6.1-sol": {
+            "groups": 12,
+            "all_library_correct": 8
+          }
+        }
+      }
+    }
+  },
+  "components": [
+    {
+      "name": "first_frozen",
+      "metrics": {
+        "groups": 636,
+        "correct": 580,
+        "top1": 0.9119496855345912,
+        "macro_top1": 0.9119496855345912,
+        "top3": 1.0,
+        "mrr": 0.9551886792452831,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 15,
+          "conditional_correct": 15,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 8
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "groups",
+      "metrics": {
+        "groups": 636,
+        "correct": 567,
+        "top1": 0.8915094339622641,
+        "macro_top1": 0.8915094339622641,
+        "top3": 1.0,
+        "mrr": 0.9449685534591195,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 12,
+          "conditional_correct": 12,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 6
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 6
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "rank_sequence",
+      "metrics": {
+        "groups": 636,
+        "correct": 567,
+        "top1": 0.8915094339622641,
+        "macro_top1": 0.8915094339622641,
+        "top3": 1.0,
+        "mrr": 0.9444444444444445,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 13,
+          "conditional_correct": 13,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 6
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 7
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "source_robust",
+      "metrics": {
+        "groups": 636,
+        "correct": 580,
+        "top1": 0.9119496855345912,
+        "macro_top1": 0.9119496855345912,
+        "top3": 1.0,
+        "mrr": 0.9551886792452831,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 15,
+          "conditional_correct": 15,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 8
+            }
+          }
+        }
+      }
+    }
+  ],
+  "confidence": {
+    "beta": 4.526640310290587,
+    "nll": 0.18889768893625764,
+    "thresholds": [
+      {
+        "threshold": 0.5,
+        "accepted": 631,
+        "correct": 577,
+        "coverage": 0.9921383647798742,
+        "precision": 0.9144215530903328,
+        "pair_accepted": 24,
+        "pair_correct": 15
+      },
+      {
+        "threshold": 0.7,
+        "accepted": 552,
+        "correct": 529,
+        "coverage": 0.8679245283018868,
+        "precision": 0.9583333333333334,
+        "pair_accepted": 6,
+        "pair_correct": 4
+      },
+      {
+        "threshold": 0.8,
+        "accepted": 517,
+        "correct": 502,
+        "coverage": 0.8128930817610063,
+        "precision": 0.9709864603481625,
+        "pair_accepted": 2,
+        "pair_correct": 1
+      },
+      {
+        "threshold": 0.9,
+        "accepted": 479,
+        "correct": 476,
+        "coverage": 0.7531446540880503,
+        "precision": 0.9937369519832986,
+        "pair_accepted": 0,
+        "pair_correct": 0
+      },
+      {
+        "threshold": 0.95,
+        "accepted": 454,
+        "correct": 454,
+        "coverage": 0.7138364779874213,
+        "precision": 1.0,
+        "pair_accepted": 0,
+        "pair_correct": 0
+      },
+      {
+        "threshold": 0.99,
+        "accepted": 385,
+        "correct": 385,
+        "coverage": 0.6053459119496856,
+        "precision": 1.0,
+        "pair_accepted": 0,
+        "pair_correct": 0
+      }
+    ]
+  }
+}
