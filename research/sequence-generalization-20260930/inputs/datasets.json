@@ -1,0 +1,38 @@
+[
+  {
+    "name": "holdout",
+    "purpose": "holdout",
+    "training_allowed": false,
+    "original_manifest_purpose": "holdout",
+    "manifest": "source/research/evaluation/holdout/manifest.json",
+    "manifest_sha256": "9bc45797fae31b5972205a50818cc168f5ce5ff048ef4a17445ee7d8ef7743e9",
+    "samples": "source/research/evaluation/holdout/samples.jsonl",
+    "attempts": 649,
+    "accepted_records": 360,
+    "independent_raw_record_count": 269
+  },
+  {
+    "name": "previous_pair",
+    "purpose": "holdout",
+    "training_allowed": false,
+    "original_manifest_purpose": null,
+    "manifest": "source/research/reports/astra-sol-separation/paired-low-01/manifest.json",
+    "manifest_sha256": "e0b9cdd6c088518a587d3092e30f3bd2402572b3866b73ed7bd730f1cbcad543",
+    "samples": "source/research/reports/astra-sol-separation/paired-low-01/samples.jsonl",
+    "attempts": 122,
+    "accepted_records": 120,
+    "independent_raw_record_count": 0
+  },
+  {
+    "name": "prospective_v1",
+    "purpose": "holdout",
+    "training_allowed": false,
+    "original_manifest_purpose": "prospective-evaluation",
+    "manifest": "source/research/reports/sequence-generalization/20260930/prospective/manifest.json",
+    "manifest_sha256": "ff48b49bf4f99c1e702ae3086ae0357760b73ac16b423e63c8c55078f4a17402",
+    "samples": "source/research/reports/sequence-generalization/20260930/prospective/samples.jsonl",
+    "attempts": 132,
+    "accepted_records": 120,
+    "independent_raw_record_count": 0
+  }
+]

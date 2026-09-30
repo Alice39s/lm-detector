@@ -1,0 +1,740 @@
+{
+  "components": [
+    {
+      "name": "rerank",
+      "metrics": {
+        "groups": 636,
+        "correct": 576,
+        "top1": 0.9056603773584906,
+        "macro_top1": 0.9056603773584906,
+        "top3": 0.9984276729559748,
+        "mrr": 0.9516509433962265,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 14,
+          "conditional_correct": 14,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 7
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "positional",
+      "metrics": {
+        "groups": 636,
+        "correct": 571,
+        "top1": 0.8977987421383647,
+        "macro_top1": 0.8977987421383646,
+        "top3": 0.9984276729559748,
+        "mrr": 0.947982180293501,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 13,
+          "conditional_correct": 13,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 6
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "dense",
+      "metrics": {
+        "groups": 636,
+        "correct": 570,
+        "top1": 0.8962264150943396,
+        "macro_top1": 0.8962264150943396,
+        "top3": 0.9968553459119497,
+        "mrr": 0.9457547169811321,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 12,
+          "conditional_correct": 12,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 5
+            }
+          }
+        }
+      }
+    }
+  ],
+  "candidates": [
+    {
+      "index": 0,
+      "weights": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 570,
+        "top1": 0.8962264150943396,
+        "macro_top1": 0.8962264150943396,
+        "top3": 0.9968553459119497,
+        "mrr": 0.9457547169811321,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 12,
+          "conditional_correct": 12,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 5
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 1,
+      "weights": [
+        0.0,
+        0.25,
+        0.75
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 567,
+        "top1": 0.8915094339622641,
+        "macro_top1": 0.8915094339622641,
+        "top3": 0.9984276729559748,
+        "mrr": 0.9440513626834381,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 11,
+          "conditional_correct": 11,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 4
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 2,
+      "weights": [
+        0.0,
+        0.5,
+        0.5
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 566,
+        "top1": 0.889937106918239,
+        "macro_top1": 0.8899371069182391,
+        "top3": 0.9984276729559748,
+        "mrr": 0.943527253668763,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 11,
+          "conditional_correct": 11,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 4
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 3,
+      "weights": [
+        0.0,
+        0.75,
+        0.25
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 566,
+        "top1": 0.889937106918239,
+        "macro_top1": 0.8899371069182391,
+        "top3": 0.9984276729559748,
+        "mrr": 0.9437893081761006,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 12,
+          "conditional_correct": 12,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 6
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 6
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 4,
+      "weights": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 571,
+        "top1": 0.8977987421383647,
+        "macro_top1": 0.8977987421383646,
+        "top3": 0.9984276729559748,
+        "mrr": 0.947982180293501,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 13,
+          "conditional_correct": 13,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 6
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 5,
+      "weights": [
+        0.25,
+        0.0,
+        0.75
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 568,
+        "top1": 0.8930817610062893,
+        "macro_top1": 0.8930817610062893,
+        "top3": 0.9984276729559748,
+        "mrr": 0.9445754716981132,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 12,
+          "conditional_correct": 12,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 5
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 6,
+      "weights": [
+        0.25,
+        0.25,
+        0.5
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 571,
+        "top1": 0.8977987421383647,
+        "macro_top1": 0.8977987421383646,
+        "top3": 1.0,
+        "mrr": 0.9478511530398321,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 13,
+          "conditional_correct": 13,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 6
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 7,
+      "weights": [
+        0.25,
+        0.5,
+        0.25
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 567,
+        "top1": 0.8915094339622641,
+        "macro_top1": 0.8915094339622641,
+        "top3": 1.0,
+        "mrr": 0.9452306079664572,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 12,
+          "conditional_correct": 12,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 5
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 8,
+      "weights": [
+        0.25,
+        0.75,
+        0.0
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 575,
+        "top1": 0.9040880503144654,
+        "macro_top1": 0.9040880503144654,
+        "top3": 1.0,
+        "mrr": 0.9515199161425578,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 13,
+          "conditional_correct": 13,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 6
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 7
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 9,
+      "weights": [
+        0.5,
+        0.0,
+        0.5
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 573,
+        "top1": 0.9009433962264151,
+        "macro_top1": 0.9009433962264151,
+        "top3": 1.0,
+        "mrr": 0.9491614255765198,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 13,
+          "conditional_correct": 13,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 6
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 10,
+      "weights": [
+        0.5,
+        0.25,
+        0.25
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 575,
+        "top1": 0.9040880503144654,
+        "macro_top1": 0.9040880503144655,
+        "top3": 1.0,
+        "mrr": 0.9515199161425578,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 13,
+          "conditional_correct": 13,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 6
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 11,
+      "weights": [
+        0.5,
+        0.5,
+        0.0
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 580,
+        "top1": 0.9119496855345912,
+        "macro_top1": 0.9119496855345912,
+        "top3": 1.0,
+        "mrr": 0.9551886792452831,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 15,
+          "conditional_correct": 15,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 8
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 12,
+      "weights": [
+        0.75,
+        0.0,
+        0.25
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 571,
+        "top1": 0.8977987421383647,
+        "macro_top1": 0.8977987421383646,
+        "top3": 0.9984276729559748,
+        "mrr": 0.9477201257861635,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 13,
+          "conditional_correct": 13,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 6
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 13,
+      "weights": [
+        0.75,
+        0.25,
+        0.0
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 577,
+        "top1": 0.9072327044025157,
+        "macro_top1": 0.9072327044025158,
+        "top3": 1.0,
+        "mrr": 0.9530922431865829,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 14,
+          "conditional_correct": 14,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 7
+            }
+          }
+        }
+      }
+    },
+    {
+      "index": 14,
+      "weights": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "metrics": {
+        "groups": 636,
+        "correct": 576,
+        "top1": 0.9056603773584906,
+        "macro_top1": 0.9056603773584906,
+        "top3": 0.9984276729559748,
+        "mrr": 0.9516509433962265,
+        "pair": {
+          "groups": 24,
+          "all_library_correct": 14,
+          "conditional_correct": 14,
+          "per_model": {
+            "gpt-6-astra": {
+              "groups": 12,
+              "all_library_correct": 7
+            },
+            "gpt-6.1-sol": {
+              "groups": 12,
+              "all_library_correct": 7
+            }
+          }
+        }
+      }
+    }
+  ],
+  "winner": {
+    "index": 11,
+    "weights": [
+      0.5,
+      0.5,
+      0.0
+    ],
+    "metrics": {
+      "groups": 636,
+      "correct": 580,
+      "top1": 0.9119496855345912,
+      "macro_top1": 0.9119496855345912,
+      "top3": 1.0,
+      "mrr": 0.9551886792452831,
+      "pair": {
+        "groups": 24,
+        "all_library_correct": 15,
+        "conditional_correct": 15,
+        "per_model": {
+          "gpt-6-astra": {
+            "groups": 12,
+            "all_library_correct": 7
+          },
+          "gpt-6.1-sol": {
+            "groups": 12,
+            "all_library_correct": 8
+          }
+        }
+      }
+    }
+  },
+  "confidence": {
+    "beta": 4.778034578749429,
+    "nll": 0.188335682747498,
+    "thresholds": [
+      {
+        "threshold": 0.5,
+        "accepted": 630,
+        "correct": 577,
+        "coverage": 0.9905660377358491,
+        "precision": 0.9158730158730158,
+        "pair_accepted": 24,
+        "pair_correct": 15
+      },
+      {
+        "threshold": 0.7,
+        "accepted": 553,
+        "correct": 530,
+        "coverage": 0.8694968553459119,
+        "precision": 0.9584086799276673,
+        "pair_accepted": 6,
+        "pair_correct": 4
+      },
+      {
+        "threshold": 0.8,
+        "accepted": 517,
+        "correct": 502,
+        "coverage": 0.8128930817610063,
+        "precision": 0.9709864603481625,
+        "pair_accepted": 2,
+        "pair_correct": 1
+      },
+      {
+        "threshold": 0.9,
+        "accepted": 479,
+        "correct": 476,
+        "coverage": 0.7531446540880503,
+        "precision": 0.9937369519832986,
+        "pair_accepted": 0,
+        "pair_correct": 0
+      },
+      {
+        "threshold": 0.95,
+        "accepted": 454,
+        "correct": 454,
+        "coverage": 0.7138364779874213,
+        "precision": 1.0,
+        "pair_accepted": 0,
+        "pair_correct": 0
+      },
+      {
+        "threshold": 0.99,
+        "accepted": 391,
+        "correct": 391,
+        "coverage": 0.6147798742138365,
+        "precision": 1.0,
+        "pair_accepted": 0,
+        "pair_correct": 0
+      }
+    ]
+  },
+  "artifact": {
+    "schema": "generic-reference-fusion-v1",
+    "model_ids": [
+      "claude-haiku-4.5",
+      "claude-sonnet-4.6",
+      "claude-sonnet-5",
+      "claude-opus-4.6",
+      "claude-opus-4.7",
+      "claude-opus-4.8",
+      "claude-opus-5",
+      "claude-fable-5.1",
+      "claude-fable-5",
+      "gemini-2.5-pro",
+      "gemini-3.1-pro-preview",
+      "gemini-3.5-flash",
+      "gemini-3.6-flash",
+      "gemini-3.7-flash",
+      "gemini-3.8-flash",
+      "grok-4.5",
+      "grok-4.6",
+      "gpt-4o",
+      "glm-5.2",
+      "glm-5.3",
+      "qwen3.8-max-0902",
+      "qwen3.8-27b",
+      "kimi-k3",
+      "hy4-preview",
+      "muse-spark-1.2",
+      "muse-spark-1.3-contributor",
+      "muse-spark-1.3",
+      "kimi-k2.8-preview",
+      "grok-4.7",
+      "mimo-v2.5",
+      "mimo-v2.5-pro",
+      "mimo-v2.6-flash",
+      "mimo-v2.6-pro",
+      "step-5-preview",
+      "claude-opus-5.5",
+      "gpt-6-luna",
+      "glm-5.3-flashx",
+      "glm-5.3-flash",
+      "deepseek-v4.1-flash",
+      "deepseek-v4-flash",
+      "deepseek-v4-pro-0813",
+      "deepseek-v4-pro",
+      "deepseek-v4-flash-0731",
+      "deepseek-v3.2",
+      "gpt-6-sol",
+      "claude-sonnet-5.5",
+      "gpt-6.1-sol",
+      "gpt-6-astra",
+      "gpt-5.4",
+      "gpt-5.5",
+      "gpt-5.6-sol",
+      "gpt-5.6-terra",
+      "gpt-5.6-luna"
+    ],
+    "beta": 4.778034578749429,
+    "reference_sha256": "5a86bb2409f7e132f4bb98456d54996014782fa531c6e670ce46f16d213b11d4",
+    "components": [
+      {
+        "name": "rerank",
+        "path": "research/reports/sequence-generalization/20260930/rerank/frozen.joblib",
+        "sha256": "1e20ee850df0dbe24cd4c62e1840370a1109db9910afe2e3b5a96db62e448c26"
+      },
+      {
+        "name": "positional",
+        "path": "research/reports/sequence-generalization/20260930/positional/fitted.joblib",
+        "sha256": "b2661ee6acab8ee94b0d2203eff79b1a9ea9b6b5e12af631bd9ea00070cf85bd"
+      },
+      {
+        "name": "dense",
+        "path": "research/reports/sequence-generalization/20260930/classifiers/fitted-winner.joblib",
+        "sha256": "e14435411fb6bf553cc1c2a50b902936168836955a6e30a9adb65b708e05aa93"
+      }
+    ],
+    "spec": {
+      "component_names": [
+        "rerank",
+        "positional",
+        "dense"
+      ],
+      "weights": [
+        0.5,
+        0.5,
+        0.0
+      ],
+      "normalization": "Within each group, z-score across all gallery labels."
+    },
+    "calibration_scope": "Reference OOF development temperature; candidate components and weights selected on these folds."
+  },
+  "sources": {
+    "research/reports/sequence-generalization/20260930/positional/reference-oof.npz": "d1fc630c718bfd2c23ed6dbe6dbd084f538526ba7e19e61158bb747eae69dcd2",
+    "research/reports/sequence-generalization/20260930/rerank/candidates.npz": "8a4c2c2e874fbd83a42ca2524c752fd37479799998f4f914983386a20ecce19d",
+    "research/reports/sequence-generalization/20260930/classifiers/reference-oof.npz": "1f7358202335762837caf41563baa83a06199389faf5af34767a71307bd75d21",
+    "research/studies/sequence-generalization/fusion.py": "e49923e1ffc445696f7977f720ddcb11462801a1223c4bf3d1960ee062d1b6a5"
+  },
+  "selection": "Highest 636-group all-library Top-1; ties prefer fewer nonzero components, then fixed grid order.",
+  "external_scores_opened": false,
+  "limitations": "Reference OOF development temperature; candidate components and weights selected on these folds."
+}

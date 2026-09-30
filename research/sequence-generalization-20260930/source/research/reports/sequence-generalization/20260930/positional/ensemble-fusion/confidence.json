@@ -1,0 +1,119 @@
+{
+  "nll": 0.21772921750550187,
+  "brier": 0.1368264565759177,
+  "ece10": 0.02811334430468769,
+  "reliability": [
+    {
+      "lo": 0.30000000000000004,
+      "hi": 0.4,
+      "n": 2,
+      "mean_confidence": 0.3795397779590692,
+      "accuracy": 0.0
+    },
+    {
+      "lo": 0.4,
+      "hi": 0.5,
+      "n": 2,
+      "mean_confidence": 0.49033611542428124,
+      "accuracy": 1.0
+    },
+    {
+      "lo": 0.5,
+      "hi": 0.6000000000000001,
+      "n": 39,
+      "mean_confidence": 0.5519970556744777,
+      "accuracy": 0.6410256410256411
+    },
+    {
+      "lo": 0.6000000000000001,
+      "hi": 0.7000000000000001,
+      "n": 28,
+      "mean_confidence": 0.6470864291212505,
+      "accuracy": 0.4642857142857143
+    },
+    {
+      "lo": 0.7000000000000001,
+      "hi": 0.8,
+      "n": 46,
+      "mean_confidence": 0.7482921162490619,
+      "accuracy": 0.6739130434782609
+    },
+    {
+      "lo": 0.8,
+      "hi": 0.9,
+      "n": 61,
+      "mean_confidence": 0.8579295941971404,
+      "accuracy": 0.8032786885245902
+    },
+    {
+      "lo": 0.9,
+      "hi": 1.0,
+      "n": 458,
+      "mean_confidence": 0.9874323095739324,
+      "accuracy": 0.9890829694323144
+    }
+  ],
+  "selective": {
+    "all": [
+      {
+        "threshold": 0.8,
+        "accepted": 519,
+        "errors": 17,
+        "coverage": 0.8160377358490566,
+        "error_upper95": 0.048728304567018425
+      },
+      {
+        "threshold": 0.9,
+        "accepted": 458,
+        "errors": 5,
+        "coverage": 0.720125786163522,
+        "error_upper95": 0.02281629432311082
+      },
+      {
+        "threshold": 0.95,
+        "accepted": 418,
+        "errors": 3,
+        "coverage": 0.6572327044025157,
+        "error_upper95": 0.01844417852046438
+      },
+      {
+        "threshold": 0.99,
+        "accepted": 323,
+        "errors": 0,
+        "coverage": 0.5078616352201258,
+        "error_upper95": 0.009231835432524078
+      }
+    ],
+    "pair": [
+      {
+        "threshold": 0.8,
+        "accepted": 3,
+        "errors": 1,
+        "coverage": 0.125,
+        "error_upper95": 0.8646496378284161
+      },
+      {
+        "threshold": 0.9,
+        "accepted": 0,
+        "errors": 0,
+        "coverage": 0.0,
+        "error_upper95": null
+      },
+      {
+        "threshold": 0.95,
+        "accepted": 0,
+        "errors": 0,
+        "coverage": 0.0,
+        "error_upper95": null
+      },
+      {
+        "threshold": 0.99,
+        "accepted": 0,
+        "errors": 0,
+        "coverage": 0.0,
+        "error_upper95": null
+      }
+    ]
+  },
+  "high_confidence_scope": "closed registered reference labels; no identity authentication"
+}

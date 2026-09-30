@@ -1,0 +1,22 @@
+{
+  "name": "fingerpoint-research",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "compare:three-paths": "cd .. && uv run research/studies/three-paths/run.py",
+    "detect:three-paths": "cd .. && uv run research/studies/three-paths/infer.py",
+    "collect:holdout": "cd .. && bun research/scripts/collect-holdout.ts",
+    "evaluate:holdout": "cd .. && bun research/scripts/evaluate-holdout.ts",
+    "audit:ranking": "cd .. && bun research/scripts/evaluate-ranking-calibration.ts",
+    "train:classifier": "cd .. && uv run research/scripts/train-probability-classifier.py",
+    "evaluate:classifier": "cd .. && uv run research/scripts/train-probability-classifier.py --evaluate-only",
+    "classify": "cd .. && uv run research/scripts/analyze-probability-classifier.py",
+    "train:embedding": "cd .. && uv run research/scripts/train-embedding.py",
+    "evaluate:embedding": "cd .. && uv run research/scripts/train-embedding.py --evaluate-only",
+    "classify:embedding": "cd .. && uv run research/scripts/analyze-embedding.py",
+    "experiment:generative": "cd .. && uv run research/scripts/experiment-generative.py",
+    "evaluate:generative": "cd .. && uv run research/scripts/evaluate-generative.py",
+    "audit:generative": "cd .. && uv run research/scripts/audit-generative.py",
+    "rebuild-bank": "cd .. && uv run --no-project python research/rebuild_unified_bank.py"
+  }
+}

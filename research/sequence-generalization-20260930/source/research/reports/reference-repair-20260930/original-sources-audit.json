@@ -1,0 +1,370 @@
+{
+  "audited_at": "2026-09-30T16:10:22.396Z",
+  "scope": "Original direct-source identity and local credential presence only",
+  "baseline_reference_sha256": "5a86bb2409f7e132f4bb98456d54996014782fa531c6e670ce46f16d213b11d4",
+  "targets": [
+    {
+      "label": "kimi-k2.8-preview",
+      "reference_batches": [
+        {
+          "id": "migration-7690f309f671fef9b898bc2b",
+          "source": {
+            "channel": "kimi-code-subscription",
+            "endpoint": "https://api.kimi.com/coding/v1/chat/completions"
+          },
+          "request": {
+            "model": "kimi-for-coding",
+            "format": "chat_completions",
+            "stream": true,
+            "reasoning_effort": "low",
+            "response_models": [
+              "kimi-for-coding"
+            ],
+            "temperature": null,
+            "max_tokens": 8192
+          },
+          "imported_from": {
+            "file": "data/archive/schema-cutover/unified_reference.rows.jsonl",
+            "sha256": "95f42eaa6108b767f1ba2c9177c4e0d04845347ca7d05eaf0b68234557093a80"
+          }
+        }
+      ],
+      "training_samples": 36,
+      "sample_sources": [
+        "kimi-code-subscription"
+      ],
+      "reported_providers": [
+        null
+      ],
+      "response_models": [
+        "kimi-for-coding"
+      ],
+      "reasoning_counts": {
+        "low": 36
+      },
+      "finished_at_range": [
+        "2026-09-17T07:37:17.634Z",
+        "2026-09-17T08:14:57.468Z"
+      ],
+      "original_evidence": [
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1445",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1446",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1447",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1448",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1449",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1450",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1451",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1452",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1453",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1454",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1455",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1456",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1457",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1458",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1459",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1460",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1461",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1462",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1463",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1464",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1465",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1466",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1467",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1468",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1469",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1470",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1471",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1472",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1473",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1474",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1475",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1476",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1477",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1478",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1479",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1480"
+      ],
+      "original_collection": {
+        "directory": "projects/runs/kimi-k2.8-preview-low-20260917",
+        "manifest_sha256": "051ff9aaa5a7509065d7dd1f68ea25d8381edf755f48c58e5ccc858246e53b8a",
+        "id": "bdb4d5fb-3380-46fe-8bdc-af7bafce70b2",
+        "schema": "fingerpoint-collection-v2",
+        "purpose": "reference-collection",
+        "metadata": {
+          "label": "kimi-k2.8-preview",
+          "family": "kimi",
+          "family_name": "Kimi",
+          "provider": "Moonshot AI",
+          "source": "api",
+          "source_name": "Kimi Coding API",
+          "response_models": [
+            "kimi-for-coding"
+          ]
+        },
+        "endpoint": "https://api.kimi.com/coding/v1/chat/completions",
+        "config": {
+          "baseUrl": "https://api.kimi.com/coding/v1",
+          "model": "kimi-for-coding",
+          "format": "openai",
+          "effort": "low",
+          "stream": true,
+          "parallel": false
+        },
+        "tasks": 36,
+        "accepted": 36,
+        "attempted": 36,
+        "recovery_directory": null
+      },
+      "historical_user_credential": {
+        "file": "/Users/ikaleio/.omp/agent/sessions/-Projects-lm-fingerpoint-detector/2026-09-17T07-24-19-560Z_01a0ae40-86e8-7133-8348-eb991b278f49.jsonl",
+        "jsonl_line": 34,
+        "message_path": "message.content[0].text",
+        "credential_present": true,
+        "current_validity": "not checked; no API requests in this audit"
+      }
+    },
+    {
+      "label": "step-5-preview",
+      "reference_batches": [
+        {
+          "id": "migration-7ab6364ae4df47cef1f35b30",
+          "source": {
+            "channel": "stepfun-api",
+            "endpoint": "https://api.stepfun.com/step_plan/v1/chat/completions"
+          },
+          "request": {
+            "model": "step-5-preview",
+            "format": "chat_completions",
+            "stream": true,
+            "reasoning_effort": "default",
+            "response_models": [
+              "step-5-preview"
+            ],
+            "temperature": null,
+            "max_tokens": 8192
+          },
+          "imported_from": {
+            "file": "data/archive/schema-cutover/unified_reference.rows.jsonl",
+            "sha256": "95f42eaa6108b767f1ba2c9177c4e0d04845347ca7d05eaf0b68234557093a80"
+          }
+        },
+        {
+          "id": "migration-a54399ef5aa41f86596ed56a",
+          "source": {
+            "channel": "stepfun-api",
+            "endpoint": "https://api.stepfun.com/step_plan/v1/chat/completions"
+          },
+          "request": {
+            "model": "step-5-preview",
+            "format": "chat_completions",
+            "stream": true,
+            "reasoning_effort": "low",
+            "response_models": [
+              "step-5-preview"
+            ],
+            "temperature": null,
+            "max_tokens": 8192
+          },
+          "imported_from": {
+            "file": "data/archive/schema-cutover/unified_reference.rows.jsonl",
+            "sha256": "95f42eaa6108b767f1ba2c9177c4e0d04845347ca7d05eaf0b68234557093a80"
+          }
+        },
+        {
+          "id": "migration-7306307f69f582b19e81eb3e",
+          "source": {
+            "channel": "stepfun-api",
+            "endpoint": "https://api.stepfun.com/step_plan/v1/chat/completions"
+          },
+          "request": {
+            "model": "step-5-preview",
+            "format": "chat_completions",
+            "stream": true,
+            "reasoning_effort": "default",
+            "response_models": [
+              "step-5-preview"
+            ],
+            "temperature": null,
+            "max_tokens": 8192
+          },
+          "imported_from": {
+            "file": "data/archive/schema-cutover/unified_reference.rows.jsonl",
+            "sha256": "95f42eaa6108b767f1ba2c9177c4e0d04845347ca7d05eaf0b68234557093a80"
+          }
+        },
+        {
+          "id": "migration-88f65cdc7836e595cb4e7ed5",
+          "source": {
+            "channel": "stepfun-api",
+            "endpoint": "https://api.stepfun.com/step_plan/v1/chat/completions"
+          },
+          "request": {
+            "model": "step-5-preview",
+            "format": "chat_completions",
+            "stream": true,
+            "reasoning_effort": "low",
+            "response_models": [
+              "step-5-preview"
+            ],
+            "temperature": null,
+            "max_tokens": 8192
+          },
+          "imported_from": {
+            "file": "data/archive/schema-cutover/unified_reference.rows.jsonl",
+            "sha256": "95f42eaa6108b767f1ba2c9177c4e0d04845347ca7d05eaf0b68234557093a80"
+          }
+        },
+        {
+          "id": "migration-853894a14a936ce219a95384",
+          "source": {
+            "channel": "stepfun-api",
+            "endpoint": "https://api.stepfun.com/step_plan/v1/chat/completions"
+          },
+          "request": {
+            "model": "step-5-preview",
+            "format": "chat_completions",
+            "stream": true,
+            "reasoning_effort": "default",
+            "response_models": [
+              "step-5-preview"
+            ],
+            "temperature": null,
+            "max_tokens": 8192
+          },
+          "imported_from": {
+            "file": "data/archive/schema-cutover/unified_reference.rows.jsonl",
+            "sha256": "95f42eaa6108b767f1ba2c9177c4e0d04845347ca7d05eaf0b68234557093a80"
+          }
+        }
+      ],
+      "training_samples": 36,
+      "sample_sources": [
+        "stepfun-api"
+      ],
+      "reported_providers": [
+        null
+      ],
+      "response_models": [
+        "step-5-preview"
+      ],
+      "reasoning_counts": {
+        "default": 34,
+        "low": 2
+      },
+      "finished_at_range": [
+        "2026-09-22T12:43:56.169Z",
+        "2026-09-22T13:10:00.713Z"
+      ],
+      "original_evidence": [
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1661",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1662",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1663",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1664",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1665",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1666",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1667",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1668",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1669",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1670",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1671",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1672",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1673",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1674",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1675",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1676",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1677",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1678",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1679",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1680",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1681",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1682",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1683",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1684",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1685",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1686",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1687",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1688",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1689",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1690",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1691",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1692",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1693",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1694",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1695",
+        "data/archive/schema-cutover/unified_reference.rows.jsonl#line=1696"
+      ],
+      "original_collection": {
+        "directory": "projects/data/collections/step-5-preview-20260922",
+        "manifest_sha256": "d3ffcb4497f5b7987446b61458881cbeb9418754858368c254db9a3be2cd8b62",
+        "id": "5711a935-3ead-4bcd-9662-afd23f90c36a",
+        "schema": "fingerpoint-collection-v2",
+        "purpose": "reference-collection",
+        "metadata": {
+          "label": "step-5-preview",
+          "family": "step",
+          "family_name": "Step",
+          "provider": "StepFun",
+          "source": "api",
+          "source_name": "StepFun Step Plan official API",
+          "response_models": [
+            "step-5-preview"
+          ]
+        },
+        "endpoint": "https://api.stepfun.com/step_plan/v1/chat/completions",
+        "config": {
+          "baseUrl": "https://api.stepfun.com/step_plan/v1",
+          "model": "step-5-preview",
+          "format": "openai",
+          "effort": "default",
+          "stream": true,
+          "parallel": false
+        },
+        "tasks": 36,
+        "accepted": 34,
+        "attempted": 54,
+        "recovery_directory": "projects/data/collections/step-5-preview-20260922-low-recovery"
+      },
+      "historical_user_credential": {
+        "file": "/Users/ikaleio/.codex/sessions/2026/09/22/rollout-2026-09-22T20-41-51-01a0c923-088a-7881-a2f9-196a93997bfd.jsonl",
+        "jsonl_line": 9,
+        "message_path": "payload.content[0].text, second text line",
+        "credential_present": true,
+        "current_validity": "not checked; no API requests in this audit"
+      }
+    }
+  ],
+  "configured": {
+    "pi_auth": {
+      "file": "/Users/ikaleio/.pi/agent/auth.json",
+      "provider_ids": [],
+      "matching_provider_present": false
+    },
+    "omp_models": {
+      "file": "/Users/ikaleio/.omp/agent/models.yml",
+      "provider_ids": [
+        "ikaleio"
+      ],
+      "matching_provider_present": false
+    },
+    "omp_auth_database": {
+      "file": "/Users/ikaleio/.omp/agent/agent.db",
+      "matching_credentials": [],
+      "total_credential_records": 0
+    },
+    "environment": {
+      "matching_variable_names": []
+    }
+  },
+  "source_sha256": {
+    "projects/shared/reference.ts": "2b3720328dce137891680eea8f1f69c89059dd416e5de13cef92642132e0f7c8",
+    "projects/shared/detection.ts": "11bbf38ebfbc7d49332f36115ea978bab5fc3ccd80becd91f20476f00fe4bace",
+    "projects/shared/completion-request.ts": "77e6e5e1813df267fa64191e9e3170375647f26e99f440c087a5cfbfa5a95cf8",
+    "projects/cli/sampling.ts": "97e8ef6bbdf102b10ff2e6a9eaea941584a251ead648d150d2158f10886da826",
+    "projects/cli/collection-options.ts": "d3da5203ef3ed5bd3d1d6e11f71720e4f5f81b9171d50e2af4ef2f99eb8669fa",
+    "research/scripts/holdout-shared.ts": "ad9f6b6a3f9faa3405a41d928773053e5cb35beed6d01cb490f3d4810f881311",
+    "research/scripts/collect-holdout.ts": "fff84ad049be7a66693e16df23719a728a7db767d24b416d7d80298f6cf6450d"
+  },
+  "api_requests": 0,
+  "shared_data_modified": false,
+  "secret_values_recorded": false
+}

@@ -1,0 +1,597 @@
+{
+  "winner": {
+    "id": "all_sequence_lda_s0.15",
+    "layout": "all_sequence",
+    "weights": {
+      "frequency": 0.6,
+      "ordered": 0.15,
+      "kernel": 0.125,
+      "sequence": 0.125
+    },
+    "shrinkage": 0.15,
+    "classifier": "lda"
+  },
+  "metrics": {
+    "config": {
+      "id": "all_sequence_lda_s0.15",
+      "layout": "all_sequence",
+      "weights": {
+        "frequency": 0.6,
+        "ordered": 0.15,
+        "kernel": 0.125,
+        "sequence": 0.125
+      },
+      "shrinkage": 0.15,
+      "classifier": "lda"
+    },
+    "sample": {
+      "n": 1908,
+      "top1": 0.8233752620545073,
+      "hits": 1571,
+      "top3": 0.9722222222222222,
+      "macro_top1": 0.8233752620545073,
+      "pair_n": 72,
+      "pair_top1": 0.4861111111111111,
+      "pair_binary_accuracy": 0.5,
+      "per_model": {
+        "claude-haiku-4.5": {
+          "n": 36,
+          "correct": 34
+        },
+        "claude-sonnet-4.6": {
+          "n": 36,
+          "correct": 36
+        },
+        "claude-sonnet-5": {
+          "n": 36,
+          "correct": 30
+        },
+        "claude-opus-4.6": {
+          "n": 36,
+          "correct": 36
+        },
+        "claude-opus-4.7": {
+          "n": 36,
+          "correct": 33
+        },
+        "claude-opus-4.8": {
+          "n": 36,
+          "correct": 31
+        },
+        "claude-opus-5": {
+          "n": 36,
+          "correct": 36
+        },
+        "claude-fable-5.1": {
+          "n": 36,
+          "correct": 35
+        },
+        "claude-fable-5": {
+          "n": 36,
+          "correct": 30
+        },
+        "gemini-2.5-pro": {
+          "n": 36,
+          "correct": 34
+        },
+        "gemini-3.1-pro-preview": {
+          "n": 36,
+          "correct": 35
+        },
+        "gemini-3.5-flash": {
+          "n": 36,
+          "correct": 36
+        },
+        "gemini-3.6-flash": {
+          "n": 36,
+          "correct": 30
+        },
+        "gemini-3.7-flash": {
+          "n": 36,
+          "correct": 18
+        },
+        "gemini-3.8-flash": {
+          "n": 36,
+          "correct": 19
+        },
+        "grok-4.5": {
+          "n": 36,
+          "correct": 24
+        },
+        "grok-4.6": {
+          "n": 36,
+          "correct": 30
+        },
+        "gpt-4o": {
+          "n": 36,
+          "correct": 35
+        },
+        "glm-5.2": {
+          "n": 36,
+          "correct": 34
+        },
+        "glm-5.3": {
+          "n": 36,
+          "correct": 33
+        },
+        "qwen3.8-max-0902": {
+          "n": 36,
+          "correct": 34
+        },
+        "qwen3.8-27b": {
+          "n": 36,
+          "correct": 25
+        },
+        "kimi-k3": {
+          "n": 36,
+          "correct": 29
+        },
+        "hy4-preview": {
+          "n": 36,
+          "correct": 34
+        },
+        "muse-spark-1.2": {
+          "n": 36,
+          "correct": 35
+        },
+        "muse-spark-1.3-contributor": {
+          "n": 36,
+          "correct": 17
+        },
+        "muse-spark-1.3": {
+          "n": 36,
+          "correct": 17
+        },
+        "kimi-k2.8-preview": {
+          "n": 36,
+          "correct": 34
+        },
+        "grok-4.7": {
+          "n": 36,
+          "correct": 36
+        },
+        "mimo-v2.5": {
+          "n": 36,
+          "correct": 23
+        },
+        "mimo-v2.5-pro": {
+          "n": 36,
+          "correct": 29
+        },
+        "mimo-v2.6-flash": {
+          "n": 36,
+          "correct": 31
+        },
+        "mimo-v2.6-pro": {
+          "n": 36,
+          "correct": 33
+        },
+        "step-5-preview": {
+          "n": 36,
+          "correct": 32
+        },
+        "claude-opus-5.5": {
+          "n": 36,
+          "correct": 35
+        },
+        "gpt-6-luna": {
+          "n": 36,
+          "correct": 36
+        },
+        "glm-5.3-flashx": {
+          "n": 36,
+          "correct": 16
+        },
+        "glm-5.3-flash": {
+          "n": 36,
+          "correct": 17
+        },
+        "deepseek-v4.1-flash": {
+          "n": 36,
+          "correct": 35
+        },
+        "deepseek-v4-flash": {
+          "n": 36,
+          "correct": 22
+        },
+        "deepseek-v4-pro-0813": {
+          "n": 36,
+          "correct": 18
+        },
+        "deepseek-v4-pro": {
+          "n": 36,
+          "correct": 18
+        },
+        "deepseek-v4-flash-0731": {
+          "n": 36,
+          "correct": 30
+        },
+        "deepseek-v3.2": {
+          "n": 36,
+          "correct": 28
+        },
+        "gpt-6-sol": {
+          "n": 36,
+          "correct": 34
+        },
+        "claude-sonnet-5.5": {
+          "n": 36,
+          "correct": 35
+        },
+        "gpt-6.1-sol": {
+          "n": 36,
+          "correct": 18
+        },
+        "gpt-6-astra": {
+          "n": 36,
+          "correct": 17
+        },
+        "gpt-5.4": {
+          "n": 36,
+          "correct": 34
+        },
+        "gpt-5.5": {
+          "n": 36,
+          "correct": 35
+        },
+        "gpt-5.6-sol": {
+          "n": 36,
+          "correct": 34
+        },
+        "gpt-5.6-terra": {
+          "n": 36,
+          "correct": 35
+        },
+        "gpt-5.6-luna": {
+          "n": 36,
+          "correct": 36
+        }
+      }
+    },
+    "group": {
+      "n": 636,
+      "top1": 0.8977987421383647,
+      "hits": 571,
+      "top3": 0.9984276729559748,
+      "macro_top1": 0.8977987421383646,
+      "pair_n": 24,
+      "pair_top1": 0.5416666666666666,
+      "pair_binary_accuracy": 0.5416666666666666,
+      "per_model": {
+        "claude-haiku-4.5": {
+          "n": 12,
+          "correct": 12
+        },
+        "claude-sonnet-4.6": {
+          "n": 12,
+          "correct": 12
+        },
+        "claude-sonnet-5": {
+          "n": 12,
+          "correct": 12
+        },
+        "claude-opus-4.6": {
+          "n": 12,
+          "correct": 12
+        },
+        "claude-opus-4.7": {
+          "n": 12,
+          "correct": 12
+        },
+        "claude-opus-4.8": {
+          "n": 12,
+          "correct": 12
+        },
+        "claude-opus-5": {
+          "n": 12,
+          "correct": 12
+        },
+        "claude-fable-5.1": {
+          "n": 12,
+          "correct": 12
+        },
+        "claude-fable-5": {
+          "n": 12,
+          "correct": 12
+        },
+        "gemini-2.5-pro": {
+          "n": 12,
+          "correct": 12
+        },
+        "gemini-3.1-pro-preview": {
+          "n": 12,
+          "correct": 12
+        },
+        "gemini-3.5-flash": {
+          "n": 12,
+          "correct": 12
+        },
+        "gemini-3.6-flash": {
+          "n": 12,
+          "correct": 12
+        },
+        "gemini-3.7-flash": {
+          "n": 12,
+          "correct": 8
+        },
+        "gemini-3.8-flash": {
+          "n": 12,
+          "correct": 5
+        },
+        "grok-4.5": {
+          "n": 12,
+          "correct": 11
+        },
+        "grok-4.6": {
+          "n": 12,
+          "correct": 10
+        },
+        "gpt-4o": {
+          "n": 12,
+          "correct": 12
+        },
+        "glm-5.2": {
+          "n": 12,
+          "correct": 12
+        },
+        "glm-5.3": {
+          "n": 12,
+          "correct": 12
+        },
+        "qwen3.8-max-0902": {
+          "n": 12,
+          "correct": 12
+        },
+        "qwen3.8-27b": {
+          "n": 12,
+          "correct": 11
+        },
+        "kimi-k3": {
+          "n": 12,
+          "correct": 12
+        },
+        "hy4-preview": {
+          "n": 12,
+          "correct": 12
+        },
+        "muse-spark-1.2": {
+          "n": 12,
+          "correct": 12
+        },
+        "muse-spark-1.3-contributor": {
+          "n": 12,
+          "correct": 5
+        },
+        "muse-spark-1.3": {
+          "n": 12,
+          "correct": 6
+        },
+        "kimi-k2.8-preview": {
+          "n": 12,
+          "correct": 12
+        },
+        "grok-4.7": {
+          "n": 12,
+          "correct": 12
+        },
+        "mimo-v2.5": {
+          "n": 12,
+          "correct": 11
+        },
+        "mimo-v2.5-pro": {
+          "n": 12,
+          "correct": 11
+        },
+        "mimo-v2.6-flash": {
+          "n": 12,
+          "correct": 11
+        },
+        "mimo-v2.6-pro": {
+          "n": 12,
+          "correct": 12
+        },
+        "step-5-preview": {
+          "n": 12,
+          "correct": 12
+        },
+        "claude-opus-5.5": {
+          "n": 12,
+          "correct": 12
+        },
+        "gpt-6-luna": {
+          "n": 12,
+          "correct": 12
+        },
+        "glm-5.3-flashx": {
+          "n": 12,
+          "correct": 6
+        },
+        "glm-5.3-flash": {
+          "n": 12,
+          "correct": 6
+        },
+        "deepseek-v4.1-flash": {
+          "n": 12,
+          "correct": 12
+        },
+        "deepseek-v4-flash": {
+          "n": 12,
+          "correct": 10
+        },
+        "deepseek-v4-pro-0813": {
+          "n": 12,
+          "correct": 8
+        },
+        "deepseek-v4-pro": {
+          "n": 12,
+          "correct": 8
+        },
+        "deepseek-v4-flash-0731": {
+          "n": 12,
+          "correct": 11
+        },
+        "deepseek-v3.2": {
+          "n": 12,
+          "correct": 12
+        },
+        "gpt-6-sol": {
+          "n": 12,
+          "correct": 12
+        },
+        "claude-sonnet-5.5": {
+          "n": 12,
+          "correct": 12
+        },
+        "gpt-6.1-sol": {
+          "n": 12,
+          "correct": 6
+        },
+        "gpt-6-astra": {
+          "n": 12,
+          "correct": 7
+        },
+        "gpt-5.4": {
+          "n": 12,
+          "correct": 12
+        },
+        "gpt-5.5": {
+          "n": 12,
+          "correct": 12
+        },
+        "gpt-5.6-sol": {
+          "n": 12,
+          "correct": 12
+        },
+        "gpt-5.6-terra": {
+          "n": 12,
+          "correct": 12
+        },
+        "gpt-5.6-luna": {
+          "n": 12,
+          "correct": 12
+        }
+      }
+    }
+  },
+  "confidence": {
+    "nll": 0.2183072226684724,
+    "brier": 0.14160983812994907,
+    "ece10": 0.03705435383539618,
+    "reliability": [
+      {
+        "lo": 0.30000000000000004,
+        "hi": 0.4,
+        "n": 1,
+        "mean_confidence": 0.3882276564656876,
+        "accuracy": 0.0
+      },
+      {
+        "lo": 0.4,
+        "hi": 0.5,
+        "n": 3,
+        "mean_confidence": 0.46446593047191626,
+        "accuracy": 1.0
+      },
+      {
+        "lo": 0.5,
+        "hi": 0.6000000000000001,
+        "n": 41,
+        "mean_confidence": 0.5432299163288871,
+        "accuracy": 0.6585365853658537
+      },
+      {
+        "lo": 0.6000000000000001,
+        "hi": 0.7000000000000001,
+        "n": 43,
+        "mean_confidence": 0.6492538115712723,
+        "accuracy": 0.5348837209302325
+      },
+      {
+        "lo": 0.7000000000000001,
+        "hi": 0.8,
+        "n": 42,
+        "mean_confidence": 0.7502273669868011,
+        "accuracy": 0.5714285714285714
+      },
+      {
+        "lo": 0.8,
+        "hi": 0.9,
+        "n": 42,
+        "mean_confidence": 0.8500756838638568,
+        "accuracy": 0.7857142857142857
+      },
+      {
+        "lo": 0.9,
+        "hi": 1.0,
+        "n": 464,
+        "mean_confidence": 0.9898415437274697,
+        "accuracy": 0.9935344827586207
+      }
+    ],
+    "selective": {
+      "all": [
+        {
+          "threshold": 0.8,
+          "accepted": 506,
+          "errors": 12,
+          "coverage": 0.7955974842767296,
+          "error_upper95": 0.03814131845610168
+        },
+        {
+          "threshold": 0.9,
+          "accepted": 464,
+          "errors": 3,
+          "coverage": 0.7295597484276729,
+          "error_upper95": 0.016625040688038176
+        },
+        {
+          "threshold": 0.95,
+          "accepted": 430,
+          "errors": 1,
+          "coverage": 0.6761006289308176,
+          "error_upper95": 0.010984332285565427
+        },
+        {
+          "threshold": 0.99,
+          "accepted": 357,
+          "errors": 0,
+          "coverage": 0.5613207547169812,
+          "error_upper95": 0.008356297348494829
+        }
+      ],
+      "pair": [
+        {
+          "threshold": 0.8,
+          "accepted": 3,
+          "errors": 1,
+          "coverage": 0.125,
+          "error_upper95": 0.8646496378284161
+        },
+        {
+          "threshold": 0.9,
+          "accepted": 1,
+          "errors": 0,
+          "coverage": 0.041666666666666664,
+          "error_upper95": 0.95
+        },
+        {
+          "threshold": 0.95,
+          "accepted": 0,
+          "errors": 0,
+          "coverage": 0.0,
+          "error_upper95": null
+        },
+        {
+          "threshold": 0.99,
+          "accepted": 0,
+          "errors": 0,
+          "coverage": 0.0,
+          "error_upper95": null
+        }
+      ]
+    },
+    "high_confidence_scope": "closed registered reference labels; no identity authentication"
+  },
+  "inverse_temperature": 5.083100688209023,
+  "prospective_evaluated": false
+}

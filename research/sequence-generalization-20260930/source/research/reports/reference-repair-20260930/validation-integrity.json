@@ -1,0 +1,556 @@
+{
+  "generated_at": "2026-09-30T17:15:35.492Z",
+  "stage": "final",
+  "status": "incomplete",
+  "input_hashes": {
+    "manifest": "9bc45797fae31b5972205a50818cc168f5ce5ff048ef4a17445ee7d8ef7743e9",
+    "samples": "84e19921aedbc23e5f0f5b283e17493a2e33d363477230c084e2f5d08bb09683",
+    "reference": "5a86bb2409f7e132f4bb98456d54996014782fa531c6e670ce46f16d213b11d4",
+    "bank": "47b8ad67e8ad32095ac650b3a384420c06ef88bb6e78206be478a8cd62029968",
+    "detector": "9e0502ce9f1fda99875d675d4a0b1fbd730138691eb42d4fa3f28c752cd1014d"
+  },
+  "verification_script_sha256": "614ad921ceca9ad040098383e5efa6c290a04a60a1b39ff2a4b7f15852031482",
+  "baseline": {
+    "recorded_attempts": 377,
+    "bytes": 2736284,
+    "samples_sha256": "2241a2d46e549b338e3843b45b661ae740a0b95727f6a88339ad27d28bd2ae91",
+    "before": {
+      "complete_groups": 72,
+      "top1_correct": 60,
+      "top3_correct": 67,
+      "top1": 0.8333333333333334
+    }
+  },
+  "preservation": {
+    "old_attempts": 377,
+    "new_attempts": 272,
+    "exact_prefix": true,
+    "old_complete_groups": 72
+  },
+  "coverage": {
+    "bank_labels": 53,
+    "manifest_labels": 53,
+    "uncovered_labels": [],
+    "retired_labels": [],
+    "planned_groups": 106,
+    "complete_groups": 104,
+    "planned_samples": 318,
+    "selected_samples": 312,
+    "old_complete_groups": 72,
+    "newly_complete_groups": 32,
+    "pending_groups": [
+      {
+        "id": "kimi-k2.8-preview:group-1",
+        "missing": [
+          "holdout-1eae36fa-5cae-46c5-ac47-877414c628f0:kimi-k2.8-preview:group-1:probe-1-8b7d432f-c944-4ded-b62a-2dfe0c58f4ce",
+          "holdout-1eae36fa-5cae-46c5-ac47-877414c628f0:kimi-k2.8-preview:group-1:probe-2-190ab572-1dc2-438a-a004-89d59897c283",
+          "holdout-1eae36fa-5cae-46c5-ac47-877414c628f0:kimi-k2.8-preview:group-1:probe-3-b2f9e1d5-adac-4be4-ac79-68dcee05211b"
+        ]
+      },
+      {
+        "id": "kimi-k2.8-preview:group-2",
+        "missing": [
+          "holdout-1eae36fa-5cae-46c5-ac47-877414c628f0:kimi-k2.8-preview:group-2:probe-1-6cffe4b1-9f46-4d64-a3ea-d35d02590505",
+          "holdout-1eae36fa-5cae-46c5-ac47-877414c628f0:kimi-k2.8-preview:group-2:probe-2-28f96546-1bac-4327-9358-b23901a96989",
+          "holdout-1eae36fa-5cae-46c5-ac47-877414c628f0:kimi-k2.8-preview:group-2:probe-3-fd881081-08ca-4819-9c0d-e9e0eb8c010d"
+        ]
+      }
+    ]
+  },
+  "evidence": {
+    "new_attempts": 272,
+    "new_http_raw_verified": 269,
+    "new_accepted_replayed": 108,
+    "provider_metadata_recoveries_verified": 6,
+    "derived_cap_attempts": 27,
+    "provider_metadata_recovery_attempts": 6,
+    "new_missing_raw": [
+      "holdout-1eae36fa-5cae-46c5-ac47-877414c628f0:mimo-v2.6-flash:group-2:probe-3-fd881081-08ca-4819-9c0d-e9e0eb8c010d:2",
+      "holdout-1eae36fa-5cae-46c5-ac47-877414c628f0:mimo-v2.6-flash:group-1:probe-3-b2f9e1d5-adac-4be4-ac79-68dcee05211b:3",
+      "holdout-1eae36fa-5cae-46c5-ac47-877414c628f0:mimo-v2.6-pro:group-2:probe-1-6cffe4b1-9f46-4d64-a3ea-d35d02590505:2"
+    ],
+    "accepted_missing_reported_provider": 222,
+    "historical_raw_evidence_required": false,
+    "historical_limit": "Old attempts remain byte-identical; missing historical raw/provider/terminal metadata cannot be reconstructed or asserted."
+  },
+  "no_train_overlap": {
+    "identifiers": [],
+    "exact_text": [],
+    "parsed_sequence": [],
+    "prompts": []
+  },
+  "attempt_statuses": {
+    "accepted": 360,
+    "failed": 284,
+    "invalid": 5
+  },
+  "new_attempt_statuses": {
+    "failed": 163,
+    "accepted": 108,
+    "invalid": 1
+  },
+  "source_versions": {
+    "matrix": {
+      "projects/shared/challenge-browser.js": {
+        "current_workspace_sha256": "65884da44d29b7d5337993609414596272010cb07cffe98b0c5546b1fe9728e4",
+        "recorded_versions": [
+          {
+            "sha256": "4977d6f107f5073131d8eed3330aefd566464bf8e6f8cc3ba0aa3b77e42c939b",
+            "attempts": 136,
+            "collection_run_ids": [
+              "f5f9c6ca-acff-4960-9546-94a0ea980fd1",
+              "73d54a79-c7d7-4857-b4b9-8bcdd77014b2",
+              "b9a17aa9-6e93-46b3-a498-0e66ee458c9f"
+            ],
+            "matches_current_workspace": false
+          },
+          {
+            "sha256": "65884da44d29b7d5337993609414596272010cb07cffe98b0c5546b1fe9728e4",
+            "attempts": 136,
+            "collection_run_ids": [
+              "f919392b-48a6-4541-8d6c-fd84235052fd",
+              "dfa4e935-4b49-4cc1-bef0-db3804b20230",
+              "88e19e0f-b1a6-470e-b7eb-94a94c3140d6",
+              "bc554da9-3f51-46ed-abd1-c9332085111f",
+              "84772b2e-f9c4-4858-a424-abf298ba8bc0"
+            ],
+            "matches_current_workspace": true
+          }
+        ]
+      },
+      "projects/shared/completion-request.ts": {
+        "current_workspace_sha256": "77e6e5e1813df267fa64191e9e3170375647f26e99f440c087a5cfbfa5a95cf8",
+        "recorded_versions": [
+          {
+            "sha256": "77e6e5e1813df267fa64191e9e3170375647f26e99f440c087a5cfbfa5a95cf8",
+            "attempts": 272,
+            "collection_run_ids": [
+              "f5f9c6ca-acff-4960-9546-94a0ea980fd1",
+              "73d54a79-c7d7-4857-b4b9-8bcdd77014b2",
+              "b9a17aa9-6e93-46b3-a498-0e66ee458c9f",
+              "f919392b-48a6-4541-8d6c-fd84235052fd",
+              "dfa4e935-4b49-4cc1-bef0-db3804b20230",
+              "88e19e0f-b1a6-470e-b7eb-94a94c3140d6",
+              "bc554da9-3f51-46ed-abd1-c9332085111f",
+              "84772b2e-f9c4-4858-a424-abf298ba8bc0"
+            ],
+            "matches_current_workspace": true
+          }
+        ]
+      },
+      "projects/shared/completion.ts": {
+        "current_workspace_sha256": "cfe4b75cde103395afa47c81d8bf78ecb69bf2178e69e828ecacaa9f9a7f8db8",
+        "recorded_versions": [
+          {
+            "sha256": "cfe4b75cde103395afa47c81d8bf78ecb69bf2178e69e828ecacaa9f9a7f8db8",
+            "attempts": 272,
+            "collection_run_ids": [
+              "f5f9c6ca-acff-4960-9546-94a0ea980fd1",
+              "73d54a79-c7d7-4857-b4b9-8bcdd77014b2",
+              "b9a17aa9-6e93-46b3-a498-0e66ee458c9f",
+              "f919392b-48a6-4541-8d6c-fd84235052fd",
+              "dfa4e935-4b49-4cc1-bef0-db3804b20230",
+              "88e19e0f-b1a6-470e-b7eb-94a94c3140d6",
+              "bc554da9-3f51-46ed-abd1-c9332085111f",
+              "84772b2e-f9c4-4858-a424-abf298ba8bc0"
+            ],
+            "matches_current_workspace": true
+          }
+        ]
+      },
+      "research/scripts/collect-holdout.ts": {
+        "current_workspace_sha256": "833733fd60813b9400be7fb35e64855a851e00c47c14f5f58c13a7ee445d65c2",
+        "recorded_versions": [
+          {
+            "sha256": "fff84ad049be7a66693e16df23719a728a7db767d24b416d7d80298f6cf6450d",
+            "attempts": 95,
+            "collection_run_ids": [
+              "f5f9c6ca-acff-4960-9546-94a0ea980fd1"
+            ],
+            "matches_current_workspace": false
+          },
+          {
+            "sha256": "a9c0a34e039336778c9113c3e86b5135b27d9aff7e60c730df3215e4149f9dc0",
+            "attempts": 51,
+            "collection_run_ids": [
+              "f919392b-48a6-4541-8d6c-fd84235052fd"
+            ],
+            "matches_current_workspace": false
+          },
+          {
+            "sha256": "833733fd60813b9400be7fb35e64855a851e00c47c14f5f58c13a7ee445d65c2",
+            "attempts": 78,
+            "collection_run_ids": [
+              "88e19e0f-b1a6-470e-b7eb-94a94c3140d6",
+              "bc554da9-3f51-46ed-abd1-c9332085111f"
+            ],
+            "matches_current_workspace": true
+          }
+        ]
+      },
+      "projects/shared/fingerprint-core.js": {
+        "current_workspace_sha256": "5a096c0e5638b9b7e266714725660549273b018e0b5eddbec3302ef96af21f16",
+        "recorded_versions": [
+          {
+            "sha256": "5a096c0e5638b9b7e266714725660549273b018e0b5eddbec3302ef96af21f16",
+            "attempts": 272,
+            "collection_run_ids": [
+              "f5f9c6ca-acff-4960-9546-94a0ea980fd1",
+              "73d54a79-c7d7-4857-b4b9-8bcdd77014b2",
+              "b9a17aa9-6e93-46b3-a498-0e66ee458c9f",
+              "f919392b-48a6-4541-8d6c-fd84235052fd",
+              "dfa4e935-4b49-4cc1-bef0-db3804b20230",
+              "88e19e0f-b1a6-470e-b7eb-94a94c3140d6",
+              "bc554da9-3f51-46ed-abd1-c9332085111f",
+              "84772b2e-f9c4-4858-a424-abf298ba8bc0"
+            ],
+            "matches_current_workspace": true
+          }
+        ]
+      },
+      "projects/cli/trace.ts": {
+        "current_workspace_sha256": "16dee820cfc06332f0d1b9f09516ab0d90413a4eec9bfc95763b0f8a90dfdc63",
+        "recorded_versions": [
+          {
+            "sha256": "16dee820cfc06332f0d1b9f09516ab0d90413a4eec9bfc95763b0f8a90dfdc63",
+            "attempts": 239,
+            "collection_run_ids": [
+              "f5f9c6ca-acff-4960-9546-94a0ea980fd1",
+              "b9a17aa9-6e93-46b3-a498-0e66ee458c9f",
+              "f919392b-48a6-4541-8d6c-fd84235052fd",
+              "dfa4e935-4b49-4cc1-bef0-db3804b20230",
+              "88e19e0f-b1a6-470e-b7eb-94a94c3140d6",
+              "bc554da9-3f51-46ed-abd1-c9332085111f"
+            ],
+            "matches_current_workspace": true
+          }
+        ]
+      },
+      "research/studies/reference-repair-20260930/adopt-truncated.ts": {
+        "current_workspace_sha256": "17dda8c469b1283e3c8640f8a232f85d8626837cd64e4a97adb2c9be849c2346",
+        "recorded_versions": [
+          {
+            "sha256": "c4f2acbcb34992c1f72998dbfc83788352ed0d884a33abff6eafac19d02927cc",
+            "attempts": 27,
+            "collection_run_ids": [
+              "73d54a79-c7d7-4857-b4b9-8bcdd77014b2"
+            ],
+            "matches_current_workspace": false
+          }
+        ]
+      },
+      "research/studies/reference-repair-20260930/collect-original-channel.ts": {
+        "current_workspace_sha256": "bb0cc3b0d7d593f8d2ccd420aa0190e7100f50ef3c1ebd1daf5d582d87a1eabe",
+        "recorded_versions": [
+          {
+            "sha256": "e8f1158682e47c7c34e01671183228aa93e950265326a28726f8c4b6f456d3ae",
+            "attempts": 14,
+            "collection_run_ids": [
+              "b9a17aa9-6e93-46b3-a498-0e66ee458c9f"
+            ],
+            "matches_current_workspace": false
+          },
+          {
+            "sha256": "bb0cc3b0d7d593f8d2ccd420aa0190e7100f50ef3c1ebd1daf5d582d87a1eabe",
+            "attempts": 1,
+            "collection_run_ids": [
+              "dfa4e935-4b49-4cc1-bef0-db3804b20230"
+            ],
+            "matches_current_workspace": true
+          }
+        ]
+      },
+      "research/studies/reference-repair-20260930/recover-openrouter-provider.ts": {
+        "current_workspace_sha256": "28adf3d5c4bc8356d710275f8c0dac2925f499560921fe3010a714bd529542e4",
+        "recorded_versions": [
+          {
+            "sha256": "28adf3d5c4bc8356d710275f8c0dac2925f499560921fe3010a714bd529542e4",
+            "attempts": 6,
+            "collection_run_ids": [
+              "84772b2e-f9c4-4858-a424-abf298ba8bc0"
+            ],
+            "matches_current_workspace": true
+          }
+        ]
+      }
+    },
+    "policy": "Each row must match its recorded collection-run sources and frozen group hash. Current workspace source changes do not invalidate old attempts; accepted responses must replay with the current parser."
+  },
+  "blockers": {
+    "uncovered_manifest_labels": [],
+    "collection_runs": [
+      {
+        "label": "claude-opus-5",
+        "request_models": [
+          null,
+          "claude-opus-5"
+        ],
+        "reason": "blocked_missing_catalog"
+      },
+      {
+        "label": "claude-fable-5.1",
+        "request_models": [
+          null,
+          "claude-fable-5.1"
+        ],
+        "reason": "blocked_missing_catalog"
+      },
+      {
+        "label": "claude-fable-5",
+        "request_models": [
+          null,
+          "claude-fable-5"
+        ],
+        "reason": "blocked_missing_catalog"
+      },
+      {
+        "label": "gemini-2.5-pro",
+        "request_models": [
+          "gemini-2.5-pro"
+        ],
+        "reason": "blocked_missing_catalog"
+      },
+      {
+        "label": "gemini-3.1-pro-preview",
+        "request_models": [
+          "gemini-3.1-pro-preview"
+        ],
+        "reason": "blocked_missing_catalog"
+      },
+      {
+        "label": "gemini-3.5-flash",
+        "request_models": [
+          "gemini-3.5-flash"
+        ],
+        "reason": "blocked_missing_catalog"
+      },
+      {
+        "label": "gemini-3.6-flash",
+        "request_models": [
+          "gemini-3.6-flash"
+        ],
+        "reason": "blocked_missing_catalog"
+      },
+      {
+        "label": "gemini-3.7-flash",
+        "request_models": [
+          "gemini-3.7-flash"
+        ],
+        "reason": "blocked_missing_catalog"
+      },
+      {
+        "label": "gemini-3.8-flash",
+        "request_models": [
+          "gemini-3.8-flash"
+        ],
+        "reason": "blocked_missing_catalog"
+      },
+      {
+        "label": "grok-4.5",
+        "request_models": [
+          "grok-4.5"
+        ],
+        "reason": "blocked_missing_catalog"
+      },
+      {
+        "label": "grok-4.6",
+        "request_models": [
+          "grok-4.6"
+        ],
+        "reason": "blocked_missing_catalog"
+      },
+      {
+        "label": "kimi-k2.8-preview",
+        "request_models": [
+          "kimi-for-coding"
+        ],
+        "reason": "blocked_missing_catalog"
+      },
+      {
+        "label": "step-5-preview",
+        "request_models": [
+          "step-5-preview"
+        ],
+        "reason": "blocked_missing_catalog"
+      },
+      {
+        "label": "kimi-k2.8-preview",
+        "request_models": [
+          "kimi-for-coding"
+        ],
+        "reason": "blocked_missing_catalog"
+      },
+      {
+        "label": "step-5-preview",
+        "request_models": [
+          "step-5-preview"
+        ],
+        "reason": "blocked_missing_catalog"
+      },
+      {
+        "label": "kimi-k2.8-preview",
+        "request_models": [
+          "kimi-for-coding"
+        ],
+        "reason": "blocked_missing_catalog"
+      },
+      {
+        "label": "step-5-preview",
+        "request_models": [
+          "step-5-preview"
+        ],
+        "reason": "blocked_missing_catalog"
+      },
+      {
+        "label": "kimi-k2.8-preview",
+        "request_models": [
+          "kimi-for-coding"
+        ],
+        "reason": "blocked_missing_catalog"
+      },
+      {
+        "label": "step-5-preview",
+        "request_models": [
+          "step-5-preview"
+        ],
+        "reason": "blocked_missing_catalog"
+      }
+    ],
+    "latest_failed_slots": [
+      {
+        "id": "holdout-1eae36fa-5cae-46c5-ac47-877414c628f0:kimi-k2.8-preview:group-1:probe-1-8b7d432f-c944-4ded-b62a-2dfe0c58f4ce",
+        "model": "kimi-k2.8-preview",
+        "attempt": 1,
+        "status": "failed",
+        "http_status": 403,
+        "reason": "HTTP 403：You've reached your monthly usage limit for this billing cycle. Your quota will be refreshed in the next cycle. To continue now, purchase extra usage or upgrade your plan: https://www.kimi.com/membership/subscription?tab=quota"
+      },
+      {
+        "id": "holdout-1eae36fa-5cae-46c5-ac47-877414c628f0:kimi-k2.8-preview:group-1:probe-2-190ab572-1dc2-438a-a004-89d59897c283",
+        "model": "kimi-k2.8-preview",
+        "attempt": 1,
+        "status": "failed",
+        "http_status": 403,
+        "reason": "HTTP 403：You've reached your monthly usage limit for this billing cycle. Your quota will be refreshed in the next cycle. To continue now, purchase extra usage or upgrade your plan: https://www.kimi.com/membership/subscription?tab=quota"
+      },
+      {
+        "id": "holdout-1eae36fa-5cae-46c5-ac47-877414c628f0:kimi-k2.8-preview:group-1:probe-3-b2f9e1d5-adac-4be4-ac79-68dcee05211b",
+        "model": "kimi-k2.8-preview",
+        "attempt": 1,
+        "status": "failed",
+        "http_status": 403,
+        "reason": "HTTP 403：You've reached your monthly usage limit for this billing cycle. Your quota will be refreshed in the next cycle. To continue now, purchase extra usage or upgrade your plan: https://www.kimi.com/membership/subscription?tab=quota"
+      },
+      {
+        "id": "holdout-1eae36fa-5cae-46c5-ac47-877414c628f0:kimi-k2.8-preview:group-2:probe-1-6cffe4b1-9f46-4d64-a3ea-d35d02590505",
+        "model": "kimi-k2.8-preview",
+        "attempt": 1,
+        "status": "failed",
+        "http_status": 403,
+        "reason": "HTTP 403：You've reached your monthly usage limit for this billing cycle. Your quota will be refreshed in the next cycle. To continue now, purchase extra usage or upgrade your plan: https://www.kimi.com/membership/subscription?tab=quota"
+      },
+      {
+        "id": "holdout-1eae36fa-5cae-46c5-ac47-877414c628f0:kimi-k2.8-preview:group-2:probe-2-28f96546-1bac-4327-9358-b23901a96989",
+        "model": "kimi-k2.8-preview",
+        "attempt": 1,
+        "status": "failed",
+        "http_status": 403,
+        "reason": "HTTP 403：You've reached your monthly usage limit for this billing cycle. Your quota will be refreshed in the next cycle. To continue now, purchase extra usage or upgrade your plan: https://www.kimi.com/membership/subscription?tab=quota"
+      },
+      {
+        "id": "holdout-1eae36fa-5cae-46c5-ac47-877414c628f0:kimi-k2.8-preview:group-2:probe-3-fd881081-08ca-4819-9c0d-e9e0eb8c010d",
+        "model": "kimi-k2.8-preview",
+        "attempt": 1,
+        "status": "failed",
+        "http_status": 403,
+        "reason": "HTTP 403：You've reached your monthly usage limit for this billing cycle. Your quota will be refreshed in the next cycle. To continue now, purchase extra usage or upgrade your plan: https://www.kimi.com/membership/subscription?tab=quota"
+      }
+    ]
+  },
+  "comparison": {
+    "report_path": "research/reports/holdout/latest.json",
+    "current_evaluation": true,
+    "paired_old_72": {
+      "before": {
+        "complete_groups": 72,
+        "top1_correct": 60,
+        "top3_correct": 67,
+        "top1": 0.8333333333333334
+      },
+      "after": {
+        "complete_groups": 72,
+        "top1_correct": 60,
+        "top3_correct": 67,
+        "top1": 0.8333333333333334
+      },
+      "changes": []
+    },
+    "newly_complete_34": {
+      "planned_groups": 34,
+      "complete_groups": 32,
+      "result": {
+        "complete_groups": 32,
+        "top1_correct": 21,
+        "top3_correct": 29,
+        "top1": 0.65625
+      }
+    },
+    "all_106": {
+      "complete_groups": 104,
+      "top1_correct": 81,
+      "top3_correct": 96,
+      "top1": 0.7788461538461539
+    }
+  },
+  "cost": {
+    "all_attempts": {
+      "attempts": 649,
+      "api_attempts": 616,
+      "derived_attempts": 33,
+      "with_reported_cost": 448,
+      "without_reported_cost": 168,
+      "reported_cost_usd": 8.576652740202992,
+      "input_tokens": 96056,
+      "output_tokens": 1737886,
+      "total_tokens": 1754394,
+      "policy": "Sum top-level usage.cost once per billed physical request. Derivatives and source_usage never add another charge. Missing physical-request cost remains unknown."
+    },
+    "old_attempts": {
+      "attempts": 377,
+      "api_attempts": 377,
+      "derived_attempts": 0,
+      "with_reported_cost": 326,
+      "without_reported_cost": 51,
+      "reported_cost_usd": 7.505743478202989,
+      "input_tokens": 61165,
+      "output_tokens": 1167751,
+      "total_tokens": 1149368,
+      "policy": "Sum top-level usage.cost once per billed physical request. Derivatives and source_usage never add another charge. Missing physical-request cost remains unknown."
+    },
+    "new_attempts": {
+      "attempts": 272,
+      "api_attempts": 239,
+      "derived_attempts": 33,
+      "with_reported_cost": 122,
+      "without_reported_cost": 117,
+      "reported_cost_usd": 1.0709092620000003,
+      "input_tokens": 34891,
+      "output_tokens": 570135,
+      "total_tokens": 605026,
+      "policy": "Sum top-level usage.cost once per billed physical request. Derivatives and source_usage never add another charge. Missing physical-request cost remains unknown."
+    },
+    "selected_answers": {
+      "attempts": 312,
+      "api_attempts": 279,
+      "derived_attempts": 33,
+      "with_reported_cost": 271,
+      "without_reported_cost": 8,
+      "reported_cost_usd": 5.787213293399997,
+      "input_tokens": 60162,
+      "output_tokens": 743854,
+      "total_tokens": 725280,
+      "policy": "Sum top-level usage.cost once per billed physical request. Derivatives and source_usage never add another charge. Missing physical-request cost remains unknown."
+    }
+  },
+  "errors": []
+}

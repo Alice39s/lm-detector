@@ -1,0 +1,237 @@
+{
+  "verified_at": "2026-09-30T17:38:04.398Z",
+  "reference_sha256": "5a86bb2409f7e132f4bb98456d54996014782fa531c6e670ce46f16d213b11d4",
+  "overlay_byte_replay": true,
+  "frozen_sources": [
+    {
+      "path": "research/studies/sequence-generalization/positional.py",
+      "sha256": "06cfec8faa7d626b08ccd8ab50444e5ad0ce47a5d14cad849c29e16723829af4",
+      "match": true
+    },
+    {
+      "path": "research/studies/sequence-generalization/classifiers.py",
+      "sha256": "2334dd964e4c1c36e5c3943df5f1711de49bf82acdd10d61098dda520a14ff38",
+      "match": true
+    },
+    {
+      "path": "research/studies/sequence-generalization/rerank.py",
+      "sha256": "b7310ce58047c32686eedb3b0ff7facf2ca036ad327e10598702ff6ce3c3d962",
+      "match": true
+    },
+    {
+      "path": "research/studies/sequence-generalization/fusion.py",
+      "sha256": "e49923e1ffc445696f7977f720ddcb11462801a1223c4bf3d1960ee062d1b6a5",
+      "match": true
+    },
+    {
+      "path": "research/studies/sequence-generalization/evaluate.py",
+      "sha256": "5e6f3099c9a6b9632f89b5e59b68a797beb83d40b213a99ff7e1e05296f02a05",
+      "match": true
+    },
+    {
+      "path": "research/studies/sequence-generalization/export-evaluation.ts",
+      "sha256": "ba86cabfa39db57007872ea1f9dedbf7bac27a3d2c55dae9c00884a4ba87cf7a",
+      "match": true
+    },
+    {
+      "path": "research/studies/sequence-generalization/PROTOCOL.md",
+      "sha256": "228bd1790f5e63b797257813c9dd63608fb4d26031449be417649a57d0db389f",
+      "match": true
+    },
+    {
+      "path": "research/reports/sequence-generalization/20260930/rerank/freeze.json",
+      "sha256": "379b55d4f97f045b79c2423bc96bf50e5dc1deb899b88559ed58726cf18e1874",
+      "match": true
+    }
+  ],
+  "hydrated_dependency_hashes": [
+    {
+      "origin": "research/reports/sequence-generalization/20260930/evaluation-data.json",
+      "sha256": "52628182c37df71a73f891892e2efce41a4cb227f2da90c1bdca91599c04844a",
+      "targets": [
+        "source/research/reports/sequence-generalization/20260930/evaluation-data.json"
+      ]
+    },
+    {
+      "origin": "research/reports/sequence-generalization/20260930/fusion/fitted.joblib",
+      "sha256": "3cd7e97bb4afef19ff490c0257e5b49e55d90944657f000d3c3cd247f95b64e7",
+      "targets": [
+        "source/research/reports/sequence-generalization/20260930/fusion/fitted.joblib"
+      ]
+    },
+    {
+      "origin": "research/reports/sequence-generalization/20260930/rerank/frozen.joblib",
+      "sha256": "1e20ee850df0dbe24cd4c62e1840370a1109db9910afe2e3b5a96db62e448c26",
+      "targets": [
+        "source/research/reports/sequence-generalization/20260930/rerank/frozen.joblib"
+      ]
+    },
+    {
+      "origin": "research/reports/sequence-generalization/20260930/positional/fitted.joblib",
+      "sha256": "b2661ee6acab8ee94b0d2203eff79b1a9ea9b6b5e12af631bd9ea00070cf85bd",
+      "targets": [
+        "source/research/reports/sequence-generalization/20260930/positional/fitted.joblib"
+      ]
+    },
+    {
+      "origin": "research/reports/sequence-generalization/20260930/classifiers/fitted-winner.joblib",
+      "sha256": "e14435411fb6bf553cc1c2a50b902936168836955a6e30a9adb65b708e05aa93",
+      "targets": [
+        "source/research/reports/sequence-generalization/20260930/classifiers/fitted-winner.joblib"
+      ]
+    },
+    {
+      "origin": "research/reports/reference-repair-20260930/baseline/unified_bank.json",
+      "sha256": "47b8ad67e8ad32095ac650b3a384420c06ef88bb6e78206be478a8cd62029968",
+      "targets": [
+        "source/projects/data/unified_bank.json",
+        "source/research/reports/reference-repair-20260930/baseline/unified_bank.json"
+      ]
+    },
+    {
+      "origin": "research/reports/reference-repair-20260930/baseline/shared_detector.json",
+      "sha256": "9e0502ce9f1fda99875d675d4a0b1fbd730138691eb42d4fa3f28c752cd1014d",
+      "targets": [
+        "source/projects/data/shared_detector.json",
+        "source/research/reports/reference-repair-20260930/baseline/shared_detector.json"
+      ]
+    },
+    {
+      "origin": "research/reports/reference-repair-20260930/baseline/holdout-manifest.json",
+      "sha256": "456f2b0fac6cec312042328cf16b7d6c0cdeccd2ab69f8faf3bf50c08f8806c7",
+      "targets": [
+        "source/research/reports/reference-repair-20260930/baseline/holdout-manifest.json"
+      ]
+    },
+    {
+      "origin": "research/reports/reference-repair-20260930/baseline/holdout-samples.jsonl",
+      "sha256": "2241a2d46e549b338e3843b45b661ae740a0b95727f6a88339ad27d28bd2ae91",
+      "targets": [
+        "source/research/reports/reference-repair-20260930/baseline/holdout-samples.jsonl"
+      ]
+    }
+  ],
+  "synthetic_inference": {
+    "input_sha256": "9087aedd756cf876daeffa748515acd8ac16cfacd21e08819f433055de2e20d7",
+    "original_and_bundle_prediction_scores_probabilities_identical": true,
+    "method": "Two independent CLI invocations with the same pinned requirements; compared their complete emitted JSON."
+  },
+  "evaluation": {
+    "holdout": {
+      "groups": 104,
+      "planned_groups": 106,
+      "baseline_correct": 81,
+      "frozen_fusion_correct": 88
+    },
+    "previous_pair": {
+      "groups": 40,
+      "planned_groups": 40,
+      "baseline_correct": 23,
+      "frozen_fusion_correct": 19
+    },
+    "prospective": {
+      "groups": 40,
+      "planned_groups": 40,
+      "baseline_correct": 19,
+      "frozen_fusion_correct": 21
+    }
+  },
+  "raw_hash_receipts": {
+    "entries": 269,
+    "unique_raw_paths": 236,
+    "local_mismatches": 0,
+    "raw_bytes_in_bundle": false
+  },
+  "candidate_weights_unchanged": true,
+  "training_performed": false,
+  "api_requests": 0,
+  "product_data_modified": false,
+  "git_staging_performed": false,
+  "pending_git_files": 186,
+  "pending_git_bytes": 68858461,
+  "copied_file_hashes": {
+    "count": 163,
+    "mismatches": []
+  },
+  "provider_generation_metadata": {
+    "records": 6,
+    "files": 15,
+    "checks": [
+      {
+        "sample_id": "holdout-1eae36fa-5cae-46c5-ac47-877414c628f0:gpt-6-sol:group-1:probe-1-8b7d432f-c944-4ded-b62a-2dfe0c58f4ce",
+        "attempt": 5,
+        "path": "research/reports/reference-repair-20260930/generation-provider-recovery/8adef9107827cd386fca619d0ff63fc72aba2fcae9dc921c124445bceab01741/source-attempt-2/generation.body.json",
+        "sha256": "0c76834f6a56feae3671e6d48660c4df6e2ae2396ad0cf63e00c5417a0a848db",
+        "recorded_sha256": "0c76834f6a56feae3671e6d48660c4df6e2ae2396ad0cf63e00c5417a0a848db",
+        "hash_matches": true,
+        "generation_id_matches": true,
+        "provider_matches": true,
+        "model_matches": true,
+        "response_status": 200
+      },
+      {
+        "sample_id": "holdout-1eae36fa-5cae-46c5-ac47-877414c628f0:gpt-6-sol:group-1:probe-2-190ab572-1dc2-438a-a004-89d59897c283",
+        "attempt": 5,
+        "path": "research/reports/reference-repair-20260930/generation-provider-recovery/cbbbb879bc9bb47d1b3a8cf30ee80fb3e6153f477ff0fd8947fda3d679abac7a/source-attempt-2/generation.body.json",
+        "sha256": "14ddabc4893d07de78d8dde2567fd9c5480a9bf57dc637cae7aacf8efd18499e",
+        "recorded_sha256": "14ddabc4893d07de78d8dde2567fd9c5480a9bf57dc637cae7aacf8efd18499e",
+        "hash_matches": true,
+        "generation_id_matches": true,
+        "provider_matches": true,
+        "model_matches": true,
+        "response_status": 200
+      },
+      {
+        "sample_id": "holdout-1eae36fa-5cae-46c5-ac47-877414c628f0:gpt-6-sol:group-1:probe-3-b2f9e1d5-adac-4be4-ac79-68dcee05211b",
+        "attempt": 5,
+        "path": "research/reports/reference-repair-20260930/generation-provider-recovery/a250a6e35a5b6125d5ccc558443d1263b2a05db700a2964b2eb32c1ef63b35d4/source-attempt-2/generation.body.json",
+        "sha256": "fbc9dfd61ad453565b0517a149213be8f0ce9eb8ca0f41e92077aa4d7dbb80fa",
+        "recorded_sha256": "fbc9dfd61ad453565b0517a149213be8f0ce9eb8ca0f41e92077aa4d7dbb80fa",
+        "hash_matches": true,
+        "generation_id_matches": true,
+        "provider_matches": true,
+        "model_matches": true,
+        "response_status": 200
+      },
+      {
+        "sample_id": "holdout-1eae36fa-5cae-46c5-ac47-877414c628f0:gpt-6-sol:group-2:probe-1-6cffe4b1-9f46-4d64-a3ea-d35d02590505",
+        "attempt": 5,
+        "path": "research/reports/reference-repair-20260930/generation-provider-recovery/e9dacb2b5f5daf9f4720c2007d36853c79b3a65cf1dae07665b72c0a36ca729e/source-attempt-2/generation.body.json",
+        "sha256": "bb1d28c99a55bff82008c7d34829186ff9cef1c756c7b7260a449d94b7f1d350",
+        "recorded_sha256": "bb1d28c99a55bff82008c7d34829186ff9cef1c756c7b7260a449d94b7f1d350",
+        "hash_matches": true,
+        "generation_id_matches": true,
+        "provider_matches": true,
+        "model_matches": true,
+        "response_status": 200
+      },
+      {
+        "sample_id": "holdout-1eae36fa-5cae-46c5-ac47-877414c628f0:gpt-6-sol:group-2:probe-2-28f96546-1bac-4327-9358-b23901a96989",
+        "attempt": 5,
+        "path": "research/reports/reference-repair-20260930/generation-provider-recovery/20c0983aaf09d1e5581a08284fd01545d8b460b5fe6ddcd2ea4232d157076cbf/source-attempt-2/generation.body.json",
+        "sha256": "6a0384a3999866d9cb19e8770898ea7ddbe929dd015fd4171ae0d70422086988",
+        "recorded_sha256": "6a0384a3999866d9cb19e8770898ea7ddbe929dd015fd4171ae0d70422086988",
+        "hash_matches": true,
+        "generation_id_matches": true,
+        "provider_matches": true,
+        "model_matches": true,
+        "response_status": 200
+      },
+      {
+        "sample_id": "holdout-1eae36fa-5cae-46c5-ac47-877414c628f0:gpt-6-sol:group-2:probe-3-fd881081-08ca-4819-9c0d-e9e0eb8c010d",
+        "attempt": 5,
+        "path": "research/reports/reference-repair-20260930/generation-provider-recovery/9e86537f8b847930298ed6c4e0dc148e4075ef2a90f4fe6a2efd529a3fabcc20/source-attempt-2/generation.body.json",
+        "sha256": "576fcb564f0f2db4fc2655dde03881efb8192a9d022896360974a68575ba60a9",
+        "recorded_sha256": "576fcb564f0f2db4fc2655dde03881efb8192a9d022896360974a68575ba60a9",
+        "hash_matches": true,
+        "generation_id_matches": true,
+        "provider_matches": true,
+        "model_matches": true,
+        "response_status": 200
+      }
+    ]
+  },
+  "secret_like_literal_scan": {
+    "matched_paths": []
+  }
+}

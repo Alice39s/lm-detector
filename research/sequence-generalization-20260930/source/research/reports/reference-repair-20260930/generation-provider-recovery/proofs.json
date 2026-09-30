@@ -1,0 +1,159 @@
+{
+  "test_set_id": "holdout-1eae36fa-5cae-46c5-ac47-877414c628f0",
+  "fixed_groups_sha256": "a68e5b43c54fbe3c564516fc69a65d895ef778b2fd9f33f69929716968097780",
+  "policy": "Earliest failed HTTP-200 answer per fixed slot with exact expected_count and only missing pinned-provider metadata; no classifier results are read.",
+  "metadata_requests": 6,
+  "model_generation_requests": 0,
+  "proofs": [
+    {
+      "kind": "openrouter-generation-api",
+      "method": "GET",
+      "endpoint": "https://openrouter.ai/api/v1/generation?id=gen-1790786996-w2ct7Pu25KDSXma0nn4n",
+      "generation_id": "gen-1790786996-w2ct7Pu25KDSXma0nn4n",
+      "provider_name": "OpenAI",
+      "model": "openai/gpt-6-sol-20260922",
+      "fetched_at": "2026-09-30T17:09:14.866Z",
+      "response": {
+        "path": "research/reports/reference-repair-20260930/generation-provider-recovery/8adef9107827cd386fca619d0ff63fc72aba2fcae9dc921c124445bceab01741/source-attempt-2/generation.body.json",
+        "sha256": "0c76834f6a56feae3671e6d48660c4df6e2ae2396ad0cf63e00c5417a0a848db",
+        "bytes": 1441,
+        "format": "json"
+      },
+      "response_metadata": {
+        "path": "research/reports/reference-repair-20260930/generation-provider-recovery/8adef9107827cd386fca619d0ff63fc72aba2fcae9dc921c124445bceab01741/source-attempt-2/generation.response.json",
+        "status": 200,
+        "content_type": "application/json",
+        "request_id": null
+      },
+      "source_sample_id": "holdout-1eae36fa-5cae-46c5-ac47-877414c628f0:gpt-6-sol:group-1:probe-1-8b7d432f-c944-4ded-b62a-2dfe0c58f4ce",
+      "source_attempt": 2,
+      "source_record_sha256": "a7d9f087c46f3a732b8704649b75c9a8702fe3625adefe41c47cef578a68a814",
+      "raw_response_sha256": "ceb5bd7ef2414e4e9e008b0ff9c5b404c4ef31b4ba12e2a68bc1b22d052fc07d"
+    },
+    {
+      "kind": "openrouter-generation-api",
+      "method": "GET",
+      "endpoint": "https://openrouter.ai/api/v1/generation?id=gen-1790787039-7hFWAduWgv7nchZ18hAj",
+      "generation_id": "gen-1790787039-7hFWAduWgv7nchZ18hAj",
+      "provider_name": "OpenAI",
+      "model": "openai/gpt-6-sol-20260922",
+      "fetched_at": "2026-09-30T17:09:15.223Z",
+      "response": {
+        "path": "research/reports/reference-repair-20260930/generation-provider-recovery/cbbbb879bc9bb47d1b3a8cf30ee80fb3e6153f477ff0fd8947fda3d679abac7a/source-attempt-2/generation.body.json",
+        "sha256": "14ddabc4893d07de78d8dde2567fd9c5480a9bf57dc637cae7aacf8efd18499e",
+        "bytes": 1440,
+        "format": "json"
+      },
+      "response_metadata": {
+        "path": "research/reports/reference-repair-20260930/generation-provider-recovery/cbbbb879bc9bb47d1b3a8cf30ee80fb3e6153f477ff0fd8947fda3d679abac7a/source-attempt-2/generation.response.json",
+        "status": 200,
+        "content_type": "application/json",
+        "request_id": null
+      },
+      "source_sample_id": "holdout-1eae36fa-5cae-46c5-ac47-877414c628f0:gpt-6-sol:group-1:probe-2-190ab572-1dc2-438a-a004-89d59897c283",
+      "source_attempt": 2,
+      "source_record_sha256": "b37325015f3df1c16282654effd868a5c8d9f9626c5b2bee400bd80ac61dd2fe",
+      "raw_response_sha256": "8945607e4b61cce06a0d0381f36fbc831446a30f7ca8cd4a70e3e921243e7840"
+    },
+    {
+      "kind": "openrouter-generation-api",
+      "method": "GET",
+      "endpoint": "https://openrouter.ai/api/v1/generation?id=gen-1790787053-vDRe5wZf2H2rI7M1X4tI",
+      "generation_id": "gen-1790787053-vDRe5wZf2H2rI7M1X4tI",
+      "provider_name": "OpenAI",
+      "model": "openai/gpt-6-sol-20260922",
+      "fetched_at": "2026-09-30T17:09:15.552Z",
+      "response": {
+        "path": "research/reports/reference-repair-20260930/generation-provider-recovery/a250a6e35a5b6125d5ccc558443d1263b2a05db700a2964b2eb32c1ef63b35d4/source-attempt-2/generation.body.json",
+        "sha256": "fbc9dfd61ad453565b0517a149213be8f0ce9eb8ca0f41e92077aa4d7dbb80fa",
+        "bytes": 1438,
+        "format": "json"
+      },
+      "response_metadata": {
+        "path": "research/reports/reference-repair-20260930/generation-provider-recovery/a250a6e35a5b6125d5ccc558443d1263b2a05db700a2964b2eb32c1ef63b35d4/source-attempt-2/generation.response.json",
+        "status": 200,
+        "content_type": "application/json",
+        "request_id": null
+      },
+      "source_sample_id": "holdout-1eae36fa-5cae-46c5-ac47-877414c628f0:gpt-6-sol:group-1:probe-3-b2f9e1d5-adac-4be4-ac79-68dcee05211b",
+      "source_attempt": 2,
+      "source_record_sha256": "f6456a3817a8fc71675c99c3de8af9494cb2d1b4357c32c8bcc9aabe110dfb7b",
+      "raw_response_sha256": "515e756e3d565f22ff249c236d1e74ca9619d83926a64bb99be48a9aab8d1bf1"
+    },
+    {
+      "kind": "openrouter-generation-api",
+      "method": "GET",
+      "endpoint": "https://openrouter.ai/api/v1/generation?id=gen-1790787055-5tebJpZskaZDN0cI7TaK",
+      "generation_id": "gen-1790787055-5tebJpZskaZDN0cI7TaK",
+      "provider_name": "OpenAI",
+      "model": "openai/gpt-6-sol-20260922",
+      "fetched_at": "2026-09-30T17:09:15.894Z",
+      "response": {
+        "path": "research/reports/reference-repair-20260930/generation-provider-recovery/e9dacb2b5f5daf9f4720c2007d36853c79b3a65cf1dae07665b72c0a36ca729e/source-attempt-2/generation.body.json",
+        "sha256": "bb1d28c99a55bff82008c7d34829186ff9cef1c756c7b7260a449d94b7f1d350",
+        "bytes": 1438,
+        "format": "json"
+      },
+      "response_metadata": {
+        "path": "research/reports/reference-repair-20260930/generation-provider-recovery/e9dacb2b5f5daf9f4720c2007d36853c79b3a65cf1dae07665b72c0a36ca729e/source-attempt-2/generation.response.json",
+        "status": 200,
+        "content_type": "application/json",
+        "request_id": null
+      },
+      "source_sample_id": "holdout-1eae36fa-5cae-46c5-ac47-877414c628f0:gpt-6-sol:group-2:probe-1-6cffe4b1-9f46-4d64-a3ea-d35d02590505",
+      "source_attempt": 2,
+      "source_record_sha256": "2519286558010d28b01eb7cf1c05668c00f965ba0d96590d0b460ae9d773f7d0",
+      "raw_response_sha256": "34aec262970bf99c4a97c1bfb771b9ae0351437693cbeb91ad4d4b2c3456e524"
+    },
+    {
+      "kind": "openrouter-generation-api",
+      "method": "GET",
+      "endpoint": "https://openrouter.ai/api/v1/generation?id=gen-1790787064-63tIrxsl7urcZqTj4PE1",
+      "generation_id": "gen-1790787064-63tIrxsl7urcZqTj4PE1",
+      "provider_name": "OpenAI",
+      "model": "openai/gpt-6-sol-20260922",
+      "fetched_at": "2026-09-30T17:09:16.524Z",
+      "response": {
+        "path": "research/reports/reference-repair-20260930/generation-provider-recovery/20c0983aaf09d1e5581a08284fd01545d8b460b5fe6ddcd2ea4232d157076cbf/source-attempt-2/generation.body.json",
+        "sha256": "6a0384a3999866d9cb19e8770898ea7ddbe929dd015fd4171ae0d70422086988",
+        "bytes": 1441,
+        "format": "json"
+      },
+      "response_metadata": {
+        "path": "research/reports/reference-repair-20260930/generation-provider-recovery/20c0983aaf09d1e5581a08284fd01545d8b460b5fe6ddcd2ea4232d157076cbf/source-attempt-2/generation.response.json",
+        "status": 200,
+        "content_type": "application/json",
+        "request_id": null
+      },
+      "source_sample_id": "holdout-1eae36fa-5cae-46c5-ac47-877414c628f0:gpt-6-sol:group-2:probe-2-28f96546-1bac-4327-9358-b23901a96989",
+      "source_attempt": 2,
+      "source_record_sha256": "b26038f23ae3d9034d475ca5f4e65c946b40a8a3bb6c9a43de1cf40a408ee123",
+      "raw_response_sha256": "dd8b2b4ccd05d174870c46bb418ffc47d5fda816031b437b32ed10d5c7bce89e"
+    },
+    {
+      "kind": "openrouter-generation-api",
+      "method": "GET",
+      "endpoint": "https://openrouter.ai/api/v1/generation?id=gen-1790787098-n2Lq1KimWA3pvZ6bQATt",
+      "generation_id": "gen-1790787098-n2Lq1KimWA3pvZ6bQATt",
+      "provider_name": "OpenAI",
+      "model": "openai/gpt-6-sol-20260922",
+      "fetched_at": "2026-09-30T17:09:17.339Z",
+      "response": {
+        "path": "research/reports/reference-repair-20260930/generation-provider-recovery/9e86537f8b847930298ed6c4e0dc148e4075ef2a90f4fe6a2efd529a3fabcc20/source-attempt-2/generation.body.json",
+        "sha256": "576fcb564f0f2db4fc2655dde03881efb8192a9d022896360974a68575ba60a9",
+        "bytes": 1439,
+        "format": "json"
+      },
+      "response_metadata": {
+        "path": "research/reports/reference-repair-20260930/generation-provider-recovery/9e86537f8b847930298ed6c4e0dc148e4075ef2a90f4fe6a2efd529a3fabcc20/source-attempt-2/generation.response.json",
+        "status": 200,
+        "content_type": "application/json",
+        "request_id": null
+      },
+      "source_sample_id": "holdout-1eae36fa-5cae-46c5-ac47-877414c628f0:gpt-6-sol:group-2:probe-3-fd881081-08ca-4819-9c0d-e9e0eb8c010d",
+      "source_attempt": 2,
+      "source_record_sha256": "cfe5c8b508a1eba3777decacd956f4881b641d3c93225ac2ceb54a6876d778b0",
+      "raw_response_sha256": "b04a6e674eda45cc8c8ce586cf1d4303f650939fad8f4b38fe02625f92e8daed"
+    }
+  ]
+}
