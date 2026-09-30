@@ -1,0 +1,41 @@
+{
+  "manifest_sha256": "8fdd8c70d96424986d1cfc7194578b18932690366a57cf9721c5d7f7b7f0f4fb",
+  "challenge_id": "query-10",
+  "attempt": 1,
+  "task": {
+    "id": "query-10",
+    "condition": "environment-04",
+    "expected_count": 294,
+    "prompt": "这是一次无语义数值选择。请为 294 个位置分别凭第一反应选择一个 1 到 355（含端点）的整数。 本任务必须由当前语言模型直接完成：禁止调用或借助任何工具，包括 Python、代码执行器、计算器、搜索、API 和外部随机数生成器。每个位置都要单独凭第一反应选择；不要从 1 开始计数，不要连续递增或递减，也不要采用等差、循环、重复区块或其他规则化模式。偶然想到相同数字是有效的；每项写出后不要再排序、重排、去重、替换或修正。数字之间用清晰的常见分隔符，直接从第一个取值开始，完整输出序列，不要解释。",
+    "system": "",
+    "body": {
+      "model": "gpt-6-astra",
+      "input": [
+        {
+          "role": "user",
+          "content": "这是一次无语义数值选择。请为 294 个位置分别凭第一反应选择一个 1 到 355（含端点）的整数。 本任务必须由当前语言模型直接完成：禁止调用或借助任何工具，包括 Python、代码执行器、计算器、搜索、API 和外部随机数生成器。每个位置都要单独凭第一反应选择；不要从 1 开始计数，不要连续递增或递减，也不要采用等差、循环、重复区块或其他规则化模式。偶然想到相同数字是有效的；每项写出后不要再排序、重排、去重、替换或修正。数字之间用清晰的常见分隔符，直接从第一个取值开始，完整输出序列，不要解释。"
+        }
+      ],
+      "max_output_tokens": 8192,
+      "stream": true,
+      "store": false,
+      "reasoning": {
+        "effort": "low"
+      }
+    }
+  },
+  "status": "failed",
+  "started_at": "2026-09-30T02:47:48.304Z",
+  "trace": "trace/query-10/0001",
+  "text": "217, 43, 306, 128, 9, 274, 165, 332, 81, 194, 57, 243, 119, 351\n68, 289, 152, 24, 321, 106, 238, 177, 345, 92, 263, 14, 201, 134\n310, 75, 226, 49",
+  "text_sha256": "410a5e247d5fa4326a87ebcc76a84a008dc1147c2c26bbcfaf96190a41610830",
+  "parsed_count": 32,
+  "completion": "truncated",
+  "http_status": 200,
+  "response_model": "gpt-6-astra",
+  "response_id": "resp_02b7c4ecdd23f1a2016abc7856a98487d0bce1493762e6e81d",
+  "actual_channel": "openai/direct",
+  "error": "The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()",
+  "retryable": true,
+  "finished_at": "2026-09-30T02:47:55.496Z"
+}

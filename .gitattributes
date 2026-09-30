@@ -1,2 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Preserve byte hashes and terminating SSE frames in direct sampling traces.
+data/collections/*-openai-direct-20260930/trace/** -text whitespace=-blank-at-eof
