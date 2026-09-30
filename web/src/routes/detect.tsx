@@ -27,7 +27,6 @@ import { anomalousSamples } from '@fingerpoint/shared/sample-distribution'
 type Phase = 'edit' | 'sampling' | 'computing' | 'result'
 const idle = (): SampleUI => ({ text: '', state: 'idle' })
 const cliCommand = 'bunx lmfpd@latest --help'
-type Run = { controller: AbortController; indexes: number[] }
 
 function safeError(message: string | undefined, key: string): string | undefined {
   if (!message) return undefined
@@ -54,7 +53,7 @@ export default function DetectRoute() {
 
   const [challenges, setChallenges] = useState<Challenge[]>(() => client.generateChallenges(3))
   const [samples, setSamples] = useState<SampleUI[]>(() => [idle(), idle(), idle()])
-  const [phase, setPhase] = useState<Phase>('edit')
+  const [computing, setComputing] = useState(false)
   const [result, setResult] = useState<Analysis | null>(null)
   const [resultModel, setResultModel] = useState<string | null>(null)
   const [expanded, setExpanded] = useState<number | null>(null)
@@ -63,12 +62,13 @@ export default function DetectRoute() {
   const previousProfileId = useRef(profileManager.activeId)
   const [apiConfigOpen, setApiConfigOpen] = useState(() => !configComplete(config))
   const apiConfigRef = useRef<HTMLDivElement>(null)
-  const activeRun = useRef<Run | null>(null)
+  /** One controller per running sample, so each card starts and stops on its own. */
+  const runs = useRef(new Map<number, AbortController>())
+  const verifying = useRef<object | null>(null)
   const mounted = useRef(true)
   const samplesRef = useRef(samples)
   const challengesRef = useRef(challenges)
   const sampledConfigs = useRef<(WebApiConfig | undefined)[]>([])
-  const resultRef = useRef(result)
   useLayoutEffect(() => {
     if (previousProfileId.current === profileManager.activeId) return
     previousProfileId.current = profileManager.activeId
@@ -78,15 +78,16 @@ export default function DetectRoute() {
     mounted.current = true
     return () => {
       mounted.current = false
-      const run = activeRun.current
-      activeRun.current = null
-      run?.controller.abort()
+      for (const controller of runs.current.values()) controller.abort()
+      runs.current.clear()
     }
   }, [])
 
   const filled = samples.filter(s => s.text.trim()).length
-  const locked = phase === 'sampling' || phase === 'computing'
-  const canSample = configComplete(config) && !locked
+  const sampling = samples.some(sample => isBusyState(sample.state))
+  const phase: Phase = computing ? 'computing' : sampling ? 'sampling' : result ? 'result' : 'edit'
+  const locked = sampling || computing
+  const canSample = configComplete(config) && !computing
   useModelMatchCelebration(result, resultModel, active && mode === 'api' && phase === 'result')
 
   function replaceSamples(next: SampleUI[]) {
@@ -103,20 +104,17 @@ export default function DetectRoute() {
     replaceSamples(samplesRef.current.map((sample, i) => i === index ? { ...sample, ...changes } : sample))
   }
 
-  function clearResult() {
-    resultRef.current = null
-    setResult(null)
-  }
-
-  function stop() {
-    const run = activeRun.current
-    if (!run) return
-    activeRun.current = null
-    run.controller.abort()
-    replaceSamples(samplesRef.current.map((sample, i) => run.indexes.includes(i) && isBusyState(sample.state)
+  /** Stops the given samples, or all of them; other samples keep running. */
+  function stop(indexes = [...runs.current.keys()]) {
+    const stopped = indexes.filter(i => runs.current.has(i))
+    if (!stopped.length) return
+    for (const i of stopped) {
+      runs.current.get(i)!.abort()
+      runs.current.delete(i)
+    }
+    replaceSamples(samplesRef.current.map((sample, i) => stopped.includes(i) && isBusyState(sample.state)
       ? { ...sample, state: 'stopped', draftText: sample.text.trim() ? undefined : sample.draftText, errorCode: undefined, errorText: undefined }
       : sample))
-    setPhase(resultRef.current ? 'result' : 'edit')
   }
 
   useEffect(() => {
@@ -126,8 +124,9 @@ export default function DetectRoute() {
     }
   }, [active])
 
-  async function sampleIndexes(indexes: number[], requestConfig: WebApiConfig = config) {
-    if (!indexes.length || activeRun.current || !mounted.current) return
+  async function sampleIndexes(requested: number[], requestConfig: WebApiConfig = config) {
+    const indexes = requested.filter(i => !runs.current.has(i))
+    if (!indexes.length || verifying.current || !mounted.current) return
     if (!configComplete(requestConfig)) {
       setApiConfigOpen(true)
       requestAnimationFrame(() => {
@@ -138,111 +137,112 @@ export default function DetectRoute() {
       return
     }
     const frozenConfig = { ...requestConfig, parallel: indexes.length > 1 && (requestConfig.parallel ?? false) }
-    const run: Run = { controller: new AbortController(), indexes: [...indexes] }
-    activeRun.current = run
-    const current = () => mounted.current && activeRun.current === run && !run.controller.signal.aborted
-    const startedAt = new Map<number, number>()
-    const accepted = new Set<number>()
-    setPhase('sampling')
+    const controllers = new Map(indexes.map(i => [i, new AbortController()]))
+    for (const [i, controller] of controllers) runs.current.set(i, controller)
     replaceSamples(samplesRef.current.map((sample, i) => indexes.includes(i)
       ? { ...sample, draftText: '', state: 'pending', errorCode: undefined, httpStatus: undefined, errorText: undefined, elapsedMs: undefined, throughput: undefined }
       : sample))
 
-    function applyProgress(progress: CollectionProgress) {
-      if (!current() || !progress.challenges) return
-      progress.challenges.forEach((challenge, k) => {
-        const index = indexes[k]
-        if (index === undefined || accepted.has(index)) return
-        const state = challenge.state ?? 'pending'
-        if (state === 'requesting' && !startedAt.has(index)) startedAt.set(index, performance.now())
-        const finished = state === 'done' || state === 'capped' || state === 'rejected'
-        const elapsedMs = finished && startedAt.has(index) ? performance.now() - startedAt.get(index)! : undefined
-        if ((state === 'done' || state === 'capped') && challenge.text.trim()) {
-          accepted.add(index)
-          sampledConfigs.current[index] = frozenConfig
-          patch(index, { text: challenge.text, draftText: undefined, state, elapsedMs, throughput: challenge.throughput, errorCode: undefined, httpStatus: undefined, errorText: undefined })
-          clearResult()
-        } else {
-          const previous = samplesRef.current[index]
-          patch(index, {
-            draftText: state === 'rejected' && previous.text.trim() ? undefined : challenge.text,
-            state, elapsedMs, throughput: challenge.throughput,
-            errorCode: state === 'rejected' ? challenge.errorCode : undefined,
-            httpStatus: state === 'rejected' ? challenge.httpStatus : undefined,
-            errorText: state === 'rejected' ? safeError(challenge.error, frozenConfig.apiKey) : undefined,
-          })
-        }
-      })
-    }
-
-    try {
-      await client.testApi(frozenConfig, indexes.map(i => challengesRef.current[i]), applyProgress, run.controller.signal)
-    } catch (error) {
-      if (!current()) return
-      const coded = error as CodedError
-      replaceSamples(samplesRef.current.map((sample, i) => indexes.includes(i) && isBusyState(sample.state)
-        ? { ...sample, state: 'rejected', draftText: sample.text.trim() ? undefined : sample.draftText, errorCode: coded?.code, httpStatus: coded?.httpStatus, errorText: safeError(error instanceof Error ? error.message : undefined, frozenConfig.apiKey) }
-        : sample))
-    }
-    if (!current()) return
-    activeRun.current = null
-    setPhase(resultRef.current ? 'result' : 'edit')
-    if (frozenConfig.autoVerify && accepted.size === indexes.length && samplesRef.current.every(sample => sample.text.trim())) {
+    const accepted: boolean[] = []
+    if (frozenConfig.parallel) accepted.push(...await Promise.all(indexes.map(i => sampleOne(i, frozenConfig, controllers.get(i)!))))
+    else for (const i of indexes) accepted.push(await sampleOne(i, frozenConfig, controllers.get(i)!))
+    if (frozenConfig.autoVerify && accepted.every(Boolean) && samplesRef.current.every(sample => sample.text.trim())) {
       void verify()
     }
   }
 
+  async function sampleOne(index: number, requestConfig: WebApiConfig, controller: AbortController): Promise<boolean> {
+    const current = () => mounted.current && runs.current.get(index) === controller
+    if (!current()) return false
+    let accepted = false
+    let startedAt: number | undefined
+
+    function applyProgress(progress: CollectionProgress) {
+      const challenge = progress.challenges?.[0]
+      if (!current() || !challenge || accepted) return
+      const state = challenge.state ?? 'pending'
+      if (state === 'requesting' && startedAt === undefined) startedAt = performance.now()
+      const finished = state === 'done' || state === 'capped' || state === 'rejected'
+      const elapsedMs = finished && startedAt !== undefined ? performance.now() - startedAt : undefined
+      if ((state === 'done' || state === 'capped') && challenge.text.trim()) {
+        accepted = true
+        sampledConfigs.current[index] = requestConfig
+        patch(index, { text: challenge.text, draftText: undefined, state, elapsedMs, throughput: challenge.throughput, errorCode: undefined, httpStatus: undefined, errorText: undefined })
+        setResult(null)
+      } else {
+        const previous = samplesRef.current[index]
+        patch(index, {
+          draftText: state === 'rejected' && previous.text.trim() ? undefined : challenge.text,
+          state, elapsedMs, throughput: challenge.throughput,
+          errorCode: state === 'rejected' ? challenge.errorCode : undefined,
+          httpStatus: state === 'rejected' ? challenge.httpStatus : undefined,
+          errorText: state === 'rejected' ? safeError(challenge.error, requestConfig.apiKey) : undefined,
+        })
+      }
+    }
+
+    try {
+      await client.testApi(requestConfig, [challengesRef.current[index]], applyProgress, controller.signal)
+    } catch (error) {
+      if (!current()) return false
+      const coded = error as CodedError
+      const sample = samplesRef.current[index]
+      if (isBusyState(sample.state)) patch(index, { state: 'rejected', draftText: sample.text.trim() ? undefined : sample.draftText, errorCode: coded?.code, httpStatus: coded?.httpStatus, errorText: safeError(error instanceof Error ? error.message : undefined, requestConfig.apiKey) })
+    }
+    if (current()) runs.current.delete(index)
+    return accepted
+  }
+
   async function verify() {
-    if (activeRun.current || !mounted.current || !samplesRef.current.some(sample => sample.text.trim())) return
-    const run: Run = { controller: new AbortController(), indexes: [] }
-    activeRun.current = run
+    if (verifying.current || runs.current.size || !mounted.current || !samplesRef.current.some(sample => sample.text.trim())) return
+    const token = {}
+    verifying.current = token
     const outputs = samplesRef.current.map((sample, i) => ({ text: sample.text, expected_count: challengesRef.current[i].expected_count }))
-    setPhase('computing')
+    setComputing(true)
     setExpanded(null)
     try {
       const analysis = await client.analyze(outputs, bank)
-      if (!mounted.current || activeRun.current !== run) return
-      resultRef.current = analysis
+      if (!mounted.current || verifying.current !== token) return
       setResultModel(mode === 'api' ? config.model : null)
       setResult(analysis)
-      setPhase('result')
     } catch (error) {
-      if (!mounted.current || activeRun.current !== run) return
+      if (!mounted.current || verifying.current !== token) return
       toast.error(describeError(i18n, error, 'errors.analyze'))
-      setPhase(resultRef.current ? 'result' : 'edit')
     } finally {
-      if (activeRun.current === run) activeRun.current = null
+      if (verifying.current === token) {
+        verifying.current = null
+        setComputing(false)
+      }
     }
   }
 
   function restart() {
     stop()
+    verifying.current = null
+    setComputing(false)
     replaceChallenges(client.generateChallenges(3))
     replaceSamples([idle(), idle(), idle()])
     sampledConfigs.current = []
-    clearResult()
+    setResult(null)
     setExpanded(null)
-    setPhase('edit')
   }
 
   /** Abnormal distributions follow the prompt, so retrying them needs new prompts. */
   function replacePrompts(indexes: number[]) {
-    if (activeRun.current) return
+    if (verifying.current || indexes.some(i => runs.current.has(i))) return
     const kept = challengesRef.current.filter((_, i) => !indexes.includes(i)).map(challenge => challenge.expected_count)
     const fresh = client.generateChallenges(indexes.length, kept)
     replaceChallenges(challengesRef.current.map((challenge, i) => indexes.includes(i) ? fresh[indexes.indexOf(i)] : challenge))
     replaceSamples(samplesRef.current.map((sample, i) => indexes.includes(i) ? idle() : sample))
-    clearResult()
+    setResult(null)
     setExpanded(null)
-    setPhase('edit')
     if (mode === 'api') void sampleIndexes(indexes, sampledConfigs.current[indexes[0]] ?? config)
   }
 
   function edit(i: number, text: string) {
-    if (activeRun.current) return
+    if (runs.current.has(i) || verifying.current) return
     patch(i, { text, draftText: undefined, state: 'idle', errorCode: undefined, httpStatus: undefined, errorText: undefined, elapsedMs: undefined, throughput: undefined })
-    clearResult()
-    setPhase('edit')
+    setResult(null)
   }
 
   async function saveImage() {
@@ -279,10 +279,10 @@ export default function DetectRoute() {
       sample={samples[index]}
       mode={mode}
       canSample={canSample}
-      locked={locked}
+      locked={computing}
       onChange={text => edit(index, text)}
       onResample={() => sampleIndexes([index], sampledConfigs.current[index] ?? config)}
-      onStop={stop}
+      onStop={() => stop([index])}
       onShowError={() => setErrorDetail(samples[index].errorText ?? null)}
       onCollapse={collapsible ? () => collapseSample(index) : undefined}
       anomalous={anomalous.includes(index)}
@@ -293,7 +293,7 @@ export default function DetectRoute() {
     <div className={cn('fp-page', 'has-actionbar')}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-h1">{t('detect.title')}</h1>
-        <Segmented label={t('detect.modeLabel')} value={mode} onChange={m => { if (!activeRun.current) setMode(m) }} disabled={locked} options={[{ value: 'manual', label: t('detect.modeManual') }, { value: 'api', label: t('detect.modeApi') }]} />
+        <Segmented label={t('detect.modeLabel')} value={mode} onChange={m => { if (!locked) setMode(m) }} disabled={locked} options={[{ value: 'manual', label: t('detect.modeManual') }, { value: 'api', label: t('detect.modeApi') }]} />
       </div>
 
       <aside className="fp-cli-promo relative isolate overflow-hidden" aria-label={t('detect.cliTitle')}>
@@ -371,7 +371,7 @@ export default function DetectRoute() {
             </>
           ) : phase === 'sampling' ? (
             <>
-              <Button variant="outline" className="h-9" onClick={stop}>{t('detect.stop')}</Button>
+              <Button variant="outline" className="h-9" onClick={() => stop()}>{t('detect.stop')}</Button>
               <Button className="h-9" disabled><Loader2 data-icon="inline-start" className="animate-spin" />{t('detect.sampling')}</Button>
             </>
           ) : phase === 'computing' ? (
