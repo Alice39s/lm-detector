@@ -1,0 +1,81 @@
+---
+title: Own Worker proxy
+description: Deploy worker/main.js to your own Cloudflare account to get a workers.dev address, so your API key does not pass through this site's proxy.
+icon: Server
+---
+
+Some APIs do not allow web pages to call them directly (the browser's cross-origin restriction, CORS), so requests must pass through a server that forwards them. By default the web app forwards them through the "This site" proxy, which means your API key passes through this site's servers. After you deploy your own Worker (a small program that runs in your own Cloudflare account), requests go through your Worker instead and the key no longer passes through this site. Static sites such as GitHub Pages have no site proxy, so they need their own Worker to check these APIs too.
+
+You need a Cloudflare account, and the free plan is enough. The "Deploy to Cloudflare" button also needs a GitHub or GitLab account. The Workers free plan handles 100,000 requests per day (reset at 00:00 UTC), far more than personal use needs. The [Cloudflare docs](https://developers.cloudflare.com/workers/platform/limits/) list the full limits. When the deployment finishes, you get an address like `https://fingerpoint-api-proxy.<subdomain>.workers.dev` (`<subdomain>` is the workers.dev subdomain of your account). Enter it under "Own Worker" in "Forwarding proxy" in the web app.
+
+The Worker code is a single file, `worker/main.js`, with no dependencies, so you can read it before you deploy.
+
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/Ikaleio/lm-detector/tree/main/worker)
+
+## Choose how to deploy
+
+All three methods deploy the same code. They differ in whether you need a GitHub or GitLab account and in how you update later. After you choose "Own Worker" under "Forwarding proxy" in the web app, the "Deploy your own Worker" area has the buttons "Deploy to Cloudflare" and "Open in the Playground", which match the first two methods below.
+
+<Tabs items={['Deploy to Cloudflare', 'Open in the Playground', 'Wrangler']}>
+  <Tab value="Deploy to Cloudflare">
+    This suits people who have a GitHub or GitLab account and want to update the Worker themselves. Click the button above, sign in to Cloudflare, confirm the names and `ALLOWED_ORIGINS` on the setup page (see the next section), and deploy.
+
+    The first time, Cloudflare asks you to install and authorize its GitHub (or GitLab) app, which it uses to create a repository in your account and to build automatically when you push. The authorization page lists the exact permissions, and you can pick your personal account or an organization you belong to. Afterwards you can review and revoke the app under Settings → Applications on GitHub.
+
+    Cloudflare clones the `worker/` directory into a new repository in your account. The "Create private Git repository" option on the setup page decides whether it is private or public. The repository holds only the Worker code and its configuration, and no API key.
+
+    Push a commit to that repository and Cloudflare redeploys automatically. The new repository is an independent copy, so later changes to `worker/main.js` in this project do not reach it. To update, copy the new content in and commit it.
+  </Tab>
+  <Tab value="Open in the Playground">
+    This suits people without a GitHub account, or who just want to get going. In the API configuration of the web app, choose "Own Worker" under "Forwarding proxy" and click "Open in the Playground". The page reads the latest `worker/main.js` from this project's GitHub repository and opens it in Cloudflare's online editor, the Workers Playground, together with the compatibility date and compatibility flags from `worker/wrangler.json`. After you sign in to Cloudflare, the Deploy button of the Playground creates the Worker in your account.
+
+    This method creates no repository, and the Worker keeps the code it was deployed with, so later updates to this project do not reach it. To update, deploy again from "Open in the Playground".
+  </Tab>
+  <Tab value="Wrangler">
+    This suits developers who are comfortable on the command line. Clone this repository, run `bun install`, then run `bun run deploy:worker` from the repository root. Wrangler is Cloudflare's command-line tool; it deploys according to `worker/wrangler.json` and, on the first run, walks you through signing in to Cloudflare.
+
+    For local testing, use `bun run dev:worker`. The Worker then runs at `http://127.0.0.1:8787`, and you can enter that address as the Worker address in the web app.
+  </Tab>
+</Tabs>
+
+## Enter the address and check it
+
+After the deployment finishes, enter the Worker address under "Own Worker" in "Forwarding proxy" in the web app and click "Check proxy". "The proxy works." means it is ready. The address can end at the domain, because the Worker answers every path the same way. Before the first request goes through this Worker, the web app asks whether to allow it and names the host of the Worker.
+
+If the check asks you to add the origin of the current page to `ALLOWED_ORIGINS`, follow the next section. The Worker has the same limits as this site's proxy, described in [Proxy limits](./proxy.mdx). For the request and response format, see the [Proxy API](../reference/proxy-api/index.mdx).
+
+## Set ALLOWED_ORIGINS [#allowed-origins]
+
+`ALLOWED_ORIGINS` decides which web pages may call your Worker. Its default is `https://lm.ikale.io`, so if you use your Worker only on `lm.ikale.io`, you need to change nothing. If you deploy the web app yourself, or want to use the Worker from another site, add the origin of that page.
+
+An origin is the scheme, domain, and port part of a URL, without the path. Write it like this:
+
+| Page address | Origin to enter |
+| --- | --- |
+| `https://example.com/app/index.html` | `https://example.com` |
+| `https://alice.github.io/lm-detector/` (a GitHub Pages project site) | `https://alice.github.io`, without the repository name |
+| `http://127.0.0.1:5173/` (a local dev server; the port varies) | `http://127.0.0.1:5173` |
+
+Separate several origins with commas, for example `https://lm.ikale.io,https://alice.github.io`. `*` allows any page, which is best not to leave on.
+
+Where you change it depends on how you deployed:
+
+<Tabs items={['Deploy to Cloudflare', 'Open in the Playground', 'Wrangler']}>
+  <Tab value="Deploy to Cloudflare">
+    Edit `vars.ALLOWED_ORIGINS` in `wrangler.json` of the new repository and commit. Cloudflare redeploys automatically, and the new value stays in effect. Do not change it only in the dashboard: a value changed under Settings → Variables and Secrets in the dashboard is overwritten by `wrangler.json` on the next deploy. If you entered a value on the setup page, check it against `wrangler.json` in the new repository after deploying.
+  </Tab>
+  <Tab value="Open in the Playground">
+    The Playground takes only the code and the compatibility settings and leaves out the variables in `wrangler.json`, so the Worker uses the default `https://lm.ikale.io`. To allow other origins, open the Worker in the Cloudflare dashboard, go to Settings → Variables and Secrets, and add a variable named `ALLOWED_ORIGINS`.
+  </Tab>
+  <Tab value="Wrangler">
+    Edit `vars.ALLOWED_ORIGINS` in `worker/wrangler.json` of your clone, then run `bun run deploy:worker`. A value changed in the dashboard is overwritten on the next deploy as well.
+  </Tab>
+</Tabs>
+
+## Logs
+
+When you deploy with the "Deploy to Cloudflare" button or with Wrangler, `wrangler.json` turns Workers Logs off (the Cloudflare feature that stores a record of each Worker invocation), so that log keeps none of your requests, including your API key and prompts. A Playground deployment does not carry this setting, so check in the dashboard that Workers Logs is off for the Worker.
+
+<Callout type="warn" title="Command-line tools ignore ALLOWED_ORIGINS">
+  `ALLOWED_ORIGINS` only limits which web pages can call the Worker. A client that sends no `Origin` header, such as curl, can forward requests through the Worker with its own key as long as it knows the Worker address, and those requests count toward your Cloudflare quota. Do not post the Worker address publicly. If it leaks, delete the Worker and deploy a new one under a different name, which gives it a new address.
+</Callout>

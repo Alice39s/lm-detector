@@ -23,6 +23,10 @@ jobs:
           bun-version: 1.4.2
       - run: bun install --frozen-lockfile
       - run: bun run build
+        env:
+          # A project site lives under /<repository>/ on <owner>.github.io, and the docs follow it.
+          DOCS_BASE: /${{ github.event.repository.name }}/docs
+          SITE_ORIGIN: https://${{ github.repository_owner }}.github.io
       - uses: actions/configure-pages@v5
         if: github.event_name == 'workflow_dispatch'
       - uses: actions/upload-pages-artifact@v3

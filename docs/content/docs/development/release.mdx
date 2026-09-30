@@ -1,0 +1,32 @@
+---
+title: 打包与发布
+description: CLI 的打包内容、自动发布工作流，以及首次配置 npm 可信发布的步骤。
+icon: Boxes
+---
+
+## 打包
+
+`bun run build:cli` 生成 `dist/fpd/`：打包 CLI 命令、固定采样挑战、共享算法、参考库工作线程和本仓库内的离线拟合模块；复制公开的参考库、核验器和分词器库，并固定已安装运行时依赖的版本。原始采样记录不会打包。采样和入库可以在仓库外用 Node 或 Bun 运行；离线重训另外需要 `uv` 和 Python。
+
+## 自动发布
+
+`Publish FPD CLI` 工作流在 `main` 上运行：CLI、共享算法、参考数据、依赖或发布配置变化时自动触发，也支持手动触发。每次构建使用 `0.0.<Unix 毫秒时间戳>` 作为版本号并发布 `latest` 标签，不需要手动改版本号或打 Git 标签。发布任务顺序执行，在仓库外验证一次干净安装，并在发布后检查 npm 标签。
+
+## 首次配置
+
+工作流使用 npm 可信发布（GitHub OIDC）。首次配置需要一个有 `lmfpd` 发布权限的 npm 账号：
+
+```sh
+npm login
+bun run build:cli
+cd dist/fpd
+npm publish --access public --tag latest
+npm trust github lmfpd --repo Ikaleio/lm-detector \
+  --file publish-cli.yml --allow-publish --yes
+```
+
+可信发布者必须允许直接 `npm publish`。配置完成后，GitHub Actions 不需要保存 npm 令牌。依赖自动发布之前，先手动触发一次工作流，确认授权可用。
+
+## 网站与文档
+
+网站和文档随 Cloudflare Pages 的 Git 集成自动部署，GitHub Pages 由手动触发的工作流发布，见[部署](../deployment/index.mdx)。

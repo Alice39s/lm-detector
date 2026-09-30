@@ -1,0 +1,60 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/geist';
+/* The detector's colors and brand fonts; Fumadocs' shadcn preset reads the same variables. */
+@import '../../web/src/tokens.css';
+@import 'fumadocs-ui/css/shadcn.css';
+@import 'fumadocs-ui/css/preset.css';
+@import 'fumadocs-openapi/css/preset.css';
+@import 'katex/dist/katex.css';
+
+@source '../node_modules/fumadocs-openapi/dist';
+
+:root {
+  --sidebar: var(--background);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-border: var(--border);
+  --sidebar-accent: var(--accent);
+  --sidebar-accent-foreground: var(--accent-foreground);
+  --sidebar-ring: var(--ring);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --fd-layout-width: 1440px;
+}
+
+html {
+  scrollbar-gutter: stable;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+
+html > body[data-scroll-locked] {
+  margin-right: 0 !important;
+  --removed-body-scroll-bar-size: 0px !important;
+}
+
+/* design.md 3「应用外壳」: the two-line brand of the detector's header. */
+.fd-brand { display: flex; flex-direction: column; }
+.fd-brand-title { font-family: var(--font-brand-title); font-size: 0.875rem; line-height: 1.25; font-weight: 500; white-space: nowrap; }
+.fd-brand-byline { font-family: var(--font-brand-byline); font-size: 0.75rem; line-height: 1rem; font-weight: 400; color: color-mix(in oklab, var(--foreground) 70%, transparent); }
+
+.fd-app-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.5rem;
+  border-radius: var(--radius);
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+  white-space: nowrap;
+  transition: color 150ms, background-color 150ms;
+}
+.fd-app-link:hover { color: var(--foreground); background: var(--accent); }
+.fd-app-link svg { width: 1rem; height: 1rem; }
+
+/* Mermaid keeps its source visible until the diagram renders in the browser. */
+.fd-mermaid { display: flex; justify-content: center; margin-block: 1.5rem; overflow-x: auto; }
+.fd-mermaid svg { max-width: 100%; height: auto; }
+.fd-mermaid-source { white-space: pre-wrap; color: var(--muted-foreground); font-size: 0.8125rem; }
+
+/* Wide tables and formulas scroll inside the article instead of widening the page. */
+.prose table { display: block; max-width: 100%; overflow-x: auto; }
+.katex-display { overflow-x: auto; overflow-y: hidden; padding-block: 0.25rem; }

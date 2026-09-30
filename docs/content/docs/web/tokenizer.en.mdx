@@ -1,0 +1,90 @@
+---
+title: Tokenizer probe
+description: While sampling, API detection identifies the upstream tokenizer, adds the result to the confidence, and checks whether it matches the model you entered.
+icon: Binary
+---
+
+A tokenizer is the rule a model uses to split text into tokens. Models from one vendor usually share a tokenizer, so knowing which one the upstream (the service behind the address you entered) uses helps the number fingerprint tell GPT, Qwen, DeepSeek, and other families apart. It also exposes a channel that claims `gpt-5` while serving a Qwen tokenizer.
+
+The tokenizer probe is part of API mode and is on by default. It costs about 12 extra short requests while sampling, at most 22; APIs billed per request charge for them. They reuse your reasoning-effort setting (except on Messages) and, apart from Messages, set no output limit, so a reasoning model can spend noticeably more tokens. Turn off "Tokenizer probe" in the API configuration to detect with the number fingerprint only. Manual mode has no API to ask, so it uses the number fingerprint only.
+
+## What happens during a detection
+
+### Start sampling [step]
+
+After you click "Start sampling", a "Tokenizer probe" card appears below the three sample cards. It shows the number of finished requests and the tokenizer leading so far. Each request only asks the model to reply OK; the page reads the input token count from the `usage` the API returns.
+
+With "Parallel requests" on, the tokenizer probe sends four requests at a time; with it off, requests go one by one, which takes longer.
+
+### Wait for the probe [step]
+
+If the probe is still running when the three samples finish, the status line shows "Finishing the tokenizer probe…", and "Stop probing" in the action bar ends it early. The page then uses the counts received so far.
+
+### Read the result [step]
+
+When the result appears, the fourth entry of the sample strip, "Tokenizer", shows the identified tokenizer and opens its details. A badge next to the family of the top candidate says whether its tokenizer matches the counts.
+
+## Reading the result
+
+The confidence of the ranking includes the tokenizer result, and the ranking note says "Candidates follow their confidence with the tokenizer result included." The tokenizer result changes the odds between two candidates by at most about 600 times, so a wider gap in the number fingerprint keeps their order. See [How it works](../principles/tokenizer.mdx#fusion).
+
+Badges next to the top candidate:
+
+| Badge | Meaning |
+| --- | --- |
+| Tokenizer matches | The candidate uses the tokenizer the counts show |
+| Tokenizer mismatch | The counts show a tokenizer the candidate does not use |
+| Tokenizer unclear | The counts are not yet enough to tell |
+| Tokenizer unknown | This tool does not know which tokenizer the candidate uses, so the tokenizer result does not affect it |
+
+The result area may also show three notices:
+
+- When the tokenizer result changed the top candidate, it names the candidate the numbers are closest to.
+- When the model you entered does not match the measured tokenizer, a red notice names the tokenizer that model should use.
+- When there is no tokenizer result, a line below the ranking note gives the reason and says that this result uses the number fingerprint only.
+
+## Tokenizer details
+
+The details show the verdict, its confidence, and the candidate tokenizers on the left, and the request log on the right. There are three verdicts:
+
+| Verdict | Meaning |
+| --- | --- |
+| Exact match | The counts of nearly all probe texts agree with one listed tokenizer class, allowing a few deviations |
+| Unlisted · closest | Close to one class, but a sizable share of probe texts count differently. It may be a derivative or an extension of that tokenizer |
+| Unlisted tokenizer | Unrelated to every listed class |
+
+A class groups open tokenizers that count almost identically. This tool lists 62 classes; see [Listed tokenizers](../principles/tokenizer.mdx#classes).
+
+The candidate list shows the confidence of the top 6 classes, and its last row is always "Unlisted tokenizer". Each row of the request log is a probe text, or the baseline request that holds only the fixed prefix and suffix (shown as "Baseline (no probe text)"), with its input token count and the tokens added over the baseline.
+
+The bottom of the details has three collapsible sections: the open tokenizers in this class, the count of each probe text, and "Understanding the result".
+
+## Check against the model you entered
+
+The model name you entered is compared with the [vendor model mapping](../principles/tokenizer.mdx#api-models):
+
+| Result | Meaning |
+| --- | --- |
+| Consistent | The measured tokenizer is the one the model uses |
+| Inconsistent | For example, the channel claims `gpt-5`, but the probe measures the Qwen tokenizer |
+| Not yet clear | The counts have not yet concentrated on one class |
+| Cannot tell | This tool does not know which tokenizer the model uses |
+
+Vendors such as Anthropic (Claude) and xAI (Grok) have not published their tokenizers: an unlisted tokenizer counts as consistent, and any listed class counts as inconsistent.
+
+<Callout type="warn" title="More than one model can share a tokenizer">
+  One tokenizer is often reused by several models. For example, Xiaomi MiMo and MiniCPM-V reuse the Qwen1 to Qwen3 tokenizer. Some relays estimate usage locally with tiktoken, OpenAI's open-source tokenizer library, which also produces o200k_base or cl100k_base counts; when the verdict is one of these and does not match the model you entered, the notice mentions this possibility. When the two baseline requests count differently, the page warns that the upstream adds hidden input of varying length, such as a system prompt; the result may be inaccurate, so probe again to check.
+</Callout>
+
+## When there is no tokenizer result
+
+- The API response has no usage. Some relays do not pass the upstream usage on; this is a limit of the API itself.
+- The baseline request fails, or no probe text is answered. When probing stops partway, the counts received so far are still used.
+- The replies were edited by hand or come from manual mode.
+- Only one or two replies are valid. The ranking then has no confidence, and the tokenizer result is only reported in the details.
+
+When probing fails, the More actions menu of the "Tokenizer probe" card and the notice in the details offer "Probe again". A successful probe after the result appears adds the new tokenizer result to the current result without sampling again.
+
+## Export
+
+"Export JSON" in the More actions menu of the result includes each candidate's number-fingerprint confidence and tokenizer match, and the count of every request. The file contains neither the API address nor the API key.

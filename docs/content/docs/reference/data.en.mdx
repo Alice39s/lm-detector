@@ -1,0 +1,79 @@
+---
+title: Data files
+description: The official reference samples, derived fingerprint bank, frozen detector, fixed challenges, and tokenizer bank in the data/ directory, and their change log.
+icon: Database
+---
+
+`data/` holds the official reference samples, the derived fingerprint bank, the frozen detector parameters, the fixed sampling challenges, and the tokenizer bank of the tokenizer probe.
+
+```files
+data
+├── unified_reference.jsonl
+├── unified_bank.json
+├── shared_detector.json
+├── enrollment-suite.json
+├── tokenizer_bank.json
+├── import_manifest.json
+├── archive
+└── collections
+```
+
+| File | Content |
+| --- | --- |
+| `unified_reference.jsonl` | Reference batches. Each line holds one version-1 batch: the model, channel, and call settings are shared, and the answers are in the `samples` array |
+| `unified_bank.json` | Statistics derived from the reference batches |
+| `shared_detector.json` | Frozen ranker, verifier, and calibration parameters, bound to the reference data by SHA-256 |
+| `enrollment-suite.json` | The 36 fixed sampling challenges. This file is sampling input, not reference answers |
+| `tokenizer_bank.json` | Tokenizer bank: probe texts, per-class counts, and model mappings for the tokenizer probe |
+| `import_manifest.json` | Historical manifest. It does not reflect the current counts |
+| `archive/` | Historical batches retired from the reference bank |
+| `collections/` | Sampling requests, attempts, and provenance checks |
+
+`archive/` and `collections/` are not used for scoring and are not copied into the public data of the website. For the fields of batches and samples, see [Sampling and resuming](../cli/sampling.mdx#batch-format).
+
+## Maintenance rules
+
+- `fpd sample`, `fpd enroll DIR`, and `fpd retrain --data-dir DIR` can all run outside the repository. Enrollment validates complete batches and raw evidence, deduplicates by model, channel, condition, challenge, and text, and rebuilds the derived bank. Retraining fits the verifier and confidence offline from the target reference bank. If nested calibration fails, `shared_detector.json` is not replaced. Training evidence is saved in `.training/`.
+- The data bundled with the CLI is read-only. The maintenance destination must be specified explicitly, or confirmed after the CLI detects this repository during interactive enrollment.
+- The fixed evaluation set must not be added to the reference bank, the model centroids, or the calibration.
+- The website build writes redacted data to `web/public/data/`. That directory is a build output and must not be maintained as a second official bank.
+
+## Tokenizer bank
+
+`tokenizer_bank.json` is generated offline from 290 open tokenizers by `token-fp export-api-bank` of the tokenizer archive tool llm-tokenizer-fingerprint. It is independent of the reference samples. An update replaces the whole file directly and does not go through `fpd enroll`.
+
+| Field | Content |
+| --- | --- |
+| `schema` | Always `tokenizer-bank-v1` |
+| `source` | Generating tool, tokenizer count, and candidate text count. `archive_manifest_sha256` records the hash of the archive manifest used, and `excluded` lists the repositories that were not exported because their archived files are untrusted, with the reasons |
+| `wrapper` | The fixed prefix and suffix of every request: `prefix` and `suffix` |
+| `probes` | ID, category, and text of each probe text |
+| `classes` | Lab, series, members, and aliases of each tokenizer class, and its count difference for each probe text in `counts`. When members disagree, `alternatives` lists their values separately |
+| `api_models` | Mapping from vendor models to tokenizer classes. A `class` of `null` means the vendor has not published its tokenizer |
+
+Tokenizer classes are grouped by authoring lab and series. Tokenizers with identical counts form one class, and classes of one lineage that differ on only a few texts are merged. For the full list of classes, see [How the tokenizer probe works](../principles/tokenizer.mdx#classes).
+
+## Change log
+
+<Accordions type="multiple">
+  <Accordion title="2026-09-30 Add gpt-6.1-sol and normalize the Claude labels" id="2026-09-30">
+    Added 36 fixed-challenge answers for `gpt-6.1-sol`, with the evidence in `collections/gpt-6.1-sol-openrouter-openai-20260930/`. The requests used the OpenRouter model `openai/gpt-6.1-sol` with streaming Chat Completions, `reasoning_effort=low`, and the fixed `openrouter/openai` channel (no fallback). All 36 answers were checked against the returned model and OpenAI provider metadata; all completed naturally, with no failures or truncation.
+
+    On the same day, the Claude reference labels switched to dotted version numbers (for example `claude-opus-5.5`), and the label of `claude-haiku-4-5-20251001` became `claude-haiku-4.5`. Requested model names and raw sampling evidence keep the upstream values; the 25 rows before the rename are saved in `archive/claude-labels-20260930/`. The `gpt-6-sol-20260922` batch left the reference bank; its raw row is saved in `archive/gpt-6-sol-20260922/`.
+  </Accordion>
+  <Accordion title="2026-09-29 Add claude-sonnet-5.5" id="2026-09-29">
+    Added 36 fixed-challenge answers for `claude-sonnet-5.5`. The evidence is saved in `collections/claude-sonnet-5.5-openrouter-anthropic-20260929/`. The requests used the official OpenRouter model `anthropic/claude-sonnet-5.5` with Chat Completions, the default reasoning effort, and the fixed `openrouter/anthropic` channel (fallback disabled). All 36 answers were checked against the returned model and the Anthropic provider metadata. All of them completed naturally, with no failures or truncation.
+  </Accordion>
+  <Accordion title="2026-09-28 gpt-6-sol moves to direct OpenAI access" id="2026-09-28">
+    The original `gpt-6-sol` reference batch (36 answers collected through `openrouter/openai` on 2026-09-22) was relabeled `gpt-6-sol-20260922`. It keeps the original requested model name, channel, and sampling evidence. The new `gpt-6-sol` batch was collected on Ikaleio-TYO by calling the Responses API of `api.openai.com` directly with an OpenAI key. It completed the same 36 fixed challenges with `reasoning_effort=low`. Of these answers, 34 completed naturally and 2 were truncated at the sampling limit. The raw evidence is saved in `collections/gpt-6-sol-openai-direct-20260928/`. The first Chat Completions requests returned HTTP 400 because the API does not support `max_tokens`. The 3 failed records are saved in `collections/gpt-6-sol-openai-direct-cc-20260928/` and were not enrolled. From then on the two labels were scored separately, until `gpt-6-sol-20260922` left the reference bank on 2026-09-30. Because the channels and APIs differ, a difference between model versions cannot be inferred from the reference bank ranking alone.
+  </Accordion>
+  <Accordion title="2026-09-26 DeepSeek moves to pinned providers" id="2026-09-26">
+    All 15 batches without a pinned provider (216 answers) for six DeepSeek models were retired from the official bank. The original rows are saved in `archive/deepseek-unpinned-20260926/unified_reference.rows.jsonl`, and the original sampling attempts stay in the research directory. The new reference batches are saved per model in `collections/deepseek-*-20260926/`. V4.1 Flash and V4 Pro 0813 each have 36 answers pinned to `openrouter/deepseek`. Flash 0731, Pro Preview, Flash Preview, and V3.2 each have 36 answers pinned to `openrouter/novita`. For Flash 0731, the 11th attempt of `query-11` and the 12th attempt of `query-23` override only `reasoning_effort=low`, and all original failures are kept. The discontinued SiliconFlow backup batches stay in `collections/` but were not enrolled. The official bank includes only complete batches that pass the provenance check. It does not let OpenRouter fall back automatically or mix answers from different providers.
+  </Accordion>
+  <Accordion title="2026-09-14 K3 moves to a pinned source" id="2026-09-14">
+    The K3 update replaces the earlier 36 answers without a pinned provider with 36 answers pinned to the MoonshotAI source, with thinking disabled. The new and old batches are in `collections/kimi-k3-moonshotai-20260914/` and `archive/kimi-k3-unpinned-20260914/`. See the manifest of the new batch for the prefix versions and the effective attempts.
+  </Accordion>
+  <Accordion title="Schema cutover" id="schema-cutover">
+    The 1,804 reference rows from before the schema cutover are saved unchanged in `archive/schema-cutover/unified_reference.rows.jsonl`. The new format keeps all sample IDs, answers, prompts, and their order. An unknown completion status is not turned into success. The runtime no longer reads the old format. Historical requests and failed attempts are still kept.
+  </Accordion>
+</Accordions>
