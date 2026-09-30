@@ -44,7 +44,7 @@ Open **[lm.ikale.io](https://lm.ikale.io)** and select a detection mode:
 
 Each answer must contain at least 80 valid integers and at least 55% of the requested count. If all three answers are valid, the page shows the ranking, verification scores, and confidence. If only one or two answers are valid, the page shows the ranking only.
 
-Before API mode or a tokenizer probe starts, the page sends one request with the real shape and a dummy key to check whether the endpoint allows cross-origin browser calls (CORS). If it does, the browser calls the endpoint directly and your key never touches this site. If it does not, or the browser cannot reach it, a dialog explains why, and the same-origin `/api/proxy` endpoint forwards the requests only after you choose "Allow once" or "Always allow this API". You can revoke a remembered consent in the API configuration. The proxy accepts any provider, but only fully qualified domain names on the default HTTPS port. The browser keeps API settings in localStorage. Exported result images do not contain the key, the endpoint, or the answer text.
+Before API mode or a tokenizer probe starts, the page sends one request with the real shape and a dummy key to check whether the endpoint allows cross-origin browser calls (CORS). If it does, the browser calls the endpoint directly and your key never touches this site. If it does not, or the browser cannot reach it, a dialog explains why, and the relay proxy forwards the requests only after you choose "Allow once" or "Always allow this API". You can revoke a remembered consent in the API configuration. The relay proxy is this site's `/api/proxy` by default; the API configuration can switch it to a Cloudflare Worker you deploy yourself ([worker/](./worker/README.md) offers one-click deployment and a Playground import). The proxy accepts any provider, but only fully qualified domain names on the default HTTPS port. The browser keeps API settings in localStorage. Exported result images do not contain the key, the endpoint, or the answer text.
 
 ### Command line
 
@@ -69,6 +69,7 @@ bun run typecheck    # Type-check the TypeScript code
 bun run build        # Build the website into web/dist
 bun run build:cli    # Pack the npm CLI into dist/fpd
 bun run fpd --help   # Run the CLI from the repository
+bun run dev:worker   # Run the proxy Worker locally at 127.0.0.1:8787
 ```
 
 For deployment to Cloudflare Pages or GitHub Pages, see [docs/deployment.md](./docs/deployment.md).
@@ -308,7 +309,7 @@ A tokenizer match shows only that the tokenizer is the same. One tokenizer often
 ├── shared/     Challenge, parsing, and scoring code shared by the website and the CLI
 ├── data/       Reference data, derived bank, frozen detector, and fixed challenges
 ├── offline/    Offline retraining and calibration (Python, run with uv)
-├── server/     Same-origin API proxy
+├── worker/     Single-file Cloudflare Worker API proxy, also used by the same-origin proxy entry points
 ├── functions/  Cloudflare Pages Functions entry point
 ├── api/        Vercel Functions entry point
 └── docs/       Deployment guide
