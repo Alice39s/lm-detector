@@ -56,6 +56,9 @@ data
 ## 变更记录
 
 <Accordions type="multiple">
+  <Accordion title="2026-09-30 六个 OpenAI 参考模型改为直连低推理强度" id="2026-09-30-openai-direct">
+    将 gpt-5.4、gpt-5.5、gpt-5.6-sol、gpt-5.6-terra、gpt-5.6-luna、gpt-6-astra 的 16 个 `codex-subscription` 批次（216 条，推理强度未记录）全部退出正式库，原始行保存在 `archive/codex-subscription-20260930/unified_reference.rows.jsonl`。替换原因：配对研究（`research/studies/astra-sol-separation/`）发现，原参考库的采集渠道和推理设置不一致，会干扰 gpt-6-astra 与 gpt-6.1-sol 的指纹比较。新批次使用 OpenAI Key 从本机直连 `api.openai.com` 的 Responses 接口，流式、`reasoning_effort=low`，与 `gpt-6-sol` 一致；各完成 36 道固定挑战，提示词与系统提示和原批次逐条相同，证据保存在 `collections/<型号>-openai-direct-20260930/`。返回型号为 `gpt-5.4-2026-03-05`、`gpt-5.5-2026-04-23`，其余与请求名相同。截断（达到采样上限）：gpt-5.6-luna 7 条、gpt-5.6-terra 1 条、gpt-5.4 1 条，其余自然完成。失败尝试均保留：gpt-6-astra 4 次、gpt-5.4 3 次连接中断，gpt-5.6-terra 1 次、gpt-5.6-luna 2 次有效数字不足，均在下一次尝试成功。
+  </Accordion>
   <Accordion title="2026-09-30 新增 gpt-6.1-sol，统一 Claude 标签" id="2026-09-30">
     新增 `gpt-6.1-sol` 的 36 条固定挑战回答，证据保存在 `collections/gpt-6.1-sol-openrouter-openai-20260930/`。请求 OpenRouter 型号 `openai/gpt-6.1-sol`，使用 Chat Completions 流式输出、`reasoning_effort=low` 和固定 `openrouter/openai` 渠道（禁止回退）；36 条均由返回型号及 OpenAI 供应商元数据核对，自然完成，无失败或截断。
 

@@ -16,6 +16,8 @@ After you click "Start sampling", a "Tokenizer probe" card appears below the thr
 
 With "Parallel requests" on, the tokenizer probe sends four requests at a time; with it off, requests go one by one, which takes longer.
 
+The three samples share one probe: stopping a sample card ends only that sample, and the probe keeps running; "Stop" in the action bar also stops the probe.
+
 ### Wait for the probe [step]
 
 If the probe is still running when the three samples finish, the status line shows "Finishing the tokenizer probe…", and "Stop probing" in the action bar ends it early. The page then uses the counts received so far.

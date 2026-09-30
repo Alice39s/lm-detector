@@ -2,6 +2,8 @@
 
 FPD uses Ink for live detection, reference collection, and enrollment. The published package runs with Node.js 22+ or Bun 1.4.2+ and does not require a repository checkout. Detection shows candidate rankings and repeated results; collection shows setup, request progress, saved evidence, and enrollment previews. Compatible terminals display `lm.ikale.io` as a clickable link in the detection header.
 
+The full documentation, in English and Chinese, is at [lm.ikale.io/docs/en/cli](https://lm.ikale.io/docs/en/cli).
+
 ## Run from npm
 
 ```sh
@@ -161,7 +163,7 @@ In this repository, output defaults to `runs/`; elsewhere it defaults to `./fpd-
 
 An interrupted enrollment is validated during preview without applying it. Confirmed enrollment completes the prepared transaction before importing new samples. Unexpected changes outside that transaction are never overwritten.
 
-Reference JSONL contains one version-1 batch per line, with shared metadata and a `samples` array. Old row and collection-manifest formats are rejected. Enrollment rebuilds the chosen bank but does not silently retrain its verifier. Run `fpd retrain --data-dir DIR` after enrollment to fit and export a matching verifier and confidence calibration. The command requires `uv` and Python with the pinned numerical dependencies; it does not call a model API or use holdout data. It stores fit evidence and the previous detector under `DIR/.training/`, then replaces `DIR/shared_detector.json` only after nested calibration validation passes. Failed fitting or validation leaves the previous detector intact. The package's bundled bank stays read-only. See [WORKFLOW.md](WORKFLOW.md) for the full workflow.
+Reference JSONL contains one version-1 batch per line, with shared metadata and a `samples` array. Old row and collection-manifest formats are rejected. Enrollment rebuilds the chosen bank but does not silently retrain its verifier. Run `fpd retrain --data-dir DIR` after enrollment to fit and export a matching verifier and confidence calibration. The command requires `uv` and Python with the pinned numerical dependencies; it does not call a model API or use holdout data. It stores fit evidence and the previous detector under `DIR/.training/`, then replaces `DIR/shared_detector.json` only after nested calibration validation passes. Failed fitting or validation leaves the previous detector intact. The package's bundled bank stays read-only. See [Sampling and resuming](https://lm.ikale.io/docs/en/cli/sampling) and [Enrollment and retraining](https://lm.ikale.io/docs/en/cli/enroll) for the full workflow.
 
 The previous detection interface remains available in the repository as `bun run detect:legacy`.
 

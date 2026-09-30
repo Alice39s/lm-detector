@@ -13,7 +13,7 @@ The detection website [lm.ikale.io](https://lm.ikale.io) is a pure frontend app.
     The page generates three challenges. Send each challenge to the target model separately (for example, in a new conversation in a chat interface), then paste each answer into its sample box. This mode suits the case where you have a chat interface but no API key. Prompts and replies are not translated, and switching the interface language does not change them.
   </Tab>
   <Tab value="API">
-    After you fill in the API configuration, the page sends requests upstream one at a time or in parallel with the selected protocol, and shows each reply as it is generated. Verification can start automatically after sampling finishes.
+    After you fill in the API configuration, the page sends requests upstream one at a time or in parallel with the selected protocol, and shows each reply as it is generated. Verification can start automatically after sampling finishes. Each sample is drawn on its own: while one sample is sampling, you can still start, stop, edit, or clear the others. Stop on a sample card ends only that sample; Stop in the action bar ends all of them.
   </Tab>
 </Tabs>
 
@@ -32,7 +32,7 @@ Switches below the configuration, all on by default:
 - **Streaming**: uses SSE and shows output as it is generated. When off, the page waits for the complete JSON response.
 - **Parallel requests**: sends the three samples at once, and the tokenizer probe four requests at a time. When off, requests go one by one, which takes longer.
 - **Relaxed mode**: streaming sampling stops once it receives the requested count of complete valid integers. A non-streaming reply that exceeds the requested count keeps only the first N. The interface marks both cases as "Capped". When off, the upstream reply must finish naturally and completely.
-- **Verify automatically after sampling**: computes the result automatically once all three samples succeed.
+- **Verify automatically after sampling**: computes the result automatically once all three samples succeed and no other sample is still sampling.
 - **Tokenizer probe**: sends about 12 extra short requests while sampling (at most 22), identifies the upstream tokenizer, and adds it to the confidence. APIs billed per request charge for these requests. See [Tokenizer probe](./tokenizer.mdx).
 
 The configuration and the key are saved automatically in the browser's localStorage and are restored after a reload or when you reopen the page. The profile menu supports several profiles, which you can rename, create, duplicate, and delete. "Save" only confirms the current configuration in the browser. "Export" and "Load" move a configuration between a file and the browser. An exported file contains your API key in plain text, so do not send it to anyone or upload it to cloud storage. "Forwarding proxy" is a browser-level setting and does not belong to any profile. See [Direct calls and proxy consent](./connection.mdx).

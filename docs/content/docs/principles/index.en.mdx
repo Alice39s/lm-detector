@@ -21,7 +21,7 @@ flowchart LR
 
 ## Challenges
 
-Each round generates 3 challenges. The requested count of each challenge comes from 292–332 without repetition, and random combinations of several template sets supply the wording. The prompt tells the model to choose the integer at each position separately, from 1 to 355, by first instinct. The prompt forbids tools and code. It also forbids counting from 1, monotonically increasing or decreasing runs, arithmetic progressions, cycles, and other rule-made patterns. As a result, the sequence mainly shows the value preferences of the model itself.
+Each round generates 3 challenges. The requested count of each challenge comes from 292–332 without repetition. Each challenge independently uses Chinese, English, Japanese, Korean, or French, and random equivalent templates in that language supply the wording. The prompt tells the model to choose the integer at each position separately, from 1 to 355, by first instinct. The prompt forbids tools and code. It also forbids counting from 1, monotonically increasing or decreasing runs, arithmetic progressions, cycles, and other rule-made patterns. As a result, the sequence mainly shows the value preferences of the model itself.
 
 The reference bank uses a different fixed set of 36 challenges: 3 challenges in each of 12 prompt environments, with requested counts from 218 to 333. The environments differ in whether a system prompt or a user prefix is added.
 
