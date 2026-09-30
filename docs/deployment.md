@@ -2,7 +2,7 @@
 
 以下路径和命令均相对于产品根目录 `projects/`。当前 WebUI 位于 `web/`。
 
-接口允许浏览器跨域时，前端直接请求接口；否则在用户授权后请求 `/api/proxy`。`server/proxy.ts` 使用标准 Request/Response，JSON 和 SSE 响应直接透传，不等待完整流。请求超时为 250 秒，客户端取消会传给上游。使用 HashRouter，无需页面路由重写。
+接口允许浏览器跨域时，前端直接请求接口；否则在用户授权后请求转发代理：默认为同源 `/api/proxy`，也可以在 API 配置中改为自建 Worker。代理实现是单文件 Cloudflare Worker `worker/main.js`，Pages Function、Vercel Function 与 Vite 开发服务器都导入它的 `proxyRequest`。它使用标准 Request/Response，JSON 和 SSE 响应直接透传，不等待完整流。请求超时为 250 秒，客户端取消会传给上游。使用 HashRouter，无需页面路由重写。
 
 ## Cloudflare Pages
 
@@ -24,6 +24,16 @@ bun run deploy:pages
 
 先在 Pages 项目中绑定 `lm.ikale.io`，再确认 Cloudflare DNS 指向该项目的 `*.pages.dev` 主机名。只有 Pages URL 的静态资源、`/api/proxy` JSON/SSE 转发和自定义域都通过后，才能停止旧站点的自动部署。
 
+## 自建 Worker 代理
+
+`worker/` 可以单独部署为 Cloudflare Worker，供 GitHub Pages 等没有服务器函数的站点，或不想经过本站代理的用户使用。部署方式、`ALLOWED_ORIGINS` 与请求约定见 [worker/README.md](../worker/README.md)：
+
+- [Deploy to Cloudflare](https://deploy.workers.cloudflare.com/?url=https://github.com/Ikaleio/lm-detector/tree/main/worker) 把 `worker/` 复制为用户自己的仓库，并用 Workers Builds 部署；
+- 网页 API 配置中的“在 Playground 中打开”读取 GitHub 上最新的 `worker/main.js`，在 Workers Playground 中打开，登录后可直接部署；
+- 在本目录运行 `bun run deploy:worker`，或用 `bun run dev:worker` 在 `http://127.0.0.1:8787` 本地运行。
+
+Worker 默认只允许 `https://lm.ikale.io` 从浏览器调用。自行部署网页时，把网页的 origin 加入 `ALLOWED_ORIGINS`；同源的 Pages Function 不需要此变量。网页在 API 配置的“转发代理”中保存 Worker 地址，“检查代理”用 GET 健康检查区分可用、浏览器无法读取响应（来源未被允许，或该地址不是代理）和无法连接。
+
 ## 上游地址与本地开发
 
 代理不限制供应商域名。在网页中填写自定义 HTTPS API 地址即可使用，无需额外配置服务器环境变量。地址必须使用完整域名；不接受 IP 字面量、单标签主机名，以及 `localhost`、`.local`、`.internal` 域名。
@@ -34,4 +44,4 @@ bun run deploy:pages
 
 ## GitHub Pages
 
-`.github/workflows/pages.yml` 在推送时构建并保存静态产物，手动触发时发布到 GitHub Pages。手动发布前需在仓库设置中启用 GitHub Actions 作为 Pages 来源。GitHub Pages 没有服务器函数：允许浏览器跨域的接口仍可直连使用 API 模式（含分词器探测）；需要代理的接口在授权后请求 `/api/proxy` 会失败，这类接口需要 Cloudflare Pages 或本地预览。
+`.github/workflows/pages.yml` 在推送时构建并保存静态产物，手动触发时发布到 GitHub Pages。手动发布前需在仓库设置中启用 GitHub Actions 作为 Pages 来源。GitHub Pages 没有服务器函数：允许浏览器跨域的接口仍可直连使用 API 模式（含分词器探测）；需要代理的接口在 API 配置中改用自建 Worker，Worker 的 `ALLOWED_ORIGINS` 需包含 Pages 站点的 origin。
