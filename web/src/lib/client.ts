@@ -79,15 +79,17 @@ function browserBody(config:ApiConfig,body:Record<string,unknown>){
   else if(config.format==='openai')delete requestBody.max_tokens
   return requestBody
 }
-const proxyTransport:CompletionTransport = (url,config,body,signal) => {
+/** Sends the request to the site proxy or a self-deployed Worker, which both run `worker/main.js`. */
+const proxyTransport = (proxy:string):CompletionTransport => (url,config,body,signal) => {
   const headers={'Content-Type':'application/json',Authorization:`Bearer ${config.apiKey}`,Accept:body.stream?'text/event-stream':'application/json'}
-  return fetch('/api/proxy',{method:'POST',headers,body:JSON.stringify({url,format:config.format,body:browserBody(config,body)}),signal,redirect:'error',credentials:'omit'})
+  return fetch(proxy,{method:'POST',headers,body:JSON.stringify({url,format:config.format,body:browserBody(config,body)}),signal,redirect:'error',credentials:'omit',cache:'no-store'})
 }
 /** Calls a CORS-enabled endpoint from the browser with the header names the sniff already tested. */
 const directTransport:CompletionTransport = (url,config,body,signal) =>
   fetch(url,{...directInit,method:'POST',headers:directHeaders(config.format,config.apiKey,Boolean(body.stream)),body:JSON.stringify(browserBody(config,body)),signal})
-export type Route = 'direct'|'proxy'
-export const transportFor = (route:Route):CompletionTransport => route==='direct'?directTransport:proxyTransport
+/** A proxied route names the relay the user agreed to, so a later settings change cannot redirect a running job. */
+export type Route = {kind:'direct'}|{kind:'proxy';endpoint:string}
+export const transportFor = (route:Route):CompletionTransport => route.kind==='direct'?directTransport:proxyTransport(route.endpoint)
 export const testApi = (config:ApiConfig,challenges:Challenge[],onProgress:(p:CollectionProgress)=>void,route:Route,signal?:AbortSignal) =>
   testApiShared(config,challenges,onProgress,signal,transportFor(route))
 

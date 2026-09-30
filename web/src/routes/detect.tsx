@@ -160,13 +160,17 @@ export default function DetectRoute() {
       return await connection.resolve(requestConfig)
     } catch (error) {
       toast.error(describeError(i18n, error))
+      if ((error as CodedError).code === 'proxy_missing') {
+        setApiConfigOpen(true)
+        requestAnimationFrame(() => apiConfigRef.current?.querySelector<HTMLInputElement>('#proxy-worker-url')?.focus())
+      }
       return null
     }
   }
 
   /** A direct request that failed at the network level re-sniffs the endpoint next time. */
   function recheckAfter(route: client.Route, requestConfig: WebApiConfig, failed: boolean) {
-    if (route === 'direct' && failed) forgetReachability(endpoint(requestConfig), requestConfig.format)
+    if (route.kind === 'direct' && failed) forgetReachability(endpoint(requestConfig), requestConfig.format)
   }
 
   async function startTokenizer() {

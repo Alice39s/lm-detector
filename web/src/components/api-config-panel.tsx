@@ -25,7 +25,8 @@ import { Segmented } from '@/components/segmented'
 import { useI18n } from '@/i18n'
 import type { ApiProfile, ApiProfileManager, WebApiConfig } from '@/lib/config'
 import { readProfileFile, saveProfileFile } from '@/lib/profile-file'
-import { hasProxyConsent, isConsentRemembered, knownReachability, revokeProxyConsent, routeVersion, subscribeRoute, upstreamOrigin } from '@/lib/route'
+import { hasProxyConsent, isConsentRemembered, knownReachability, proxyEndpoint, proxyName, revokeProxyConsent, routeVersion, subscribeRoute, upstreamOrigin } from '@/lib/route'
+import { ProxySettings } from '@/components/proxy-settings'
 import { cn } from '@/lib/utils'
 import { useMotionPreset } from '@/lib/motion'
 
@@ -57,13 +58,15 @@ function ConnectionStatus({ config }: { config: WebApiConfig }) {
   // An address that is still being typed has no route yet.
   try { url = endpoint(config) } catch { return null }
   const origin = upstreamOrigin(url), reachability = knownReachability(url, config.format)
+  const relay = proxyEndpoint()
   const text = reachability === 'direct' ? t('proxy.statusDirect')
-    : reachability ? (hasProxyConsent(origin) ? t('proxy.statusProxy') : t(reachability === 'unreachable' ? 'proxy.statusUnreachable' : 'proxy.statusNeedsConsent'))
-    : t('proxy.statusUnknown')
+    : !reachability ? t('proxy.statusUnknown')
+    : !relay ? t('proxy.statusNoWorker')
+    : t(hasProxyConsent(relay, origin) ? 'proxy.statusProxy' : reachability === 'unreachable' ? 'proxy.statusUnreachable' : 'proxy.statusNeedsConsent', { proxy: proxyName(t, relay) })
   return (
     <FieldDescription id="api-route-status" className="flex flex-wrap items-center gap-x-2">
       <span>{text}</span>
-      {isConsentRemembered(origin) && <Button type="button" variant="link" size="sm" className="h-auto p-0" onClick={() => revokeProxyConsent(origin)}>{t('proxy.revoke')}</Button>}
+      {relay && isConsentRemembered(relay, origin) && <Button type="button" variant="link" size="sm" className="h-auto p-0" onClick={() => revokeProxyConsent(relay, origin)}>{t('proxy.revoke')}</Button>}
     </FieldDescription>
   )
 }
@@ -392,6 +395,10 @@ export function ApiConfigPanel({ open, onOpenChange, config, update, profileMana
               <SwitchRow id="api-relaxed" label={t('api.relaxed')} help={t('api.relaxedHelp')} checked={config.relaxed} onChange={relaxed => update({ relaxed })} disabled={disabled} />
               <SwitchRow id="api-auto" label={t('api.autoVerify')} checked={config.autoVerify} onChange={autoVerify => update({ autoVerify })} disabled={disabled} />
             </>}
+          </FieldGroup>
+          <Separator />
+          <FieldGroup className="grid gap-4 md:grid-cols-2">
+            <ProxySettings disabled={disabled} />
           </FieldGroup>
         </FieldSet>
       </CollapsibleContent>

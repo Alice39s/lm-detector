@@ -1,4 +1,5 @@
 import type { ApiConfig } from '@fingerpoint/shared/types'
+import type { I18n } from '@/i18n'
 
 /**
  * How the browser reaches an API endpoint:
@@ -14,6 +15,8 @@ const SNIFF_TIMEOUT_MS = 8000
 const SNIFF_TTL_MS = 10 * 60_000
 const SNIFF_KEY = 'fingerpoint-cors-v1'
 const CONSENT_KEY = 'fingerpoint-proxy-consent-v1'
+const PROXY_KEY = 'fingerpoint-proxy-v1'
+const PROXY_SERVICE = 'fingerpoint-api-proxy'
 /** A dummy credential with the real header names: preflights carry names only, and a 401 without a model run is the expected answer. */
 const PROBE_KEY = 'sk-cors-probe'
 
@@ -93,35 +96,112 @@ export async function sniffReachability(url: string, format: Format): Promise<Re
 
 export const upstreamOrigin = (url: string) => new URL(url).origin
 
-/** Proxy consent per upstream origin: "once" lasts for this page session, "always" is kept in localStorage. */
+/** This site's own relay. Static hosts such as GitHub Pages do not have it; a self-deployed Worker replaces it. */
+export const SITE_PROXY = '/api/proxy'
+
+/**
+ * Normalizes a proxy address typed by the user: HTTPS, or plain HTTP on this machine for `wrangler dev`, without
+ * credentials, query or fragment. Returns null for anything else.
+ */
+export function parseProxyEndpoint(value: string): string | null {
+  let url: URL
+  try { url = new URL(value.trim()) } catch { return null }
+  const local = url.hostname === 'localhost' || url.hostname === '127.0.0.1' || url.hostname === '[::1]'
+  if (!(url.protocol === 'https:' || (url.protocol === 'http:' && local))) return null
+  if (url.username || url.password || url.search || url.hash) return null
+  return url.href
+}
+
+/**
+ * The relay choice. Worker mode keeps its own address, which is null while the typed address is empty or invalid:
+ * requests then need no proxy or wait for a valid address, and never fall back to another relay.
+ */
+export interface ProxySetting { mode: 'site' | 'worker'; endpoint: string | null }
+let setting: ProxySetting | undefined
+
+function loadSetting(): ProxySetting {
+  const stored = readJson<Partial<ProxySetting>>(localStorage, PROXY_KEY)
+  const endpoint = typeof stored?.endpoint === 'string' ? parseProxyEndpoint(stored.endpoint) : null
+  return { mode: stored?.mode === 'worker' ? 'worker' : 'site', endpoint }
+}
+export const proxySetting = () => setting ??= loadSetting()
+export function setProxySetting(next: ProxySetting) {
+  setting = next
+  writeJson(localStorage, PROXY_KEY, next)
+  notify()
+}
+/** The relay for requests the browser cannot send directly; null in Worker mode without a valid address. */
+export function proxyEndpoint(): string | null {
+  const { mode, endpoint } = proxySetting()
+  return mode === 'site' ? SITE_PROXY : endpoint
+}
+/** The host of a custom proxy; null for the site proxy. */
+export const proxyHost = (endpoint: string) => endpoint === SITE_PROXY ? null : new URL(endpoint).host
+/** Names the relay inside a sentence: this site's proxy, or the host of the user's Worker. */
+export function proxyName(t: I18n['t'], endpoint: string) {
+  const host = proxyHost(endpoint)
+  return host ? t('proxy.customName', { host }) : t('proxy.siteName')
+}
+
+export type ProxyHealth = 'ok' | 'forbidden' | 'invalid' | 'unreachable'
+
+/**
+ * Checks a relay with the GET health answer of `worker/main.js`. A response the browser may not read comes from a
+ * Worker whose ALLOWED_ORIGINS leaves out this site, or from a host that is no proxy at all; the no-cors GET tells
+ * both apart from an unreachable host.
+ */
+export async function checkProxy(endpoint: string): Promise<ProxyHealth> {
+  const init: RequestInit = { method: 'GET', credentials: 'omit', cache: 'no-store', redirect: 'error', signal: AbortSignal.timeout(SNIFF_TIMEOUT_MS) }
+  let response: Response
+  try { response = await fetch(endpoint, init) } catch {
+    try {
+      const opaque = await fetch(endpoint, { ...init, mode: 'no-cors', redirect: 'follow', signal: AbortSignal.timeout(SNIFF_TIMEOUT_MS) })
+      return opaque.type === 'opaque' ? 'forbidden' : 'unreachable'
+    } catch { return 'unreachable' }
+  }
+  const body: unknown = await response.json().catch(() => null)
+  const service = typeof body === 'object' && body !== null && 'service' in body ? body.service : null
+  return response.ok && service === PROXY_SERVICE ? 'ok' : 'invalid'
+}
+
+/**
+ * Proxy consent per relay and upstream origin, since each relay is a different party that sees the key:
+ * "once" lasts for this page session, "always" is kept in localStorage.
+ */
 const sessionConsent = new Set<string>()
 type ConsentRecord = Record<string, { at: number }>
+const consentKey = (proxy: string, origin: string) => `${proxy} ${origin}`
 
-export function hasProxyConsent(origin: string) {
-  return sessionConsent.has(origin) || Boolean(readJson<ConsentRecord>(localStorage, CONSENT_KEY)?.[origin])
+export function hasProxyConsent(proxy: string, origin: string) {
+  return sessionConsent.has(consentKey(proxy, origin)) || isConsentRemembered(proxy, origin)
 }
-export function isConsentRemembered(origin: string) {
-  return Boolean(readJson<ConsentRecord>(localStorage, CONSENT_KEY)?.[origin])
+export function isConsentRemembered(proxy: string, origin: string) {
+  return Boolean(readJson<ConsentRecord>(localStorage, CONSENT_KEY)?.[consentKey(proxy, origin)])
 }
-export function grantProxyConsent(origin: string, remember: boolean) {
-  sessionConsent.add(origin)
-  if (remember) writeJson(localStorage, CONSENT_KEY, { ...readJson<ConsentRecord>(localStorage, CONSENT_KEY), [origin]: { at: Date.now() } })
+export function grantProxyConsent(proxy: string, origin: string, remember: boolean) {
+  const key = consentKey(proxy, origin)
+  sessionConsent.add(key)
+  if (remember) writeJson(localStorage, CONSENT_KEY, { ...readJson<ConsentRecord>(localStorage, CONSENT_KEY), [key]: { at: Date.now() } })
   notify()
 }
-export function revokeProxyConsent(origin: string) {
-  sessionConsent.delete(origin)
+export function revokeProxyConsent(proxy: string, origin: string) {
+  const key = consentKey(proxy, origin)
+  sessionConsent.delete(key)
   const stored = readJson<ConsentRecord>(localStorage, CONSENT_KEY)
-  if (stored?.[origin]) { delete stored[origin]; writeJson(localStorage, CONSENT_KEY, stored) }
+  if (stored?.[key]) { delete stored[key]; writeJson(localStorage, CONSENT_KEY, stored) }
   notify()
 }
 
-/** Subscribers re-render when a verdict or a consent changes, including consent changes from other tabs. */
+/** Subscribers re-render when a verdict, a consent or the relay changes, including changes from other tabs. */
 const listeners = new Set<() => void>()
 let version = 0
 function notify() { version++; listeners.forEach(listener => listener()) }
 export function subscribeRoute(listener: () => void) {
   listeners.add(listener)
-  const onStorage = (event: StorageEvent) => { if (event.key === CONSENT_KEY) notify() }
+  const onStorage = (event: StorageEvent) => {
+    if (event.key === PROXY_KEY) setting = undefined
+    if (event.key === CONSENT_KEY || event.key === PROXY_KEY) notify()
+  }
   window.addEventListener('storage', onStorage)
   return () => { listeners.delete(listener); window.removeEventListener('storage', onStorage) }
 }
