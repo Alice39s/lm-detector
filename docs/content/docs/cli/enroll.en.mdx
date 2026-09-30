@@ -1,0 +1,49 @@
+---
+title: Enrollment and retraining
+description: Validate a sampling batch, deduplicate it, and write it to the reference bank, then retrain the verifier and confidence calibration offline.
+---
+
+## Enrollment
+
+```sh
+fpd enroll ./my-run --dry-run
+fpd enroll ./my-run
+```
+
+In interactive mode, the CLI searches upward from the current directory for this repository. It also recognizes the repository in `projects/` under an enclosing directory. Detection relies on the package name, workspaces, and official data files. It does not depend on Git and never uses the installation directory. The preview shows the full destination path and the counts of new and deduplicated records. Confirmation defaults to no.
+
+Outside the repository or in noninteractive mode, specify the destination explicitly:
+
+```sh
+mkdir -p ./reference-data
+fpd enroll ./my-run --data-dir ./reference-data --dry-run --json
+fpd enroll ./my-run --data-dir ./reference-data --json
+```
+
+The destination must be an existing directory; an empty one can start a separate reference bank. An invalid explicit path fails immediately, without falling back to the detected repository. `--yes` skips the interactive confirmation only when `--data-dir` is given, and cannot be combined with `--dry-run`. You can also add `--enroll` when sampling to go straight to enrollment after a complete sampling run.
+
+Enrollment parses the raw responses again and validates the requests, text, response models, batch hash, and official bank hash. It then deduplicates, rebuilds, and writes. Duplicate records with the same model, channel, condition, challenge, and text are not counted again. Evidence from one channel never absorbs evidence from another. Writes use a lock and a recoverable transaction. Receipts and backups are stored in `.enrollments/` in the destination directory.
+
+If an unfinished transaction exists, the preview checks the hashes of the staged and official files and computes the counts from the recovered state, but writes no files. The recovery completes only after you confirm enrollment. If changes outside the transaction are found, enrollment refuses to overwrite them.
+
+The reference bank installed with the CLI is always read-only. Enrollment rebuilds the destination reference bank but does not automatically retrain the verifier or the confidence calibration layer. When the bank and these layers do not match, detection falls back to the basic ranking and confidence is empty.
+
+## Retraining [#retrain]
+
+```sh
+fpd retrain --data-dir ./reference-data
+```
+
+After you update the official data inside the repository, you can also run `bun run retrain --data-dir ./data` from the root directory. Retraining requires `uv` and Python. The CLI uses Bun to manage the directory lock, options, and processes; the bundled `offline/` modules perform the numerical fitting. The command does not call a model API and does not read the fixed evaluation set.
+
+Retraining first checks the hashes of the reference bank and the fingerprint bank, then refits the ranker, the verifier, and the confidence temperature over the fixed reference environments. The plan, metrics, and frozen source code of each training run are saved in `.training/` in the destination directory. If parameters already exist, the same run directory also stores `before-shared-detector.json`. Calibration must pass the [nested holdout check](../principles/ranking.mdx#calibration) before `shared_detector.json` is replaced atomically. On failure, the previous parameters stay in place, and detection keeps using the basic ranking. `--data-dir` must point to an existing directory. The bank bundled with the published package stays read-only.
+
+<Callout type="warn" title="Evaluation data must stay out of the reference bank">
+  The fixed evaluation set must not be used to build the bank, train, or calibrate, and must not be added to the reference bank or the model centroids. In the full research repository, run `bun run rebuild-bank` first, then run `bun run evaluate:holdout`, and check the coverage, identification results, and before-and-after changes in `reports/holdout/latest.md`. `rebuild-bank` must run before retraining, and the reference bank must not change after retraining.
+</Callout>
+
+## Publishing
+
+From the root directory, run `bun run build` to build the website data and `bun run build:cli` to package the standalone CLI. Neither command publishes anything by itself. See [Packaging and publishing](../development/release.mdx) for automatic publication.
+
+Enrollment exit codes: `0` when enrollment completes or validation passes, `1` for an option, file, or runtime error, and `2` when an interactive step is canceled.

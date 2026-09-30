@@ -1,0 +1,56 @@
+---
+title: 自建 Worker 代理
+description: 把单文件 worker/main.js 一键部署到自己的 Cloudflare 账号，替代本站代理，或为 GitHub Pages 等静态站点提供转发。
+icon: Server
+---
+
+`worker/main.js` 是一个完整的 Cloudflare Worker：没有依赖，也没有构建步骤。本站的 Pages Function、Vercel Function 和 Vite 开发服务器导入的是同一个文件，所以每种部署运行的代码都相同。自己部署一份之后，把地址填进网页 API 配置的“转发代理 → 自建 Worker”，需要代理的请求就改走你的 Worker。
+
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/Ikaleio/lm-detector/tree/main/worker)
+
+## 部署
+
+<Tabs items={['Deploy to Cloudflare', 'Workers Playground', 'Wrangler']}>
+  <Tab value="Deploy to Cloudflare">
+    点击上面的按钮。Cloudflare 把 `worker/` 目录复制为你 GitHub 或 GitLab 账号下的新仓库，再用 Workers Builds 构建并部署；之后向该仓库推送会重新部署。设置页可以修改 `ALLOWED_ORIGINS`。
+  </Tab>
+  <Tab value="Workers Playground">
+    在网页的 API 配置中选择“转发代理 → 自建 Worker”，点击“从 GitHub 导入 Playground”。页面从本仓库读取最新的 `worker/main.js`，连同 `worker/wrangler.json` 中的兼容日期和兼容标志一起在 Workers Playground 中打开；登录后用 Playground 的 Deploy 按钮在你的账号中创建 Worker。这种方式不创建仓库，Worker 保留部署时的代码，也不需要 GitHub 账号。
+  </Tab>
+  <Tab value="Wrangler">
+    在仓库根目录运行 `bun run deploy:worker`。本地调试用 `bun run dev:worker`，Worker 运行在 `http://127.0.0.1:8787`。
+  </Tab>
+</Tabs>
+
+部署后，把 Worker 地址（例如 `https://fingerpoint-api-proxy.<subdomain>.workers.dev`）填入“自建 Worker”，再点“检查代理”。网页在第一次经过这个 Worker 发送请求前会询问你，并在对话框中写明 Worker 的主机名。
+
+## 配置
+
+`ALLOWED_ORIGINS` 列出可以从浏览器调用 Worker 的页面 origin，用逗号分隔；`*` 表示允许任何页面。默认值是 `https://lm.ikale.io`，变量缺失时（例如 Playground 部署后）也使用这个值。自己部署网页时，把网页的 origin 加进去。
+
+<Tabs items={['Deploy to Cloudflare', 'Workers Playground']}>
+  <Tab value="Deploy to Cloudflare">
+    修改新仓库中 `wrangler.json` 的 `vars`：每次部署都会应用这个文件，并覆盖在控制台中修改的值。
+  </Tab>
+  <Tab value="Workers Playground">
+    在 Cloudflare 控制台的 Settings → Variables and Secrets 中设置变量。
+  </Tab>
+</Tabs>
+
+`wrangler.json` 关闭了 Workers Logs，Worker 的调用不会存入 Workers Logs。
+
+## 请求
+
+| 方法 | 响应 |
+| --- | --- |
+| `OPTIONS` | CORS 预检：允许的 origin 返回 204，其余返回 403 |
+| `GET` | 健康检查 `{"service":"fingerpoint-api-proxy","formats":["openai","responses","anthropic"]}` |
+| `POST` | 转发的 API 请求 |
+
+`POST` 携带 `Authorization: Bearer <上游密钥>` 和 JSON 请求体 `{ "url", "format", "body" }`。`url` 是完整端点，`format` 为 `openai`、`responses` 或 `anthropic` 时，端点分别以 `/chat/completions`、`/responses` 或 `/messages` 结尾。`anthropic` 格式下，Worker 把密钥作为 `x-api-key` 发送，并附带 `anthropic-version: 2023-06-01`。JSON 和 SSE 响应原样流式返回。完整的请求与响应结构见 [API 参考](../reference/proxy-api/index.mdx)。
+
+Worker 只接受 HTTPS 的 443 端口和公网主机名：不接受 IP 地址、`localhost`、`.local` 或 `.internal` 名称，URL 中也不能带凭据、查询参数或片段。它拒绝超过 128 KiB 的请求体，不跟随重定向，不转发 Cookie，不保存密钥。上游请求 250 秒后超时，浏览器取消请求时上游请求也随之取消。
+
+<Callout type="warn" title="ALLOWED_ORIGINS 不是鉴权">
+  `ALLOWED_ORIGINS` 只限制哪些网页可以从浏览器使用 Worker。不带 `Origin` 头的客户端（例如 curl）只要知道 Worker 地址，就能用自己的密钥经它转发请求，这些请求计入 Worker 的额度。
+</Callout>

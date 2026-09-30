@@ -1,0 +1,66 @@
+---
+title: Tokenizer probe
+description: Read the input token count from usage on the website, identify which tokenizer the upstream uses, and check whether it matches the model you entered.
+icon: Binary
+---
+
+The "Tokenizer" mode and the "API" mode share the same API configuration. Instead of asking the model to write integers, it sends a set of short texts, reads the input token count from the usage of each response, and compares the counts with [62 classes merged from 290 open tokenizers](../principles/tokenizer.mdx#classes). The algorithm is the same as `fpd tokenizer` in the CLI. See [How the tokenizer probe works](../principles/tokenizer.mdx).
+
+## Run a probe
+
+### Enter the mode [step]
+
+On the detection page, select "Tokenizer", or open `https://lm.ikale.io/#/?mode=tokenizer`. Opening the page, switching modes, or changing the configuration sends no requests.
+
+### Start probing [step]
+
+Click "Start probing". A probe run usually sends 8–20 short requests. It first measures a baseline that holds only the fixed wrapper. Then it picks the probes that best separate the current candidates, until one tokenizer class or "unlisted" reaches 99% posterior probability. Finally, it measures the baseline once more. With the Messages protocol, each request asks for at most 16 output tokens. The other protocols set no output limit, like sampling requests.
+
+When "Parallel requests" is on, 4 probes are sent at once. When it is off, probes are sent one at a time, which uses the fewest requests in total. You can stop a probe run, and the completed probes still give a result.
+
+### Read the verdict [step]
+
+There are only three verdicts:
+
+| Verdict | Meaning |
+| --- | --- |
+| Exact match | The counts of all probes agree with one listed tokenizer class |
+| Unlisted · closest | Close to one class, but a sizable share of probes differ. It may be a derivative or an extension of that tokenizer |
+| Unlisted tokenizer | Unrelated to every listed class |
+
+The percentage on the right is the posterior probability. The candidate list shows the "Exact match" probability of the top 6 classes, and its last row is always "Unlisted tokenizer".
+
+## Check against the model you entered
+
+The model name you entered is compared with the [first-party model mapping](../principles/tokenizer.mdx#api-models). The result is one of the following:
+
+- **Consistent**: the measured tokenizer class is the same as the tokenizer registered for that model.
+- **Inconsistent**: for example, the channel claims `gpt-5`, but the probe measures the Qwen tokenizer.
+- **Not yet clear**: the posterior probability has not yet concentrated on one class.
+- **Not registered**: neither the mapping nor the class aliases match the model, so only the tokenizer verdict is shown.
+
+Models such as Claude and Grok are registered with an unpublished tokenizer: an unlisted tokenizer counts as consistent, and any listed class counts as inconsistent.
+
+<Callout type="warn" title="A tokenizer match only shows the same tokenizer">
+  One tokenizer is often reused by several models. For example, Xiaomi MiMo and MiniCPM-V reuse the Qwen2–Qwen3 tokenizer. A relay that estimates usage locally with tiktoken also measures as o200k_base or cl100k_base. When the verdict is one of these two classes and is not confirmed as consistent with the model you entered, the page warns about this possibility separately. When the two baseline counts differ, the page warns that the upstream adds hidden content that varies, so this result is unreliable.
+</Callout>
+
+## Raw evidence
+
+The right column of the result area is the request log. Each row shows the probe category, the probe text, the input token count, and the delta from the baseline. For a failed request, you can open the error details. The bottom of the result has three collapsible sections:
+
+- The open tokenizers in this class.
+- The count table of the probes: observed delta, expected delta, and whether they match.
+- Understanding tokenizer results.
+
+The count table is raw evidence, not an explanation of the score.
+
+## Export and offline recomputation
+
+At the result stage, the More actions menu can export JSON. The file uses the same format as `fpd tokenizer --output` in the CLI (`fpd-tokenizer-v1`) and does not contain the API key. With the `--input` option of the CLI, you can recompute it offline against the current tokenizer bank:
+
+```sh
+npx lmfpd@latest tokenizer --input fingerpoint-tokenizer.json
+```
+
+See [CLI tokenizer probe](../cli/tokenizer.mdx).

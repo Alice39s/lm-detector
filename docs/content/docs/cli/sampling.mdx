@@ -1,0 +1,128 @@
+---
+title: 采样与续采
+description: 用 36 道固定挑战为新模型或新渠道采集参考批次，中断后续采，并逐题微调或采用截断回答。
+---
+
+参考数据的维护分三步：`fpd sample` 采样，[`fpd enroll`](./enroll.mdx) 入库，[`fpd retrain`](./enroll.mdx#retrain) 离线重训。三者都可以在仓库外运行；在仓库内也可以用 `bun run sample`、`bun run enroll` 和 `bun run retrain`。网页只检测和只读查看参考库。
+
+## 开始采样
+
+交互终端运行 `fpd sample` 会打开设置向导：询问缺少的参数，发送请求前展示确认页，并实时显示进度。API Key 隐藏输入，不写入文件。已有参数或环境变量不会重复询问。
+
+也可以显式指定全部参数，这时不需要终端；`--json` 只向 stdout 输出最终报告：
+
+```sh
+export API_KEY='你的密钥'
+fpd sample \
+  --baseurl https://openrouter.ai/api/v1 \
+  --api chatcompletion \
+  --model provider/api-model \
+  --label my-model \
+  --family my-family \
+  --family-name 'My Family' \
+  --channel openrouter/provider-route \
+  --response-model provider/returned-model \
+  --effort default \
+  --output-dir ./my-run
+```
+
+模型 ID、允许的返回模型 ID 和渠道需要替换为实际值。`--response-model` 可以重复指定多个别名。连接信息也可以来自 `API_KEY`、`MODEL`、`BASE_URL`。
+
+| 常用参数 | 说明 |
+| --- | --- |
+| `--count N` | 固定挑战数量，1–36，默认 36 |
+| `-p, --parallel N` | 并发请求数，1–36，默认 3 |
+| `--max-attempts N` | 每道挑战的累计尝试上限，1–20，默认 3 |
+| `--response-model ID` | 允许的响应模型名；重复传入可接受别名 |
+| `--subscription` | 订阅渠道，名称必须以 `-subscription` 结尾 |
+| `--enroll --data-dir DIR` | 采样结束后立即入库 |
+| `--json` | 非交互模式，向 stdout 输出最终 JSON |
+
+采样使用 36 道固定挑战，而不是检测命令每轮一到三道的随机挑战；`--count` 选择较小的固定计划。正式入库要求计划全部成功，不按检测分数挑选回答。采样不使用检测命令的宽松截断规则；回答一旦达到 500 个整数就停止读取并截断，防止模型无限循环输出，这类回答按截断记录并正常采用。上限写在批次清单中，旧批次续采和校验时不截断。
+
+仓库内默认保存到 `runs/<批次>/`；其他目录默认保存到 `./fpd-runs/<批次>/`。`--output-dir` 始终优先，新批次不会覆盖已有目录。
+
+## 渠道
+
+渠道表示具体采集路径，不是模型家族或计费信息：
+
+- `codex-subscription`：读取本机 Codex 登录，固定 Responses 流式端点；不需要提供 API Key 或地址。
+- `kimi-code-subscription`：Kimi Code 渠道，显式提供其接口配置和密钥。
+- `openrouter/anthropic`、`openrouter/xiaomi/fp8`：OpenRouter 固定供应商；实际请求使用 `provider.only` 并关闭回退。
+- `openrouter`：允许自动路由，实际供应商记录在每条样本中。
+- 其他网关使用明确的自定义渠道 ID，并保留实际 endpoint。
+
+订阅渠道必须以 `-subscription` 结尾。已知订阅产品会强制校验，其他订阅路径可以用 `--subscription` 要求该后缀；这个标记不产生 billing 字段。
+
+返回模型必须在声明的别名列表中。固定 OpenRouter 渠道会核对返回的供应商名称（忽略大小写和标点），不匹配时保留失败记录并停止本轮。供应商原始返回值与请求渠道分开记录；未返回供应商信息时实际渠道为 `null`，不把请求值当成返回事实。这些记录不构成上游身份的独立认证。
+
+## 续采与取消
+
+```sh
+fpd sample --resume ./my-run --max-attempts 5
+```
+
+成功或已手工选中的题直接跳过。旧失败、中断和请求都保留，累计上限包含旧尝试。遇到传输失败或有效数字不足等可重试错误时，间隔一秒重试；明确的 HTTP 配置或认证错误以及返回模型不匹配会停止本轮。
+
+`q`、Ctrl+C 或 SIGTERM 会取消活动请求并保存进度。异常退出留下的完整响应会优先离线恢复。续采以题目为单位，不接续上游 token 流。已完成的批次可以不加载密钥直接核对。
+
+模型、渠道和批次默认调用设置不可在原批次中修改；需要改动整批时创建新批次。只有尚未选中回答的单题，可以带说明覆写其提示词或推理强度，此前的全部尝试都保留。
+
+## 逐题微调与截断采用
+
+对尚无选中回答的题，可以调整提示词再尝试：
+
+```sh
+fpd sample --resume ./my-run --max-attempts 5 \
+  --challenge query-07 --prompt-file ./prompt.txt \
+  --note '原提示触发误拒绝，改写前缀'
+```
+
+`--system-file` 可以同时替换系统提示词。新尝试保存实际提示词和独立的条件标识，旧尝试不覆盖。没有提示词版本链或额外的处理对象，说明写入 `note`。
+
+若固定提示词不变、只需降低单题推理强度，可以指定 `--effort`：
+
+```sh
+fpd sample --resume ./my-run --challenge query-07 --effort low \
+  --max-attempts 15 --note '此前尝试均在输出上限前未给出有效回答'
+```
+
+`--effort` 只作用于指定题目的新尝试，其他题与批次默认设置不变。实际请求体和覆写强度保存在该题的 `attempts/`、`trace/`；入库样本记录 `reasoning_effort`、生效尝试编号、独立条件标识、说明及证据路径。同一固定环境下的单题覆写仍归属原环境，离线校准留出该环境时一并排除。
+
+循环、截断等回答可以在审查原始证据后明确采用：
+
+```sh
+fpd sample --resume ./my-run --adopt query-07:3 --take 300 \
+  --note '循环后保留前 300 个有效整数'
+```
+
+此命令不请求 API。`--take` 取已记录回答中的前 N 个有效整数；省略时采用该次回答原文。仍须满足有效数字阈值和返回模型限制。原始尝试和 trace 不修改，样本记录最终采用的文本和说明。截断响应仍标记为 `truncated`；自然完成后裁剪的文本不会伪装成网络截断。已经采用回答的题要重采时，需要新建批次。
+
+## 批次与样本格式 [#batch-format]
+
+一个批次目录的结构：
+
+```files
+my-run
+├── manifest.json
+├── attempts
+├── trace
+├── selections
+├── attempts.jsonl
+└── result.json
+```
+
+`manifest.json` 冻结公共设置和采样计划；`attempts/` 保存逐次结果；`trace/` 保存实际请求和原始响应；`selections/` 保存显式的手工选择。`attempts.jsonl` 与 `result.json` 是可以重新生成的汇总。
+
+`result.json` 是一个批次；正式的 `unified_reference.jsonl` 每行一个同结构的批次：
+
+- 批次：`schema_version`、`id`、`purpose`、`created_at`、`model`、`source`、`request`、`plan`。
+- 每条 `samples`：样本与题目 ID、`condition`、实际提示词、`expected_count`、`attempt`、时间、实际渠道与返回型号、`text`、`completion`、`usage`、`note`、`evidence_path`；逐题覆写时另有可选的 `reasoning_effort`。
+- 不保存重复的模型标签、`strict_valid`、派生数字统计或独立的 `nuisance_group`。当前算法使用 `condition` 作为干扰分组。
+- 历史未知信息保留为 `null`，完整性无法确认时标记 `unknown`。
+
+新 CLI 不接受旧的 collection manifest 或旧参考行格式。格式迁移前的正式行原样保存在 `data/archive/schema-cutover/`，历史采样证据不改写。
+
+`fpd --input ./my-run/result.json` 可以离线检测，按条件组成最多三条回答一轮；严格模式拒绝截断或完整性未知的样本。
+
+采样的退出码：`0` 完成，`1` 参数、文件或运行错误，`2` 采样未完整或被取消。`--json` 让 stdout 保持机器可读，进度写入 stderr。

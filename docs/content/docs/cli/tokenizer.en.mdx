@@ -1,0 +1,58 @@
+---
+title: Tokenizer probe
+description: fpd tokenizer identifies the upstream tokenizer from the input token count in usage and checks whether it matches the model you entered.
+---
+
+```sh
+# Usually 8–20 short requests; each Messages request asks for at most 16 output tokens
+npx lmfpd@latest tokenizer -b https://api.example.com/v1 -k sk-xxx -m deepseek-chat -a cc
+
+# Send probes one at a time (fewest requests) and save the result for later offline recomputation
+npx lmfpd@latest tokenizer -a cc -p 1 --output tokenizer.json
+npx lmfpd@latest tokenizer --input tokenizer.json --json
+```
+
+`fpd tokenizer` first sends a baseline with only the fixed wrapper. It then chooses probes one batch at a time, picking the probes that best separate the remaining tokenizer classes, and reads the input token count from each response's usage. It stops once one class, or "unlisted", reaches 99% posterior probability, then measures the baseline once more to check that the hidden overhead is stable. Unlike the website, the CLI also accepts `http://` endpoints, such as a local server. See [How the tokenizer probe works](../principles/tokenizer.mdx) for the algorithm.
+
+## Options
+
+| Option | Description | Default |
+| --- | --- | --- |
+| `-b`, `-k`, `-m`, `-a`, `-e`, `-ns` | Same as the [detection command](./detect.mdx#options); `-e` applies to Chat Completions and Responses only, and Messages requests send no reasoning effort | Same as detection |
+| `-p, --parallel N` | Requests in flight, 1–8. `-p 1` uses the fewest requests | `4` |
+| `--max-probes N` | Probe budget (two baselines are sent in addition), 4–60 | `20` |
+| `--timeout SECONDS` | Deadline of each request | `90` |
+| `--bank FILE` | Use a custom tokenizer bank | Built-in tokenizer bank |
+| `--input FILE` | Recompute a saved result against the current tokenizer bank without sending requests | — |
+| `--output FILE`, `--json` | Save or print JSON without credentials | — |
+
+The model name from `-m` is also used to check the claimed tokenizer. For example, a channel that claims `gpt-5` but shows the Qwen tokenizer is marked "inconsistent". The result lists the tokenizer class, its authoring lab, the open tokenizers in the class, and whether it matches the tokenizer registered for `--model`.
+
+## Report format
+
+`--output` uses the same format as the website export:
+
+| Field | Content |
+| --- | --- |
+| `schema` | Always `fpd-tokenizer-v1` |
+| `request` | Endpoint, model, reasoning effort, protocol, whether streaming is on, and concurrency. The API key is excluded |
+| `bank` | Generation date, class count, probe count, and archive manifest hash of the tokenizer bank used |
+| `steps`, `observations` | Probe, status, and input token count of each request |
+| `verdict` | The verdict `kind` (`exact`, `related`, or `unknown`), the closest class `top`, its probability `confidence`, and `claim`, the check against the entered model |
+| `classes`, `labs`, `unknown` | Posterior probabilities of the top 10 classes and the top 5 labs, and the probability of "unlisted" |
+| `baseline_drift` | Whether the two baselines differ |
+| `cancelled`, `error` | Whether the run was canceled, and the error code and HTTP status of a failed request |
+
+Keys that appear in error messages, response model names, or endpoint addresses are replaced with `[REDACTED]`.
+
+## Exit codes
+
+| Exit code | Meaning |
+| --- | --- |
+| `0` | A result was produced |
+| `1` | Invalid input, a failed request, or no result |
+| `130` | Canceled |
+
+<Callout type="warn" title="This measures the tokenizer, not the model weights">
+  Relays that estimate usage locally with tiktoken report o200k_base or cl100k_base counts. When the verdict is one of these two classes and it does not match the entered model, the counting method is a more likely cause than a model substitution.
+</Callout>

@@ -1,0 +1,128 @@
+---
+title: Sampling and resuming
+description: Collect a reference batch for a new model or channel with the 36 fixed challenges, resume after an interruption, and adjust single challenges or adopt truncated answers.
+---
+
+Maintaining reference data takes three steps: `fpd sample` collects samples, [`fpd enroll`](./enroll.mdx) enrolls them, and [`fpd retrain`](./enroll.mdx#retrain) retrains offline. All three can run outside the repository. Inside the repository, you can also use `bun run sample`, `bun run enroll`, and `bun run retrain`. The website only detects and shows the reference bank read-only.
+
+## Start sampling
+
+In an interactive terminal, `fpd sample` opens a setup wizard. It asks for missing settings, shows a confirmation page before sending requests, and displays live progress. The API key is masked during input and is not written to files. The wizard does not ask again for settings that flags or environment variables already supply.
+
+You can also specify every option explicitly. No terminal is needed then. `--json` writes only the final report to stdout:
+
+```sh
+export API_KEY='your-api-key'
+fpd sample \
+  --baseurl https://openrouter.ai/api/v1 \
+  --api chatcompletion \
+  --model provider/api-model \
+  --label my-model \
+  --family my-family \
+  --family-name 'My Family' \
+  --channel openrouter/provider-route \
+  --response-model provider/returned-model \
+  --effort default \
+  --output-dir ./my-run
+```
+
+Replace the model ID, the allowed response model ID, and the channel with real values. Repeat `--response-model` to specify several aliases. Connection settings can also come from `API_KEY`, `MODEL`, and `BASE_URL`.
+
+| Common option | Description |
+| --- | --- |
+| `--count N` | Number of fixed challenges, 1–36, default 36 |
+| `-p, --parallel N` | Concurrent requests, 1–36, default 3 |
+| `--max-attempts N` | Cumulative attempts per challenge, 1–20, default 3 |
+| `--response-model ID` | Allowed response model. Repeat the option to accept aliases |
+| `--subscription` | Subscription channel. The name must end in `-subscription` |
+| `--enroll --data-dir DIR` | Enroll immediately after sampling |
+| `--json` | Noninteractive mode. Writes the final JSON to stdout |
+
+Sampling uses the 36 fixed challenges, not the one to three random challenges per round of the detection command. `--count` chooses a smaller fixed plan. Official enrollment requires the whole plan to succeed, and answers are never selected by detection score. Sampling does not use the relaxed truncation rule of the detection command. It stops reading an answer once it reaches 500 integers and truncates it there, so a looping model cannot run forever. Such answers are recorded as truncated and accepted as usual. The limit is stored in the batch manifest, so older batches are not truncated when resumed or verified.
+
+Inside the repository, output defaults to `runs/<batch>/`; elsewhere it defaults to `./fpd-runs/<batch>/`. `--output-dir` always takes precedence, and a new batch never overwrites an existing directory.
+
+## Channels
+
+A channel identifies the concrete collection path. It is not a model family or billing information:
+
+- `codex-subscription`: reads the local Codex login and pins the Responses streaming endpoint. No API key or address is needed.
+- `kimi-code-subscription`: the Kimi Code channel. Supply its endpoint configuration and key explicitly.
+- `openrouter/anthropic`, `openrouter/xiaomi/fp8`: fixed OpenRouter providers. Requests use `provider.only` and disable fallback.
+- `openrouter`: allows automatic routing. The actual provider is recorded in each sample.
+- Other gateways use an explicit custom channel ID and keep the actual endpoint.
+
+Subscription channels must end with `-subscription`. Known subscription products enforce this check. For another subscription route, `--subscription` requires the suffix. The flag does not produce a billing field.
+
+The response model must be in the declared alias list. Fixed OpenRouter channels check the reported provider name, ignoring case and punctuation. A mismatch is retained as a failed record and stops the current run. The raw provider value is recorded separately from the requested channel. When no provider information is returned, the actual channel is `null`; the requested value is never treated as a reported fact. These records do not independently authenticate the upstream identity.
+
+## Resuming and canceling
+
+```sh
+fpd sample --resume ./my-run --max-attempts 5
+```
+
+Challenges that succeeded or were selected manually are skipped. Earlier failures, interruptions, and requests are all kept, and the cumulative limit includes earlier attempts. Retryable errors, such as transport failures or too few valid numbers, are retried after one second. Definite HTTP configuration or authentication errors, and response model mismatches, stop the current run.
+
+`q`, Ctrl+C, or SIGTERM cancels active requests and saves progress. Complete responses left by an abnormal exit are recovered offline first. Resuming works per challenge; it does not continue an upstream token stream. A completed batch can be verified without loading a key.
+
+The model, channel, and default request settings of a batch cannot be changed within that batch. To change the whole batch, create a new batch. Only a single challenge without a selected answer can have its prompt or reasoning effort overridden, with a note. All earlier attempts are kept.
+
+## Adjusting single challenges and adopting truncated answers
+
+For a challenge without a selected answer, you can adjust the prompt and try again:
+
+```sh
+fpd sample --resume ./my-run --max-attempts 5 \
+  --challenge query-07 --prompt-file ./prompt.txt \
+  --note 'The original prompt triggered a false refusal; rewrote the prefix'
+```
+
+`--system-file` also replaces the system prompt. New attempts store the actual prompt and a separate condition identifier. Earlier attempts are not overwritten. There is no prompt version chain or extra treatment object; the explanation goes into `note`.
+
+To keep the fixed prompt and only lower the reasoning effort of one challenge, specify `--effort`:
+
+```sh
+fpd sample --resume ./my-run --challenge query-07 --effort low \
+  --max-attempts 15 --note 'No earlier attempt produced a valid answer before the output limit'
+```
+
+`--effort` applies only to new attempts of the specified challenge. Other challenges and the batch defaults stay unchanged. The actual request body and the overridden effort are saved under `attempts/` and `trace/` for that challenge. The enrolled sample records `reasoning_effort`, the effective attempt number, the separate condition identifier, the note, and the evidence path. A single-challenge override within a fixed environment still belongs to that environment. When offline calibration holds out that environment, it excludes the override as well.
+
+Looping, truncated, and similar answers can be adopted explicitly after you review the raw evidence:
+
+```sh
+fpd sample --resume ./my-run --adopt query-07:3 --take 300 \
+  --note 'Output looped; keep the first 300 valid integers'
+```
+
+This command sends no API requests. `--take` takes the first N valid integers from the recorded answer. Without it, the original text of that attempt is adopted. The answer must still meet the valid-number threshold and the response model restriction. The raw attempt and trace stay unchanged; the sample records the adopted text and the note. A truncated response is still marked `truncated`. Text trimmed after natural completion is never presented as a network truncation. To resample a challenge that already has an adopted answer, create a new batch.
+
+## Batch and sample format [#batch-format]
+
+The structure of a batch directory:
+
+```files
+my-run
+├── manifest.json
+├── attempts
+├── trace
+├── selections
+├── attempts.jsonl
+└── result.json
+```
+
+`manifest.json` freezes the shared settings and the sampling plan. `attempts/` stores the result of each attempt. `trace/` stores the actual requests and raw responses. `selections/` stores explicit manual selections. `attempts.jsonl` and `result.json` are summaries that can be regenerated.
+
+`result.json` holds one batch. The official `unified_reference.jsonl` holds one batch with the same structure per line:
+
+- Batch: `schema_version`, `id`, `purpose`, `created_at`, `model`, `source`, `request`, `plan`.
+- Each entry in `samples`: sample and challenge IDs, `condition`, the actual prompt, `expected_count`, `attempt`, time, the actual channel and response model, `text`, `completion`, `usage`, `note`, `evidence_path`. Per-challenge overrides add an optional `reasoning_effort`.
+- Duplicated model labels, `strict_valid`, derived number statistics, and a separate `nuisance_group` are not stored. The current algorithm uses `condition` as the nuisance group.
+- Historical information that is unknown stays `null`. When completion cannot be confirmed, it is marked `unknown`.
+
+The new CLI rejects the old collection manifest and the old reference row format. Official rows from before the format migration are preserved unchanged in `data/archive/schema-cutover/`. Historical sampling evidence is not rewritten.
+
+`fpd --input ./my-run/result.json` runs detection offline and groups answers by condition into rounds of up to three. Strict mode rejects samples that are truncated or have unknown completion.
+
+Sampling exit codes: `0` when complete, `1` for an option, file, or runtime error, and `2` when sampling is incomplete or canceled. `--json` keeps stdout machine-readable, and progress goes to stderr.

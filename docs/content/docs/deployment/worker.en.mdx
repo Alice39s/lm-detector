@@ -1,0 +1,56 @@
+---
+title: Own Worker proxy
+description: Deploy the single-file worker/main.js to your own Cloudflare account in one click, to replace this site's proxy or to relay requests for static sites such as GitHub Pages.
+icon: Server
+---
+
+`worker/main.js` is a complete Cloudflare Worker. It has no dependencies and no build step. This site's Pages Function, the Vercel Function, and the Vite dev server import the same file, so every deployment runs the same code. After you deploy your own copy, enter its address under "Relay proxy → Own Worker" in the API configuration of the website, and requests that need a proxy go through your Worker instead.
+
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/Ikaleio/lm-detector/tree/main/worker)
+
+## Deploy
+
+<Tabs items={['Deploy to Cloudflare', 'Workers Playground', 'Wrangler']}>
+  <Tab value="Deploy to Cloudflare">
+    Click the button above. Cloudflare copies the `worker/` directory into a new repository in your GitHub or GitLab account, then builds and deploys it with Workers Builds. Later pushes to that repository redeploy the Worker. The setup page lets you change `ALLOWED_ORIGINS`.
+  </Tab>
+  <Tab value="Workers Playground">
+    In the API configuration of the website, choose "Relay proxy → Own Worker", then click "Import from GitHub into the Playground". The page reads the latest `worker/main.js` from this repository and opens it in the Workers Playground, together with the compatibility date and compatibility flags from `worker/wrangler.json`. After you sign in, the Deploy button of the Playground creates the Worker in your account. This method creates no repository, the Worker keeps the code it was deployed with, and no GitHub account is needed.
+  </Tab>
+  <Tab value="Wrangler">
+    From the repository root, run `bun run deploy:worker`. For local testing, use `bun run dev:worker`. The Worker then runs at `http://127.0.0.1:8787`.
+  </Tab>
+</Tabs>
+
+After deploying, enter the Worker address (for example, `https://fingerpoint-api-proxy.<subdomain>.workers.dev`) under "Own Worker", then click "Check proxy". Before the website sends the first request through this Worker, it asks you and names the host name of the Worker in the dialog.
+
+## Configuration
+
+`ALLOWED_ORIGINS` lists the origins of the pages that may call the Worker from a browser, separated by commas. `*` allows any page. The default is `https://lm.ikale.io`, which also applies when the variable is missing (for example, after a Playground deploy). If you deploy the website yourself, add its origin.
+
+<Tabs items={['Deploy to Cloudflare', 'Workers Playground']}>
+  <Tab value="Deploy to Cloudflare">
+    Edit `vars` in `wrangler.json` of the new repository. Every deploy applies this file and overwrites values changed in the dashboard.
+  </Tab>
+  <Tab value="Workers Playground">
+    Set the variable in the Cloudflare dashboard under Settings → Variables and Secrets.
+  </Tab>
+</Tabs>
+
+`wrangler.json` turns Workers Logs off, so invocations of the Worker are not stored in Workers Logs.
+
+## Requests
+
+| Method | Response |
+| --- | --- |
+| `OPTIONS` | CORS preflight: 204 for an allowed origin, 403 otherwise |
+| `GET` | Health check `{"service":"fingerpoint-api-proxy","formats":["openai","responses","anthropic"]}` |
+| `POST` | The relayed API request |
+
+A `POST` carries `Authorization: Bearer <upstream key>` and the JSON body `{ "url", "format", "body" }`. `url` is the complete endpoint. When `format` is `openai`, `responses`, or `anthropic`, the endpoint ends in `/chat/completions`, `/responses`, or `/messages`, respectively. For the `anthropic` format, the Worker sends the key as `x-api-key` and adds `anthropic-version: 2023-06-01`. JSON and SSE responses stream back unchanged. For the complete request and response structure, see the [API reference](../reference/proxy-api/index.mdx).
+
+The Worker accepts only HTTPS on port 443 and public host names. It does not accept IP addresses or `localhost`, `.local`, or `.internal` names, and the URL cannot carry credentials, a query, or a fragment. It rejects bodies over 128 KiB, follows no redirects, forwards no cookies, and stores no keys. An upstream request times out after 250 seconds, and when the browser cancels a request, the upstream request is canceled too.
+
+<Callout type="warn" title="ALLOWED_ORIGINS is not authentication">
+  `ALLOWED_ORIGINS` only limits which web pages can use the Worker from a browser. A client without an `Origin` header (such as curl) can relay requests through the Worker with its own key as long as it knows the Worker address. Those requests count toward the quota of the Worker.
+</Callout>

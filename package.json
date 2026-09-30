@@ -7,13 +7,16 @@
   "workspaces": [
     "web",
     "cli",
-    "shared"
+    "shared",
+    "docs"
   ],
   "scripts": {
     "dev": "bun run sync-data && bun run --cwd web dev",
-    "build": "bun run sync-data && bun run typecheck && bun run --cwd web build",
+    "dev:docs": "bun run --cwd docs dev",
+    "build": "bun run sync-data && bun run typecheck && bun run --cwd web build && bun run build:docs",
+    "build:docs": "bun run --cwd docs build && bun docs/scripts/publish.ts",
     "build:cli": "bun cli/build.ts",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && bun run --cwd docs typecheck",
     "preview": "bun run --cwd web preview",
     "build:pages": "bun run build && wrangler pages functions build --outdir .wrangler/pages",
     "build:pages:upload": "bun run build:pages && cp .wrangler/pages/index.js web/dist/_worker.js",

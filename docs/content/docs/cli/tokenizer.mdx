@@ -1,0 +1,58 @@
+---
+title: 词表探测
+description: fpd tokenizer 从 usage 中的输入 token 数识别上游词表，并核对它与所填模型是否一致。
+---
+
+```sh
+# 通常 8–20 个短请求；Messages 协议的每个请求最多输出 16 个 token
+npx lmfpd@latest tokenizer -b https://api.example.com/v1 -k sk-xxx -m deepseek-chat -a cc
+
+# 逐个发送探针（总请求数最少），保存结果供之后离线复算
+npx lmfpd@latest tokenizer -a cc -p 1 --output tokenizer.json
+npx lmfpd@latest tokenizer --input tokenizer.json --json
+```
+
+`fpd tokenizer` 先发送只含固定包裹的基线，再按批次挑选最能区分剩余词表类的探针，从每个响应的 usage 中读取输入 token 数。某一类或“未收录”的后验概率达到 99% 后停止，最后再测一次基线，检查隐藏开销是否稳定。与网页不同，CLI 也接受 `http://` 端点，例如本机服务。算法见[词表探测原理](../principles/tokenizer.mdx)。
+
+## 参数
+
+| 参数 | 说明 | 默认值 |
+| --- | --- | --- |
+| `-b`、`-k`、`-m`、`-a`、`-e`、`-ns` | 与[检测命令](./detect.mdx#options)相同；`-e` 只用于 Chat Completions 和 Responses，Messages 请求不发送推理强度 | 同检测 |
+| `-p, --parallel N` | 同时在途的请求数，1–8；`-p 1` 的总请求数最少 | `4` |
+| `--max-probes N` | 探针数上限（另发两次基线），4–60 | `20` |
+| `--timeout SECONDS` | 单个请求的时限 | `90` |
+| `--bank FILE` | 使用自定义词表库 | 内置词表库 |
+| `--input FILE` | 用当前词表库离线复算保存的结果，不发送请求 | — |
+| `--output FILE`、`--json` | 保存或输出 JSON，不含凭据 | — |
+
+`-m` 填写的模型名同时用来核对声称的词表：例如声称 `gpt-5` 却测得 Qwen 词表，结果会标为“不一致”。结果列出词表类、作者实验室、类中的开源词表，以及它与 `--model` 登记的词表是否一致。
+
+## 报告格式
+
+`--output` 与网页导出使用同一格式：
+
+| 字段 | 内容 |
+| --- | --- |
+| `schema` | 固定为 `fpd-tokenizer-v1` |
+| `request` | 接口地址、模型、推理强度、协议、是否流式和并发数，不含 API Key |
+| `bank` | 所用词表库的生成日期、类数、探针数与归档清单哈希 |
+| `steps`、`observations` | 每个请求的探针、状态与输入 token 数 |
+| `verdict` | 判定 `kind`（`exact`、`related` 或 `unknown`）、最接近的类 `top`、概率 `confidence`，以及与所填模型的核对 `claim` |
+| `classes`、`labs`、`unknown` | 前 10 类、前 5 个实验室的后验概率，以及“未收录”的概率 |
+| `baseline_drift` | 两次基线是否不同 |
+| `cancelled`、`error` | 是否被取消，以及失败请求的错误码与 HTTP 状态 |
+
+错误信息、响应模型名和接口地址中出现的密钥会被替换为 `[REDACTED]`。
+
+## 退出码
+
+| 退出码 | 含义 |
+| --- | --- |
+| `0` | 给出了结果 |
+| `1` | 输入无效、请求失败或没有结果 |
+| `130` | 被取消 |
+
+<Callout type="warn" title="测到的是词表，不是模型权重">
+  用 tiktoken 在本地估算 usage 的中转站会报告 o200k_base 或 cl100k_base 的计数。判定为这两类且与所填模型不一致时，更可能是计数方式的问题，而不是换了模型。
+</Callout>

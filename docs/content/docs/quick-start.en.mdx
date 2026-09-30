@@ -1,0 +1,60 @@
+---
+title: Quick start
+description: Run one detection on the website, or run fpd in a terminal without installing anything.
+icon: Rocket
+---
+
+## Detect on the website
+
+### Open the detection page [step]
+
+Open **[lm.ikale.io](https://lm.ikale.io)** and select a detection mode:
+
+| Mode | Steps | Use case |
+| --- | --- | --- |
+| Manual | Copy the three challenges that the page generates, send each one to the target model, then paste each answer back into the page | You have a chat interface but no API key |
+| API | Enter the Base URL, API key, model name, and protocol. The page samples automatically | You want to check an API channel |
+| Tokenizer | Uses the same API configuration. The page sends a set of short texts and reads the input token count from usage | You want to check the tokenizer behind a channel |
+
+### Fill in the API configuration [step]
+
+API mode and the tokenizer probe need a Base URL, an API key, and a model name. The protocol can be Chat Completions, Messages, or Responses. The configuration and the key are saved only in the current browser. The profile menu can store several profiles and can also export them to files.
+
+### Start and read the results [step]
+
+Each answer needs at least 80 valid integers and at least 55% of the requested count. If all three answers are valid, the page shows the ranking and a confidence value for each candidate. If only one or two are valid, the page shows the ranking only. For what the results mean, see [Website](./web/index.mdx#reading-results).
+
+<Callout title="When the API does not allow direct browser calls">
+  Before the requests start, the page checks whether the API allows cross-origin browser calls. If it does not, the page first explains why in a dialog and sends the requests through the relay proxy only after you agree. See [Direct calls and proxy consent](./web/connection.mdx).
+</Callout>
+
+## Run in a terminal
+
+The command line tool `fpd` is published as the npm package `lmfpd`. You do not need to install it or check out the repository:
+
+```sh tab="Node.js ≥ 22"
+npx lmfpd@latest -b https://api.example.com/v1 -k sk-xxx -m gpt-6-astra
+```
+
+```sh tab="Bun ≥ 1.4.2"
+bunx --bun lmfpd@latest -b https://api.example.com/v1 -k sk-xxx -m gpt-6-astra
+```
+
+The connection settings can also come from the environment variables `BASE_URL`, `API_KEY`, and `MODEL`. Every subcommand supports `--help`. For all options, see [Command line](./cli/index.mdx).
+
+## Develop locally
+
+The repository is a Bun workspace. It contains the website, the command line tool, the shared algorithms, the data, and these docs:
+
+```sh
+bun install
+bun run dev          # Sync data and start the web dev server (includes /api/proxy)
+bun run dev:docs     # Start the docs dev server
+bun run typecheck    # Type-check the TypeScript code of the website, CLI, and docs
+bun run build        # Build the website and the docs into web/dist
+bun run build:cli    # Pack the npm CLI into dist/fpd
+bun run fpd --help   # Run the CLI from the repository
+bun run dev:worker   # Run the proxy Worker locally at 127.0.0.1:8787
+```
+
+For deployment steps, see [Deployment](./deployment/index.mdx). For what each directory does, see [Project structure](./development/index.mdx).

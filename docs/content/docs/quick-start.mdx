@@ -1,0 +1,60 @@
+---
+title: 快速开始
+description: 在网页上完成一次检测，或者不安装任何东西，直接在终端运行 fpd。
+icon: Rocket
+---
+
+## 在网页上检测
+
+### 打开检测页 [step]
+
+打开 **[lm.ikale.io](https://lm.ikale.io)**，选择检测方式：
+
+| 模式 | 操作 | 适用场景 |
+| --- | --- | --- |
+| 手动 | 复制页面生成的三道挑战，分别发给目标模型，再把回答粘贴回页面 | 只有聊天界面，没有 API Key |
+| API | 填写 Base URL、API Key、模型名和协议，页面自动采样 | 检测 API 渠道 |
+| 词表探测 | 使用同一份 API 配置，页面发送一组短文本并读取 usage 中的输入 token 数 | 核对渠道背后的分词器 |
+
+### 填写 API 配置 [step]
+
+API 模式和词表探测需要 Base URL、API Key 和模型名。协议可选 Chat Completions、Messages 和 Responses。配置和密钥只保存在当前浏览器；配置菜单可以保存多份预设，也可以导出为文件。
+
+### 开始并阅读结果 [step]
+
+每条回答至少需要 80 个有效整数，且不少于要求数量的 55%。三条回答都有效时，页面给出排名和每个候选的置信度；只有一两条有效时，页面只给出排名。结果的含义见[网页检测](./web/index.mdx#reading-results)。
+
+<Callout title="接口不允许浏览器直连时">
+  开始请求前，页面会检查接口是否允许浏览器跨域调用。不允许时，页面先弹窗说明原因，经你同意后才通过转发代理发送。详见[直连与代理授权](./web/connection.mdx)。
+</Callout>
+
+## 在终端运行
+
+命令行工具 `fpd` 发布为 npm 包 `lmfpd`，无需安装或检出仓库：
+
+```sh tab="Node.js ≥ 22"
+npx lmfpd@latest -b https://api.example.com/v1 -k sk-xxx -m gpt-6-astra
+```
+
+```sh tab="Bun ≥ 1.4.2"
+bunx --bun lmfpd@latest -b https://api.example.com/v1 -k sk-xxx -m gpt-6-astra
+```
+
+连接参数也可以来自环境变量 `BASE_URL`、`API_KEY` 和 `MODEL`。每个子命令都支持 `--help`，完整参数见[命令行](./cli/index.mdx)。
+
+## 在本地开发
+
+仓库是一个 Bun workspace，包含网页、命令行、共享算法、数据和本文档：
+
+```sh
+bun install
+bun run dev          # 同步数据并启动 Web 开发服务器（已接入 /api/proxy）
+bun run dev:docs     # 启动文档开发服务器
+bun run typecheck    # 网页、命令行与文档的 TypeScript 类型检查
+bun run build        # 构建网站和文档到 web/dist
+bun run build:cli    # 打包 npm CLI 到 dist/fpd
+bun run fpd --help   # 在仓库内直接运行 CLI
+bun run dev:worker   # 在 127.0.0.1:8787 本地运行代理 Worker
+```
+
+部署步骤见[部署](./deployment/index.mdx)，各目录的职责见[项目结构](./development/index.mdx)。

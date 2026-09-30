@@ -1,0 +1,63 @@
+---
+title: Website
+description: The manual and API sampling modes, the switches in the API configuration, and how to read detection results.
+icon: Globe
+---
+
+The detection website [lm.ikale.io](https://lm.ikale.io) is a pure frontend app. Challenge generation, feature extraction, ranking, and verification all run in the browser, and the reference bank is served as static files. The website only runs detection and browses the reference bank read-only. It never writes any reply to the reference bank.
+
+## Sampling modes
+
+<Tabs items={['Manual', 'API']}>
+  <Tab value="Manual">
+    The page generates three challenges. Send each challenge to the target model separately (for example, in a new conversation in a chat interface), then paste each answer into its sample box. This mode suits the case where you have a chat interface but no API key. Prompts and replies are not translated, and switching the interface language does not change them.
+  </Tab>
+  <Tab value="API">
+    After you fill in the API configuration, the page sends requests upstream one at a time or in parallel with the selected protocol, and shows each reply as it is generated. Verification can start automatically after sampling finishes.
+  </Tab>
+</Tabs>
+
+## API configuration
+
+| Field | Description |
+| --- | --- |
+| Base URL | Base URL or complete endpoint. If you enter the address only up to `/v1`, the protocol endpoint is added automatically |
+| Model | The model name in the request |
+| API key | Hidden by default. You can toggle it visible |
+| Reasoning effort | Can be left blank, or set to any `reasoning_effort` value that the upstream supports |
+| Protocol | Chat Completions, Messages, or Responses |
+
+Switches below the configuration:
+
+- **Streaming**: uses SSE and shows output as it is generated. When off, the page waits for the complete JSON response.
+- **Parallel requests**: sends the three samples at once. In tokenizer probe mode, it sends 4 probes at once instead.
+- **Relaxed mode**: streaming sampling stops once it receives the requested count of complete valid integers. A non-streaming reply that exceeds the requested count keeps only the first N. The interface marks both cases as "Capped". When off, the upstream reply must finish naturally and completely.
+- **Verify automatically after sampling**: computes the result automatically once all three samples succeed.
+
+The configuration and the key are saved automatically in the browser's localStorage and are restored after a reload or when you reopen the page. The profile menu supports several profiles, which you can rename, create, duplicate, and delete. "Save" only confirms the current configuration in the browser. "Export" and "Load" move a configuration between a file and the browser. "Relay proxy" is a browser-level setting and does not belong to any profile. See [Direct calls and proxy consent](./connection.mdx).
+
+## Reading results [#reading-results]
+
+If all three answers are valid, the result area lists the candidates of the reference bank in ranking order, with one confidence value per row:
+
+- When the confidence is calibrated, it is a relative probability within the reference bank: all candidates total 100%, and models outside the bank are not included.
+- When it is not calibrated, the row shows an estimate from the verification score, which is not a probability.
+
+If the confidence of the top candidate is below 75%, the page shows a low-confidence warning. If only one or two answers are valid, the page shows only the ranking, without confidence. The command line also marks a disagreement when the top-ranked candidate differs from the verifier's choice; see [Detection](../cli/detect.mdx#results).
+
+If the smallest valid number of a sample is 200 or more, the page marks its distribution as abnormal and the result as unreliable. The prompt causes this distribution, so resampling with the same prompt repeats it. In API mode, "New prompt and resample" generates new challenges for these samples and samples them again at once with the original settings; in manual mode, "New prompt" only replaces the prompts and clears the matching answers. The other samples stay as they are. This warning plays no part in scoring.
+
+<Callout type="warn" title="A ranking is not proof of identity">
+  A model outside the bank still gets a "closest" candidate. A result with the same name as the claimed model is supporting evidence, but it cannot prove identity on its own. A result naming another model does not directly prove that the model was substituted, because the fingerprints of some models are naturally close. This site cannot reliably detect intermittent model substitution.
+</Callout>
+
+## Export
+
+- **PNG image**: generated in a browser Canvas at twice the pixel density. It contains the site name, the date, the top candidate, the top five entries, the number of valid samples, and a note on the limitations, in the current language and theme. It does not contain the API key, the Base URL, the model ID you entered, or the reply text.
+- **JSON**: contains only the candidate list and the confidence values.
+- **Library page**: browse reference replies by model, each with its original prompt. You can search, filter by family, and export to JSONL. Keys and authorization fields are removed before export.
+
+## Other modes
+
+- [Tokenizer probe](./tokenizer.mdx): identifies the upstream tokenizer from the token counts in usage.
+- [Direct calls and proxy consent](./connection.mdx): how the page decides whether to call the API directly or relay requests through a proxy.

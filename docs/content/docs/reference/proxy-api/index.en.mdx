@@ -1,0 +1,19 @@
+---
+title: Proxy API
+description: The HTTP API of the relay proxy, described by worker/openapi.json. This site's proxy and a self-hosted Worker share the same contract.
+---
+
+The relay proxy has one path, `/api/proxy`. `GET` runs a health check, `POST` relays an API request, and `OPTIONS` answers the CORS preflight of the browser. This site's proxy accepts only same-origin calls. A self-hosted Worker also accepts pages in `ALLOWED_ORIGINS`, and it gives the same response on any path.
+
+<Cards>
+  <Card title="Health check" href="./checkProxy.mdx">`GET /api/proxy`: confirm that the address is a Fingerpoint proxy.</Card>
+  <Card title="Relay an API request" href="./relayRequest.mdx">`POST /api/proxy`: relay a request with your key and stream the response back unchanged.</Card>
+</Cards>
+
+The browser sends the `OPTIONS` preflight automatically before a cross-origin `POST`. An allowed origin gets 204 with `Access-Control-Allow-*` headers. Any other origin gets 403 without CORS headers.
+
+The pages below are generated from `worker/openapi.json`. After you change this contract, run `bun run openapi` in `docs/` to regenerate them. The Playground on these pages sends requests directly from your browser. In the docs on this site, it relays the key and the request you enter to the upstream through the same-origin `/api/proxy`, the same way web detection does when it goes through this site's proxy.
+
+<Callout type="warn">
+  The Playground sends real requests and uses upstream quota. Do not enter your key on a page you do not trust.
+</Callout>

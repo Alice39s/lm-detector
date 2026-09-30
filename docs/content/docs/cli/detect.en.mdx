@@ -1,0 +1,96 @@
+---
+title: Detection
+description: Check an API channel with random challenges over several rounds, save the report, and recompute it offline.
+---
+
+## Examples
+
+```sh
+# Pass the connection settings explicitly
+npx lmfpd@latest -b https://api.example.com/v1 -k sk-xxx -m gpt-6-astra
+
+# Read the connection settings from the environment; use Chat Completions and set the reasoning effort
+npx lmfpd@latest -a cc -e high
+
+# Run 5 detection rounds
+npx lmfpd@latest -n 5
+
+# Send only one request per round
+npx lmfpd@latest -b https://api.example.com/v1 -k sk-xxx -m gpt-6-astra --count 1
+
+# Strict mode without streaming; save the full report (credentials excluded)
+npx lmfpd@latest -s -ns --timeout 180 --output result.json
+
+# Analyze a saved report again offline without calling a model
+npx lmfpd@latest --input result.json --json
+```
+
+## Options [#options]
+
+| Option | Description | Default |
+| --- | --- | --- |
+| `-b, --baseurl URL` | Base URL or complete endpoint. The CLI adds the endpoint path if it is missing | `$BASE_URL` |
+| `-k, --apikey KEY` | API key | `$API_KEY` |
+| `-m, --model MODEL` | Model to request | `$MODEL` |
+| `-a, --api TYPE` | `responses`, `chatcompletion` (or `cc`), or `message`. Any prefix works | `responses` |
+| `-e, --effort LEVEL` | Reasoning effort, such as `low` or `high`, or a provider-specific value | Not sent |
+| `-ns, --no-stream` | Use a plain JSON response instead of SSE | SSE |
+| `--timeout SECONDS` | Deadline for the first SSE byte. In JSON mode, deadline for the complete response. Fractional seconds are supported | `120` |
+| `--count N` | Samples per round, 1–3. Fewer than 3 samples give a ranking only | `3` |
+| `-p, --parallel N` | Concurrent samples per round, 1–3, capped at `--count`. Does not change the total number of requests | `3` |
+| `-n, --repeat N` | Sequential detection rounds | `1` |
+| `-s, --strict` | Disable automatic truncation and require 3 complete, valid answers | Off |
+| `--challenges FILE` | Reuse saved challenges in every round. The count must match `--count` | Random |
+| `--bank FILE` | Use a custom reference bank | Bundled bank |
+| `--input FILE` | Analyze saved outputs offline | — |
+| `--output FILE` | Save all rounds, request settings, challenges, received text, and results as JSON | — |
+| `--json` | Write JSON to stdout instead of the terminal interface | — |
+| `--no-update-check` | Disable background update checks | On |
+
+An origin without a path, such as `https://api.example.com`, uses `/v1`. A base URL with a path preserves that path and appends the selected endpoint. Messages requests use `x-api-key` and `anthropic-version` headers. Detection requests omit the optional output token limit for Responses and Chat Completions. Messages requests keep `max_tokens: 8192`, which that API requires.
+
+## Sampling behavior
+
+Each round generates `--count` random challenges with the shared challenge generator (default: 3). The prompts stay unchanged to keep the sampling method consistent. `-p 1` only serializes the requests; `-n 1` runs only one round. For a fixed single challenge, use `--count 1 --challenges one-challenge.json`. The file must contain a one-element array whose element has `id`, `prompt`, and `expected_count`. A mismatched array length is rejected before any requests are sent.
+
+<Tabs items={['Relaxed mode (default)', 'Strict mode']}>
+  <Tab value="Relaxed mode (default)">
+    A streaming sample stops after it receives the requested number of complete integers. The interface marks it **Capped**. JSON responses with excess numbers are trimmed after receipt. The raw text received before cancellation remains in the sample record. An incomplete final integer does not trigger truncation. One or two valid samples still produce a ranking, but without confidence scores. The verifier and confidence calibration still require three valid samples.
+  </Tab>
+  <Tab value="Strict mode">
+    Requires `--count 3`, disables the client count limit, and waits for complete responses. Scoring runs only if all three samples succeed. Combining `--strict` with `--count 1` or `--count 2` is rejected before any requests are sent. Provider token limits still apply.
+  </Tab>
+</Tabs>
+
+A naturally completed sample must contain at least `max(80, ceil(expected_count × 0.55))` valid numbers, matching the scorer. A refusal, provider error, or unfinished response is rejected unless relaxed mode already stopped it at the requested count. Failed samples remain visible and are preserved in the results.
+
+All samples in a round, including failed requests, must settle before the next round starts. The concurrency limit applies per round and is capped at the sample count. Detection does not retry automatically. A failed round does not prevent later rounds from running.
+
+The timeout starts when each request is dispatched. For SSE, the first nonempty response-body chunk clears the timer, including a heartbeat or metadata event. Response headers alone do not clear it. No client deadline or Bun idle timeout remains after SSE starts. In JSON mode, the entire response must arrive before the deadline.
+
+Press `q` or `Ctrl+C` to cancel active requests. Queued requests and later rounds do not start. With `--output`, samples received before cancellation are saved. Redirected output contains a static report, and progress goes to stderr. `--json` keeps stdout limited to machine-readable results.
+
+## Results and offline recomputation [#results]
+
+```sh
+bun run fpd --output result.json
+bun run fpd --input result.json
+bun run fpd --input result.json --strict --json
+```
+
+`--input` accepts a saved report, a report with `outputs`, an array of one to three `{ "text": "...", "expected_count": 300 }` objects, or the `result.json` of a sampling batch. Sampling batches are grouped by condition into rounds of up to three answers. Reports with several rounds are analyzed one round at a time. Strict recomputation rejects samples recorded as truncated or with unknown completion. A plain output array cannot verify its original network completion status. `--count` applies only to online detection and cannot be combined with `--input`.
+
+When all three samples are valid, the result states whether the ranker and the verifier chose the same leading candidate; when they disagree, it names the verifier's choice, and the candidate order still follows the ranker. The terminal interface shows the latest ranking and summaries of recent rounds. After at least one scored round, a dimmed final line links the GitHub repository. JSON retains every round. The "most frequent candidate" counts round winners; it is not a combined probability. Confidence is relative to models in the reference bank and does not establish the upstream model's identity. When a custom reference bank does not match the detector, only the legacy ranker is used, without confidence scores.
+
+If the smallest valid number of a sample is 200 or more, the interface warns that the sample has an abnormal distribution and the result is unreliable. The prompt causes it: with random challenges, a new run draws new prompts; with `--challenges`, replace the matching prompts in the file.
+
+## Exit codes
+
+| Exit code | Meaning |
+| --- | --- |
+| `0` | All rounds produced a ranking (a partial ranking in relaxed mode also counts as success) |
+| `1` | Invalid input, or any round could not be scored |
+| `130` | Canceled |
+| `143` | Received SIGTERM |
+
+The previous detection interface remains available in the repository as `bun run detect:legacy`.

@@ -1,0 +1,80 @@
+---
+title: 项目结构
+description: Bun workspace 中各目录的职责、共享算法模块，以及修改代码时要遵守的约定。
+icon: Code
+---
+
+```files
+.
+├── cli/
+├── web/
+├── shared/
+├── data/
+├── docs/
+├── offline/
+├── worker/
+├── functions/
+├── api/
+├── package.json
+└── wrangler.jsonc
+```
+
+| 目录 | 职责 |
+| --- | --- |
+| `cli/` | 命令行 `fpd`（Bun + Ink），发布为 npm 包 `lmfpd` |
+| `web/` | 检测网站与只读参考库（React、shadcn/ui、Tailwind CSS） |
+| `shared/` | 网页与 CLI 共用的挑战、解析、评分与词表探测算法 |
+| `data/` | 参考数据、派生库、冻结检测器、固定挑战与词表库，见[数据文件](../reference/data.mdx) |
+| `docs/` | 本文档（Fumadocs + React Router，全部页面预渲染） |
+| `offline/` | 离线重训与校准（Python，由 uv 运行） |
+| `worker/` | 单文件 Cloudflare Worker API 代理，也供同源代理入口复用 |
+| `functions/` | Cloudflare Pages Functions 入口 |
+| `api/` | Vercel Functions 入口 |
+
+## 共享算法 [#shared]
+
+`shared/` 不依赖 React、浏览器存储或外层研究目录：
+
+| 模块 | 职责 |
+| --- | --- |
+| `challenge-browser.js` | 检测挑战生成 |
+| `completion-request.ts`、`completion.ts`、`detection.ts` | 请求体、响应解析和检测流程 |
+| `fingerprint-core.js`、`number-features.js`、`gaussian-core.js` | 数字特征与基础评分 |
+| `shared-detector.ts` | 冻结的排名器和核验器 |
+| `sample-distribution.ts` | 标记最小有效数字不低于 200 的异常样本；只用于界面提示，不参与评分 |
+| `builder.ts` | 从参考样本离线建库；拒绝带评估标记的样本 |
+| `tokenizer-bank.ts`、`tokenizer-usage.ts` | 词表库的类型与校验，以及从 JSON 或 SSE 响应读取 usage |
+| `tokenizer-posterior.ts`、`tokenizer-probe.ts` | 词表后验、探针选择与探测流程 |
+| `privacy.ts`、`types.ts` | 脱敏与公共类型 |
+
+正式数据和冻结参数位于 `data/`。网页只调用检测模块，不打包建库入口。
+
+## 检测网站
+
+`web/src/` 包含检测页面、只读样本库与中英文文案。路由使用 React Router 的 HashRouter；界面使用 shadcn/ui（Base UI）、Tailwind CSS v4 和 Framer Motion。[设计规范](./design.mdx)定义视觉原语和交互约束，颜色与品牌字体在 `web/src/tokens.css` 中，本文档也使用同一个文件。
+
+- `src/i18n/messages.ts` 包含中英文文案，`src/i18n/index.tsx` 提供语言偏好、插值及日期和数字格式化。切换语言不修改算法提示词或用户回复。
+- 网站没有入库功能，不读取旧的 IndexedDB 自定义库，也不合并或重建参考数据。
+- 构建前的 `scripts/sync-data.ts` 校验并脱敏正式数据，把参考库、派生库与检测器压缩成 zstd 静态分段，并生成数据清单。
+- 生产构建从 `telemetry.json` 注入 Koitoyu 和 Recorder 脚本，本地开发不加载。Recorder 回放会遮蔽 API 配置区和错误详情，输入框默认被遮蔽。
+
+## 本文档
+
+`docs/` 是 React Router 的 SPA，用 Fumadocs MDX 的宏 API 声明内容集合。页面按 `页面.mdx`（中文）与 `页面.en.mdx`（英文）成对存放；缺少英文文件的页面在英文站点中回退为中文。页面中的链接写成内容文件的相对路径（例如 `../cli/detect.mdx#options`），构建时解析为当前语言的 URL。
+
+| 文件 | 作用 |
+| --- | --- |
+| `site.config.ts` | 路径前缀 `DOCS_BASE`，默认 `/docs` |
+| `source.config.ts` | 全局 MDX 插件：数学公式、Mermaid、文件树与步骤 |
+| `app/lib/source.ts` | 内容集合、页面树与 `llms.txt` |
+| `app/routes/*.ts(x)` | 页面、搜索索引、Markdown 版本与 Open Graph 图片 |
+| `scripts/generate-openapi.ts` | 从 `worker/openapi.json` 生成[代理 API](../reference/proxy-api/index.mdx) 页面 |
+
+## 约定
+
+- 使用 Bun 管理依赖并运行 TypeScript。产品构建不依赖仓库之外的文件，配置、锁文件和部署入口都在根目录。
+- `web/` 只提供检测和只读参考库页面；采样在 `cli/`，算法在 `shared/`，数据在 `data/`。
+- 不新增测试文件；改动后运行 `bun run typecheck` 和 `bun run build`。
+- 参考库模型标签的数字版本使用小数点（如 `claude-opus-5.5`）；`claude-haiku-4-5-20251001` 的展示和参考标签固定为 `claude-haiku-4.5`。API 请求型号和原始采样证据保持上游原值。
+- 不自动请求模型 API，只有在用户要求采集或检测上游时才发送请求。
+- 评估样本不得进入参考库、模型中心或校准；采样记录保留失败和旧尝试。
