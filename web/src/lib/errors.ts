@@ -17,6 +17,7 @@ const codeKeys: Record<ErrorCode, Parameters<I18n['t']>[0]> = {
   insufficient_numbers: 'errors.insufficient_numbers',
   no_output: 'errors.no_output',
   responses_incomplete: 'errors.responses_incomplete',
+  no_usage: 'errors.no_usage',
 }
 
 /** 把共享层错误映射为用户可读文案（design.md 6.4）。原始 message 由调用方放入「查看详情」。 */
