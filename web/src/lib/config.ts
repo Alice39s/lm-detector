@@ -4,6 +4,8 @@ import type { ApiConfig } from '@fingerpoint/shared/types'
 export interface WebApiConfig extends ApiConfig {
   relaxed: boolean
   autoVerify: boolean
+  /** Probe the tokenizer alongside sampling and fuse it into the ranking. */
+  tokenizerProbe: boolean
 }
 
 export interface ApiProfile extends WebApiConfig {
@@ -48,13 +50,14 @@ export const defaultConfig: WebApiConfig = {
   parallel: true,
   relaxed: true,
   autoVerify: true,
+  tokenizerProbe: true,
 }
 
-const configFields = ['baseUrl', 'apiKey', 'model', 'effort', 'format', 'stream', 'parallel', 'relaxed', 'autoVerify'] as const
+const configFields = ['baseUrl', 'apiKey', 'model', 'effort', 'format', 'stream', 'parallel', 'relaxed', 'autoVerify', 'tokenizerProbe'] as const
 
 function snapshot(profile: ApiProfile): ProfileSnapshot {
-  const { name, baseUrl, apiKey, model, effort, format, stream, parallel, relaxed, autoVerify } = profile
-  return { name, baseUrl, apiKey, model, effort, format, stream, parallel, relaxed, autoVerify }
+  const { name, baseUrl, apiKey, model, effort, format, stream, parallel, relaxed, autoVerify, tokenizerProbe } = profile
+  return { name, baseUrl, apiKey, model, effort, format, stream, parallel, relaxed, autoVerify, tokenizerProbe }
 }
 
 function readSnapshot(raw: unknown): ProfileSnapshot | null {
@@ -68,7 +71,9 @@ function readSnapshot(raw: unknown): ProfileSnapshot | null {
   for (const field of ['stream', 'parallel', 'autoVerify']) {
     if (typeof value[field] !== 'boolean') return null
   }
-  if (value.relaxed !== undefined && typeof value.relaxed !== 'boolean') return null
+  for (const field of ['relaxed', 'tokenizerProbe']) {
+    if (value[field] !== undefined && typeof value[field] !== 'boolean') return null
+  }
   return {
     name: value.name,
     baseUrl: value.baseUrl as string,
@@ -80,6 +85,7 @@ function readSnapshot(raw: unknown): ProfileSnapshot | null {
     parallel: value.parallel as boolean,
     relaxed: typeof value.relaxed === 'boolean' ? value.relaxed : true,
     autoVerify: value.autoVerify as boolean,
+    tokenizerProbe: typeof value.tokenizerProbe === 'boolean' ? value.tokenizerProbe : true,
   }
 }
 
@@ -110,7 +116,7 @@ function sanitizeProfile(raw: unknown, fallbackId: string, fallbackName = ''): A
     if (obj.format === 'openai' || obj.format === 'responses' || obj.format === 'anthropic') {
       profile.format = obj.format
     }
-    for (const field of ['stream', 'parallel', 'relaxed', 'autoVerify'] as const) {
+    for (const field of ['stream', 'parallel', 'relaxed', 'autoVerify', 'tokenizerProbe'] as const) {
       if (typeof obj[field] === 'boolean') profile[field] = obj[field] as boolean
     }
   }
@@ -178,8 +184,8 @@ function persist(state: StoredApiProfiles) {
   localStorage.setItem(PROFILES_STORAGE_KEY, JSON.stringify(state))
   const active = state.profiles.find(p => p.id === state.activeId) ?? state.profiles[0]
   if (active) {
-    const { baseUrl, apiKey, model, effort, format, stream, parallel, relaxed, autoVerify } = active
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ baseUrl, apiKey, model, effort, format, stream, parallel, relaxed, autoVerify }))
+    const { baseUrl, apiKey, model, effort, format, stream, parallel, relaxed, autoVerify, tokenizerProbe } = active
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ baseUrl, apiKey, model, effort, format, stream, parallel, relaxed, autoVerify, tokenizerProbe }))
   }
   localStorage.removeItem(LEGACY_KEY)
   sessionStorage.removeItem(SESSION_KEY)

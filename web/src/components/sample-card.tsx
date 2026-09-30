@@ -1,4 +1,4 @@
-import { useId, useLayoutEffect, useRef, useState } from 'react'
+import { useId, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { ChevronDown, Copy, Loader2, MoreVertical, TriangleAlert } from 'lucide-react'
 import { toast } from 'sonner'
 import { Badge } from '@/components/ui/badge'
@@ -39,7 +39,7 @@ export function badgeFor(sample: SampleUI, expected: number): { key: 'empty' | '
   return parseNumbers(sample.text).length >= minimumNumbers(expected) ? { key: 'filled', tone: 'success' } : { key: 'short', tone: 'warning' }
 }
 
-const toneClass = {
+export const toneClass = {
   muted: 'bg-muted text-muted-foreground',
   success: 'bg-success/12 text-success',
   warning: 'bg-warning/15 text-warning',
@@ -219,10 +219,11 @@ function PromptText({ text }: { text: string }) {
 }
 
 
-export function SampleStrip({ samples, challenges, expanded, anomalous, onToggle }: { samples: SampleUI[]; challenges: Challenge[]; expanded: number | null; anomalous: number[]; onToggle: (i: number) => void }) {
+/** `extra` is a fourth entry after the samples, such as the tokenizer probe. */
+export function SampleStrip({ samples, challenges, expanded, anomalous, onToggle, extra }: { samples: SampleUI[]; challenges: Challenge[]; expanded: number | null; anomalous: number[]; onToggle: (i: number) => void; extra?: ReactNode }) {
   const { t } = useI18n()
   return (
-    <div className="grid grid-cols-3 gap-2">
+    <div className={cn('grid gap-2', extra ? 'grid-cols-4' : 'grid-cols-3')}>
       {samples.map((sample, i) => (
         <button
           key={challenges[i].id}
@@ -244,6 +245,7 @@ export function SampleStrip({ samples, challenges, expanded, anomalous, onToggle
           </span>
         </button>
       ))}
+      {extra}
     </div>
   )
 }

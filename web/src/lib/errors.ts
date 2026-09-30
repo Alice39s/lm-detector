@@ -39,4 +39,8 @@ export function describe(i18n: I18n, code: ErrorCode | undefined, status: number
   return i18n.t(fallbackKey)
 }
 
+/** A described error without its closing full stop, for use inside a longer sentence. */
+export const errorReason = (i18n: I18n, error: unknown, fallbackKey?: Parameters<I18n['t']>[0]) =>
+  describeError(i18n, error, fallbackKey).replace(/[。.]\s*$/, '')
+
 export const rawMessage = (error: unknown) => (error instanceof Error ? error.message : String(error ?? ''))
