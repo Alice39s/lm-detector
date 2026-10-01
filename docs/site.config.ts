@@ -16,8 +16,9 @@ function normalizeBase(value: string) {
   return base
 }
 
+/** Accepts an origin in any letter case, such as `https://Owner.github.io` from the Pages workflow, and lowercases it. */
 function normalizeOrigin(value: string) {
   const url = new URL(value)
-  if (url.origin !== value.replace(/\/+$/, '')) throw new Error(`SITE_ORIGIN must be an origin such as "https://lm.ikale.io", got "${value}".`)
+  if (url.origin !== value.replace(/\/+$/, '').toLowerCase()) throw new Error(`SITE_ORIGIN must be an origin such as "https://lm.ikale.io", got "${value}".`)
   return url.origin
 }
