@@ -16,7 +16,7 @@ This fits anyone with a GitHub or GitLab account. The button above copies this d
 
 ### Workers Playground
 
-This fits anyone without a GitHub or GitLab account, or anyone who wants a one-off deployment with nothing to install. In the web app, open the API configuration, choose Forwarding proxy → Own Worker, then select Open in the Playground. The page downloads the current `main.js` from this repository and opens it in the Workers Playground, Cloudflare's in-browser editor. After you sign in to Cloudflare, the Playground's Deploy button creates the Worker in your account. No repository is created, and the Worker keeps the code it was deployed with, so it never updates by itself. To get newer code, deploy again.
+This fits anyone without a GitHub or GitLab account, or anyone who wants a one-off deployment with nothing to install. In the web app, open the API configuration, choose Connection → Own Worker, then select Open in the Playground. The page downloads the current `main.js` from this repository and opens it in the Workers Playground, Cloudflare's in-browser editor. After you sign in to Cloudflare, the Playground's Deploy button creates the Worker in your account. No repository is created, and the Worker keeps the code it was deployed with; to update it, open the Playground again and redeploy.
 
 ### Wrangler
 
@@ -24,11 +24,11 @@ This fits anyone who already has a checkout of this repository, or who wants to 
 
 ## After deploying
 
-Open the Worker address in a browser. A working Worker answers `{"service":"fingerpoint-api-proxy","formats":["openai","responses","anthropic"]}`. Enter the address under Own Worker and select Check proxy. The web app asks for your consent before it sends the first request through that Worker, and names the Worker in the dialog.
+Open the Worker address in a browser. A working Worker answers `{"service":"fingerpoint-api-proxy","formats":["openai","responses","anthropic"]}`. Choose Connection → Own Worker in the web app, enter the address, and select Check proxy. Sampling and the tokenizer probe then go through that Worker.
 
 ## Configuration
 
-`ALLOWED_ORIGINS` lists the web pages that may call the Worker from a browser. Each entry is an origin, the protocol, domain, and port of a page address, such as `https://example.com`. Separate entries with commas; `*` allows any page. The default is `https://lm.ikale.io`, which also applies when the variable is missing, as after a Playground deployment. If you only use the Worker from lm.ikale.io, change nothing. If you host the web app yourself, add its origin. The origin of a GitHub Pages site is `https://<username>.github.io`, without the repository name.
+`ALLOWED_ORIGINS` lists the web pages that may call the Worker from a browser. Each entry is an origin, the protocol, domain, and port of a page address, such as `https://example.com`; a URL copied from the address bar also works, since the Worker keeps only its origin and ignores the path and letter case. Separate entries with commas; `*` allows any page. The default is `https://lm.ikale.io`, which also applies when the variable is missing, as after a Playground deployment. If you only use the Worker from lm.ikale.io, change nothing. If you host the web app yourself, add its origin. The origin of a GitHub Pages site is `https://<username>.github.io`, without the repository name.
 
 With the button, edit `vars` in `wrangler.json` in your new repository. With Wrangler, edit `worker/wrangler.json` and deploy again. Every deployment applies that file and replaces values changed in the dashboard. After a Playground deployment, set the variable in the Cloudflare dashboard under Settings → Variables and Secrets.
 
@@ -55,7 +55,7 @@ The Worker forwards no cookies and stores no keys, and cancelling a request in t
 
 ## Request format
 
-Clients other than the web app can call the Worker too. `GET` returns the health check shown above, `OPTIONS` answers the browser's CORS preflight (204 for an allowed origin, 403 otherwise), and `POST` forwards an API request. A `POST` carries `Authorization: Bearer <API key>` and the JSON body `{ "url", "format", "body" }`, where `url` is the complete API endpoint. JSON and streamed (SSE) responses come back unchanged. For Messages requests, the Worker sends the key as `x-api-key` with `anthropic-version: 2023-06-01`. The full schema is in the [proxy API reference](https://lm.ikale.io/docs/en/reference/proxy-api).
+Clients other than the web app can call the Worker too. `GET` returns the health check shown above, `OPTIONS` answers the browser's CORS preflight (204 for an allowed origin, 403 otherwise), and `POST` forwards an API request. A `POST` carries `Authorization: Bearer <API key>` and the JSON body `{ "url", "format", "body" }`, where `url` is the complete API endpoint. JSON and streamed (SSE) responses come back unchanged. When the API answers with a success status but sends something else, usually a web page because the address has a wrong path, the Worker returns 502 with `"code": "upstream_not_api"` in its error object. For Messages requests, the Worker sends the key as `x-api-key` with `anthropic-version: 2023-06-01`. The full schema is in the [proxy API reference](https://lm.ikale.io/docs/en/reference/proxy-api).
 
 | Protocol | `format` | `url` ends in | Command line `-a` |
 | --- | --- | --- | --- |
@@ -65,4 +65,4 @@ Clients other than the web app can call the Worker too. `GET` returns the health
 
 ## For maintainers
 
-The site's Pages Function, the Vercel function, and the Vite dev server import `main.js` too, so every deployment runs the same code. `bun run dev:worker` serves the Worker locally at `http://127.0.0.1:8787`.
+The site's Pages Function, the Vercel function, and the Vite dev server import `main.js` too, so every deployment runs the same code. `bun run dev:worker` serves the Worker locally at `http://127.0.0.1:8787` and allows the local web app (`http://127.0.0.1:5173` and `http://127.0.0.1:4173`) besides `https://lm.ikale.io`.

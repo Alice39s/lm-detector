@@ -45,7 +45,6 @@ icon: Code
 | `builder.ts` | Builds the bank offline from reference samples. Rejects samples with an evaluation mark |
 | `tokenizer-bank.ts`, `tokenizer-usage.ts` | Tokenizer bank types and validation, and reading usage from JSON or SSE responses |
 | `tokenizer-posterior.ts`, `tokenizer-probe.ts` | Tokenizer posterior, probe selection, and the probe flow |
-| `tokenizer-fusion.ts` | Adds the tokenizer result to the confidence of the number fingerprint by Bayes' rule |
 | `privacy.ts`, `types.ts` | Redaction and shared types |
 
 The official data and frozen parameters are in `data/`. The website calls only the detection modules and does not bundle the bank-building entry point.
@@ -65,7 +64,7 @@ The official data and frozen parameters are in `data/`. The website calls only t
 
 | File | Purpose |
 | --- | --- |
-| `site.config.ts` | Path prefix `DOCS_BASE`, `/docs` by default |
+| `site.config.ts` | Path prefix `DOCS_BASE` (`/docs` by default) and public origin `SITE_ORIGIN` (`https://lm.ikale.io` by default) |
 | `source.config.ts` | Global MDX plugins: math, Mermaid, file trees, and steps |
 | `app/lib/source.ts` | Content collections, page tree, and `llms.txt` |
 | `app/routes/*.ts(x)` | Pages, search index, Markdown versions, and Open Graph images |

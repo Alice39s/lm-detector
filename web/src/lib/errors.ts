@@ -6,6 +6,7 @@ const codeKeys: Record<ErrorCode, Parameters<I18n['t']>[0]> = {
   aborted: 'errors.aborted',
   timeout: 'errors.timeout',
   network: 'errors.network',
+  direct_network: 'errors.direct_network',
   http: 'errors.httpOther',
   proxy_unavailable: 'errors.proxy_unavailable',
   not_json: 'errors.not_json',
@@ -19,6 +20,7 @@ const codeKeys: Record<ErrorCode, Parameters<I18n['t']>[0]> = {
   responses_incomplete: 'errors.responses_incomplete',
   no_usage: 'errors.no_usage',
   proxy_missing: 'errors.proxy_missing',
+  upstream_not_api: 'errors.upstream_not_api',
 }
 
 /** 把共享层错误映射为用户可读文案（design.md 6.4）。原始 message 由调用方放入「查看详情」。 */

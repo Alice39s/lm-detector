@@ -1,6 +1,6 @@
 ---
 title: LM Fingerpoint Detector
-description: Identify the LLM behind an API from a few hundred casually written integers; API detection also identifies the upstream tokenizer from the token counts in the API usage.
+description: Identify the LLM behind an API from a few hundred casually written integers. With the optional tokenizer probe on, API detection also identifies the upstream tokenizer from the token counts in the API usage.
 icon: ScanSearch
 ---
 
@@ -11,7 +11,7 @@ A relay or third-party API may claim to serve one model while actually routing t
 <Cards>
   <Card icon={<Rocket />} title="Quick start" href="./quick-start.mdx">Detect on the website, or run `npx lmfpd` in a terminal.</Card>
   <Card icon={<Globe />} title="Website" href="./web/index.mdx">Manual and API modes, the tokenizer probe, and how the page reaches an API.</Card>
-  <Card icon={<Terminal />} title="Command line" href="./cli/index.mdx">Detection (including the tokenizer probe), sampling, and enrollment with `fpd`.</Card>
+  <Card icon={<Terminal />} title="Command line" href="./cli/index.mdx">Detection (with an optional tokenizer probe), sampling, and enrollment with `fpd`.</Card>
   <Card icon={<FlaskConical />} title="How it works" href="./principles/index.mdx">From challenges and features to ranking, verification, and confidence calibration.</Card>
 </Cards>
 
@@ -20,8 +20,8 @@ A relay or third-party API may claim to serve one model while actually routing t
 - **Two entry points**: the [website](https://lm.ikale.io) supports manual pasting and direct API access; the `fpd` command line tool provides a live terminal interface, multi-round detection, and JSON output.
 - **Three protocols**: OpenAI Responses, Chat Completions, and Anthropic Messages, with SSE streaming by default.
 - **Reference bank**: covers common model families such as GPT, Claude, Gemini, Grok, Qwen, and DeepSeek. The website's reference library can be browsed and exported read-only.
-- **Tokenizer probe**: while sampling, API detection sends about 12 extra short requests, identifies the tokenizer behind the API (the rule a model uses to cut text into tokens) from the token counts in the API usage, adds the result to the candidates' confidence, and checks it against the requested model.
-- **Direct first**: when an API allows web pages to call it directly, the browser calls it; when the browser's cross-origin restriction (CORS) blocks that, your API key and requests go through a forwarding proxy only after you allow it, and the proxy can be a Cloudflare Worker you deploy yourself.
+- **Tokenizer probe (optional, off by default)**: turn on “Tokenizer probe” in the API configuration, or add `--tokenizer` on the command line. Detection then sends about 12 more short requests and identifies the upstream tokenizer (the rule a model uses to cut text into tokens) from the token counts in the API usage. It checks the tokenizer against the model you entered. The result is reference only: the ranking and the confidence come from the number fingerprint alone and do not wait for the probe. Many models share one tokenizer, so a matching tokenizer does not prove the model identity.
+- **Choose how to connect**: pick Auto, Direct, This site's proxy, or Own Worker in the API configuration. Auto calls the API directly from the browser when it allows web pages to (CORS) and otherwise goes through this site's proxy; you can switch to a Cloudflare Worker you deploy yourself.
 - **Traceable data maintenance**: `fpd sample`, `fpd enroll`, and `fpd retrain` handle sampling, enrollment, and offline retraining. Failed records and previous attempts are always kept.
 
 <Callout type="warn" title="Results rank the reference bank only">
@@ -30,7 +30,7 @@ A relay or third-party API may claim to serve one model while actually routing t
 
 ## About these docs
 
-The docs are built with the repository and published under `/docs` of the detector site, with Chinese and English versions of every page. The buttons at the top of each page copy the page as Markdown or open its source file on GitHub; `llms.txt` and `llms-full.txt` at the docs root provide a plain-text version of the whole site for LLM tools.
+The docs are built with the repository and published under `/docs` of the detector site. Every page has a Chinese and an English version, except the proxy API reference pages generated from `worker/openapi.json`, which have one version. The buttons at the top of each page copy the page as Markdown or open its source file on GitHub; `llms.txt` and `llms-full.txt` at the docs root provide a plain-text version of the whole site for LLM tools.
 
 ## Acknowledgments
 

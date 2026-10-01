@@ -36,30 +36,30 @@ export interface TokenizerBank {
 /** Throws unless the bank has the expected shape, so a stale or truncated file fails before any request is sent. */
 export function assertTokenizerBank(value: unknown): asserts value is TokenizerBank {
   const bank = value as TokenizerBank
-  if (bank?.schema !== 'tokenizer-bank-v1') throw new Error('The tokenizer bank has an unsupported schema.')
+  if (bank?.schema !== 'tokenizer-bank-v1') throw new Error('The tokenizer bank schema must be tokenizer-bank-v1.')
   if (!Array.isArray(bank.probes) || !bank.probes.length || !Array.isArray(bank.classes) || bank.classes.length < 2) {
-    throw new Error('The tokenizer bank must contain probes and at least two classes.')
+    throw new Error('The tokenizer bank needs a nonempty probes array and a classes array with two or more classes.')
   }
   if (typeof bank.wrapper?.prefix !== 'string' || typeof bank.wrapper?.suffix !== 'string') {
-    throw new Error('The tokenizer bank has no probe wrapper.')
+    throw new Error('The tokenizer bank needs wrapper.prefix and wrapper.suffix strings.')
   }
   const ids = new Set<string>()
   for (const item of bank.classes) {
-    if (ids.has(item.id)) throw new Error(`The tokenizer bank repeats class ${item.id}.`)
+    if (ids.has(item.id)) throw new Error(`Tokenizer class ${item.id} occurs more than one time in the tokenizer bank.`)
     ids.add(item.id)
     if (item.counts.length !== bank.probes.length || !item.counts.every(Number.isSafeInteger)) {
-      throw new Error(`Tokenizer class ${item.id} does not have one integer count per probe.`)
+      throw new Error(`Tokenizer class ${item.id} needs one integer count for each probe text.`)
     }
   }
-  if (!Array.isArray(bank.api_models)) throw new Error('The tokenizer bank has no api_models array.')
+  if (!Array.isArray(bank.api_models)) throw new Error('The tokenizer bank needs an api_models array.')
   for (const model of bank.api_models) {
-    if (model.class !== null && !ids.has(model.class)) throw new Error(`API model ${model.pattern} refers to unknown class ${model.class}.`)
+    if (model.class !== null && !ids.has(model.class)) throw new Error(`API model pattern ${model.pattern} points to class ${model.class}, which is not in the tokenizer bank.`)
   }
   // Compile the patterns now so a broken bank fails before any request is sent and billed.
   const patterns = [...bank.api_models.map(model => model.pattern), ...bank.classes.flatMap(item => Array.isArray(item.aliases) ? item.aliases : [null])]
   for (const pattern of patterns) {
-    if (typeof pattern !== 'string') throw new Error('The tokenizer bank has a class without an aliases array.')
-    try { new RegExp(pattern, 'i') } catch (error) { throw new Error(`The tokenizer bank has an invalid pattern ${pattern}: ${(error as Error).message}`) }
+    if (typeof pattern !== 'string') throw new Error('Each tokenizer class needs an aliases array.')
+    try { new RegExp(pattern, 'i') } catch (error) { throw new Error(`Pattern ${pattern} in the tokenizer bank is not a valid regular expression: ${(error as Error).message}`) }
   }
 }
 

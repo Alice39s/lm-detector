@@ -51,9 +51,12 @@ function corsOrigin(request, allowed) {
 /** @param {string} origin @returns {Record<string, string>} */
 const corsHeaders = origin => origin === 'same' ? {} : { 'Access-Control-Allow-Origin': origin, 'Access-Control-Expose-Headers': 'Retry-After', Vary: 'Origin' }
 
-/** @param {number} status @param {string} message @param {string} origin */
-function failure(status, message, origin) {
-  return Response.json({ error: { message } }, {
+/**
+ * @param {number} status @param {string} message @param {string} origin
+ * @param {string} [code] Machine-readable reason, which the web app turns into a hint.
+ */
+function failure(status, message, origin, code) {
+  return Response.json({ error: code ? { message, code } : { message } }, {
     status,
     headers: { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff', ...(status === 405 ? { Allow: 'GET, POST, OPTIONS' } : {}), ...corsHeaders(origin) },
   })
@@ -170,7 +173,11 @@ export async function proxyRequest(request, options = {}) {
     const mediaType = contentType.split(';')[0].trim().toLowerCase()
     if (mediaType !== 'text/event-stream' && mediaType !== 'application/json' && !/^application\/[\w.-]+\+json$/.test(mediaType)) {
       await upstream.body?.cancel()
-      return failure(upstream.ok ? 502 : upstream.status, `The upstream returned an unsupported response (HTTP ${upstream.status}).`, origin)
+      // A successful answer that is no API reply is almost always a web page behind a wrong path in the Base URL.
+      if (upstream.ok) {
+        return failure(502, `The upstream returned a web page or other non-API content (HTTP ${upstream.status}). Check the path in the Base URL.`, origin, 'upstream_not_api')
+      }
+      return failure(upstream.status, `The upstream returned an unsupported response (HTTP ${upstream.status}).`, origin)
     }
     const responseHeaders = new Headers({
       'Content-Type': contentType, 'Cache-Control': 'no-store, no-transform', 'X-Content-Type-Options': 'nosniff', 'X-Accel-Buffering': 'no',
@@ -187,8 +194,15 @@ export async function proxyRequest(request, options = {}) {
   }
 }
 
-/** @param {string | undefined} value @returns {string[]} */
-export const parseOrigins = value => (value ?? DEFAULT_ALLOWED_ORIGINS).split(',').map(origin => origin.trim()).filter(Boolean)
+/**
+ * Normalizes each entry to the form browsers send in `Origin` (lowercase, no path or trailing slash), so a value
+ * copied from the address bar still matches. Entries that are not URLs are dropped.
+ * @param {string | undefined} value @returns {string[]}
+ */
+export const parseOrigins = value => (value ?? DEFAULT_ALLOWED_ORIGINS).split(',').map(origin => origin.trim()).flatMap(origin => {
+  if (origin === '*') return [origin]
+  try { return [new URL(origin).origin] } catch { return [] }
+})
 
 export default {
   /** @param {Request} request @param {{ ALLOWED_ORIGINS?: string }} env */

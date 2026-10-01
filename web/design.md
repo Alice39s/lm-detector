@@ -1,20 +1,20 @@
 ---
 name: fingerpoint-design
-description: 用于 Fingerpoint 的三样本检测、分词器探测、API 配置、候选结果、图片导出和只读样本库。服务需要比较 LLM 指纹的用户，支持简体中文和英文、浅色和深色主题。
-version: 2026-10-01.4
+description: 用于 Fingerpoint 的三样本检测、分词器探测、API 配置、候选结果、图片导出、只读样本库和文档站。服务需要比较 LLM 指纹的用户，支持简体中文和英文、浅色和深色主题。
+version: 2026-10-01.10
 ---
 
 # Fingerpoint design.md
 
 ## 1. 范围与优先级
 
-[必须] 将本文件用于 `web/` 的检测、样本库、反馈状态和结果图片。
+[必须] 将本文件用于 `web/` 的检测、样本库、反馈状态和结果图片，以及 `docs/` 的文档站。
 [必须] 不参考旧站点的视觉外观。
 [必须] 按用户要求、真实算法输出、安全与无障碍、当前任务、视觉表达的顺序处理冲突。
 [必须] 保留三条算法生成的提示词和对应回复。
 [必须] 将评分算法视为黑盒。界面不生成特征命中、贡献分或推理解释。
 [必须] 不提供 URL 分享结果或网页端贡献样本功能。
-[必须] 前端发布静态资源。接口允许浏览器跨域（CORS）时由浏览器直接请求；否则只在用户授权后经转发代理（同源 `/api/proxy`，或用户保存的自建 Worker）转发到用户指定且代理允许的 HTTPS 服务，仅 `/api/proxy` 进入 Cloudflare Pages Function。
+[必须] 前端发布静态资源。请求按用户选择的连接方式发送：自动（默认，每次运行检查一次接口是否允许浏览器跨域，允许时直连，否则经同源 `/api/proxy`）、直连、本站代理（同源 `/api/proxy`）或自建 Worker。代理只转发到用户指定且代理允许的 HTTPS 服务，仅 `/api/proxy` 进入 Cloudflare Pages Function。
 [必须] 不使用固定评估集建库、校准或生成模型中心。
 
 ## 2. 品牌与读者
@@ -27,12 +27,14 @@ version: 2026-10-01.4
 [必须] 用文字和颜色共同表达取样状态。
 [必须] 区分“模型排名”和“身份已确认”。相似结果不能独立证明身份。
 [必须] 区分“分词器一致”和“模型一致”。分词器探测只说明上游使用哪一种分词器。
+[必须] 分词器探测只作参考信息，不改变排名、置信度或校验分数，结果不等待探测完成。（来源：2026-10-01 用户要求把分词器改成可选参考信息，不加权算入得分，不阻塞最终结果。）
 
 ## 3. 页面结构与构图
 
 ### 应用外壳
 
 - 桌面顶栏高 56px；左侧站名，中间“检测 / 样本库 / 文档”，右侧仓库入口、语言和主题切换。仓库入口在 1024px 以下收为图标。640px 以下使用 88px 双行顶栏，将主导航排在第二行。
+- 768px 以下，顶栏操作区的图标按钮至少 44×44px，仓库入口除外。（来源：2026-10-01 审查发现原规则的选择器未命中按钮。）
 - 左上标识左侧放 32px 像素指纹动画 `.fp-brand-mark`，使用 muted-foreground；右侧为两行文字。（来源：2026-09-28 用户要求图标改为 muted 色。）
 - 左上标识使用两行：`Fingerpoint Detector` 使用 `--font-brand-title`、14px、500 字重、1.25 行高；`by Ikaleio` 使用 `--font-brand-byline`、12px、400 字重、16px 行高，颜色为前景色的 70% 不透明度。（来源：2026-09-22 用户指定 FisProxy 截图，参数取自其品牌标识实现。）
 - 主题菜单提供“浅色 / 深色 / 跟随系统”，用单选标记显示当前选择；默认跟随系统。
@@ -42,7 +44,7 @@ version: 2026-10-01.4
 - 切换页面路径时回到顶部。模型列表与详情标题不做跨页位置变形。
 - 检测页与样本库主体统一最大宽度 1440px。全局预留滚动条空间，内容不随滚动条出现或消失而横移。
 - 两个主导航页面按桌面切换方式横向滑动：进入样本库向左，返回检测向右，顶栏固定。使用视口快照避免长页面滚动位置影响动画，不卸载检测会话。
-- 不添加侧栏。
+- 检测页与样本库不添加侧栏；文档站例外，见“文档站”。
 - 页脚说明本地分析及 API 请求去向，不声称密钥永不离开浏览器。
 
 ### 检测页
@@ -76,11 +78,13 @@ version: 2026-10-01.4
 - 失败或取消单条替换时保留旧回复和旧结果。
 - 成功替换或手动编辑回复时清除旧结果。
 - 未完成且未达到目标数的流式片段不能自动参与验证。用户编辑后可手动采用。
+- 回复只在文本与该条 API 最近返回的文本一致时，才算未经编辑的 API 回复；编辑后再替换失败或被停止，仍按编辑过的回复处理。
 - 单条重新取样沿用该条成功取样时的参数和原提示词。异常分布样本的“更换提示词”例外，见“结果”。
 - 并行开关控制三个请求同时或依次执行；不自动重试失败请求。
 - 每条样本独立取样：一条取样时，其他样本仍可开始取样、停止、编辑或清空。样本卡的停止只中止该条，依次执行时跳过该条并继续其余请求；操作栏的停止中止全部。计算期间锁定全部样本。
 - 流式、并行、宽松模式、自动验证在新配置中默认开启；旧配置已明确保存的开关状态保持不变。自动验证仅在本轮指定请求全部成功、三条回复齐全且没有其他样本仍在取样时执行。
 - 离开检测页时中止正在进行的请求，保留已完成内容，忽略旧运行的后续回调。
+- 等待连接检查期间若停止全部、重新检测、开始验证、离开检测页或卸载页面，检查结束后不再开始取样或探测。
 
 ### API 配置
 
@@ -89,46 +93,45 @@ version: 2026-10-01.4
 - API 摘要整行使用等宽字体，包括 Base URL、分隔符和 model。
 - 展开后显示配置表单。桌面字段分两列，窄屏排为一列。
 - 配置卡片使用 220ms 高度和透明度过渡，展开或收起时摘要保持原位；减少动效时立即完成。
-- 字段顺序：Base URL、model、API Key、reasoning_effort、协议、流式、并行、宽松模式、自动验证、分词器探测。
+- 字段顺序：Base URL、model、API Key、reasoning_effort、协议、流式、并行、宽松模式、自动验证、分词器探测；开关之后用分隔线隔出“连接方式”。
 - 协议选项固定为 Chat Completions、Messages、Responses。
 - reasoning_effort 可留空，允许输入上游支持的任意值，不限制为少数预设。
 - Key 默认隐藏，可通过有名称的按钮切换可见性。
 - 表单修改直接更新配置；折叠或切换模式时保留填写内容。取样仍由主操作触发，修改字段不发送请求。
 - 配置不完整时默认展开。点击开始取样时若有缺项，展开并聚焦第一个缺失字段。
 - 取样及计算期间禁用配置编辑；重新展开配置时 Key 恢复隐藏。
-- 接口地址下方用次级文字显示连接方式：尚未检查、可直连、经代理（已授权）、需要授权、无法直连、Worker 地址缺失；记住的授权旁提供“撤销代理授权”链接按钮，撤销立即生效。
-- 代理授权对话框使用 `Dialog`：标题前放 warning 色 `ShieldAlert` 图标，正文写明接口主机、原因（拒绝跨域或无法连接）和将要经过的代理（“本站代理”或“代理 {主机}”），列表说明密钥与内容经该代理转发、代理如何处理密钥、授权可撤销；自建 Worker 如实说明本站无法确认它如何处理密钥。底部按钮依次为取消（ghost，默认焦点）、仅本次允许（outline）、始终允许此接口（主按钮）。Esc、关闭按钮与点击遮罩都等同取消。
-- 配置开关之后用分隔线隔出“转发代理”（`ProxySettings`）：说明文字写明只用于不能直连的接口、对所有配置生效；`Segmented` 选择本站代理或自建 Worker，右侧为“检查代理”按钮。转发代理是浏览器级设置，不写入配置预设或导出的配置文件。
-- 自建 Worker 显示等宽的 Worker 地址输入框：接受 HTTPS，或本机调试用的 `http://localhost`、`http://127.0.0.1`；有效地址随输入保存，失焦后规范化；清空或改成无效地址时同时清除已保存的地址，失焦后用 `FieldError` 提示。其他标签页保存的新地址会替换输入框内容。检查结果写在 `role="status"` 的次级文字中，可用时为 success 色；结果只对应当前选中的代理，切换后不沿用。
+- “连接方式”（`ProxySettings`）用 `Segmented` 四选一：自动（默认）、直连、本站代理、自建 Worker。下方一行次级文字只说明选中的选项：自动写明接口不允许网页直接访问时改经本站代理；直连写明接口不允许浏览器跨域时请求会失败；本站代理写明 Key 经本站中转、中转不保存密钥；自建 Worker 写明 Key 不再经过本站。连接方式是浏览器级设置，不写入配置预设或导出的配置文件；API Key 的说明写明它对所有配置生效。（来源：2026-10-01 用户要求连接方式改为四选一，不要缓存和授权系统。）
+- 自建 Worker 显示等宽的 Worker 地址输入框，右侧为“检查代理”按钮（只在自建 Worker 下出现）：接受 HTTPS，或本机调试用的 `http://localhost`、`http://127.0.0.1`；有效地址随输入保存，失焦后规范化；清空或改成无效地址时同时清除已保存的地址，失焦后用 `FieldError` 提示。检查结果写在 `role="status"` 的次级文字中，可用时为 success 色；结果只对应当前保存的地址，地址变化后不沿用。
 - 自建 Worker 下方用细边框区块放“部署自己的 Worker”：“部署到 Cloudflare”为 outline 链接按钮（新标签打开 Deploy 按钮页），“在 Playground 中打开”为 outline 按钮，下方列表说明两者差别；当前页面 origin 不在 Worker 默认 `ALLOWED_ORIGINS` 中时，追加一条需要加入该 origin 的提示。导入按钮在点击时先打开新标签，下载失败则关闭该标签并用 toast 报错；浏览器拦截新标签时单独提示允许弹出窗口。
-- 试探期间主按钮禁用并显示 `Loader2` 与“检查连接…”，配置与模式切换同时锁定。
+- 自动模式检查连接期间主按钮禁用并显示 `Loader2` 与“检查连接…”，配置与模式切换同时锁定。
 - API 设置支持本地多配置预设（Profiles）：收起时摘要条左侧提供快速切换菜单，展开后顶部工具栏支持配置重命名、新建、一键克隆副本与安全删除。设置（包括密钥）自动保存在 localStorage，刷新或重新打开浏览器后恢复，兼容迁移旧版单项配置与 sessionStorage 密钥。
 - “保存”只把当前配置确认保存到浏览器并清除未保存标记，不下载文件；JSON 配置文件通过配置菜单的“导出”生成，“加载”读取该文件。（来源：2026-09-27 用户要求保存按钮不下载 JSON。）
-- “分词器探测”开关在新配置中默认开启，说明写明通常与最多多发的请求数，以及按次计费的接口会多计这些请求；并行请求的说明同时写出“分词器探测每批发 4 个请求”。
+- “分词器探测”开关在新配置中默认关闭；旧配置和导入的配置文件没有该字段时也按关闭处理，已明确保存的值保持不变。说明写明通常与最多多发的请求数（最多为 `TOKENIZER_MODEL.maximumProbes` + 2），以及按次计费的接口会计入这些请求；并行请求的说明同时写出“分词器探测每批发 4 个请求”。（来源：2026-10-01 用户要求默认不开分词器探测。）
 
 ### 分词器探测
 
 - 分词器探测是 API 检测的一部分，没有单独的检测方式。开关开启时，点击“开始取样”后与三条取样请求同时探测上游的分词器；修改配置、切换模式或打开页面都不发送请求。（来源：2026-10-01 用户要求把分词器探测融入指纹检测，不做独立模式。）
-- 一次探测对应一组“协议、Base URL、model、Key”。单条重新取样、更换提示词沿用已有的探测；配置变化后的取样、或上次探测没有任何测试文本得到计数时，重新探测。接口不返回用量时不重复探测。
-- 探测为全部样本服务：样本卡的停止只中止该条取样，探测继续；操作栏的停止同时停止探测。
-- 编辑和取样阶段，三张样本卡下方显示一张整行的“分词器探测”卡，结构同样本卡：标题、状态徽标、更多菜单（查看错误详情、重新探测）；探测中标题下的分隔线使用 `march` 像素效果；正文一行给出暂时领先的分词器及置信度，或失败原因；次级文字给出已完成的请求数和一句用途说明。
-- 状态徽标：探测中（warning，带旋转图标）、完全一致（success）、未收录 · 最接近（warning）、未收录的分词器（muted）、未完成（destructive）、已停止（muted）。
-- 计算和结果阶段，样本摘要条增加第四项“分词器 · <系列名>”，与三条样本的摘要同样可展开；展开的详情与样本详情共用同一个展开位置，一次只展开一项。
-- 详情在 1024px 起分两栏（约 3:2）：左栏依次为分词器（系列名、实验室、置信度）、与所填模型的一致性提示、两次对照请求计数不同的 `warning`、候选分词器列表、接口返回的模型名；右栏为请求记录。窄屏按同一顺序排成一列。探测失败时顶部的 `destructive` 提示提供“查看错误详情”和“重新探测”。
-- 一致性提示：一致用默认 `Alert` 加 success 色图标；不一致用 `destructive`；尚不能确定用 `warning`；本工具不知道该模型的分词器时只显示一行次级文字。判定为 o200k_base 或 cl100k_base 且与所填模型不一致时，在同一提示内补一句中转站可能用 tiktoken 在本地估算用量。
-- 候选列表复用 `fp-result-row` 与置信度条，显示前 6 类的“完全一致”概率，最后一行固定为“未收录的分词器”。候选按概率排序，重排使用 smooth 弹簧的位置动画；减少动效时不做位置动画。
-- 请求记录在桌面限制最大高度并局部滚动；每行显示状态图标、测试文本的类别、测试文本原文（单行省略，完整原文在标题提示中）、输入 token 数和相对对照请求增加的 token 数。失败行提供“失败”按钮打开错误详情；用户停止的请求标为“已停止”，不显示为错误。
-- 详情底部依次提供三个折叠项：这一类包含的开源分词器、每条测试文本的计数表（实测增加的 token、预期增加的 token、是否一致）、如何理解探测结果（依次说明测量方法、分词器一致的含义、用量估算的影响、并入置信度的方式）。计数表只列原始计数。
-- 取样结束时探测仍在进行，计算状态行显示“正在完成分词器探测…”，操作栏提供“停止探测”；停止后用已收到的计数计算。
-- 结果出现后重新探测成功，直接把新的分词器结果并入当前结果，不重新取样。
+- 一次探测对应一组“协议、Base URL、model、Key、流式”。单条重新取样、更换提示词沿用已有的探测；配置变化后的取样、或上次探测没有任何测试文本得到计数时，重新探测。接口不返回用量时不重复探测。
+- 探测为全部样本服务：样本卡的停止只中止该条取样，探测继续；操作栏的停止同时停止探测。读取分词器库期间停止时，不发送也不记录任何测试请求，探测标为已停止。
+- 编辑和取样阶段，三张样本卡下方显示一张整行的“分词器探测”卡，结构同样本卡：标题、状态徽标、更多菜单（查看错误详情、重新探测）；探测中标题下的分隔线使用 `march` 像素效果；正文一行给出暂时领先的分词器及置信度，或失败原因；次级文字为“请求数 · 说明”，说明与详情标题下的说明是同一句（参考信息，不改变排名和置信度）。
+- 状态徽标：探测中（warning，带旋转图标）、完全一致（success）、接近已收录的类（warning）、未收录（muted）、未完成（destructive）、已停止（muted）。
+- 计算和结果阶段，只要本次会话有探测，样本摘要条就增加第四项“分词器 · <系列名>”，与三条样本的摘要同样可展开；展开的详情与样本详情共用同一个展开位置，一次只展开一项。探测在结果出现后继续进行时，第四项和详情随新计数实时更新。分词器的判定和与所填模型的一致性只在这张卡、第四项和详情中显示，结果区不显示分词器信息。
+- 详情头部与样本详情相同：左侧标题；右侧依次为“收起”按钮、状态徽标、更多菜单（有失败时“查看错误详情”，以及“重新探测”）。标题行下方一行 `text-meta` muted 说明它是参考信息、不改变排名。头部下方是分隔线，探测中使用 `march` 像素效果。
+- 探测失败（`destructive`）、已停止（默认 `Alert`，muted 文字）、收尾对照请求失败与两次对照请求计数不同（`warning`）用整行 `Alert` 放在分隔线和网格之间，左右边缘与卡片内容边缘对齐。操作只放在更多菜单和底部行，正文中不另放按钮。
+- 正文是一个网格，DOM 顺序为 A 摘要、B 所填模型、C 候选分词器、D 请求记录。1024px 起两列 `minmax(0,3fr) minmax(0,2fr)`，只有一个列间距：A|B 为第一行，C|D 为第二行，第二行在两列从同一 y 开始。1024px 以下排成一列，顺序为 A、B、C、D，所有块左右边缘相同，页面不横向溢出。
+- A 是 `minmax(0,1fr) auto` 的三行：`text-meta` 标签（结束后“上游分词器”，探测中“暂时领先”）| 右对齐的“置信度”；`text-section-title` 系列名（非完全一致时为“未收录的分词器”）| `fp-mono` 百分比；`text-body` muted 实验室名（非完全一致时为“最接近 <类>”）。A 的左边缘与 C 名次列左边缘相同，百分比右边缘与 C 百分比列右边缘相同。
+- B 使用与 A 相同的三行字号：`text-meta` 标签“所填模型”；`text-section-title` `fp-mono` 模型 ID（`overflow-wrap:anywhere`）；`text-body` 状态行，左侧 16px lucide 图标按语义着色：一致 success、不一致 destructive、尚不能确定 warning、本工具不知道该模型的分词器 muted、探测中 muted（探测结束后核对）。其下可加 `text-meta` muted 行：判定为 o200k_base 或 cl100k_base 且不一致时说明中转站可能用 tiktoken 估算用量；接口返回的模型名。B 不使用 `Alert` 框。
+- C 与 D 都是无边框列表，不嵌套卡片。两者以相同的头部行开始：左侧 `text-body` font-medium 标题，右侧 `text-meta` muted 数量，同高 44px，底部分隔线。两列表的行高同为 48px（`fp-result-row` 的节奏），行线在两列对齐。
+- C 复用 `fp-result-row` 与置信度条，显示前 6 类的“完全一致”概率，最后一行固定为“未收录的分词器”；768px 起由 `fp-custom-tokenizer-candidates` 给名称列保留 8rem，名称单行省略。候选按概率排序，重排使用 smooth 弹簧的位置动画；减少动效时不做位置动画。
+- D 每行显示状态图标、测试文本的类别、测试文本原文（单行省略，完整原文在标题提示中）、输入 token 数和相对对照请求增加的 token 数（`fp-mono` 右对齐）。1024px 起列表最大高度为 7 行（336px），与 C 同时结束，超出部分局部滚动，列表可用键盘聚焦。失败行提供“失败”按钮打开错误详情；用户停止的请求标为“已停止”，不显示为错误。
+- 底部行同样本详情：左侧 `text-meta` muted 的请求数和探测耗时，右侧 ghost primary 小按钮“重新探测”（探测中或不允许时禁用）。其下为三个整行折叠项：这一类包含的开源分词器、每条测试文本的计数表（实测增加的 token、预期增加的 token、结果；测试文本列左对齐，数值列右对齐，th 与 td 一致）、如何理解探测结果（测量方法、分词器一致不能确认模型身份、用量估算的影响、只作参考）。计数表只列原始计数。
+- [必须] 分词器详情的列共享左右边缘和行线：A 与 C、B 与 D 左边缘相同，A 的百分比与 C 的百分比列右边缘相同，A 与 B 三行基线相同，C 与 D 的头部行同 y 同高、前 7 条行线同 y。检查方法：1440px 下用 `getBoundingClientRect` 比较，误差不超过 1px。（来源：2026-10-01 用户要求分词器详情保持网格对齐。）
+- 探测进行中，凡是操作栏没有取样的“停止”时（编辑、计算、结果阶段，包括取样全部失败或逐条停止之后），操作栏都提供“停止探测”；它只停止探测，停止后用已收到的计数给出判定。取样结束时探测仍在进行，验证照常计算并显示结果，不等待探测。（来源：2026-10-01 审计发现取样结束后探测仍在发送计费请求，却没有停止入口；2026-10-01 用户要求分词器不阻塞最终结果。）
+- 重新探测沿用当前显示的探测的配置，只重新探测，不重新取样，也不改变当前结果。
 
 ### 结果
 
-- 展示算法返回顺序，不以置信度重新排序。并入分词器结果后，算法按融合后的置信度返回候选。
-- 分词器结果只并入回复都来自本次 API 取样、未经编辑、且配置与探测一致的结果；手动模式和编辑过的回复只用数字指纹。只有一两条有效回复时，分词器结果只作报告，不改变排名。
-- 第一候选的家族名旁用状态徽标标出其分词器与实测是否一致：分词器一致（success）、分词器不符（destructive）、分词器待定（warning）、分词器未知（muted）。
-- 分词器结果改变了第一候选时，用 `warning` 说明数字分布最接近的候选；该候选的分词器与实测不符时一并写明。只有一两条有效回复且第一候选的分词器不符时，用 `warning` 说明。
-- 所填模型与实测分词器不一致时，在结果区用 `destructive` 显示一致性提示。没有取得分词器结果时，在排名说明下方用一行次级文字给出原因，并说明本次只使用数字指纹。
+- 展示算法返回顺序，不以置信度重新排序。排名、置信度、检验分数和结果文字只来自数字指纹。
 - 第一项使用模型名和置信度作为主要信息。
 - 主百分数下方显示右对齐的次级文字“检验分数”。
 - 检验分数下方显示次级文字“检测结果由 lm.ikale.io 提供”，其中域名使用 `--font-mono`；英文界面使用对应译文。
@@ -151,10 +154,22 @@ version: 2026-10-01.4
 ### 图片
 
 - 使用浏览器 Canvas，逻辑宽度 1200px，按 2 倍像素密度导出 PNG。
-- 包含站名、日期、第一候选、前五项、实际有效样本数和限制说明；并入分词器结果的结果在范围说明中注明“和分词器探测”。
+- 包含站名、日期、第一候选、前五项、实际有效样本数和限制说明。
 - 使用当前语言及主题，并等待字体加载。
 - 不包含 API Key、接口地址、用户填写的模型 ID 或回复正文。
 - 零置信度的填充宽度为零；不可用置信度显示破折号。
+
+### 文档站
+
+- 文档站在 `docs/`（Fumadocs，React Router 预渲染）。页面顶部使用与检测站相同的顶栏：相同尺寸、`.fp-brand-mark` 像素指纹动画、两行标识（副行写“文档”/“Docs”）、仓库入口、语言切换和主题菜单（浅色 / 深色 / 跟随系统）。导航“检测 / 样本库 / 文档”中，“检测”“样本库”是指向检测站 `#/`、`#/library` 的普通链接，“文档”为当前项并显示下划线。语言切换进入另一语言的同一页面。（决策：文档与检测共用一个应用外壳。来源：2026-10-01 用户要求文档站按 design.md 实现。）
+- 顶栏下方使用 1440px 框架：1024px 起左侧为页面树侧栏（顶部是搜索框），中间为正文，1280px 起右侧为本页目录。1024px 以下页面树改为抽屉，顶栏下方用 44px 的目录栏放“目录”按钮和搜索按钮，本页目录收为可展开的条。（决策：文档需要页面树导航。来源：同上。）
+- Fumadocs 的 `md` 断点设为 1024px，与检测站的布局断点一致。（决策：抽屉与侧栏的切换点沿用 1024px。）
+- 字号使用第 4 章的角色：页面标题用 `text-h1`；描述、侧栏、目录和顶栏用 `text-body`；h2 用 `text-section-title`，h3 用 `text-card-title`，表格用 `text-body`。正文段落为 14px，行高 1.75；行内代码为 13px。（决策：文档是长文，行高高于工具页的 1.5，只用于文档站正文。来源：同上。）
+- 卡片（`Card`）使用 12px 圆角、细边框、16px 内边距，不加阴影，卡片间隔 16px。图标放在标题左侧，使用 muted-foreground，不放图标底板。
+- 提示框（`Callout`）沿用检测站 `Alert` 的样式：8px 圆角；info 与 idea 用 primary 图标；warn 用 warning 底色和边框；error 用 destructive；success 用 success 图标。
+- 代码块和控件使用 8px 圆角，不加阴影。Tabs 是一张卡片，面板与标签栏在同一表面，不嵌套卡片。同一列的 th/td 对齐方式一致，宽表在正文内横向滚动。
+- 公式由 rehype-katex 渲染。`docs/package.json` 中的 `katex` 版本与 rehype-katex 依赖的版本一致。（来源：2026-10-01 审查发现版本不一致，公式失去排版规则。）
+- 减少动效与 focus-visible 的要求同第 4 章。Fumadocs 控件去掉 outline 而没有替代样式时，补 2px ring。
 
 ### 样本库
 
@@ -175,12 +190,12 @@ version: 2026-10-01.4
 
 ### 字体与颜色
 
-- 使用 `src/index.css` 的 Geist Variable 和 CJK 系统回退。接口、Key 和 ID 输入可用 `--font-mono`。
-- 标识标题使用 `--font-brand-title`（Noto Serif SC）；署名使用 `--font-brand-byline`（Noto Sans SC），与参考的 FisProxy 标识一致。`src/index.css` 从 `@fontsource-variable/noto-serif-sc` 和 `@fontsource-variable/noto-sans-sc` 包引用英文标识所需的 Latin WOFF2 文件，随站点构建加载。
+- 使用 `src/tokens.css` 的 Geist Variable 和 CJK 系统回退。接口、Key 和 ID 输入可用 `--font-mono`。
+- 标识标题使用 `--font-brand-title`（Noto Serif SC）；署名使用 `--font-brand-byline`（Noto Sans SC），与参考的 FisProxy 标识一致。`src/tokens.css` 从 `@fontsource-variable/noto-serif-sc` 和 `@fontsource-variable/noto-sans-sc` 包引用英文标识所需的 Latin WOFF2 文件，随站点构建加载。
 - 正文与控件使用 `text-body` 或组件的 `text-sm`。移动输入框使用 1rem，避免浏览器自动缩放。
 - `text-meta` 只承载数量、日期等次要内容，不承载主要操作和限制说明。
 - 数值统一使用 tabular-nums；百分比保留一位小数。
-- 浅色及深色 token 都在 `src/index.css` 中定义，页面不复制色值。
+- 浅色及深色 token 都在 `src/tokens.css` 中定义，页面不复制色值。
 - 蓝色用于主要操作、焦点和置信度条；状态使用 success、warning、destructive 语义色；`--star` 只用于求 Star 入口，不作为状态色。
 - 不按厂商分配置信度条颜色。
 
@@ -238,17 +253,19 @@ version: 2026-10-01.4
 | 角色 | 实现名称 | 路径 | 状态 |
 |---|---|---|---|
 | 颜色与主题 | background、foreground、card、popover、primary、muted、muted-foreground、border、input、ring、success、warning、destructive、star | `src/tokens.css`、`src/index.css` | 已实现 |
-| 字号 | text-display、text-display-number、text-h1、text-section-title、text-card-title、text-body、text-meta | `src/index.css` | 已实现 |
+| 字号 | text-display、text-display-number、text-h1、text-section-title、text-card-title、text-body、text-meta | `src/tokens.css` | 已实现 |
+| 应用外壳 | fp-topbar、fp-topbar-inner、fp-topbar-actions、fp-brand、fp-brand-mark、fp-brand-text、fp-brand-title、fp-brand-byline、fp-nav、fp-nav-indicator、fp-repository-link；--fp-topbar-height | `src/shell.css` | 已实现 |
 | 容器 | fp-shell、fp-page、fp-page-wide、fp-grid-samples、fp-detect-footer、fp-actionbar、fp-result-row | `src/index.css` | 已实现 |
 | 表面与数据 | fp-card、fp-bar、fp-reply、fp-mono | `src/index.css` | 已实现 |
 | 控件 | Button、Input、Textarea、Field、Switch、ToggleGroup、Tabs、Collapsible | `src/components/ui/` | 已实现 |
 | 浮层 | Dialog、DropdownMenu、Tooltip、Sonner | `src/components/ui/` | 已实现 |
 | 数据反馈 | Table、Badge、Empty、Skeleton、Alert | `src/components/ui/` | 已实现 |
 | 检测对象 | SampleCard、SampleStrip、ResultPanel、ApiConfigPanel（摘要类 fp-api-summary） | `src/components/`、`src/index.css` | 已实现 |
-| 连接与代理 | ProxyConsentDialog、ProxySettings、useConnectionRoute | `src/components/proxy-consent-dialog.tsx`、`src/components/proxy-settings.tsx`、`src/lib/use-connection-route.ts` | 已实现 |
-| 分词器探测 | TokenizerCard、TokenizerStripButton、TokenizerDetails、ClaimAlert、useTokenizerProbe；复用 ConfidenceBar | `src/components/tokenizer-panel.tsx`、`src/components/tokenizer-claim.tsx`、`src/lib/use-tokenizer-probe.ts` | 已实现 |
+| 连接方式 | ProxySettings、useConnectionRoute | `src/components/proxy-settings.tsx`、`src/lib/use-connection-route.ts`、`src/lib/route.ts` | 已实现 |
+| 分词器探测 | TokenizerCard、TokenizerStripButton、TokenizerDetails、ModelCheck、useTokenizerProbe；复用 ConfidenceBar；fp-custom-tokenizer-candidates | `src/components/tokenizer-panel.tsx`、`src/components/tokenizer-claim.tsx`、`src/lib/use-tokenizer-probe.ts`、`src/index.css` | 已实现 |
 | 动效 | useMotionPreset、spring、listStagger、listItem | `src/lib/motion.ts` | 已实现 |
-| 像素装饰 | PixelShader、PixelSpinner、fp-pixel、fp-brand-mark | `src/components/pixel-shader.tsx`、`src/lib/pixel-effects.ts`、`src/lib/pixel-renderer.ts`、`src/index.css` | 已实现 |
+| 像素装饰 | PixelShader、PixelSpinner、fp-pixel、fp-brand-mark | `src/components/pixel-shader.tsx`、`src/lib/pixel-effects.ts`、`src/lib/pixel-renderer.ts`、`src/shell.css` | 已实现 |
+| 文档站 | SiteHeader、DocsBar、Callout、Card | `docs/app/components/` | 已实现 |
 | 图标 | lucide-react | `package.json` | 已安装 |
 
 [必须] 公开原语是本表的组件、类和 token；使用前确认 API 存在。
@@ -275,7 +292,7 @@ version: 2026-10-01.4
 [必须] 不把分词器一致写成“已确认模型身份”；同一种分词器常被多个模型复用。
 [必须] 不把未知置信度显示为 0%，不自行添加判定阈值。
 [必须] 不把密钥写入 URL、导出图片或日志。
-[必须] 不在用户授权前把请求或密钥发给任何代理；换用另一个代理时重新询问。
+[必须] 请求和密钥只发往所选连接方式指定的去向；“自动”可能改经本站代理，设置的说明文字写明这一点。不把失败的直连请求自动改走代理。（来源：2026-10-01 用户要求连接方式改为四选一，不要缓存和授权系统。）
 [必须] 不在设置草稿变化时自动发送模型请求。
 [必须] 不自动向参考库写入检测回复。
 [必须] 不添加 URL 分享、贡献样本、登录等未请求入口。
@@ -290,19 +307,19 @@ version: 2026-10-01.4
 - 样式为 Tailwind v4；shadcn 使用现有 base-nova / Base UI 组件，不切换到另一套组件系统。
 - 动效使用已安装的 `framer-motion`。
 - `next-themes` 通过 html.dark 应用主题，`index.html` 在加载前恢复偏好。
-- 主题偏好保存到 `fp-theme`。存储不可用时，首屏按系统外观显示；原生控件和滚动条使用当前主题的 color-scheme。文档站使用同一个键，两处的主题选择互相同步。
-- 颜色 token 与品牌字体在 `src/tokens.css`。文档站 `docs/` 直接导入该文件，经 Fumadocs 的 shadcn 预设映射为文档配色；文档顶栏沿用两行品牌标识，副行写“文档”。新增或修改 token 时同时检查两处。
+- 主题偏好保存到 `fp-theme`。存储不可用时，首屏按系统外观显示；原生控件和滚动条使用当前主题的 color-scheme。文档站通过 Fumadocs RootProvider 的 next-themes `storageKey` 使用同一个键，主题菜单同为三项单选，两处的主题选择互相同步。
+- 颜色 token、字号角色（`text-*`）与品牌字体在 `src/tokens.css`；顶栏外壳类与像素装饰宿主 `.fp-pixel` 在 `src/shell.css`。两个文件都在 `@import "tailwindcss"` 之后导入：检测站由 `src/index.css` 导入，文档站由 `docs/app/app.css` 直接导入，Fumadocs 的 shadcn 预设把颜色映射为文档配色。文档顶栏通过相对路径导入 `src/components/pixel-shader.tsx`，只在浏览器中懒加载。新增或修改 token 或外壳类时同时检查两处。
 - `src/lib/client.ts` 载入静态参考库，在 Worker 中调用共享算法，Worker 不可用时使用同一实现回退。
-- 每次取样或探测前，`src/lib/route.ts` 用真实请求的方法与头名、假 Key 和 `{}` 请求体试探 CORS；读到任何 HTTP 状态即视为可直连。试探失败时再发 no-cors GET：收到不透明响应为“拒绝跨域”，仍失败为“无法连接”。结论在本页会话缓存 10 分钟；直连请求出现网络错误后下一次重新试探。
-- 直连请求与试探共用 `directHeaders` 与 `directInit`：不携带 Cookie 和 Referer，`redirect: 'error'`；Messages 附带 `anthropic-dangerous-direct-browser-access: true`。
-- 需要代理时按“代理 + 接口 origin”检查授权：仅本次允许只在本页会话有效，始终允许写入 localStorage 的 `fingerpoint-proxy-consent-v1`，其他标签页通过 storage 事件同步。不把失败的直连请求自动改走代理。
-- 转发代理设置以 `{ mode, endpoint }` 保存在 localStorage 的 `fingerpoint-proxy-v1`，缺省为本站代理 `/api/proxy`。自建 Worker 模式只使用该模式下保存的有效地址：地址为空或无效时，需要代理的运行不开始，提示并聚焦 Worker 地址输入框，不回退到本站代理或旧地址。每次运行开始时把选定的代理写进路由（`Route`），运行中修改设置不影响正在进行的请求。
-- 经代理时浏览器向该代理发送请求及认证头，不携带 Cookie。代理实现为单文件 Worker `worker/main.js`：只转发允许的 HTTPS 域名和三种协议端点，不跟随重定向，不保存或记录密钥，不转发 Cookie；Messages 由代理发送 x-api-key 和 anthropic-version。跨域调用自建 Worker 时，Worker 按 `ALLOWED_ORIGINS` 回应预检和 CORS 头。
+- 每次取样或探测开始时，`src/lib/use-connection-route.ts` 按连接方式确定路由：直连；本站代理 `/api/proxy`；自建 Worker 的已保存有效地址；自动模式用真实请求的方法与头名、假 Key（`sk-cors-check`）和 `{}` 请求体检查一次（8 秒超时），读到任何 HTTP 响应即直连，否则经本站代理。检查结果不缓存，每次运行重新检查。
+- 直连请求与自动检查共用 `directHeaders` 与 `directInit`：不携带 Cookie 和 Referer，`redirect: 'error'`；Messages 附带 `anthropic-dangerous-direct-browser-access: true`。
+- 直连请求在网络层失败时，`src/lib/client.ts` 报错误码 `direct_network`：文案同时列出地址或网络问题、接口不允许浏览器跨域两种可能，并指向“连接方式”，不断言原因是 CORS。
+- 连接方式以 `{ mode, endpoint }` 保存在 localStorage 的 `fingerpoint-proxy-v1`，mode 缺失或未知时为自动。自建 Worker 模式只使用该模式下保存的有效地址：地址为空或无效时运行不开始，提示并聚焦 Worker 地址输入框，不回退到本站代理或旧地址。每次运行开始时把路由写进 `Route`，运行中修改设置不影响正在进行的请求。
+- 经代理时浏览器向该代理发送请求及认证头，不携带 Cookie。代理实现为单文件 Worker `worker/main.js`：只转发允许的 HTTPS 域名和三种协议端点，不跟随重定向，不保存或记录密钥，不转发 Cookie；Messages 由代理发送 x-api-key 和 anthropic-version。跨域调用自建 Worker 时，Worker 按 `ALLOWED_ORIGINS` 回应预检和 CORS 头。上游以成功状态返回 JSON、SSE 以外的内容（通常是 Base URL 路径错误时的网页）时，代理返回 502 并在错误对象中带 `code: upstream_not_api`；网页把它映射为错误码 `upstream_not_api`，提示检查 Base URL 路径，不提示稍后重试。（来源：2026-10-01 用户遇到 `https://openrouter.ai/v1` 经代理一直 502。）
 - “检查代理”向代理发 GET，读到 `service: fingerpoint-api-proxy` 为可用；读不到响应时再发 no-cors GET，得到不透明响应说明能连上但浏览器无法读取，仍失败则为无法连接。
 - `src/lib/worker-deploy.ts` 生成 Deploy to Cloudflare 链接，并把 GitHub 上的 `worker/main.js` 与 `worker/wrangler.json` 的兼容日期、兼容标志打包成 Workers Playground 链接（multipart 正文经 lz-string 压缩后放在片段中）。
 - `shared/detection.ts` 与 `shared/completion.ts` 负责请求和 JSON/SSE 解析；UI 使用结构化状态和错误 code。
-- 分词器探测的请求、用量解析、后验概率、测试文本选择与融合在 `shared/tokenizer-*.ts`；`src/lib/client.ts` 从静态数据载入 `tokenizer_bank.json`，测试请求与取样请求走同一条已确定的连接方式（直连或代理），并在数字指纹的分析结果上调用 `fuseTokenizerEvidence`。
-- `src/lib/export-image.ts` 在 Canvas 中生成 PNG。JSON 导出包含候选列表；有分词器结果时，每个候选另带数字指纹置信度和分词器一致性，并附每个测试请求的计数，不含请求配置和 API Key。
+- 分词器探测的请求、用量解析、后验概率与测试文本选择在 `shared/tokenizer-*.ts`；`src/lib/client.ts` 从静态数据载入 `tokenizer_bank.json`，测试请求与取样请求走同一条已确定的连接方式（直连或代理）。探测结果不进入数字指纹的分析结果。
+- `src/lib/export-image.ts` 在 Canvas 中生成 PNG。JSON 导出包含只来自数字指纹的候选列表；本次会话的探测已结束时，另在 `tokenizer` 下附探测报告（判定、与所填模型的一致性和每个测试请求的计数），不含请求配置和 API Key。
 - 构建命令为 `bun run typecheck` 和 `bun run build`；渲染检查直接运行网页，不用单元测试替代视觉检查。
 
 ## 词汇表
@@ -318,9 +335,10 @@ version: 2026-10-01.4
 | 把文本切成 token 的规则 | 分词器 / Tokenizer |
 | 计数方式几乎相同的开源分词器的分组 | 类 / Class |
 | 从用量识别上游分词器的检测步骤 | 分词器探测 / Tokenizer probe |
-| 分词器探测发送的一段短文本 | 测试文本 / Probe |
-| 只含固定前后缀、不含测试文本的请求 | 对照请求 / Baseline |
+| 分词器探测发送的一段短文本 | 测试文本 / Probe text |
+| 只含固定前后缀、不含测试文本的请求 | 对照请求 / Baseline request |
 | 上游在请求里额外加入的内容，例如系统提示词 | 隐藏内容 / Hidden input |
 | 接口返回的 token 数 | 用量 / Usage |
 | 替浏览器转发请求的服务 | 转发代理 / Forwarding proxy |
+| 决定请求直连还是经哪个代理转发的设置 | 连接方式 / Connection |
 | 用户自己部署的 `worker/main.js` | 自建 Worker / Own Worker |

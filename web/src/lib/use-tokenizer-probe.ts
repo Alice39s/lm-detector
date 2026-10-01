@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { coded } from '@fingerpoint/shared/detection'
 import type { TokenizerBank } from '@fingerpoint/shared/tokenizer-bank'
 import type { TokenizerRun } from '@fingerpoint/shared/tokenizer-probe'
 import type { ApiConfig, CodedError } from '@fingerpoint/shared/types'
 import * as client from '@/lib/client'
+import type { WebApiConfig } from '@/lib/config'
 
 export type TokenizerPhase = 'idle' | 'loading' | 'probing' | 'result'
 export interface TokenizerSession {
@@ -10,38 +12,39 @@ export interface TokenizerSession {
   bank: TokenizerBank | null
   run: TokenizerRun | null
   /** Configuration frozen at the start of the run, so edits during review do not change the result. */
-  config: ApiConfig | null
-  /** Endpoint, protocol, model and key of the run; samples drawn with another signature are not fused with it. */
-  signature: string
+  config: WebApiConfig | null
   startedAt: number
+  /** When the run settled, failed or stopped; 0 while it runs. */
+  finishedAt: number
   /** Failure before any request, such as an invalid address or a missing bank. */
   error: CodedError | null
 }
-/** A finished probe as the detection reads it, independent of later renders. */
-export interface SettledProbe { bank: TokenizerBank | null; run: TokenizerRun | null; signature: string; startedAt: number; model: string; error: CodedError | null }
 
-export const probeSignature = (config: ApiConfig) => [config.format, config.baseUrl.trim(), config.model.trim(), config.apiKey].join('\n')
-const idle: TokenizerSession = { phase: 'idle', bank: null, run: null, config: null, signature: '', startedAt: 0, error: null }
+const probeSignature = (config: ApiConfig) => [config.format, config.baseUrl.trim(), config.model.trim(), config.apiKey, config.stream ?? true].join('\n')
+const idle: TokenizerSession = { phase: 'idle', bank: null, run: null, config: null, startedAt: 0, finishedAt: 0, error: null }
+
+/** The latest probe. */
+interface Probe {
+  controller: AbortController
+  /** Endpoint, protocol, model, key and streaming of the run. */
+  signature: string
+  /** Whether a new probe with the same signature would add nothing. */
+  reusable: boolean
+}
 
 /**
  * Runs one tokenizer probe at a time next to the sampling requests. Stopping aborts the requests in flight but keeps
  * the run, which then settles with the answered probes; starting over or resetting discards it.
  */
-export function useTokenizerProbe(active: boolean) {
+export function useTokenizerProbe() {
   const [session, setSession] = useState<TokenizerSession>(idle)
-  const controller = useRef<AbortController | null>(null)
-  const pending = useRef<Promise<SettledProbe> | null>(null)
-  /** Signature of the latest probe and whether a new one would add anything, read outside the render cycle. */
-  const latest = useRef<{ signature: string; reusable: boolean } | null>(null)
+  const probe = useRef<Probe | null>(null)
 
-  const stop = useCallback(() => controller.current?.abort(), [])
+  const stop = useCallback(() => probe.current?.controller.abort(), [])
 
   const discard = useCallback(() => {
-    const previous = controller.current
-    controller.current = null
-    pending.current = null
-    latest.current = null
-    previous?.abort()
+    probe.current?.controller.abort()
+    probe.current = null
   }, [])
 
   const reset = useCallback(() => {
@@ -49,55 +52,42 @@ export function useTokenizerProbe(active: boolean) {
     setSession(idle)
   }, [discard])
 
-  /** Starts a probe over the route the sampling requests use and resolves once it settles. */
-  const start = useCallback((config: ApiConfig, route: client.Route) => {
+  /** Starts a probe over the route the sampling requests use. It runs on its own; nothing waits for it to settle. */
+  const start = useCallback((config: WebApiConfig, route: client.Route) => {
     discard()
-    const run = new AbortController()
-    controller.current = run
-    const current = () => controller.current === run
+    const controller = new AbortController()
     const frozen = { ...config }
-    const signature = probeSignature(frozen)
-    const startedAt = Date.now()
-    const base = { signature, startedAt, model: frozen.model.trim() }
-    setSession({ ...idle, phase: 'loading', config: frozen, signature, startedAt })
-    latest.current = { signature, reusable: true }
-    const settled = (async (): Promise<SettledProbe> => {
+    const entry: Probe = { controller, signature: probeSignature(frozen), reusable: true }
+    probe.current = entry
+    const update = (changes: Partial<TokenizerSession>) => { if (probe.current === entry) setSession(previous => ({ ...previous, ...changes })) }
+    setSession({ ...idle, phase: 'loading', config: frozen, startedAt: Date.now() })
+    void (async () => {
       let bank: TokenizerBank | null = null
       try {
         bank = await client.loadTokenizerBank()
-        if (current()) setSession(previous => ({ ...previous, phase: 'probing', bank }))
-        const result = await client.probeTokenizer(frozen, bank, route, run.signal, update => {
-          if (current()) setSession(previous => ({ ...previous, run: update }))
-        })
-        if (current()) {
-          setSession(previous => ({ ...previous, phase: 'result', run: result }))
-          // An upstream without usage will not report it on the next attempt either.
-          latest.current = { signature, reusable: Boolean(result.posterior?.answered) || result.error?.code === 'no_usage' }
+        let run: TokenizerRun
+        if (controller.signal.aborted) {
+          // Stopped while the bank loaded: settle as stopped without sending a request.
+          run = { steps: [], observations: [], posterior: null, verdict: null, baselineDrift: false, error: coded('The request was cancelled.', 'aborted') }
+        } else {
+          update({ phase: 'probing', bank })
+          run = await client.probeTokenizer(frozen, bank, route, controller.signal, next => update({ run: next }))
         }
-        return { ...base, bank, run: result, error: result.error ?? null }
+        update({ phase: 'result', bank, run, finishedAt: Date.now() })
+        // An upstream without usage will not report it on the next attempt either.
+        entry.reusable = Boolean(run.posterior?.answered) || run.error?.code === 'no_usage'
       } catch (error) {
-        if (current()) {
-          setSession(previous => ({ ...previous, phase: 'result', error: error as CodedError }))
-          latest.current = { signature, reusable: false }
-        }
-        return { ...base, bank, run: null, error: error as CodedError }
-      } finally {
-        if (current()) controller.current = null
+        update({ phase: 'result', error: error as CodedError, finishedAt: Date.now() })
+        entry.reusable = false
       }
     })()
-    pending.current = settled
-    return settled
   }, [discard])
-
-  /** The settled run of the current probe, or null when none was started or it was discarded. */
-  const settled = useCallback(() => pending.current ?? Promise.resolve(null), [])
 
   /** Whether sampling with this configuration should start a probe: none ran for it, or the last one ended without evidence. */
   const needed = useCallback((config: ApiConfig) =>
-    latest.current?.signature !== probeSignature(config) || !latest.current.reusable, [])
+    probe.current?.signature !== probeSignature(config) || !probe.current.reusable, [])
 
-  useEffect(() => { if (!active) stop() }, [active, stop])
   useEffect(() => discard, [discard])
 
-  return { session, start, stop, reset, settled, needed, busy: session.phase === 'loading' || session.phase === 'probing' }
+  return { session, start, stop, reset, needed, busy: session.phase === 'loading' || session.phase === 'probing' }
 }

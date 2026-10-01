@@ -1,50 +1,31 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { endpoint } from '@fingerpoint/shared/detection'
+import { useCallback, useState } from 'react'
+import { coded, endpoint } from '@fingerpoint/shared/detection'
 import type { ApiConfig } from '@fingerpoint/shared/types'
 import type { Route } from '@/lib/client'
-import { grantProxyConsent, hasProxyConsent, proxyEndpoint, sniffReachability, upstreamOrigin, type Reachability } from '@/lib/route'
-
-export type ProxyConsentAnswer = 'once' | 'always' | null
-export interface ProxyConsentRequest { origin: string; proxy: string; reachability: Exclude<Reachability, 'direct'> }
+import { allowsDirect, connectionSetting, SITE_PROXY } from '@/lib/route'
 
 /**
- * Decides the route for one run: direct when the endpoint allows browser CORS, otherwise the configured proxy after
- * the user agrees for this proxy and origin. Resolves null when the user dismisses the consent dialog, and rejects
- * with `proxy_missing` when Worker mode has no valid address; nothing is sent in either case.
+ * Decides the route for one run from the connection setting. Auto mode checks the endpoint once (`checking` is true
+ * meanwhile) and goes direct when the browser can read its answer, otherwise through this site's proxy. Rejects with
+ * `invalid_base_url`, or with `proxy_missing` when Worker mode has no valid address; nothing is sent in either case.
  */
 export function useConnectionRoute() {
-  const [request, setRequest] = useState<ProxyConsentRequest | null>(null)
   const [checking, setChecking] = useState(false)
-  const pending = useRef<((answer: ProxyConsentAnswer) => void) | null>(null)
 
-  const answer = useCallback((value: ProxyConsentAnswer) => {
-    const settle = pending.current
-    pending.current = null
-    setRequest(null)
-    settle?.(value)
-  }, [])
-
-  const resolve = useCallback(async (config: ApiConfig): Promise<Route | null> => {
+  const resolve = useCallback(async (config: ApiConfig): Promise<Route> => {
     const url = endpoint(config)
+    const { mode, endpoint: worker } = connectionSetting()
+    if (mode === 'direct') return { kind: 'direct' }
+    if (mode === 'site') return { kind: 'proxy', endpoint: SITE_PROXY }
+    if (mode === 'worker') {
+      if (!worker) throw coded('Worker mode has no valid Worker address.', 'proxy_missing')
+      return { kind: 'proxy', endpoint: worker }
+    }
     setChecking(true)
-    let reachability: Reachability
-    try { reachability = await sniffReachability(url, config.format) } finally { setChecking(false) }
-    if (reachability === 'direct') return { kind: 'direct' }
-    const origin = upstreamOrigin(url), proxy = proxyEndpoint()
-    if (!proxy) throw Object.assign(new Error('Worker mode has no valid Worker address.'), { code: 'proxy_missing' as const })
-    if (hasProxyConsent(proxy, origin)) return { kind: 'proxy', endpoint: proxy }
-    const choice = await new Promise<ProxyConsentAnswer>(settle => {
-      pending.current?.(null)
-      pending.current = settle
-      setRequest({ origin, proxy, reachability })
-    })
-    if (!choice) return null
-    grantProxyConsent(proxy, origin, choice === 'always')
-    return { kind: 'proxy', endpoint: proxy }
+    try {
+      return await allowsDirect(url, config.format) ? { kind: 'direct' } : { kind: 'proxy', endpoint: SITE_PROXY }
+    } finally { setChecking(false) }
   }, [])
 
-  // Leaving the page while the dialog is open counts as dismissing it.
-  useEffect(() => () => pending.current?.(null), [])
-
-  return { resolve, checking, request, answer }
+  return { resolve, checking }
 }

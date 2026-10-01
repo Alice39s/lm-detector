@@ -2,30 +2,14 @@ import { useEffect, useState } from 'react'
 import { motion, useMotionValueEvent, useSpring } from 'framer-motion'
 import { TriangleAlert } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { PixelShader } from '@/components/pixel-shader'
-import { toneClass, type Mode } from '@/components/sample-card'
-import { ClaimAlert } from '@/components/tokenizer-claim'
+import type { Mode } from '@/components/sample-card'
 import { useI18n } from '@/i18n'
 import { brandLogos } from '@/lib/brand-logos'
-import type { ResultTokenizer } from '@/lib/client'
-import { errorReason } from '@/lib/errors'
 import { listItem, listStagger, spring as motionSpring, useMotionPreset } from '@/lib/motion'
 import { confidenceOf, NORMAL_CONFIDENCE_THRESHOLD } from '@/lib/result-confidence'
-import { cn } from '@/lib/utils'
-import type { TokenizerFit } from '@fingerpoint/shared/tokenizer-fusion'
-import type { Analysis, CodedError } from '@fingerpoint/shared/types'
-
-const fitTone: Record<TokenizerFit['status'], keyof typeof toneClass> = { consistent: 'success', inconsistent: 'destructive', uncertain: 'warning', unmapped: 'muted' }
-
-function FitBadge({ fit }: { fit: TokenizerFit }) {
-  const { t } = useI18n()
-  return <Badge className={cn('h-[22px] rounded-[var(--radius-badge)] px-2 text-meta font-medium', toneClass[fitTone[fit.status]])}>{t(`tokenizer.fit.${fit.status}`)}</Badge>
-}
-
-/** Tokenizer evidence of a result: the probe it was fused with, or why none was available. */
-export interface ResultEvidence { probe: ResultTokenizer | null; error: CodedError | null; model: string }
+import type { Analysis } from '@fingerpoint/shared/types'
 
 const VISIBLE = 8
 
@@ -50,9 +34,8 @@ export function ConfidenceBar({ value }: { value: number | null }) {
   )
 }
 
-export function ResultPanel({ result, anomalous, mode, evidence, onReplacePrompts }: { result: Analysis; anomalous: number[]; mode: Mode; evidence: ResultEvidence | null; onReplacePrompts: () => void }) {
-  const i18n = useI18n()
-  const { t, percent } = i18n
+export function ResultPanel({ result, anomalous, mode, onReplacePrompts }: { result: Analysis; anomalous: number[]; mode: Mode; onReplacePrompts: () => void }) {
+  const { t, percent } = useI18n()
   const [all, setAll] = useState(false)
   const { reduced } = useMotionPreset()
   const unscorable = result.decision === 'unscorable' || result.results.length === 0
@@ -62,12 +45,6 @@ export function ResultPanel({ result, anomalous, mode, evidence, onReplacePrompt
   const lowConfidence = !unscorable && topConfidence !== null && topConfidence < NORMAL_CONFIDENCE_THRESHOLD
   const hasScores = result.results.some(r => confidenceOf(r) !== null)
   const rows = all ? result.results : result.results.slice(0, VISIBLE)
-  const tokenizer = result.tokenizer
-  const claim = tokenizer?.verdict?.claim
-  // The tokenizer moved another candidate to the top, or could not be fused and contradicts the leader.
-  const displaced = !unscorable && tokenizer?.fused && tokenizer.fingerprint_top !== result.prediction
-    ? result.results.find(row => row.model === tokenizer.fingerprint_top) : undefined
-  const contradicted = !unscorable && tokenizer && !tokenizer.fused && top?.tokenizer?.status === 'inconsistent'
 
   return (
     <section className="flex flex-col gap-6" aria-labelledby="result-title">
@@ -86,10 +63,7 @@ export function ResultPanel({ result, anomalous, mode, evidence, onReplacePrompt
               <div className="flex min-w-0 flex-col gap-1">
                 <span className="text-meta text-muted-foreground">{t('detect.topLabel')}</span>
                 <span className="text-display [overflow-wrap:anywhere]">{top.display_name}</span>
-                {(top.family_name || top.tokenizer) && <span className="flex flex-wrap items-center gap-2 text-body text-muted-foreground">
-                  {top.family_name}
-                  {top.tokenizer && <FitBadge fit={top.tokenizer} />}
-                </span>}
+                {top.family_name && <span className="text-body text-muted-foreground">{top.family_name}</span>}
               </div>
               {logo && <PixelShader effect="logo" image={logo} className="size-12 shrink-0 text-foreground sm:size-18" />}
             </div>
@@ -121,17 +95,7 @@ export function ResultPanel({ result, anomalous, mode, evidence, onReplacePrompt
           <AlertTitle>{t('detect.lowConfidence')}</AlertTitle>
         </Alert>
       )}
-      {(displaced || contradicted) && (
-        <Alert variant="warning" className="p-4">
-          <TriangleAlert aria-hidden="true" />
-          <AlertTitle>{displaced
-            ? t(displaced.tokenizer?.status === 'inconsistent' ? 'tokenizer.changedLeader' : 'tokenizer.changedLeaderNeutral', { fingerprint: displaced.display_name, top: top.display_name })
-            : t('tokenizer.leaderInconsistent', { top: top.display_name })}</AlertTitle>
-        </Alert>
-      )}
-      {claim?.status === 'inconsistent' && evidence?.model && <ClaimAlert bank={evidence.probe?.bank ?? null} claim={claim} model={evidence.model} observed={tokenizer?.verdict?.kind === 'exact' ? tokenizer.verdict.top.id : undefined} />}
-      {!unscorable && <p className="text-body text-muted-foreground">{result.used_outputs < 3 ? t('detect.partialNote', { n: result.used_outputs }) : t(tokenizer?.fused ? 'detect.rankingNoteFused' : 'detect.rankingNote')}</p>}
-      {!unscorable && !tokenizer && evidence?.error && <p className="text-body text-muted-foreground">{t('tokenizer.unavailableResult', { reason: errorReason(i18n, evidence.error, 'tokenizer.bankFailed') })}</p>}
+      {!unscorable && <p className="text-body text-muted-foreground">{result.used_outputs < 3 ? t('detect.partialNote', { n: result.used_outputs }) : t('detect.rankingNote')}</p>}
       {!unscorable && (
         <motion.ol className="fp-card px-4" variants={reduced ? undefined : listStagger} initial={reduced ? false : 'hidden'} animate="show" aria-label={t('detect.result')}>
           {rows.map((r, i) => {

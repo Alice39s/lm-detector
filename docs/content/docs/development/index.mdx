@@ -45,7 +45,6 @@ icon: Code
 | `builder.ts` | 从参考样本离线建库；拒绝带评估标记的样本 |
 | `tokenizer-bank.ts`、`tokenizer-usage.ts` | 分词器库的类型与校验，以及从 JSON 或 SSE 响应读取用量 |
 | `tokenizer-posterior.ts`、`tokenizer-probe.ts` | 分词器的后验概率、测试文本选择与探测流程 |
-| `tokenizer-fusion.ts` | 把分词器结果按贝叶斯规则并入数字指纹的置信度 |
 | `privacy.ts`、`types.ts` | 脱敏与公共类型 |
 
 正式数据和冻结参数位于 `data/`。网页只调用检测模块，不打包建库入口。
@@ -65,7 +64,7 @@ icon: Code
 
 | 文件 | 作用 |
 | --- | --- |
-| `site.config.ts` | 路径前缀 `DOCS_BASE`，默认 `/docs` |
+| `site.config.ts` | 路径前缀 `DOCS_BASE`（默认 `/docs`）与公开来源 `SITE_ORIGIN`（默认 `https://lm.ikale.io`） |
 | `source.config.ts` | 全局 MDX 插件：数学公式、Mermaid、文件树与步骤 |
 | `app/lib/source.ts` | 内容集合、页面树与 `llms.txt` |
 | `app/routes/*.ts(x)` | 页面、搜索索引、Markdown 版本与 Open Graph 图片 |

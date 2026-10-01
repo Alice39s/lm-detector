@@ -42,7 +42,8 @@ export async function runDetectionCommand(args: string[]) {
         readJson(options.bank ?? fileURLToPath(new URL('../data/unified_bank.json', import.meta.url))),
         readJson(fileURLToPath(new URL('../data/shared_detector.json', import.meta.url))),
         loadChallenges(options.challenges, options.count),
-        options.tokenizer ? readJson(options.tokenizerBank ?? fileURLToPath(new URL('../data/tokenizer_bank.json', import.meta.url))) : undefined,
+        // --input reads a saved probe without requests, so it always needs the bank to recompute it.
+        options.tokenizer || options.input ? readJson(options.tokenizerBank ?? fileURLToPath(new URL('../data/tokenizer_bank.json', import.meta.url))) : undefined,
       ])
       const bank = bankData as Bank, detector = detectorData as SharedDetector
       if (!Array.isArray(bank?.models) || !bank.models.length) throw new Error('The reference bank must contain a nonempty models array.')
@@ -57,14 +58,16 @@ export async function runDetectionCommand(args: string[]) {
       if (!options.json) display = createDisplay(options, bank.models.length, cancel, tokenizerBank)
       const state = options.input ? await analyzeInput(options, bank, detector, tokenizerBank)
         : await runDetection(options, bank, detector, state => display?.update(state), abort.signal, challenges, tokenizerBank)
-      display?.update(state)
+      if (display) display.update(state)
+      else if (state.tokenizerWarning) process.stderr.write(`Warning: ${state.tokenizerWarning}\n`)
       const serialized = serializeResult(state, options, bank, tokenizerBank)
       if (options.output) await writeFile(options.output, serialized, { mode: 0o600 })
       if (options.json) process.stdout.write(serialized)
       const updateNotice = stopUpdateCheck?.()
       await display?.finish(options.output, undefined, state.cancelled ? undefined : updateNotice)
       display = undefined
-      if (state.cancelled) process.exitCode = process.exitCode || 130
+      // Stopping only the trailing tokenizer probe keeps every round but still exits as a cancellation.
+      if (state.cancelled || abort.signal.aborted) process.exitCode = process.exitCode || 130
       else if (state.rounds.some(round => round.error)) process.exitCode = 1
     }
   } catch (error) {

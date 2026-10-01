@@ -11,10 +11,12 @@ import { docsBase } from '../site.config.ts'
 const docsDir = resolve(import.meta.dirname, '..')
 const built = join(docsDir, 'build/client', docsBase)
 const target = resolve(docsDir, '../web/dist/docs')
+const detectorIndex = resolve(docsDir, '../web/dist/index.html')
 
-if (!(await stat(built)).isDirectory()) throw new Error(`No pre-rendered docs in ${built}; run the docs build first.`)
+// A missing path rejects with ENOENT; it reads as "not built yet" here.
+if (!(await stat(built).catch(() => null))?.isDirectory()) throw new Error(`No pre-rendered docs in ${built}; run the docs build first.`)
 // The detector must be built first: publishing into an empty web/dist would deploy the docs alone.
-await stat(resolve(docsDir, '../web/dist/index.html'))
+if (!(await stat(detectorIndex).catch(() => null))?.isFile()) throw new Error(`No detector build at ${detectorIndex}; build the detector first.`)
 await rm(target, { recursive: true, force: true })
 await mkdir(target, { recursive: true })
 await cp(built, target, { recursive: true })

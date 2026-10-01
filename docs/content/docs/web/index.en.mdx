@@ -4,7 +4,7 @@ description: The manual and API sampling modes, the switches in the API configur
 icon: Globe
 ---
 
-The detection website [lm.ikale.io](https://lm.ikale.io) is a pure frontend app. Challenge generation, feature extraction, ranking, and verification all run in the browser, and the reference bank is served as static files. The website only runs detection and browses the reference bank read-only. It never writes any reply to the reference bank. Your API key is sent only to the API you enter, or through a forwarding proxy you agree to; see [Direct calls and proxy consent](./connection.mdx).
+The detection website [lm.ikale.io](https://lm.ikale.io) is a pure frontend app. Challenge generation, feature extraction, ranking, and verification all run in the browser, and the reference bank is served as static files. The website only runs detection and browses the reference bank read-only. It never writes any reply to the reference bank. Your API key is sent only when a request goes out, to the API you enter or to a forwarding proxy, as the connection mode you choose decides; see [Connection](./connection.mdx).
 
 ## Sampling modes
 
@@ -27,15 +27,17 @@ The detection website [lm.ikale.io](https://lm.ikale.io) is a pure frontend app.
 | Reasoning effort | Can be left blank, or set to any `reasoning_effort` value that the upstream supports |
 | Protocol | Chat Completions, Messages, or Responses |
 
-Switches below the configuration, all on by default:
+Switches below the configuration, all on by default except "Tokenizer probe":
 
 - **Streaming**: uses SSE and shows output as it is generated. When off, the page waits for the complete JSON response.
 - **Parallel requests**: sends the three samples at once, and the tokenizer probe four requests at a time. When off, requests go one by one, which takes longer.
 - **Relaxed mode**: streaming sampling stops once it receives the requested count of complete valid integers. A non-streaming reply that exceeds the requested count keeps only the first N. The interface marks both cases as "Capped". When off, the upstream reply must finish naturally and completely.
 - **Verify automatically after sampling**: computes the result automatically once all three samples succeed and no other sample is still sampling.
-- **Tokenizer probe**: sends about 12 extra short requests while sampling (at most 22), identifies the upstream tokenizer, and adds it to the confidence. APIs billed per request charge for these requests. See [Tokenizer probe](./tokenizer.mdx).
+- **Tokenizer probe**: off by default. When on, it sends about 12 extra short requests while sampling (at most 22) and identifies the upstream tokenizer. The result is reference information and does not change the ranking. APIs billed per request bill these requests. See [Tokenizer probe](./tokenizer.mdx).
 
-The configuration and the key are saved automatically in the browser's localStorage and are restored after a reload or when you reopen the page. The profile menu supports several profiles, which you can rename, create, duplicate, and delete. "Save" only confirms the current configuration in the browser. "Export" and "Load" move a configuration between a file and the browser. An exported file contains your API key in plain text, so do not send it to anyone or upload it to cloud storage. "Forwarding proxy" is a browser-level setting and does not belong to any profile. See [Direct calls and proxy consent](./connection.mdx).
+Below the switches is "Connection": Auto (the default), Direct, This site's proxy, or Own Worker. It decides whether the browser calls the API directly or sends requests through a proxy; see [Connection](./connection.mdx).
+
+The configuration and the key are saved automatically in the browser's localStorage and are restored after a reload or when you reopen the page. The profile menu supports several profiles, which you can rename, create, duplicate, and delete. "Save" only confirms the current configuration in the browser. "Export" and "Load" move a configuration between a file and the browser. An exported file contains your API key in plain text, so do not send it to anyone or upload it to cloud storage. "Connection" is a browser-level setting and does not belong to any profile.
 
 ## Reading results [#reading-results]
 
@@ -44,7 +46,7 @@ If all three answers are valid, the result area lists the candidates of the refe
 - When the confidence is calibrated, it is a relative probability within the reference bank: all candidates total 100%, and models outside the bank are not included.
 - When it is not calibrated, the row shows an estimate from the verification score, which is not a probability.
 
-In API mode, the confidence includes the result of the [tokenizer probe](./tokenizer.mdx), and a badge next to the family of the top candidate says whether its tokenizer matches the counts.
+The ranking and the confidence come from the number fingerprint alone. In API mode, the result of the [tokenizer probe](./tokenizer.mdx) appears separately as reference information in the fourth entry of the sample strip and in the tokenizer details. The result does not wait for the probe, which keeps running beside it.
 
 If the confidence of the top candidate is below 75%, the page shows a low-confidence warning. If only one or two answers are valid, the page shows only the ranking, without confidence. The command line also marks a disagreement when the top-ranked candidate differs from the verifier's choice; see [Detection](../cli/detect.mdx#results).
 
@@ -57,10 +59,10 @@ If the smallest valid number of a sample is 200 or more, the page marks its dist
 ## Export
 
 - **PNG image**: generated in a browser Canvas at twice the pixel density. It contains the site name, the date, the top candidate, the top five entries, the number of valid samples, and a note on the limitations, in the current language and theme. It does not contain the API key, the Base URL, the model ID you entered, or the reply text.
-- **JSON**: the candidate list and the confidence values; with a tokenizer result, also each candidate's tokenizer match and the count of every request. It contains neither the API address nor the API key.
+- **JSON**: the candidate list and the confidence values; once the probe has ended, also the tokenizer probe report (the verdict, the check against the model you entered, and the count of every request). It contains neither the API address nor the API key.
 - **Library page**: browse reference replies by model, each with its original prompt. You can search, filter by family, and export to JSONL. Keys and authorization fields are removed before export.
 
 ## Related pages
 
 - [Tokenizer probe](./tokenizer.mdx): how API detection identifies the upstream tokenizer, and how to read the result.
-- [Direct calls and proxy consent](./connection.mdx): how the page decides whether to call the API directly or relay requests through a proxy.
+- [Connection](./connection.mdx): where each of the four connection modes sends requests, and how Auto decides between a direct call and this site's proxy.

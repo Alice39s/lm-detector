@@ -49,9 +49,9 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   if (isRouteErrorResponse(error) && error.status === 404) return <NotFound />
   const details = error instanceof Error ? error.message : isRouteErrorResponse(error) ? error.statusText : String(error)
   return (
-    <main className="mx-auto w-full max-w-[1400px] p-4 pt-16">
-      <h1 className="text-xl font-semibold">Error</h1>
-      <p className="text-fd-muted-foreground">{details}</p>
+    <main className="mx-auto flex w-full max-w-[1440px] flex-col gap-4 px-4 py-6 sm:px-6 md:px-8">
+      <h1 className="text-h1">Error</h1>
+      <p className="text-body text-fd-muted-foreground">{details}</p>
       {import.meta.env.DEV && error instanceof Error && error.stack && <pre className="w-full overflow-x-auto p-4"><code>{error.stack}</code></pre>}
     </main>
   )

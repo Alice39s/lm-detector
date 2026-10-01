@@ -1,13 +1,19 @@
 @import 'tailwindcss';
 @import '@fontsource-variable/geist';
-/* The detector's colors and brand fonts; Fumadocs' shadcn preset reads the same variables. */
+/* The detector's colour tokens, font roles, brand fonts and top bar; Fumadocs' shadcn preset reads the same variables. */
 @import '../../web/src/tokens.css';
+@import '../../web/src/shell.css';
 @import 'fumadocs-ui/css/shadcn.css';
 @import 'fumadocs-ui/css/preset.css';
 @import 'fumadocs-openapi/css/preset.css';
 @import 'katex/dist/katex.css';
 
 @source '../node_modules/fumadocs-openapi/dist';
+
+/* Fumadocs swaps the page-tree drawer for the sidebar at `md`; the detector's layout steps up at 1024px. */
+@theme {
+  --breakpoint-md: 64rem;
+}
 
 :root {
   --sidebar: var(--background);
@@ -18,6 +24,15 @@
   --sidebar-ring: var(--ring);
   --sidebar-primary-foreground: var(--primary-foreground);
   --fd-layout-width: 1440px;
+}
+
+/* Fumadocs' state colours are design.md's: notes in primary, then warning, destructive and success. */
+:root,
+.dark {
+  --color-fd-info: var(--primary);
+  --color-fd-idea: var(--primary);
+  --color-fd-warning: var(--warning);
+  --color-fd-success: var(--success);
 }
 
 html {
@@ -31,24 +46,34 @@ html > body[data-scroll-locked] {
   --removed-body-scroll-bar-size: 0px !important;
 }
 
-/* design.md 3「应用外壳」: the two-line brand of the detector's header. */
-.fd-brand { display: flex; flex-direction: column; }
-.fd-brand-title { font-family: var(--font-brand-title); font-size: 0.875rem; line-height: 1.25; font-weight: 500; white-space: nowrap; }
-.fd-brand-byline { font-family: var(--font-brand-byline); font-size: 0.75rem; line-height: 1rem; font-weight: 400; color: color-mix(in oklab, var(--foreground) 70%, transparent); }
-
-.fd-app-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: 0.375rem 0.5rem;
-  border-radius: var(--radius);
-  color: var(--muted-foreground);
-  font-size: 0.875rem;
-  white-space: nowrap;
-  transition: color 150ms, background-color 150ms;
+@layer base {
+  :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
 }
-.fd-app-link:hover { color: var(--foreground); background: var(--accent); }
-.fd-app-link svg { width: 1rem; height: 1rem; }
+/* Fumadocs drops the outline of the small-screen table-of-contents toggle without another focus style. */
+[data-toc-popover-trigger]:focus-visible { outline: 2px solid var(--ring); outline-offset: -2px; }
+
+/* The layout sits under the site header, inside the detector's 1440px frame; from 1024px the sidebar's and the table
+   of contents' own 16px padding completes the 32px page margin. */
+#nd-docs-layout {
+  --fd-banner-height: var(--fp-topbar-height);
+  width: 100%;
+  max-width: 1440px;
+  margin-inline: auto;
+  min-height: calc(100dvh - var(--fd-banner-height));
+}
+@media (min-width: 1024px) { #nd-docs-layout { padding-inline: 1rem; } }
+/* Below 1024px the page tree opens as a drawer, in the body role like the sidebar. */
+#nd-sidebar-mobile { font-size: 0.875rem; }
+
+/* Long-form text: the body role's 14px with a long-form 1.75 line height; Fumadocs' em-based spacing follows it and
+   inline code keeps its 13px. Headings take the section and card title roles, tables the body role. */
+.prose { font-size: 0.875rem; line-height: 1.75; }
+.prose :where(h2):not(:where(.not-prose, .not-prose *)) { @apply text-section-title; }
+.prose :where(h3):not(:where(.not-prose, .not-prose *)) { @apply text-card-title; }
+.prose :where(table):not(:where(.not-prose, .not-prose *)) { @apply text-body; }
+
+/* Code blocks are controls-sized surfaces: 8px radius, a thin border, no shadow. */
+#nd-page figure.shiki { border-radius: var(--radius); box-shadow: none; }
 
 /* Mermaid keeps its source visible until the diagram renders in the browser. */
 .fd-mermaid { display: flex; justify-content: center; margin-block: 1.5rem; overflow-x: auto; }
@@ -58,3 +83,15 @@ html > body[data-scroll-locked] {
 /* Wide tables and formulas scroll inside the article instead of widening the page. */
 .prose table { display: block; max-width: 100%; overflow-x: auto; }
 .katex-display { overflow-x: auto; overflow-y: hidden; padding-block: 0.25rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+}

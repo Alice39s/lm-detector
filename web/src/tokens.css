@@ -1,4 +1,4 @@
-/* design.md 4.2 颜色 token 与品牌字体。检测网站和文档站（docs/）共用本文件，改动会同时作用于两处。 */
+/* design.md 4「字体与颜色」：颜色 token、字号角色与品牌字体。检测网站和文档站（docs/）共用本文件，改动会同时作用于两处。 */
 @font-face {
   font-family: "Noto Serif SC Variable";
   src: url("@fontsource-variable/noto-serif-sc/files/noto-serif-sc-latin-wght-normal.woff2") format("woff2");
@@ -73,3 +73,12 @@
   --input: oklch(0.27 0 0);
   --ring: oklch(0.72 0.15 255);
 }
+
+/* 字号角色 */
+@utility text-display { font-size: 1.875rem; line-height: 1.2; font-weight: 600; text-wrap: balance; }
+@utility text-display-number { font-size: 2.25rem; line-height: 1; font-weight: 600; }
+@utility text-h1 { font-size: 1.5rem; line-height: 1.25; font-weight: 600; text-wrap: balance; }
+@utility text-section-title { font-size: 1.125rem; line-height: 1.35; font-weight: 600; }
+@utility text-card-title { font-size: 0.875rem; line-height: 1.4; font-weight: 600; }
+@utility text-body { font-size: 0.875rem; line-height: 1.5; font-weight: 400; }
+@utility text-meta { font-size: 0.75rem; line-height: 1.4; font-weight: 400; }

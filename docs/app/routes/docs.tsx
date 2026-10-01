@@ -1,11 +1,13 @@
 import { use, type ComponentProps } from 'react'
 import { useFumadocsLoader } from 'fumadocs-core/source/client'
 import { DocsLayout } from 'fumadocs-ui/layouts/docs'
-import { DocsBody, DocsDescription, DocsPage, DocsTitle, MarkdownCopyButton, PageLastUpdate, ViewOptionsPopover } from 'fumadocs-ui/layouts/docs/page'
+import { DocsBody, DocsPage, MarkdownCopyButton, PageLastUpdate, ViewOptionsPopover } from 'fumadocs-ui/layouts/docs/page'
 import type { Route } from './+types/docs'
 import { OpenAPIPage } from '@/components/api-page'
+import { DocsBar } from '@/components/docs-bar'
 import { useMDXComponents } from '@/components/mdx'
-import { baseOptions } from '@/lib/layout.shared'
+import { SiteHeader } from '@/components/site-header'
+import { layoutOptions } from '@/lib/layout.shared'
 import { openapi } from '@/lib/openapi.server'
 import { docsBase, pageImageUrl, pageMarkdownUrl, repository, repositoryUrl, siteOrigin } from '@/lib/shared'
 import { docs, source } from '@/lib/source'
@@ -55,10 +57,10 @@ function Content({ path, markdownUrl, lastModified, openapiData }: { path: strin
   const { toc } = use(page.load())
   const Body = page.body
   return (
-    <DocsPage toc={toc} full={page.full} tableOfContent={{ style: 'clerk' }}>
-      <DocsTitle>{page.title}</DocsTitle>
-      <DocsDescription>{page.description}</DocsDescription>
-      <div className="-mt-4 flex flex-row flex-wrap items-center gap-2 border-b pb-6">
+    <DocsPage toc={toc} full={page.full} tableOfContent={{ style: 'clerk' }} className="sm:px-6 md:px-8 md:pt-6 xl:pt-6">
+      <h1 className="text-h1">{page.title}</h1>
+      {page.description && <p className="text-body text-fd-muted-foreground">{page.description}</p>}
+      <div className="flex flex-row flex-wrap items-center gap-2 border-b pb-6">
         <MarkdownCopyButton markdownUrl={markdownUrl} />
         <ViewOptionsPopover markdownUrl={markdownUrl} githubUrl={`${repositoryUrl}/blob/${repository.branch}/${repository.contentDir}/${path}`} />
       </div>
@@ -75,8 +77,11 @@ function Content({ path, markdownUrl, lastModified, openapiData }: { path: strin
 export default function Page({ loaderData }: Route.ComponentProps) {
   const { locale, path, markdownUrl, lastModified, pageTree, openapiData } = useFumadocsLoader(loaderData)
   return (
-    <DocsLayout {...baseOptions(locale)} tree={pageTree}>
-      <Content path={path} markdownUrl={markdownUrl} lastModified={lastModified} openapiData={openapiData} />
-    </DocsLayout>
+    <>
+      <SiteHeader locale={locale} />
+      <DocsLayout {...layoutOptions} tree={pageTree} slots={{ header: DocsBar }} sidebar={{ collapsible: false }}>
+        <Content path={path} markdownUrl={markdownUrl} lastModified={lastModified} openapiData={openapiData} />
+      </DocsLayout>
+    </>
   )
 }

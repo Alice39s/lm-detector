@@ -1,69 +1,91 @@
 ---
 title: Tokenizer probe
-description: While detecting, fpd identifies the tokenizer behind the API, adds the result to the confidence of every round, and checks whether it matches the model you entered.
+description: With --tokenizer, fpd identifies the tokenizer behind the API during detection and checks it against the model you entered. The result is reference only. It does not change the ranking or delay the result.
 ---
 
 ```sh
-# The tokenizer probe runs by default
-npx lmfpd@latest -b https://api.example.com/v1 -k sk-xxx -m deepseek-v4-pro -a cc
+# Detect and run the tokenizer probe (off by default)
+npx lmfpd@latest -b https://api.example.com/v1 -k sk-xxx -m deepseek-v4-pro -a cc --tokenizer
 
-# Rank by the number fingerprint only, without the tokenizer probe
-npx lmfpd@latest -a cc --no-tokenizer
-
-# Analyze a saved report offline and recompute it against the current tokenizer bank
+# Read the tokenizer probe saved in a report offline, without requests
 npx lmfpd@latest --input result.json --json
 ```
 
-A tokenizer is the rule a model uses to cut text into tokens. Different model families use different rules, so the token counts an API reports can reveal the model behind it. Alongside the first round, detection probes the tokenizer behind the API once; every round waits for the probe before it is scored, and all rounds use the result. A probe usually sends about 12 extra short requests and at most 22; APIs billed per request charge for them. With `--parallel` above 1, requests go four at a time, otherwise one by one, and each has a 90-second deadline. Messages requests ask for at most 16 output tokens; the other protocols omit the output limit, like sampling requests. The website does the same; see [Tokenizer probe on the website](../web/tokenizer.mdx), and [How it works](../principles/tokenizer.mdx) for the method.
+A tokenizer is the rule that a model uses to cut text into tokens. Different model families use different tokenizers. Thus the input token count that an API reports in its usage (`usage`) can show the upstream tokenizer.
+
+The tokenizer probe is off by default. With `--tokenizer`, fpd sends one baseline request and a set of probe texts beside the first round. It probes one time for each detection. A probe usually sends about 12 more requests and at most `--max-probes` + 2 (22 by default). APIs that bill per request bill these requests.
+
+The probe result is reference only:
+
+- The candidate ranking, the confidence, and the verification scores come from the number fingerprint alone. They are the same with or without the probe.
+- Each round is scored when its samples finish. Scoring does not wait for the probe.
+- A matching tokenizer does not prove the model identity, because many models share one tokenizer.
+
+If `--parallel` is above 1, the probe sends four requests at a time. Otherwise, it sends one request at a time. Each request has a 90-second deadline. Messages requests limit the output to 16 tokens. Like sample requests, the other protocols set no output limit. For the website, see [Tokenizer probe on the website](../web/tokenizer.mdx). For the method, see [How it works](../principles/tokenizer.mdx).
 
 ## Options
 
 | Option | Description | Default |
 | --- | --- | --- |
-| `--no-tokenizer` | Skip the tokenizer probe and rank by the number fingerprint only | Probe |
-| `--max-probes N` | Maximum number of probe texts, 4–60. Two baseline requests, which contain no probe text, are sent in addition to cancel out hidden input the API adds | `20` |
-| `--tokenizer-bank FILE` | Use a custom tokenizer bank | Bundled tokenizer bank |
+| `--tokenizer` | Run the tokenizer probe | No probe |
+| `--max-probes N` | Probe text limit, 4–60. The probe stops at the limit. The two baseline requests do not count toward it. Use only with `--tokenizer` | `20` |
+| `--tokenizer-bank FILE` | Use a custom tokenizer bank. Use only with `--tokenizer` or `--input` | Bundled tokenizer bank |
 
-The connection options are the same as for the [detection command](./detect.mdx#options). The model name from `-m` is also checked against the tokenizer it should use. For example, a channel that claims `gpt-5` but shows the Qwen tokenizer is marked `inconsistent`.
+If you use `--max-probes` or `--tokenizer-bank` without `--tokenizer`, fpd stops with an error before it sends a request. `--input` sends no requests, so you cannot use it with `--tokenizer` or `--max-probes`.
+
+The connection options are the same as for the [detection command](./detect.mdx#options). fpd checks the tokenizer against the model name from `-m`. For example, if the model name is `gpt-5` and the probe finds the Qwen tokenizer, the interface shows `no match`, and `claim.status` in the report is `inconsistent`.
 
 ## Terminal interface
 
-Every round waits for the tokenizer probe before it is scored. The `TOKENIZER` block shows the number of answered requests and the tokenizer leading so far; when probing ends, it shows the verdict, the authoring lab, and whether it matches the tokenizer of `--model`.
+The `TOKENIZER PROBE` block is below the ranking. Its first line tells you that the block is reference only.
 
-Rounds with three valid samples add the tokenizer result to the confidence, and the candidate table gains a `Tok` column:
+- During the probe, the block shows the number of answered requests and the tokenizer that leads on the counts so far.
+- After the probe, the block shows the verdict, the lab of the tokenizer, and the check against `--model`.
+- If the verdict is o200k_base or cl100k_base and the check result is not a match, the block tells you that the counts can come from an estimate by a relay.
+- If the two baseline requests gave different counts, the block tells you that the result can be wrong.
 
-| Mark | Meaning |
-| --- | --- |
-| `✓` | The candidate's tokenizer matches the counts |
-| `×` | The candidate's tokenizer does not match the counts |
-| `?` | Not yet clear |
-| `·` | This tool does not know which tokenizer the candidate uses |
+If the probe is still running after the last round, the status line shows `Ranking final · tokenizer probe running`. The ranking is final at this point. fpd waits for the probe before it exits, so the interface and the report get the complete probe result. Press `q` or `Ctrl+C` to stop the probe and exit:
 
-Rounds with one or two samples only report the tokenizer result and keep their ranking.
+- fpd keeps the results of all rounds, and `--output` saves the report.
+- The tokenizer verdict uses the counts received before the stop.
+- In the report, the top-level `cancelled` is `false` and `tokenizer.cancelled` is `true`.
+- The exit code is `130`.
+
+If the output is redirected, fpd writes one line with the probe result to stderr.
 
 ## Report format
 
-Reports from `--output` and `--json` gain a `tokenizer` object:
+With `--tokenizer`, reports from `--output` and `--json` contain a `tokenizer` object:
 
 | Field | Content |
 | --- | --- |
 | `schema` | Always `fpd-tokenizer-v1` |
-| `model` | The entered model name the result was checked against |
-| `bank` | Generation date, class count, probe count, and archive manifest hash of the tokenizer bank used |
-| `steps`, `observations` | Probe text, status, and input token count of each request; a `probe` of `null` is a baseline request (only the fixed prefix and suffix, no probe text) |
-| `verdict` | The verdict `kind` (`exact`, `related`, or `unknown`), the closest class `top`, its confidence `confidence`, and `claim`, the check against the entered model |
-| `classes`, `labs`, `unknown` | Probabilities of the top 10 classes and the top 5 labs, and the probability of "unlisted" |
-| `baseline_drift` | Whether the two baseline requests counted differently |
-| `cancelled`, `error` | Whether the run was canceled, and the error code and HTTP status of a failed request |
+| `model` | The model name used for the check |
+| `bank` | Generation date, class count, probe text count, and archive manifest hash of the tokenizer bank |
+| `steps`, `observations` | The probe text, status, and input token count of each request. A `probe` of `null` is a baseline request: the fixed prefix and suffix without a probe text |
+| `verdict` | The verdict `kind` (`exact`, `related`, or `unknown`), the nearest class `top`, its confidence `confidence`, and `claim`, the check against the model name |
+| `classes`, `labs`, `unknown` | Probabilities of the first 10 classes and the first 5 labs, and the probability of "unlisted" |
+| `baseline_drift` | Whether the two baseline requests gave different counts |
+| `cancelled`, `error` | Whether the probe was stopped, and the error code and HTTP status of a failed request |
 
-In rounds that include the tokenizer result, `analysis.tokenizer` records whether it was added (`fused`) and the top candidate of the number fingerprint alone (`fingerprint_top`). Each candidate in `analysis.results[]` also has `fingerprint_confidence`, its confidence before the tokenizer result, and `tokenizer`, with the match `status` and the `factor` its confidence was multiplied by. The report contains no API key.
+The `tokenizer` field in the request settings of the report records whether `--tokenizer` was set. The `analysis` of each round comes from the number fingerprint alone. The report contains no API key.
 
-`--input` reads `tokenizer.observations` from the report and recomputes them against the current tokenizer bank without sending requests; `-m` or `MODEL` overrides the model name saved in the report.
+## Offline reading
+
+`--input` reads `tokenizer.observations` from a report and recomputes the result with the current tokenizer bank. It sends no requests and does not need `--tokenizer`. Use `--tokenizer-bank` to select a different tokenizer bank. Use `-m` or `MODEL` to replace the model name saved in the report.
+
+If the current tokenizer bank does not contain a probe text, fpd skips its count and shows one warning. With `--json`, the warning goes to stderr. If no count remains after the skip, the interface shows no tokenizer result, and the exit code does not change. A report saved again with `--output` keeps all original counts.
 
 ## Failures and exit codes
 
-When probing stops partway, the counts received so far are still used. When the API reports no usage, the baseline request fails, or no probe text is answered, detection still completes with the number fingerprint only. A failed tokenizer probe never changes the [exit code](./detect.mdx#exit-codes).
+If the probe fails partway, the verdict uses the counts received before the failure. In these cases, there is no tokenizer result, and detection completes:
 
-<Callout type="warn" title="This measures the tokenizer">
-  Relays that estimate usage locally with tiktoken, OpenAI's open-source tokenizer library, report o200k_base or cl100k_base counts. When the verdict is one of these and does not match the entered model, the relay's counting method may be the cause, and the model itself may be unchanged.
+- The API response has no usage.
+- The baseline request fails.
+- No probe text gets an answer.
+
+A failed probe does not change the [exit code](./detect.mdx#exit-codes).
+
+<Callout type="warn" title="The probe measures the count method">
+  Some relays estimate usage locally with tiktoken, the open-source tokenizer library from OpenAI. The probe then finds o200k_base or cl100k_base. If the verdict is one of these and does not match the model you entered, the cause can be the count method of the relay. The upstream model is not necessarily replaced.
 </Callout>

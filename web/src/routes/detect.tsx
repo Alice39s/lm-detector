@@ -10,10 +10,9 @@ import { ApiConfigPanel } from '@/components/api-config-panel'
 import { PixelShader, PixelSpinner } from '@/components/pixel-shader'
 import { Segmented } from '@/components/segmented'
 import { useLoadedBank } from '@/lib/bank-context'
-import { ResultPanel, type ResultEvidence } from '@/components/result-panel'
+import { ResultPanel } from '@/components/result-panel'
 import { SampleCard, SampleStrip, isBusyState, type Mode, type SampleUI } from '@/components/sample-card'
 import { TokenizerCard, TokenizerDetails, TokenizerStripButton } from '@/components/tokenizer-panel'
-import { ProxyConsentDialog } from '@/components/proxy-consent-dialog'
 import { useI18n } from '@/i18n'
 import * as client from '@/lib/client'
 import { configComplete, useApiConfig, type WebApiConfig } from '@/lib/config'
@@ -21,12 +20,10 @@ import { describeError } from '@/lib/errors'
 import { exportResultImage } from '@/lib/export-image'
 import { useMotionPreset } from '@/lib/motion'
 import { useModelMatchCelebration } from '@/lib/use-model-match-celebration'
-import { probeSignature, useTokenizerProbe, type SettledProbe } from '@/lib/use-tokenizer-probe'
+import { useTokenizerProbe } from '@/lib/use-tokenizer-probe'
 import { useConnectionRoute } from '@/lib/use-connection-route'
-import { forgetReachability } from '@/lib/route'
 import { docsHref } from '@/lib/docs'
 import { cn } from '@/lib/utils'
-import { endpoint } from '@fingerpoint/shared/detection'
 import type { Analysis, Challenge, CodedError, CollectionProgress } from '@fingerpoint/shared/types'
 import { redactPrivateMetadata } from '@fingerpoint/shared/privacy'
 import { anomalousSamples } from '@fingerpoint/shared/sample-distribution'
@@ -59,7 +56,7 @@ export default function DetectRoute() {
       setParams(mode === 'api' ? { mode: 'api' } : {}, { replace: true })
     }
   }, [active, mode, params, setParams])
-  const tokenizer = useTokenizerProbe(active)
+  const tokenizer = useTokenizerProbe()
   const connection = useConnectionRoute()
 
   const [challenges, setChallenges] = useState<Challenge[]>(() => client.generateChallenges(3))
@@ -67,10 +64,7 @@ export default function DetectRoute() {
   const [computing, setComputing] = useState(false)
   const [result, setResult] = useState<Analysis | null>(null)
   const [resultModel, setResultModel] = useState<string | null>(null)
-  const [resultEvidence, setResultEvidence] = useState<ResultEvidence | null>(null)
   const [expanded, setExpanded] = useState<Expanded>(null)
-  /** Verification is waiting for the probe to settle before it fuses the result. */
-  const [awaitingProbe, setAwaitingProbe] = useState(false)
   const [errorDetail, setErrorDetail] = useState<string | null>(null)
   const [config, update, profileManager] = useApiConfig(() => toast.error(t('errors.unknown')))
   const previousProfileId = useRef(profileManager.activeId)
@@ -79,12 +73,13 @@ export default function DetectRoute() {
   /** One controller per running sample, so each card starts and stops on its own. */
   const runs = useRef(new Map<number, AbortController>())
   const verifying = useRef<object | null>(null)
+  /** Changes when everything stops, the page restarts or a verification begins; a run waiting for its route then does not start. */
+  const generation = useRef(0)
   const mounted = useRef(true)
   const samplesRef = useRef(samples)
   const challengesRef = useRef(challenges)
-  const sampledConfigs = useRef<(WebApiConfig | undefined)[]>([])
-  /** The number-only analysis of the current result and the probe signature it may be fused with. */
-  const fingerprint = useRef<{ analysis: Analysis; signature: string | null } | null>(null)
+  /** The configuration of the last reply the API returned for each index, so a resample asks the same endpoint. */
+  const sampled = useRef<(WebApiConfig | undefined)[]>([])
   useLayoutEffect(() => {
     if (previousProfileId.current === profileManager.activeId) return
     previousProfileId.current = profileManager.activeId
@@ -102,10 +97,8 @@ export default function DetectRoute() {
   const filled = samples.filter(s => s.text.trim()).length
   const sampling = samples.some(sample => isBusyState(sample.state))
   const phase: Phase = computing ? 'computing' : sampling ? 'sampling' : result ? 'result' : 'edit'
-  /** Checking the endpoint or waiting for proxy consent holds back every new request. */
-  const connecting = connection.checking || connection.request !== null
-  const locked = sampling || computing || connecting
-  const canSample = configComplete(config) && !computing && !connecting
+  const locked = sampling || computing || connection.checking
+  const canSample = configComplete(config) && !computing && !connection.checking
   const probeShown = mode === 'api' && tokenizer.session.phase !== 'idle'
   useModelMatchCelebration(result, resultModel, active && mode === 'api' && phase === 'result')
 
@@ -123,30 +116,15 @@ export default function DetectRoute() {
     replaceSamples(samplesRef.current.map((sample, i) => i === index ? { ...sample, ...changes } : sample))
   }
 
-  function clearResult() {
-    fingerprint.current = null
-    setResult(null)
-    setResultEvidence(null)
-  }
-
-  /** Fuses a settled probe into the number-only analysis when it measured the configuration the samples came from. */
-  function showResult(analysis: Analysis, signature: string | null, probe: SettledProbe | null) {
-    const matching = probe && probe.signature === signature ? probe : null
-    // A baseline without any answered probe carries no evidence; the result then says why.
-    const evidence = matching?.run?.posterior?.answered && matching.bank
-      ? { run: matching.run, bank: matching.bank, startedAt: matching.startedAt, model: matching.model } : null
-    const fused = evidence ? client.fuseTokenizer(analysis, evidence) : analysis
-    fingerprint.current = { analysis, signature }
-    setResult(fused)
-    setResultEvidence(matching ? { probe: evidence, error: evidence ? null : matching.error, model: matching.model } : null)
-  }
-
   /**
    * Stops the given samples, or all of them; other samples keep running.
    * Stopping all of them also stops the tokenizer probe, which serves every sample.
    */
   function stop(indexes?: number[]) {
-    if (!indexes) tokenizer.stop()
+    if (!indexes) {
+      generation.current++
+      tokenizer.stop()
+    }
     const stopped = (indexes ?? [...runs.current.keys()]).filter(i => runs.current.has(i))
     if (!stopped.length) return
     for (const i of stopped) {
@@ -177,7 +155,7 @@ export default function DetectRoute() {
     return false
   }
 
-  /** Sniffs CORS for the endpoint and asks for proxy consent when needed. Returns null when nothing may be sent. */
+  /** Decides the route of a run from the connection setting. Returns null when nothing may be sent. */
   async function resolveRoute(requestConfig: WebApiConfig): Promise<client.Route | null> {
     try {
       return await connection.resolve(requestConfig)
@@ -191,29 +169,18 @@ export default function DetectRoute() {
     }
   }
 
-  /** A direct request that failed at the network level re-sniffs the endpoint next time. */
-  function recheckAfter(route: client.Route, requestConfig: WebApiConfig, failed: boolean) {
-    if (route.kind === 'direct' && failed) forgetReachability(endpoint(requestConfig), requestConfig.format)
-  }
-
-  /** Probes over the route the samples use; a network failure on a direct route re-sniffs the endpoint next time. */
-  function startProbe(requestConfig: WebApiConfig, route: client.Route) {
-    const settled = tokenizer.start(requestConfig, route)
-    void settled.then(probe => recheckAfter(route, requestConfig, probe.error?.code === 'network'))
-    return settled
-  }
-
   async function sampleIndexes(requested: number[], requestConfig: WebApiConfig = config) {
     const indexes = requested.filter(i => !runs.current.has(i))
     if (!indexes.length || verifying.current || !mounted.current || connection.checking) return
     if (!requireConfig(requestConfig)) return
+    const token = generation.current
     const route = await resolveRoute(requestConfig)
-    if (!route || verifying.current || !mounted.current || indexes.some(i => runs.current.has(i))) return
+    if (!route || generation.current !== token || verifying.current || !mounted.current || indexes.some(i => runs.current.has(i))) return
     const frozenConfig = { ...requestConfig, parallel: indexes.length > 1 && (requestConfig.parallel ?? false) }
     const controllers = new Map(indexes.map(i => [i, new AbortController()]))
     for (const [i, controller] of controllers) runs.current.set(i, controller)
     // The probe measures the upstream itself, so one probe serves every sample drawn with this configuration.
-    if (requestConfig.tokenizerProbe && tokenizer.needed(requestConfig)) void startProbe(requestConfig, route)
+    if (requestConfig.tokenizerProbe && tokenizer.needed(requestConfig)) void tokenizer.start(requestConfig, route)
     replaceSamples(samplesRef.current.map((sample, i) => indexes.includes(i)
       ? { ...sample, draftText: '', state: 'pending', errorCode: undefined, httpStatus: undefined, errorText: undefined, elapsedMs: undefined, throughput: undefined }
       : sample))
@@ -241,9 +208,9 @@ export default function DetectRoute() {
       const elapsedMs = finished && startedAt !== undefined ? performance.now() - startedAt : undefined
       if ((state === 'done' || state === 'capped') && challenge.text.trim()) {
         accepted = true
-        sampledConfigs.current[index] = requestConfig
+        sampled.current[index] = requestConfig
         patch(index, { text: challenge.text, draftText: undefined, state, elapsedMs, throughput: challenge.throughput, errorCode: undefined, httpStatus: undefined, errorText: undefined })
-        clearResult()
+        setResult(null)
       } else {
         const previous = samplesRef.current[index]
         patch(index, {
@@ -264,7 +231,6 @@ export default function DetectRoute() {
       const sample = samplesRef.current[index]
       if (isBusyState(sample.state)) patch(index, { state: 'rejected', draftText: sample.text.trim() ? undefined : sample.draftText, errorCode: coded?.code, httpStatus: coded?.httpStatus, errorText: safeError(error instanceof Error ? error.message : undefined, requestConfig.apiKey) })
     }
-    recheckAfter(route, requestConfig, samplesRef.current[index].errorCode === 'network')
     if (current()) runs.current.delete(index)
     return accepted
   }
@@ -273,29 +239,20 @@ export default function DetectRoute() {
     if (verifying.current || runs.current.size || !mounted.current || !samplesRef.current.some(sample => sample.text.trim())) return
     const token = {}
     verifying.current = token
+    generation.current++
     const outputs = samplesRef.current.map((sample, i) => ({ text: sample.text, expected_count: challengesRef.current[i].expected_count }))
-    // Only replies the API returned unedited take the evidence, and only from a probe of the configuration that produced
-    // them. An edited reply is idle again; a failed replacement keeps the earlier API reply and its configuration.
-    const signatures = new Set(samplesRef.current.flatMap((sample, i) => {
-      if (!sample.text.trim()) return []
-      const sampled = sampledConfigs.current[i]
-      return [sampled?.tokenizerProbe && sample.state !== 'idle' ? probeSignature(sampled) : null]
-    }))
-    const signature = mode === 'api' && signatures.size === 1 ? [...signatures][0] : null
     setComputing(true)
     setExpanded(null)
     try {
-      const waiting = signature ? tokenizer.settled() : null
-      setAwaitingProbe(Boolean(waiting))
-      const [analysis, probe] = await Promise.all([client.analyze(outputs, bank), waiting])
+      // The result is the number fingerprint alone; a probe still running keeps going beside it.
+      const analysis = await client.analyze(outputs, bank)
       if (!mounted.current || verifying.current !== token) return
       setResultModel(mode === 'api' ? config.model : null)
-      showResult(analysis, signature, probe)
+      setResult(analysis)
     } catch (error) {
       if (!mounted.current || verifying.current !== token) return
       toast.error(describeError(i18n, error, 'errors.analyze'))
     } finally {
-      if (mounted.current) setAwaitingProbe(false)
       if (verifying.current === token) {
         verifying.current = null
         setComputing(false)
@@ -303,16 +260,13 @@ export default function DetectRoute() {
     }
   }
 
-  /** Probes again with the sampling configuration; a result on screen takes the new evidence without resampling. */
+  /** Probes again with the configuration of the probe on screen; the result on screen stays as it is. */
   async function retryProbe() {
-    const requestConfig = sampledConfigs.current.find(Boolean) ?? config
+    const requestConfig = tokenizer.session.config ?? config
     if (locked || tokenizer.busy || !requireConfig(requestConfig)) return
-    const shown = fingerprint.current
+    const token = generation.current
     const route = await resolveRoute(requestConfig)
-    if (!route || !mounted.current) return
-    const settled = await startProbe(requestConfig, route)
-    // A new sample or a new verification replaces the result while the probe runs; only the same result takes it.
-    if (mounted.current && shown && fingerprint.current === shown && !verifying.current) showResult(shown.analysis, shown.signature, settled)
+    if (route && generation.current === token && mounted.current) tokenizer.start(requestConfig, route)
   }
 
   function restart() {
@@ -322,8 +276,8 @@ export default function DetectRoute() {
     setComputing(false)
     replaceChallenges(client.generateChallenges(3))
     replaceSamples([idle(), idle(), idle()])
-    sampledConfigs.current = []
-    clearResult()
+    sampled.current = []
+    setResult(null)
     setExpanded(null)
   }
 
@@ -334,21 +288,28 @@ export default function DetectRoute() {
     const fresh = client.generateChallenges(indexes.length, kept)
     replaceChallenges(challengesRef.current.map((challenge, i) => indexes.includes(i) ? fresh[indexes.indexOf(i)] : challenge))
     replaceSamples(samplesRef.current.map((sample, i) => indexes.includes(i) ? idle() : sample))
-    clearResult()
+    setResult(null)
     setExpanded(null)
-    if (mode === 'api') void sampleIndexes(indexes, sampledConfigs.current[indexes[0]] ?? config)
+    if (mode === 'api') void sampleIndexes(indexes, sampled.current[indexes[0]] ?? config)
   }
 
   function edit(i: number, text: string) {
     if (runs.current.has(i) || verifying.current) return
     patch(i, { text, draftText: undefined, state: 'idle', errorCode: undefined, httpStatus: undefined, errorText: undefined, elapsedMs: undefined, throughput: undefined })
-    clearResult()
+    setResult(null)
   }
 
   async function saveImage() {
     if (!result) return
     try { await exportResultImage(result, i18n); if (mounted.current) toast.success(t('detect.imageSaved')) }
     catch { if (mounted.current) toast.error(t('detect.imageFailed')) }
+  }
+
+  /** The JSON carries the settled probe on screen as reference information next to the number-only candidates. */
+  function exportJson(analysis: Analysis) {
+    const { phase: probePhase, bank: probeBank, run, startedAt, config: probeConfig } = tokenizer.session
+    const probe = probeShown && probePhase === 'result' && probeBank && run ? { run, bank: probeBank, startedAt, model: probeConfig?.model.trim() ?? '' } : undefined
+    client.exportAnalysis(analysis, probe)
   }
 
   async function copyCliCommand() {
@@ -366,6 +327,8 @@ export default function DetectRoute() {
     ? anomalousSamples(samples.map((sample, i) => result.diagnostics[i]?.accepted ? sample.text : ''))
     : []
   const showProbeError = (detail: string) => setErrorDetail(safeError(detail, tokenizer.session.config?.apiKey ?? config.apiKey) ?? '')
+  // The probe bills requests, so it can be stopped in every phase; while sampling, the action bar's Stop covers it.
+  const stopProbe = tokenizer.busy && <Button variant="outline" className="h-9" onClick={tokenizer.stop}>{t('tokenizer.stop')}</Button>
 
   /** The probe belongs to API mode, so manual mode stops it and closes its details. */
   function changeMode(next: Mode) {
@@ -397,7 +360,7 @@ export default function DetectRoute() {
       canSample={canSample}
       locked={computing}
       onChange={text => edit(index, text)}
-      onResample={() => sampleIndexes([index], sampledConfigs.current[index] ?? config)}
+      onResample={() => sampleIndexes([index], sampled.current[index] ?? config)}
       onStop={() => stop([index])}
       onShowError={() => setErrorDetail(samples[index].errorText ?? null)}
       onCollapse={collapsible ? () => collapseSample(index) : undefined}
@@ -471,11 +434,11 @@ export default function DetectRoute() {
       {phase === 'computing' && (
         <div className="flex h-12 items-center gap-2 text-body text-muted-foreground" role="status">
           <PixelSpinner />
-          {awaitingProbe && tokenizer.busy ? t('tokenizer.waiting') : t('detect.computing')}
+          {t('detect.computing')}
           <PixelShader effect="scan" cell={3} className="h-6 min-w-0 flex-1 text-muted-foreground/60" />
         </div>
       )}
-      {phase === 'result' && result && <ResultPanel result={result} anomalous={anomalous} mode={mode} evidence={resultEvidence} onReplacePrompts={() => replacePrompts(anomalous)} />}
+      {phase === 'result' && result && <ResultPanel result={result} anomalous={anomalous} mode={mode} onReplacePrompts={() => replacePrompts(anomalous)} />}
 
       <div className="fp-detect-footer">
         <a href="https://github.com/Ikaleio/lm-detector" target="_blank" rel="noopener noreferrer" className="fp-star-link">
@@ -485,9 +448,10 @@ export default function DetectRoute() {
         <div className="fp-actionbar">
           {phase === 'result' ? (
             <>
+              {stopProbe}
               {result && <DropdownMenu>
                 <DropdownMenuTrigger render={<Button variant="ghost" size="icon-lg" aria-label={t('detect.more')} />}><MoreVertical /></DropdownMenuTrigger>
-                <DropdownMenuContent align="end"><DropdownMenuGroup><DropdownMenuItem onClick={() => client.exportAnalysis(result, resultEvidence?.probe ?? undefined)}>{t('detect.exportJson')}</DropdownMenuItem></DropdownMenuGroup></DropdownMenuContent>
+                <DropdownMenuContent align="end"><DropdownMenuGroup><DropdownMenuItem onClick={() => exportJson(result)}>{t('detect.exportJson')}</DropdownMenuItem></DropdownMenuGroup></DropdownMenuContent>
               </DropdownMenu>}
               <Button variant="outline" className="h-9" onClick={saveImage}>{t('detect.saveImage')}</Button>
               <Button className="h-9" onClick={restart}>{t('detect.restart')}</Button>
@@ -499,12 +463,13 @@ export default function DetectRoute() {
             </>
           ) : phase === 'computing' ? (
             <>
-              {awaitingProbe && tokenizer.busy && <Button variant="outline" className="h-9" onClick={tokenizer.stop}>{t('tokenizer.stop')}</Button>}
+              {stopProbe}
               <Button className="h-9" disabled><PixelSpinner data-icon="inline-start" />{t('detect.computing')}</Button>
             </>
           ) : (
             <>
               {samples.some(s => s.text.trim() || s.draftText?.trim()) && <Button variant="ghost" className="h-9" onClick={restart}>{t('detect.restart')}</Button>}
+              {stopProbe}
               {mode === 'api' && emptyIndexes.length > 0 ? (
                 <>
                   {filled > 0 && <Button variant="outline" className="h-9" onClick={() => verify()}>{t('detect.verifyPartial', { n: filled })}</Button>}
@@ -517,8 +482,6 @@ export default function DetectRoute() {
           )}
         </div>
       </div>
-
-      <ProxyConsentDialog request={active ? connection.request : null} onAnswer={connection.answer} />
 
       <Dialog open={active && errorDetail !== null} onOpenChange={open => !open && setErrorDetail(null)}>
         <DialogContent>

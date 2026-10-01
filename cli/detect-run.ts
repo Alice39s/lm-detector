@@ -4,7 +4,6 @@ import { directTransport } from '@fingerpoint/shared/detection'
 import { parseNumbers } from '@fingerpoint/shared/fingerprint-core.js'
 import { analyzeSharedOutputs, type SharedDetector } from '@fingerpoint/shared/shared-detector'
 import type { TokenizerBank } from '@fingerpoint/shared/tokenizer-bank'
-import { fuseTokenizerEvidence } from '@fingerpoint/shared/tokenizer-fusion'
 import { tokenizerPosterior, tokenizerVerdict, type TokenizerObservation } from '@fingerpoint/shared/tokenizer-posterior'
 import { probeTokenizer, tokenizerReport, type TokenizerRun } from '@fingerpoint/shared/tokenizer-probe'
 import type { Analysis, Bank, Challenge, Output } from '@fingerpoint/shared/types'
@@ -26,13 +25,21 @@ export interface DetectionState {
   total: number
   startedAt: number
   finishedAt?: number
+  /** When the last round settled. The run may still be waiting for the tokenizer probe until `finishedAt`. */
+  roundsFinishedAt?: number
+  /** Cancelled before every round settled; stopping only the trailing tokenizer probe keeps this false. */
   cancelled: boolean
-  /** The tokenizer probe shared by every round; absent with --no-tokenizer or a saved file without probe data. */
+  /**
+   * The tokenizer probe of the run, shown as reference information beside the ranking. Present only with --tokenizer
+   * or with an --input file that saved a probe. It never changes the ranking.
+   */
   tokenizer?: TokenizerRun
   /** False while the probe is still running. */
   tokenizerSettled?: boolean
   /** The claimed model the verdict was checked against. */
   tokenizerModel?: string
+  /** Why a saved probe was only partly used or not used against the current tokenizer bank. */
+  tokenizerWarning?: string
 }
 
 export async function readJson(path: string): Promise<unknown> {
@@ -64,13 +71,10 @@ function englishAnalysis(analysis: Analysis): Analysis {
     label = 'Custom bank ranking'
     reason = 'The verifier does not match this bank. Confidence is unavailable.'
   } else {
-    // A fused analysis keeps the ranker's own leader for this comparison.
-    const fused = analysis.tokenizer?.fused
-    const agrees = analysis.verification_top === (analysis.tokenizer?.fingerprint_top ?? analysis.prediction)
-    const order = fused ? 'Candidate order follows the confidence with the tokenizer result included.' : 'Candidate order follows the ranker.'
+    const agrees = analysis.verification_top === analysis.prediction
     label = agrees ? 'Ranker and verifier agree' : 'Ranker and verifier disagree'
-    reason = agrees ? `Both methods selected the same leading candidate.${fused ? ` ${order}` : ''}`
-      : `The verifier preferred ${analysis.results.find(row => row.model === analysis.verification_top)?.display_name ?? analysis.verification_top}. ${order}`
+    reason = agrees ? 'Both methods selected the same leading candidate.'
+      : `The verifier preferred ${analysis.results.find(row => row.model === analysis.verification_top)?.display_name ?? analysis.verification_top}. Candidate order follows the ranker.`
   }
   return {
     ...analysis, prediction_name: analysis.decision === 'unscorable' ? 'Not scored' : analysis.prediction_name,
@@ -78,9 +82,8 @@ function englishAnalysis(analysis: Analysis): Analysis {
   }
 }
 
-interface Probe { bank: TokenizerBank; run: TokenizerRun }
-
-function scoreRound(round: Round, options: DetectOptions, bank: Bank, detector: SharedDetector, probe?: Probe) {
+/** Scores the number fingerprint alone; the tokenizer probe is reference information and never enters the ranking. */
+function scoreRound(round: Round, options: DetectOptions, bank: Bank, detector: SharedDetector) {
   round.outputs = round.samples.map(sample => ({
     text: acceptedSample(sample) ? sample.text : '', expected_count: sample.expectedCount,
   }))
@@ -91,8 +94,7 @@ function scoreRound(round: Round, options: DetectOptions, bank: Bank, detector: 
     return
   }
   try {
-    const analysis = analyzeSharedOutputs(round.outputs, bank, detector, { allowPartial: !options.strict })
-    round.analysis = englishAnalysis(probe?.run.posterior ? fuseTokenizerEvidence(analysis, probe.bank, probe.run.posterior, probe.run.verdict) : analysis)
+    round.analysis = englishAnalysis(analyzeSharedOutputs(round.outputs, bank, detector, { allowPartial: !options.strict }))
     if (!round.analysis.results.length) round.error = round.analysis.evidence.reason
   } catch {
     round.error = 'Scoring failed. Check that the reference bank and detector files are valid.'
@@ -105,9 +107,9 @@ export async function runDetection(
 ): Promise<DetectionState> {
   const state: DetectionState = { rounds: [], total: options.repeat, startedAt: Date.now(), cancelled: false }
   const report = () => onUpdate({ ...state, rounds: state.rounds.map(round => ({ ...round, samples: [...round.samples] })) })
-  // One probe measures the upstream for every round. It runs beside the first round, with four probes in flight
-  // when samples run in parallel and one otherwise.
-  const probing = tokenizerBank && probeTokenizer(options.config, tokenizerBank, {
+  // One probe measures the upstream for the whole run. It starts beside the first round, with four probes in flight
+  // when samples run in parallel and one otherwise. Rounds never wait for it.
+  const probing = options.tokenizer && tokenizerBank && probeTokenizer(options.config, tokenizerBank, {
     url: requestEndpoint(options.config), transport: directTransport, signal, maximumProbes: options.maxProbes,
     concurrency: options.parallel > 1 ? 4 : 1,
     onUpdate: run => { state.tokenizer = run; report() },
@@ -115,7 +117,6 @@ export async function runDetection(
     state.tokenizer = run
     state.tokenizerSettled = true
     report()
-    return { bank: tokenizerBank, run }
   })
   if (probing) {
     state.tokenizerSettled = false
@@ -151,33 +152,45 @@ export async function runDetection(
       }
       round.outputs = round.samples.map(sample => ({ text: acceptedSample(sample) ? sample.text : '', expected_count: sample.expectedCount }))
       round.error = 'Cancelled. This round was not scored.'
-    } else scoreRound(round, options, bank, detector, probing ? await probing : undefined)
+    } else scoreRound(round, options, bank, detector)
     round.finishedAt = Date.now()
     report()
   }
-  // A cancelled run still waits for the aborted probe, so its partial requests are saved with the rounds.
-  if (probing) await probing
   state.cancelled = signal.aborted
+  state.roundsFinishedAt = Date.now()
+  report()
+  // The results are final here. The exit still waits for a running probe so that the report saves it complete;
+  // cancelling stops it and keeps the results. A cancelled run also waits, so the partial requests are saved.
+  if (probing) await probing
   state.finishedAt = Date.now()
   report()
   return state
 }
 
-/** Recomputes a saved probe against the current bank. `-m` or `MODEL` overrides the saved model for the claim check. */
-function savedProbe(source: Record<string, unknown> | undefined, tokenizerBank: TokenizerBank, model: string): Probe & { model: string } | undefined {
+/**
+ * Recomputes a saved probe against the current bank. `-m` or `MODEL` overrides the saved model for the claim check.
+ * Observations of probes the bank no longer has are skipped; the run keeps them so that `--output` saves them again.
+ */
+function savedProbe(source: Record<string, unknown> | undefined, tokenizerBank: TokenizerBank, model: string): { run: TokenizerRun; model: string; warning?: string } | undefined {
   const saved = source?.tokenizer as { observations?: TokenizerObservation[]; model?: unknown } | undefined
   if (!saved) return undefined
   const observations = saved.observations
   if (!Array.isArray(observations) || !observations.every(item =>
     item && (item.probe === null || typeof item.probe === 'string') && Number.isSafeInteger(item.tokens))) {
-    throw new Error('The saved tokenizer probe must have an observations array.')
+    throw new Error('The tokenizer object in the input file needs an observations array. Each item needs probe (a string or null) and tokens (an integer).')
   }
-  const posterior = tokenizerPosterior(tokenizerBank, observations)
+  const known = new Set(tokenizerBank.probes.map(probe => probe.id))
+  const usable = observations.filter(item => item.probe === null || known.has(item.probe))
+  const skipped = observations.length - usable.length
+  const missing = new Set(observations.flatMap(item => item.probe === null || known.has(item.probe) ? [] : [item.probe]))
+  const posterior = tokenizerPosterior(tokenizerBank, usable)
   const baselines = observations.filter(item => item.probe === null).map(item => item.tokens)
   const request = source?.request as { model?: unknown } | undefined
   const claimed = model || (typeof saved.model === 'string' ? saved.model : typeof request?.model === 'string' ? request.model : '')
+  const warning = skipped ? `The tokenizer bank has no probe text with the ID${missing.size === 1 ? '' : 's'} ${[...missing].join(', ')}. FPD skipped ${skipped} saved count${skipped === 1 ? '' : 's'}.`
+    + (posterior?.answered ? '' : ' No probe text count remains, so there is no tokenizer result.') : undefined
   return {
-    bank: tokenizerBank, model: claimed,
+    model: claimed, warning,
     run: {
       steps: observations.map(item => ({ probe: item.probe, state: 'done', tokens: item.tokens, responseModel: item.responseModel })),
       observations, posterior, baselineDrift: new Set(baselines).size > 1,
@@ -213,7 +226,7 @@ export async function analyzeInput(options: DetectOptions, bank: Bank, detector:
   if (!entries.length) throw new Error('The input file contains no rounds.')
   const state: DetectionState = {
     rounds: [], total: entries.length, startedAt: Date.now(), cancelled: false,
-    tokenizer: probe?.run, tokenizerSettled: probe ? true : undefined, tokenizerModel: probe?.model,
+    tokenizer: probe?.run, tokenizerSettled: probe ? true : undefined, tokenizerModel: probe?.model, tokenizerWarning: probe?.warning,
   }
   for (const entry of entries) {
     const outputs = Array.isArray(entry) ? entry : entry?.outputs
@@ -240,7 +253,7 @@ export async function analyzeInput(options: DetectOptions, bank: Bank, detector:
         }
       }),
     }
-    scoreRound(round, options, bank, detector, probe)
+    scoreRound(round, options, bank, detector)
     round.finishedAt = Date.now()
     state.rounds.push(round)
   }

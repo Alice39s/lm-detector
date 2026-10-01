@@ -51,7 +51,7 @@ export async function readProfileFile(file: File): Promise<{ name: string; confi
       parallel: value.parallel as boolean,
       relaxed: value.relaxed === undefined ? true : value.relaxed as boolean,
       autoVerify: value.autoVerify as boolean,
-      tokenizerProbe: value.tokenizerProbe === undefined ? true : value.tokenizerProbe as boolean,
+      tokenizerProbe: value.tokenizerProbe === undefined ? false : value.tokenizerProbe as boolean,
     },
   }
 }

@@ -5,7 +5,10 @@ import { docsBase } from '@/lib/shared'
 import { source } from '@/lib/source'
 import { localeOf } from '@/lib/urls'
 
-/** The preview image of a page at `<page>/image.png`, pre-rendered at build time with the detector's colors. */
+/**
+ * The preview image of a page at `/docs/og/<page>/image.png` (`/docs/en/og/…` in English), pre-rendered at build
+ * time with the detector's colors.
+ */
 export async function loader({ params, request }: Route.LoaderArgs) {
   const locale = localeOf(new URL(request.url).pathname, docsBase)
   const slugs = params['*'].split('/').filter(segment => segment.length > 0)

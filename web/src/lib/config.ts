@@ -4,7 +4,7 @@ import type { ApiConfig } from '@fingerpoint/shared/types'
 export interface WebApiConfig extends ApiConfig {
   relaxed: boolean
   autoVerify: boolean
-  /** Probe the tokenizer alongside sampling and fuse it into the ranking. */
+  /** Probe the tokenizer alongside sampling and show it as reference information beside the result. */
   tokenizerProbe: boolean
 }
 
@@ -50,7 +50,7 @@ export const defaultConfig: WebApiConfig = {
   parallel: true,
   relaxed: true,
   autoVerify: true,
-  tokenizerProbe: true,
+  tokenizerProbe: false,
 }
 
 const configFields = ['baseUrl', 'apiKey', 'model', 'effort', 'format', 'stream', 'parallel', 'relaxed', 'autoVerify', 'tokenizerProbe'] as const
@@ -85,7 +85,7 @@ function readSnapshot(raw: unknown): ProfileSnapshot | null {
     parallel: value.parallel as boolean,
     relaxed: typeof value.relaxed === 'boolean' ? value.relaxed : true,
     autoVerify: value.autoVerify as boolean,
-    tokenizerProbe: typeof value.tokenizerProbe === 'boolean' ? value.tokenizerProbe : true,
+    tokenizerProbe: typeof value.tokenizerProbe === 'boolean' ? value.tokenizerProbe : false,
   }
 }
 

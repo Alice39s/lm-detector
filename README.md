@@ -25,8 +25,8 @@
 - **两种入口**：[网页](https://lm.ikale.io)支持手动粘贴和直连 API；命令行 `fpd` 提供实时终端界面、多轮检测和 JSON 输出。
 - **三种协议**：OpenAI Responses、Chat Completions 和 Anthropic Messages，默认使用 SSE 流式响应。
 - **参考库**：覆盖 GPT、Claude、Gemini、Grok、Qwen、DeepSeek 等常见模型家族。网页的参考库页面可以只读浏览和导出。
-- **分词器探测**：API 检测在取样的同时多发约 12 个短请求，从接口返回的用量（`usage`）识别接口背后使用的分词器（模型把文字切成 token 的规则），把结果并入候选的置信度，并核对它与所填模型是否一致。
-- **直连优先**：接口允许网页直接访问时由浏览器直接请求；受浏览器跨域限制（CORS）不允许时，经你授权后才把 API Key 和请求交给转发代理，代理可以换成自己[一键部署](https://lm.ikale.io/docs/deployment/worker)的 Cloudflare Worker。
+- **分词器探测（可选，默认关闭）**：在网页的 API 配置中打开“分词器探测”，或在命令行加上 `--tokenizer`，检测会多发约 12 个短请求，从接口返回的用量（`usage`）识别上游的分词器（模型把文字切成 token 的规则），并与所填模型核对。结果只作参考：排名和置信度只由数字指纹计算，也不等待探测。很多模型共用同一种分词器，所以分词器一致不能证明模型身份。
+- **连接方式可选**：默认“自动”，接口允许网页直接访问时由浏览器直接请求，受浏览器跨域限制（CORS）不允许时改经本站代理转发；也可以固定直连、本站代理，或自己[一键部署](https://lm.ikale.io/docs/deployment/worker)的 Cloudflare Worker。
 - **可追溯的数据维护**：`fpd sample`、`fpd enroll`、`fpd retrain` 依次完成采样、入库和离线重训。失败记录和旧尝试全部保留。
 
 > [!IMPORTANT]
@@ -34,7 +34,7 @@
 
 ## 快速开始
 
-**网页**：打开 [lm.ikale.io](https://lm.ikale.io)，选择手动或 API 模式。每条回答至少需要 80 个有效整数；三条回答都有效时，页面给出排名和每个候选的置信度，API 模式还会并入分词器探测的结果。
+**网页**：打开 [lm.ikale.io](https://lm.ikale.io)，选择手动或 API 模式。每条回答至少需要 80 个有效整数；三条回答都有效时，页面给出排名和每个候选的置信度。API 模式打开分词器探测后，页面还会单独显示探测结果。
 
 **命令行**：无需安装，任选一种运行时：
 
@@ -64,9 +64,9 @@ bun run fpd --help   # 在仓库内直接运行 CLI
 
 | 章节 | 内容 |
 | --- | --- |
-| [网页检测](https://lm.ikale.io/docs/web) | 取样方式、API 配置、结果解读、分词器探测、直连与代理授权 |
-| [命令行](https://lm.ikale.io/docs/cli) | 检测与分词器探测、采样与续采、入库与重训 |
-| [原理](https://lm.ikale.io/docs/principles) | 挑战与特征、排名与核验、置信度校准、分词器探测及其并入置信度的方式 |
+| [网页检测](https://lm.ikale.io/docs/web) | 取样方式、API 配置、结果解读、分词器探测、连接方式 |
+| [命令行](https://lm.ikale.io/docs/cli) | 检测、可选的分词器探测、采样与续采、入库与重训 |
+| [原理](https://lm.ikale.io/docs/principles) | 挑战与特征、排名与核验、置信度校准、分词器探测 |
 | [部署](https://lm.ikale.io/docs/deployment) | Cloudflare Pages、GitHub Pages、Vercel、自建 Worker 代理 |
 | [参考](https://lm.ikale.io/docs/reference/data) | 数据文件与变更记录、代理 API |
 | [开发](https://lm.ikale.io/docs/development) | 项目结构、设计规范、打包与发布 |

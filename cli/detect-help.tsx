@@ -21,9 +21,9 @@ const sections = [
     ['--bank FILE', 'Use a custom reference bank.'],
   ] },
   { title: 'TOKENIZER PROBE', options: [
-    ['--no-tokenizer', 'Skip the tokenizer probe and rank by the number fingerprint only.'],
-    ['--max-probes NUMBER', `Most probe texts to send, ${TOKENIZER_MODEL.minimumProbes} to 60. Default: ${TOKENIZER_MODEL.maximumProbes}. Probing stops at this number even if confidence is below ${TOKENIZER_MODEL.stopAt * 100}%. Two baseline requests are sent on top.`],
-    ['--tokenizer-bank FILE', 'Use a custom tokenizer bank.'],
+    ['--tokenizer', 'Also run the tokenizer probe. Off by default. Sends about 12 more requests, at most --max-probes + 2.'],
+    ['--max-probes NUMBER', `Probe text limit: ${TOKENIZER_MODEL.minimumProbes}–60. Default: ${TOKENIZER_MODEL.maximumProbes}. At the limit, the probe stops, also below ${TOKENIZER_MODEL.stopAt * 100}% confidence. Two baseline requests are extra. Needs --tokenizer.`],
+    ['--tokenizer-bank FILE', 'Use a custom tokenizer bank. Needs --tokenizer or --input.'],
   ] },
   { title: 'OUTPUT', options: [
     ['--input FILE', 'Analyze saved outputs offline. No API requests.'],
@@ -41,6 +41,7 @@ const examples = [
   ['Rank with a single API request using environment credentials', 'npx lmfpd@latest --count 1'],
   ['Require complete responses and disable streaming', 'npx lmfpd@latest -s -ns --timeout 180 --output result.json'],
   ['Analyze a saved report without calling a model', 'npx lmfpd@latest --input result.json --json'],
+  ['Add the tokenizer probe (about 12 more requests)', 'npx lmfpd@latest -a cc --tokenizer'],
 ] as const
 
 export function StarNote() {
@@ -77,8 +78,9 @@ function Help() {
       <Text bold color="cyan">HOW ROUNDS WORK</Text>
       <Text>Relaxed mode caps each sample at its requested number count. One or two valid samples can produce a ranking without confidence scores.</Text>
       <Text>Each round waits for all requested samples to settle before the next round starts. No automatic retries. Detection never enrolls samples.</Text>
-      <Text>Beside the first round, about 12 short requests (at most {TOKENIZER_MODEL.maximumProbes + 2}) identify the upstream tokenizer from the token counts in the API usage. APIs billed per request charge for them. Three-sample rounds add the result to the confidence; one- or two-sample rounds only report it.</Text>
-      <Text>The Tok column marks each candidate's tokenizer: ✓ matches the counts, × does not, ? unclear, · unknown to this tool.</Text>
+      <Text>With --tokenizer, FPD also sends short requests beside the first round. It reads the input token count from each usage report, identifies the upstream tokenizer, and checks it against --model. APIs that bill per request bill these requests.</Text>
+      <Text>The tokenizer result is reference only. The ranking never uses it and never waits for it. Many models share one tokenizer, so a match does not identify the model.</Text>
+      <Text>If the rounds finish first, FPD waits for the probe before it exits. q or Ctrl+C then stops the probe and keeps the round results.</Text>
       <Text dimColor>Use q or Ctrl+C to cancel. --base-url and --api-key are also accepted.</Text>
     </Box>
     <Box flexDirection="column" marginTop={1}>

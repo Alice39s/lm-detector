@@ -23,6 +23,9 @@ npx lmfpd@latest -s -ns --timeout 180 --output result.json
 
 # Analyze a saved report again offline without calling a model
 npx lmfpd@latest --input result.json --json
+
+# Also run the tokenizer probe (about 12 more requests)
+npx lmfpd@latest -a cc --tokenizer
 ```
 
 ## Options [#options]
@@ -42,9 +45,9 @@ npx lmfpd@latest --input result.json --json
 | `-s, --strict` | Disable automatic truncation and require 3 complete, valid answers | Off |
 | `--challenges FILE` | Reuse saved challenges in every round. The count must match `--count` | Random |
 | `--bank FILE` | Use a custom reference bank | Bundled bank |
-| `--no-tokenizer` | Skip the [tokenizer probe](./tokenizer.mdx) (on by default, about 12 extra requests) and rank by the number fingerprint only | Probe |
-| `--max-probes N` | Maximum number of probe texts for the tokenizer probe, 4–60 | `20` |
-| `--tokenizer-bank FILE` | Use a custom tokenizer bank | Bundled tokenizer bank |
+| `--tokenizer` | Run the [tokenizer probe](./tokenizer.mdx). Sends about 12 more requests. The ranking is the same with or without it | Off |
+| `--max-probes N` | Probe text limit for the tokenizer probe, 4–60. Use only with `--tokenizer` | `20` |
+| `--tokenizer-bank FILE` | Use a custom tokenizer bank. Use only with `--tokenizer` or `--input` | Bundled tokenizer bank |
 | `--input FILE` | Analyze saved outputs offline | — |
 | `--output FILE` | Save all rounds, request settings, challenges, received text, and results as JSON | — |
 | `--json` | Write JSON to stdout instead of the terminal interface | — |
@@ -71,7 +74,7 @@ All samples in a round, including failed requests, must settle before the next r
 
 The timeout starts when each request is dispatched. For SSE, the first nonempty response-body chunk clears the timer, including a heartbeat or metadata event. Response headers alone do not clear it. No client deadline or Bun idle timeout remains after SSE starts. In JSON mode, the entire response must arrive before the deadline.
 
-Press `q` or `Ctrl+C` to cancel active requests. Queued requests and later rounds do not start. With `--output`, samples received before cancellation are saved. Redirected output contains a static report, and progress goes to stderr. `--json` keeps stdout limited to machine-readable results.
+Press `q` or `Ctrl+C` to cancel active requests. Queued requests and later rounds do not start. With `--output`, samples received before cancellation are saved. If a tokenizer probe is still running after the last round, the same keys stop only the probe, and all results stay. Redirected output contains a static report, and progress goes to stderr: each sample, each round's leading candidate as soon as the round is scored, and the probe result with `--tokenizer`. `--json` keeps stdout limited to machine-readable results.
 
 ## Results and offline recomputation [#results]
 
@@ -85,7 +88,7 @@ bun run fpd --input result.json --strict --json
 
 When all three samples are valid, the result states whether the ranker and the verifier chose the same leading candidate; when they disagree, it names the verifier's choice, and the candidate order still follows the ranker. The terminal interface shows the latest ranking and summaries of recent rounds. After at least one scored round, a dimmed final line links the GitHub repository. JSON retains every round. The "most frequent candidate" counts round winners; it is not a combined probability. Confidence is relative to models in the reference bank and does not establish the upstream model's identity. When a custom reference bank does not match the detector, only the legacy ranker is used, without confidence scores.
 
-In rounds that include the tokenizer result, candidates follow the confidence with that result included, and the terminal interface adds a `Tok` column; see [Tokenizer probe](./tokenizer.mdx).
+Each round is scored from the number fingerprint alone, when its samples finish. With `--tokenizer`, the [tokenizer probe](./tokenizer.mdx) result shows in a separate block as reference only. It does not change the candidates, their order, or the confidence. With `--input`, a tokenizer probe saved in the report shows in the same block. Reading it sends no requests.
 
 If the smallest valid number of a sample is 200 or more, the interface warns that the sample has an abnormal distribution and the result is unreliable. The prompt causes it: with random challenges, a new run draws new prompts; with `--challenges`, replace the matching prompts in the file.
 
@@ -95,7 +98,7 @@ If the smallest valid number of a sample is 200 or more, the interface warns tha
 | --- | --- |
 | `0` | All rounds produced a ranking (a partial ranking in relaxed mode also counts as success) |
 | `1` | Invalid input, or any round could not be scored |
-| `130` | Canceled |
+| `130` | Canceled, including a tokenizer probe stopped after the last round |
 | `143` | Received SIGTERM |
 
 The previous detection interface remains available in the repository as `bun run detect:legacy`.

@@ -28,6 +28,6 @@ icon: Network
 
 ## 本地开发
 
-`bun run dev` 和 `bun run preview` 已接入同一代理，无需另外启动后端服务。本地 Pages 预览用 `bun run preview:pages`，运行在 `http://127.0.0.1:8788`；本地 Worker 用 `bun run dev:worker`，运行在 `http://127.0.0.1:8787`。
+`bun run dev` 和 `bun run preview` 已接入同一代理，无需另外启动后端服务。这两个脚本在 Node 中运行代理，并设置 `NODE_USE_ENV_PROXY=1`：转发请求按 `HTTP_PROXY`、`HTTPS_PROXY` 和 `NO_PROXY` 经本机代理发出，未设置这些变量时直接连接上游。本地 Pages 预览用 `bun run preview:pages`，运行在 `http://127.0.0.1:8788`；本地 Worker 用 `bun run dev:worker`，运行在 `http://127.0.0.1:8787`，由 workerd 运行，不读取这些变量。
 
 CLI 不经过代理，总是直接连接上游，也接受 `http://` 端点。

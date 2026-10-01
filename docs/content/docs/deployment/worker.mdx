@@ -14,7 +14,7 @@ Worker 的代码只有 `worker/main.js` 一个文件，不依赖其他包，部�
 
 ## 选择部署方式
 
-三种方式部署的是同一份代码，区别在于要不要 GitHub 或 GitLab 账号，以及以后怎么更新。网页「转发代理」里选「自建 Worker」后，「部署自己的 Worker」区域有「部署到 Cloudflare」和「在 Playground 中打开」两个按钮，与下面前两种方式相同。
+三种方式部署的是同一份代码，区别在于要不要 GitHub 或 GitLab 账号，以及以后怎么更新。网页 API 配置的「连接方式」里选「自建 Worker」后，「部署自己的 Worker」区域有「部署到 Cloudflare」和「在 Playground 中打开」两个按钮，与下面前两种方式相同。
 
 <Tabs items={['部署到 Cloudflare', '在 Playground 中打开', 'Wrangler']}>
   <Tab value="部署到 Cloudflare">
@@ -27,26 +27,26 @@ Worker 的代码只有 `worker/main.js` 一个文件，不依赖其他包，部�
     向这个仓库推送提交，Cloudflare 会自动重新部署。新仓库是一份独立的副本，本项目以后修改 `worker/main.js` 不会自动同步过来，需要更新时，把新的内容复制进去并提交。
   </Tab>
   <Tab value="在 Playground 中打开">
-    适合没有 GitHub 账号，或者只想尽快用起来的人。在网页 API 配置的「转发代理」里选「自建 Worker」，点击「在 Playground 中打开」。页面会从本项目的 GitHub 仓库读取最新的 `worker/main.js`，连同 `worker/wrangler.json` 里的兼容日期和兼容标志，在 Cloudflare 的在线编辑器 Workers Playground 中打开。登录 Cloudflare 后点击 Playground 的 Deploy，就会在你的账号里创建这个 Worker。
+    适合没有 GitHub 账号，或者只想尽快用起来的人。在网页 API 配置的「连接方式」里选「自建 Worker」，点击「在 Playground 中打开」。页面会从本项目的 GitHub 仓库读取最新的 `worker/main.js`，连同 `worker/wrangler.json` 里的兼容日期和兼容标志，在 Cloudflare 的在线编辑器 Workers Playground 中打开。登录 Cloudflare 后点击 Playground 的 Deploy，就会在你的账号里创建这个 Worker。
 
     这种方式不创建仓库，Worker 一直使用部署时的代码，本项目以后更新代码不会自动带过来。需要更新时，再从「在 Playground 中打开」部署一次。
   </Tab>
   <Tab value="Wrangler">
     适合已经会用命令行的开发者。克隆本仓库，运行 `bun install` 安装依赖，再在仓库根目录运行 `bun run deploy:worker`。Wrangler 是 Cloudflare 的命令行工具，它按 `worker/wrangler.json` 部署，首次运行时会引导你登录 Cloudflare。
 
-    本机调试用 `bun run dev:worker`，Worker 运行在 `http://127.0.0.1:8787`，把这个地址填进网页的 Worker 地址即可。
+    本机调试用 `bun run dev:worker`，Worker 运行在 `http://127.0.0.1:8787`，把这个地址填进网页的 Worker 地址即可。这个命令允许 `http://127.0.0.1:5173`（`bun run dev`）、`http://127.0.0.1:4173`（`bun run preview`）和 `https://lm.ikale.io` 调用 Worker。
   </Tab>
 </Tabs>
 
 ## 填写地址并检查
 
-部署完成后，把 Worker 的地址填进网页「转发代理」里的「自建 Worker」，点击「检查代理」，看到「代理可用。」就成功了。地址填到域名为止即可，Worker 对任何路径的回答都相同。第一次经过这个 Worker 发送请求前，网页会弹窗询问是否允许，并写明 Worker 的主机名。
+部署完成后，在网页「连接方式」里选「自建 Worker」，填入 Worker 的地址，点击「检查代理」，看到「代理可用。」就成功了。地址填到域名为止即可，Worker 对任何路径的回答都相同。之后的取样和分词器探测都经这个 Worker 转发。
 
 如果检查结果要你把当前页面的来源加入 `ALLOWED_ORIGINS`，按下一节添加。Worker 的限制与本站代理相同，见[代理约束](./proxy.mdx)；请求与响应的格式见[代理 API](../reference/proxy-api/index.mdx)。
 
 ## 设置 ALLOWED_ORIGINS [#allowed-origins]
 
-`ALLOWED_ORIGINS` 决定哪些网页可以调用你的 Worker。它的默认值是 `https://lm.ikale.io`，所以只在 `lm.ikale.io` 上使用你的 Worker 时，什么都不用改。如果你自己部署了网页，或者想在别的网站上使用，就把那个网页的来源加进去。
+`ALLOWED_ORIGINS` 决定哪些网页可以调用你的 Worker。它的默认值是 `https://lm.ikale.io`，所以只在 `lm.ikale.io` 上使用你的 Worker 时，什么都不用改。如果你自己部署了网页，或者想在别的网站上使用，就把那个网页的来源加进去。从地址栏复制的网址也可以：Worker 只取其中的来源，忽略路径和大小写。
 
 来源（origin）是网址里协议、域名和端口的部分，不含路径。写法如下：
 

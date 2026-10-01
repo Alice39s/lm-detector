@@ -1,5 +1,4 @@
-import { useRef, useState, useSyncExternalStore, type Ref } from 'react'
-import { endpoint } from '@fingerpoint/shared/detection'
+import { useRef, useState, type Ref } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronDown, Copy, Download, Eye, EyeOff, FolderOpen, Pencil, Plus, Save, Settings2, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -25,10 +24,10 @@ import { Segmented } from '@/components/segmented'
 import { useI18n } from '@/i18n'
 import type { ApiProfile, ApiProfileManager, WebApiConfig } from '@/lib/config'
 import { readProfileFile, saveProfileFile } from '@/lib/profile-file'
-import { hasProxyConsent, isConsentRemembered, knownReachability, proxyEndpoint, proxyName, revokeProxyConsent, routeVersion, subscribeRoute, upstreamOrigin } from '@/lib/route'
 import { ProxySettings } from '@/components/proxy-settings'
 import { cn } from '@/lib/utils'
 import { useMotionPreset } from '@/lib/motion'
+import { TOKENIZER_MODEL } from '@fingerpoint/shared/tokenizer-posterior'
 
 const placeholders: Record<WebApiConfig['format'], string> = {
   openai: 'https://api.openai.com/v1',
@@ -47,27 +46,6 @@ function SwitchRow({ id, label, help, checked, onChange, disabled }: { id: strin
       </FieldContent>
       <Switch id={id} checked={checked} onCheckedChange={onChange} disabled={disabled} aria-describedby={help ? `${id}-help` : undefined} />
     </Field>
-  )
-}
-
-/** Shows how the next request reaches the endpoint, and lets the user revoke a remembered proxy consent. */
-function ConnectionStatus({ config }: { config: WebApiConfig }) {
-  const { t } = useI18n()
-  useSyncExternalStore(subscribeRoute, routeVersion, routeVersion)
-  let url: string
-  // An address that is still being typed has no route yet.
-  try { url = endpoint(config) } catch { return null }
-  const origin = upstreamOrigin(url), reachability = knownReachability(url, config.format)
-  const relay = proxyEndpoint()
-  const text = reachability === 'direct' ? t('proxy.statusDirect')
-    : !reachability ? t('proxy.statusUnknown')
-    : !relay ? t('proxy.statusNoWorker')
-    : t(hasProxyConsent(relay, origin) ? 'proxy.statusProxy' : reachability === 'unreachable' ? 'proxy.statusUnreachable' : 'proxy.statusNeedsConsent', { proxy: proxyName(t, relay) })
-  return (
-    <FieldDescription id="api-route-status" className="flex flex-wrap items-center gap-x-2">
-      <span>{text}</span>
-      {relay && isConsentRemembered(relay, origin) && <Button type="button" variant="link" size="sm" className="h-auto p-0" onClick={() => revokeProxyConsent(relay, origin)}>{t('proxy.revoke')}</Button>}
-    </FieldDescription>
   )
 }
 
@@ -350,8 +328,7 @@ export function ApiConfigPanel({ open, onOpenChange, config, update, profileMana
           <FieldGroup className="grid gap-4 md:grid-cols-2">
             <Field>
               <FieldLabel htmlFor="api-base-url">{t('api.baseUrl')}</FieldLabel>
-              <Input id="api-base-url" data-api-required className="fp-mono h-9" value={config.baseUrl} placeholder={placeholders[config.format]} autoComplete="off" spellCheck={false} onChange={e => update({ baseUrl: e.target.value })} onBlur={() => update({ baseUrl: config.baseUrl.trim() })} aria-describedby="api-route-status" />
-              <ConnectionStatus config={config} />
+              <Input id="api-base-url" data-api-required className="fp-mono h-9" value={config.baseUrl} placeholder={placeholders[config.format]} autoComplete="off" spellCheck={false} onChange={e => update({ baseUrl: e.target.value })} onBlur={() => update({ baseUrl: config.baseUrl.trim() })} />
             </Field>
             <Field>
               <FieldLabel htmlFor="api-model">{t('api.model')}</FieldLabel>
@@ -391,7 +368,7 @@ export function ApiConfigPanel({ open, onOpenChange, config, update, profileMana
             <SwitchRow id="api-parallel" label={t('api.parallel')} help={t(config.tokenizerProbe ? 'api.parallelProbeHelp' : 'api.parallelHelp')} checked={config.parallel ?? true} onChange={parallel => update({ parallel })} disabled={disabled} />
             <SwitchRow id="api-relaxed" label={t('api.relaxed')} help={t('api.relaxedHelp')} checked={config.relaxed} onChange={relaxed => update({ relaxed })} disabled={disabled} />
             <SwitchRow id="api-auto" label={t('api.autoVerify')} checked={config.autoVerify} onChange={autoVerify => update({ autoVerify })} disabled={disabled} />
-            <SwitchRow id="api-tokenizer" label={t('api.tokenizerProbe')} help={t('api.tokenizerProbeHelp')} checked={config.tokenizerProbe} onChange={tokenizerProbe => update({ tokenizerProbe })} disabled={disabled} />
+            <SwitchRow id="api-tokenizer" label={t('api.tokenizerProbe')} help={t('api.tokenizerProbeHelp', { max: TOKENIZER_MODEL.maximumProbes + 2 })} checked={config.tokenizerProbe} onChange={tokenizerProbe => update({ tokenizerProbe })} disabled={disabled} />
           </FieldGroup>
           <Separator />
           <FieldGroup className="grid gap-4 md:grid-cols-2">

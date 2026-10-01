@@ -69,10 +69,10 @@ export function probeBody(config: ApiConfig, bank: TokenizerBank, text: string) 
   return body
 }
 
-function failure(error: unknown, signal: AbortSignal | undefined, timeout: AbortSignal, key: string): CodedError {
-  if (signal?.aborted) return coded('The request was cancelled.', 'aborted')
-  if (timeout.aborted) return coded('The upstream request timed out.', 'timeout')
-  if (error instanceof TypeError) return coded('Cannot reach the API. Check the address and the network.', 'network')
+function failure(error: unknown, signal: AbortSignal | undefined, timeout: AbortSignal, timeoutMs: number, key: string): CodedError {
+  if (signal?.aborted) return coded('The probe request was stopped.', 'aborted')
+  if (timeout.aborted) return coded(`The API did not answer within ${timeoutMs / 1000} seconds.`, 'timeout')
+  if (error instanceof TypeError) return coded('Cannot connect to the API. Check the base URL and the network.', 'network')
   const known = error instanceof Error ? error as CodedError : coded(String(error), 'network')
   if (key) known.message = known.message.replaceAll(key, '[REDACTED]')
   return known
@@ -93,12 +93,13 @@ export async function probeTokenizer(config: ApiConfig, bank: TokenizerBank, opt
 
   async function ask(probe: string | null) {
     const text = probe === null ? '' : texts.get(probe)
-    if (text === undefined) throw new Error(`The tokenizer bank has no probe ${probe}.`)
+    if (text === undefined) throw new Error(`Probe text ${probe} is not in the tokenizer bank.`)
     const step: ProbeStep = { probe, state: 'requesting' }
     run.steps.push(step)
     if (probe !== null) asked.add(probe)
     emit()
-    const timeout = AbortSignal.timeout(options.timeoutMs ?? PROBE_TIMEOUT_MS)
+    const timeoutMs = options.timeoutMs ?? PROBE_TIMEOUT_MS
+    const timeout = AbortSignal.timeout(timeoutMs)
     const signal = options.signal ? AbortSignal.any([options.signal, timeout]) : timeout
     try {
       const body = probeBody(config, bank, text)
@@ -107,7 +108,7 @@ export async function probeTokenizer(config: ApiConfig, bank: TokenizerBank, opt
       run.observations.push({ probe, tokens: usage.inputTokens, responseModel: usage.responseModel })
       run.posterior = tokenizerPosterior(bank, run.observations)
     } catch (error) {
-      const reason = failure(error, options.signal, timeout, config.apiKey)
+      const reason = failure(error, options.signal, timeout, timeoutMs, config.apiKey)
       Object.assign(step, { state: 'failed', error: reason.message, errorCode: reason.code, httpStatus: reason.httpStatus })
       run.error ??= reason
     }

@@ -6,7 +6,7 @@ icon: Cloud
 
 `bun run build` 同时构建检测网站和本文档：网站输出到 `web/dist/`，文档预渲染后复制到 `web/dist/docs/`。一次静态部署在 `/` 提供检测网站，在 `/docs` 提供文档。检测网站使用 HashRouter，不需要页面路由重写。
 
-需要转发代理的接口由同源 `/api/proxy` 或[自建 Worker](./worker.mdx) 转发。三个同源入口都导入单文件 Worker `worker/main.js` 中的 `proxyRequest`：
+连接方式选择本站代理（或自动模式不能直连）时，请求由同源 `/api/proxy` 转发；选择[自建 Worker](./worker.mdx) 时由你的 Worker 转发。三个同源入口都导入单文件 Worker `worker/main.js` 中的 `proxyRequest`：
 
 | 文件 | 运行环境 |
 | --- | --- |
@@ -42,6 +42,16 @@ Pages 项目使用仓库根目录作为根目录，通过 Git 集成部署：
 
 先在 Pages 项目中绑定 `lm.ikale.io`，再确认 Cloudflare DNS 指向该项目的 `*.pages.dev` 主机名。只有 Pages URL 的静态资源、`/api/proxy` 的 JSON/SSE 转发和自定义域都通过后，才能停止旧站点的自动部署。
 
+自定义域 `lm.ikale.io` 的 `/api/proxy` 由下文的[代理 Worker 路由](#代理-worker-路由)处理。Pages Function 只服务 `*.pages.dev` 和预览部署。
+
+### 代理 Worker 路由 [step]
+
+`wrangler.proxy.jsonc` 把 `api/proxy.ts` 部署为 Worker `lm-fingerpoint-proxy`，并绑定路由 `lm.ikale.io/api/proxy`。Worker 路由先于 Pages 执行，所以该路径不会进入 Pages Function。
+
+不在自定义域上使用 Pages Function 的原因：自定义域把 Pages 当作源站。Cloudflare 会把源站返回的 502 替换成自己的错误页，客户端因此收不到上游的错误信息。另外，自定义域等待源站响应头最多 100 秒，超时返回 524。Worker 路由由 Worker 直接生成响应，不经过这一层源站代理。
+
+修改 `worker/main.js` 后，除了推送 Pages，还要在仓库根目录运行 `bun run deploy:proxy`。API 令牌需要账户级 Workers Scripts 编辑权限和 `ikale.io` 区域的 Workers Routes 编辑权限。
+
 ## 用 Wrangler 发布
 
 ```sh
@@ -60,7 +70,7 @@ bun run deploy:pages
 
 `.github/workflows/pages.yml` 在推送时构建并保存静态产物，手动触发时发布到 GitHub Pages。手动发布前需要在仓库设置中启用 GitHub Actions 作为 Pages 来源。项目站点位于 `/<仓库名>/` 之下，工作流会把 `DOCS_BASE` 设为 `/<仓库名>/docs`，文档的链接、搜索索引和 `llms.txt` 都随之使用这个前缀。
 
-GitHub Pages 没有服务器函数：允许浏览器跨域的接口仍可直连使用 API 模式（含分词器探测）；需要代理的接口在 API 配置中改用[自建 Worker](./worker.mdx)，Worker 的 `ALLOWED_ORIGINS` 需要包含 Pages 站点的 origin。
+GitHub Pages 没有服务器函数，也就没有本站代理 `/api/proxy`：连接方式为“自动”或“本站代理”时，需要代理的请求会失败。允许浏览器跨域的接口可以在 API 配置的“连接方式”中选“直连”使用 API 模式（含分词器探测）；其他接口选[自建 Worker](./worker.mdx)，Worker 的 `ALLOWED_ORIGINS` 需要包含 Pages 站点的 origin。
 
 ## Vercel
 
@@ -71,8 +81,8 @@ GitHub Pages 没有服务器函数：允许浏览器跨域的接口仍可直连�
 文档位于 `docs/`，是 React Router 的 SPA，所有页面在构建时预渲染：
 
 - 每页的 HTML 与数据文件；
-- 每页的 Markdown 版本 `<页面>/content.md`，供“复制 Markdown”和 LLM 工具使用；
-- 每页的 Open Graph 图片 `<页面>/image.png`；
+- 每页的 Markdown 版本 `/docs/llms.mdx/<页面>/content.md`（英文为 `/docs/en/llms.mdx/<页面>/content.md`），供“复制 Markdown”和 LLM 工具使用；
+- 每页的 Open Graph 图片 `/docs/og/<页面>/image.png`（英文为 `/docs/en/og/<页面>/image.png`）；
 - 静态搜索索引 `api/search`，以及 `llms.txt` 与 `llms-full.txt`。
 
-`DOCS_BASE` 决定文档的路径前缀，默认 `/docs`。本地开发用 `bun run dev:docs`，单独构建用 `bun run --cwd docs build`。
+`DOCS_BASE` 决定文档的路径前缀，默认 `/docs`；上面的路径都以它开头。`SITE_ORIGIN` 是文档的公开来源，默认 `https://lm.ikale.io`，用于 Open Graph 标签和 Markdown 版本里的绝对网址；部署到其他域名（Vercel、Pages 预览或分支站点）时设为该域名的来源。本地开发用 `bun run dev:docs`，单独构建用 `bun run --cwd docs build`。

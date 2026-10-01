@@ -28,6 +28,6 @@ The `Origin` and `Sec-Fetch-Site` checks of the same-origin proxy limit cross-si
 
 ## Local development
 
-`bun run dev` and `bun run preview` already include the same proxy, so you do not need to start a separate backend service. For a local Pages preview, use `bun run preview:pages`, which runs at `http://127.0.0.1:8788`. For a local Worker, use `bun run dev:worker`, which runs at `http://127.0.0.1:8787`.
+`bun run dev` and `bun run preview` already include the same proxy, so you do not need to start a separate backend service. Both scripts run the proxy in Node with `NODE_USE_ENV_PROXY=1`: relayed requests go through the local proxy named by `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY`, or straight to the upstream when these are unset. For a local Pages preview, use `bun run preview:pages`, which runs at `http://127.0.0.1:8788`. For a local Worker, use `bun run dev:worker`, which runs at `http://127.0.0.1:8787` in workerd and does not read these variables.
 
 The CLI does not use the proxy. It always connects to the upstream directly and also accepts `http://` endpoints.

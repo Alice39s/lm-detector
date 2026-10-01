@@ -1,0 +1,33 @@
+/* design.md 3「应用外壳」顶栏与 4.4 像素着色器宿主。检测网站和文档站（docs/）共用本文件，改动会同时作用于两处。 */
+:root { --fp-topbar-height: 56px; }
+.fp-topbar { position: sticky; top: 0; z-index: 20; height: var(--fp-topbar-height); background: var(--background); border-bottom: 1px solid var(--border); }
+.fp-topbar-inner { height: 100%; max-width: 1440px; margin: 0 auto; padding: 0 1rem; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; }
+.fp-brand { display: flex; align-items: center; gap: .5rem; justify-self: start; }
+.fp-brand-text { display: flex; flex-direction: column; }
+.fp-brand-mark { flex-shrink: 0; width: 32px; height: 32px; color: var(--muted-foreground); }
+.fp-brand-title { font-family: var(--font-brand-title); font-size: .875rem; line-height: 1.25; font-weight: 500; white-space: nowrap; }
+.fp-brand-byline { font-family: var(--font-brand-byline); font-size: .75rem; line-height: 1rem; font-weight: 400; color: color-mix(in oklab, var(--foreground) 70%, transparent); }
+.fp-repository-link { display: inline-flex; align-items: center; gap: .4rem; padding: .5rem; border-radius: var(--radius); color: var(--muted-foreground); font-size: .75rem; white-space: nowrap; text-decoration: none; }
+.fp-repository-link:hover { color: var(--foreground); background: var(--accent); }
+@media (max-width: 1023px) { .fp-repository-link span { display: none; } }
+.fp-nav { position: relative; display: flex; gap: 1.5rem; justify-self: center; height: 100%; }
+.fp-nav a { position: relative; display: flex; align-items: center; height: 100%; font-size: 0.875rem; color: var(--muted-foreground); text-decoration: none; }
+.fp-nav a:hover, .fp-nav a[aria-current="page"] { color: var(--foreground); }
+.fp-nav a[aria-current="page"] { font-weight: 500; }
+.fp-nav-indicator { position: absolute; pointer-events: none; left: 0; bottom: -1px; height: 2px; background: var(--primary); }
+@media (max-width: 639px) {
+  :root { --fp-topbar-height: 88px; }
+  .fp-topbar-inner { grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: 56px 32px; }
+  .fp-nav { grid-column: 1 / -1; grid-row: 2; }
+  .fp-topbar-actions { grid-column: 2; grid-row: 1; }
+}
+@media (min-width: 640px) { .fp-topbar-inner { padding-left: 1.5rem; padding-right: 1.5rem; } }
+@media (min-width: 1024px) { .fp-topbar-inner { padding-left: 2rem; padding-right: 2rem; } }
+/* 窄屏触控：操作区的图标按钮（仓库入口除外）至少 44px。 */
+@media (max-width: 767px) { .fp-topbar-actions > :not(.fp-repository-link) { min-width: 44px; min-height: 44px; } }
+
+/* 宿主决定尺寸，画布按整格放大。 */
+@layer components {
+  .fp-pixel { position: relative; display: block; overflow: hidden; pointer-events: none; }
+  .fp-pixel > canvas { position: absolute; top: 0; left: 0; image-rendering: pixelated; }
+}

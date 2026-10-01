@@ -92,7 +92,7 @@ function data(bank: TokenizerBank, observations: TokenizerObservation[]): Datum[
   return observations.map(observation => {
     if (observation.probe === null) return { j: -1, tokens: observation.tokens }
     const j = index.get(observation.probe)
-    if (j === undefined) throw new Error(`The tokenizer bank has no probe ${observation.probe}.`)
+    if (j === undefined) throw new Error(`Probe text ${observation.probe} is not in the tokenizer bank.`)
     return { j, tokens: observation.tokens }
   })
 }
@@ -222,6 +222,7 @@ const initialPlans = new WeakMap<TokenizerBank, Map<number, string[]>>()
 /**
  * Plans the next batch with the pairwise Bhattacharyya surrogate
  *   F(S) = sum over pairs a<b in different groups of sqrt(w_a w_b) * (1 - prod_{j in S} BC_j(a, b)),
+ * with w normalized over the atoms of the `planned` leading classes,
  * which bounds the MAP error from above and is monotone submodular, so the greedy batch is within 1 - 1/e of the
  * best batch. With exact counts BC is 0 or 1 and F reduces to equivalence-class edge cutting (EC2). Each class
  * contributes its known atom and its relative atom (grouped with the alien as "unknown"), so batches also test the
@@ -282,6 +283,11 @@ export interface ClaimCheck {
   /** Classes the claimed model id is served with; empty when the vendor has not published its tokenizer. */
   expected: string[]
   vendor: string
+  /**
+   * The claim comes from a first-party API model id, whose vendor publishes the exact tokenizer, so an unlisted relative
+   * does not support it. Alias claims of open-weight lineages also accept a relative, such as a retrained variant.
+   */
+  firstParty: boolean
   /** Posterior probability that the observed tokenizer is compatible with the claim. */
   probability: number
   status: 'consistent' | 'inconsistent' | 'uncertain'
@@ -302,10 +308,14 @@ export function expectedClasses(bank: TokenizerBank, model: string): Omit<ClaimC
   const id = normalizeModel(model)
   if (!id) return null
   const vendor = bank.api_models.find(entry => new RegExp(entry.pattern, 'i').test(id))
-  if (vendor) return { expected: vendor.class ? [vendor.class] : [], vendor: vendor.vendor }
+  if (vendor) return { expected: vendor.class ? [vendor.class] : [], vendor: vendor.vendor, firstParty: true }
   const classes = bank.classes.filter(item => item.aliases.some(alias => new RegExp(alias, 'i').test(id)))
-  return classes.length ? { expected: classes.map(item => item.id), vendor: classes[0].lab_name } : null
+  return classes.length ? { expected: classes.map(item => item.id), vendor: classes[0].lab_name, firstParty: false } : null
 }
+
+/** Posterior that the upstream uses one of `classes`, counting their unlisted relatives only when `relatives` is set. */
+export const classPosterior = (posterior: TokenizerPosterior, classes: string[], relatives: boolean) => posterior.classes
+  .filter(score => classes.includes(score.id)).reduce((sum, score) => sum + score.exact + (relatives ? score.related : 0), 0)
 
 export function tokenizerVerdict(bank: TokenizerBank, posterior: TokenizerPosterior, model = ''): TokenizerVerdict {
   const byExact = posterior.classes.reduce((best, score) => score.exact > best.exact ? score : best)
@@ -317,9 +327,7 @@ export function tokenizerVerdict(bank: TokenizerBank, posterior: TokenizerPoster
   const expected = model ? expectedClasses(bank, model) : null
   let claim: ClaimCheck | null = null
   if (expected) {
-    const probability = expected.expected.length
-      ? posterior.classes.filter(score => expected.expected.includes(score.id)).reduce((sum, score) => sum + score.exact + score.related, 0)
-      : posterior.unknown
+    const probability = expected.expected.length ? classPosterior(posterior, expected.expected, !expected.firstParty) : posterior.unknown
     claim = { ...expected, probability, status: probability >= 0.9 ? 'consistent' : probability <= 0.1 ? 'inconsistent' : 'uncertain' }
   }
   return { kind, top, confidence, claim }

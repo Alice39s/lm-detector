@@ -14,7 +14,7 @@ The Worker code is a single file, `worker/main.js`, with no dependencies, so you
 
 ## Choose how to deploy
 
-All three methods deploy the same code. They differ in whether you need a GitHub or GitLab account and in how you update later. After you choose "Own Worker" under "Forwarding proxy" in the web app, the "Deploy your own Worker" area has the buttons "Deploy to Cloudflare" and "Open in the Playground", which match the first two methods below.
+All three methods deploy the same code. They differ in whether you need a GitHub or GitLab account and in how you update later. After you choose "Own Worker" under "Connection" in the API configuration of the web app, the "Deploy your own Worker" area has the buttons "Deploy to Cloudflare" and "Open in the Playground", which match the first two methods below.
 
 <Tabs items={['Deploy to Cloudflare', 'Open in the Playground', 'Wrangler']}>
   <Tab value="Deploy to Cloudflare">
@@ -27,26 +27,26 @@ All three methods deploy the same code. They differ in whether you need a GitHub
     Push a commit to that repository and Cloudflare redeploys automatically. The new repository is an independent copy, so later changes to `worker/main.js` in this project do not reach it. To update, copy the new content in and commit it.
   </Tab>
   <Tab value="Open in the Playground">
-    This suits people without a GitHub account, or who just want to get going. In the API configuration of the web app, choose "Own Worker" under "Forwarding proxy" and click "Open in the Playground". The page reads the latest `worker/main.js` from this project's GitHub repository and opens it in Cloudflare's online editor, the Workers Playground, together with the compatibility date and compatibility flags from `worker/wrangler.json`. After you sign in to Cloudflare, the Deploy button of the Playground creates the Worker in your account.
+    This suits people without a GitHub account, or who just want to get going. In the API configuration of the web app, choose "Own Worker" under "Connection" and click "Open in the Playground". The page reads the latest `worker/main.js` from this project's GitHub repository and opens it in Cloudflare's online editor, the Workers Playground, together with the compatibility date and compatibility flags from `worker/wrangler.json`. After you sign in to Cloudflare, the Deploy button of the Playground creates the Worker in your account.
 
     This method creates no repository, and the Worker keeps the code it was deployed with, so later updates to this project do not reach it. To update, deploy again from "Open in the Playground".
   </Tab>
   <Tab value="Wrangler">
     This suits developers who are comfortable on the command line. Clone this repository, run `bun install`, then run `bun run deploy:worker` from the repository root. Wrangler is Cloudflare's command-line tool; it deploys according to `worker/wrangler.json` and, on the first run, walks you through signing in to Cloudflare.
 
-    For local testing, use `bun run dev:worker`. The Worker then runs at `http://127.0.0.1:8787`, and you can enter that address as the Worker address in the web app.
+    For local testing, use `bun run dev:worker`. The Worker then runs at `http://127.0.0.1:8787`, and you can enter that address as the Worker address in the web app. This command lets `http://127.0.0.1:5173` (`bun run dev`), `http://127.0.0.1:4173` (`bun run preview`) and `https://lm.ikale.io` call the Worker.
   </Tab>
 </Tabs>
 
 ## Enter the address and check it
 
-After the deployment finishes, enter the Worker address under "Own Worker" in "Forwarding proxy" in the web app and click "Check proxy". "The proxy works." means it is ready. The address can end at the domain, because the Worker answers every path the same way. Before the first request goes through this Worker, the web app asks whether to allow it and names the host of the Worker.
+After the deployment finishes, choose "Own Worker" under "Connection" in the web app, enter the Worker address, and click "Check proxy". "The proxy works." means it is ready. The address can end at the domain, because the Worker answers every path the same way. Sampling and the tokenizer probe then go through this Worker.
 
 If the check asks you to add the origin of the current page to `ALLOWED_ORIGINS`, follow the next section. The Worker has the same limits as this site's proxy, described in [Proxy limits](./proxy.mdx). For the request and response format, see the [Proxy API](../reference/proxy-api/index.mdx).
 
 ## Set ALLOWED_ORIGINS [#allowed-origins]
 
-`ALLOWED_ORIGINS` decides which web pages may call your Worker. Its default is `https://lm.ikale.io`, so if you use your Worker only on `lm.ikale.io`, you need to change nothing. If you deploy the web app yourself, or want to use the Worker from another site, add the origin of that page.
+`ALLOWED_ORIGINS` decides which web pages may call your Worker. Its default is `https://lm.ikale.io`, so if you use your Worker only on `lm.ikale.io`, you need to change nothing. If you deploy the web app yourself, or want to use the Worker from another site, add the origin of that page. A URL copied from the address bar works too: the Worker keeps only its origin and ignores the path and letter case.
 
 An origin is the scheme, domain, and port part of a URL, without the path. Write it like this:
 

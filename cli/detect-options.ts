@@ -16,7 +16,7 @@ export interface DetectOptions {
   challenges?: string
   json: boolean
   updateCheck: boolean
-  /** Probe the tokenizer once and fuse it into every round. */
+  /** Run the tokenizer probe beside the first round. Off by default; it never changes the ranking. */
   tokenizer: boolean
   maxProbes: number
   tokenizerBank?: string
@@ -39,7 +39,7 @@ export function parseOptions(args: string[], env = process.env): DetectOptions |
     input: { type: 'string' }, output: { type: 'string' }, bank: { type: 'string' },
     challenges: { type: 'string' }, json: { type: 'boolean' }, help: { type: 'boolean', short: 'h' },
     'base-url': { type: 'string' }, 'api-key': { type: 'string' },
-    'no-update-check': { type: 'boolean' }, 'no-tokenizer': { type: 'boolean' },
+    'no-update-check': { type: 'boolean' }, tokenizer: { type: 'boolean' },
     'max-probes': { type: 'string' }, 'tokenizer-bank': { type: 'string' },
   }, strict: true, allowPositionals: false })
   if (values.help) return undefined
@@ -62,8 +62,15 @@ export function parseOptions(args: string[], env = process.env): DetectOptions |
   }
   const maxProbes = positiveInteger(values['max-probes'] ?? String(TOKENIZER_MODEL.maximumProbes), '--max-probes', 60)
   if (maxProbes < TOKENIZER_MODEL.minimumProbes) throw new Error(`--max-probes must be an integer from ${TOKENIZER_MODEL.minimumProbes} to 60.`)
-  if (values['no-tokenizer'] && (values['max-probes'] !== undefined || values['tokenizer-bank'] !== undefined)) {
-    throw new Error('--no-tokenizer cannot be combined with --max-probes or --tokenizer-bank.')
+  // Without --tokenizer, the probe options are mistakes; with --input, no request is sent, but --tokenizer-bank still
+  // recomputes a probe saved in the file.
+  const unused = (values.input ? ['tokenizer', 'max-probes'] as const : values.tokenizer ? [] : ['max-probes', 'tokenizer-bank'] as const)
+    .filter(name => values[name] !== undefined).map(name => `--${name}`)
+  if (unused.length) {
+    const names = unused.join(' and '), verb = unused.length === 1 ? 'applies' : 'apply'
+    throw new Error(values.input
+      ? `${names} ${verb} only to live detection. --input sends no requests. It shows the tokenizer probe saved in the file, if any. Remove ${names}.`
+      : `${names} ${verb} only to the tokenizer probe. Add --tokenizer to run the probe, or remove ${names}.`)
   }
   const config: ApiConfig = {
     model: (values.model ?? env.MODEL ?? '').trim(),
@@ -84,7 +91,7 @@ export function parseOptions(args: string[], env = process.env): DetectOptions |
     strict: !!values.strict, json: !!values.json,
     updateCheck: !values['no-update-check'] && !env.FPD_NO_UPDATE_CHECK && !env.NO_UPDATE_NOTIFIER,
     input: values.input, output: values.output, bank: values.bank, challenges: values.challenges,
-    tokenizer: !values['no-tokenizer'], maxProbes, tokenizerBank: values['tokenizer-bank'],
+    tokenizer: !!values.tokenizer, maxProbes, tokenizerBank: values['tokenizer-bank'],
   }
 }
 

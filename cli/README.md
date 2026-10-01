@@ -55,9 +55,9 @@ Explicit flags override environment variables. Credentials do not appear in the 
 | `-e`, `--effort` | Optional provider reasoning effort. Accepts any string, including `none`, `minimal`, `low`, `medium`, `high`, `xhigh`, and `max`. Omitted from API requests by default. |
 | `--challenges FILE` | Reuse a JSON array of challenges in every round. Its length must match `--count` (default: 3). |
 | `--bank FILE` | Use a custom reference bank. |
-| `--no-tokenizer` | Skip the tokenizer probe and rank by the number fingerprint only. |
-| `--max-probes` | Maximum number of probe texts for the tokenizer probe, 4 to 60. Default: 20. Two baseline requests are sent in addition. |
-| `--tokenizer-bank FILE` | Use a custom tokenizer bank. |
+| `--tokenizer` | Run the tokenizer probe. Off by default. Sends about 12 more requests, at most `--max-probes` + 2. The ranking is the same with or without it. |
+| `--max-probes` | Probe text limit for the tokenizer probe, 4 to 60. Default: 20. The two baseline requests are extra. Use only with `--tokenizer`. |
+| `--tokenizer-bank FILE` | Use a custom tokenizer bank. Use only with `--tokenizer` or `--input`. |
 | `--input FILE` | Analyze saved outputs without API requests. |
 | `--output FILE` | Save all rounds, request settings, challenges, received text, and results. |
 | `--json` | Write machine-readable JSON to stdout. Disable the TUI. |
@@ -96,7 +96,7 @@ All requested samples must settle before the next round starts, including failed
 
 The timeout starts when each request is dispatched. For SSE, the first nonempty response-body chunk clears the timer, including a heartbeat or metadata event. Response headers alone do not clear it. No client deadline or Bun idle timeout remains after SSE starts. For JSON, the entire response must arrive before the deadline.
 
-Use `q` or `Ctrl+C` to cancel active requests and prevent queued requests and later rounds from starting. With `--output`, received samples are saved on cancellation. Redirected output contains a static report; progress goes to stderr. `--json` keeps stdout free of interface output.
+Use `q` or `Ctrl+C` to cancel active requests and prevent queued requests and later rounds from starting. With `--output`, received samples are saved on cancellation. If a tokenizer probe is still running after the last round, the same keys stop only the probe, and all results stay. Redirected output contains a static report; progress goes to stderr, including each round's leading candidate as soon as the round is scored. `--json` keeps stdout free of interface output.
 
 ## Results and offline use
 
@@ -112,23 +112,24 @@ The input can be a saved report, a report with `outputs`, an array of one to thr
 
 The TUI shows the latest ranking and recent round summaries. After at least one scored round, a dimmed final line links the GitHub repository. JSON retains every round. The most frequent candidate counts round winners; it is not a combined probability. Confidence is relative to models in the reference bank and does not establish the upstream model's identity. An incompatible custom bank uses the existing legacy ranker without confidence scores.
 
-Exit codes: `0` when all requested rounds produce a ranking, `1` for invalid input or any unscored round, `130` after cancellation, and `143` after SIGTERM. A partial ranking is a successful relaxed-mode result.
+Exit codes: `0` when all requested rounds produce a ranking, `1` for invalid input or any unscored round, `130` after cancellation (including a tokenizer probe stopped after the last round), and `143` after SIGTERM. A partial ranking is a successful relaxed-mode result.
 
 ## Tokenizer probe
 
 ```sh
-npx lmfpd@latest -b https://api.example.com/v1 -k sk-xxx -m deepseek-v4-pro -a cc
-npx lmfpd@latest -a cc --no-tokenizer
+# Detect and run the tokenizer probe
+npx lmfpd@latest -b https://api.example.com/v1 -k sk-xxx -m deepseek-v4-pro -a cc --tokenizer
+# Read a saved probe again offline; no requests and no --tokenizer
 npx lmfpd@latest --input result.json --json
 ```
 
-Beside the first round, detection identifies the upstream tokenizer from the token counts in each response's usage. A run usually takes about 12 extra short requests and at most 22; APIs billed per request charge for them. Four requests are in flight when `--parallel` is above 1, one otherwise, and each has a 90-second deadline. Messages requests ask for at most 16 output tokens; the other protocols omit the output limit, like detection requests.
+The tokenizer probe is off by default. With `--tokenizer`, the CLI sends short requests beside the first round and reads the input token count from the usage of each response. A probe usually sends about 12 requests and at most `--max-probes` + 2 (22 by default). APIs that bill per request bill these requests. If `--parallel` is above 1, four requests run at a time. Otherwise, one request runs at a time. Each request has a 90-second deadline. Messages requests limit the output to 16 tokens. The other protocols set no output limit, like sample requests.
 
-Each request places a short probe text inside a fixed prefix and suffix (the wrapper). A baseline request sends the wrapper alone, so hidden input such as a system prompt cancels out of the difference. Probe texts are chosen one batch at a time to separate the tokenizer classes still in doubt; a class groups open tokenizers that count almost identically. Probing stops once one class, or an unlisted tokenizer, reaches 99% posterior probability, and a second baseline request checks that the hidden input is stable.
+Each request puts a short probe text between a fixed prefix and suffix (the wrapper). A baseline request sends only the wrapper. The difference between the two counts removes hidden input, such as a system prompt. The CLI selects probe texts in batches to separate the tokenizer classes that are still possible. A class groups open tokenizers that give almost the same counts. The probe stops when one class, or an unlisted tokenizer, gets 99% posterior probability. A second baseline request then checks that the hidden input did not change.
 
-Every round waits for the probe before it is scored. Rounds with three valid samples multiply each candidate's calibrated confidence by the Bayes factor of its tokenizer, bounded by a 10% allowance for usage that was not counted with the model's tokenizer, and renormalize; the `Tok` column marks each candidate's tokenizer as matching (`✓`), mismatching (`×`), unclear (`?`), or unknown to this tool (`·`). Rounds with one or two samples only report the tokenizer. The TUI also shows the tokenizer class, its authoring lab, and whether it matches the tokenizer of `--model`.
+The tokenizer result is reference only. Each round is scored from the number fingerprint alone when its samples finish. The probe does not change the candidates, their order, or the confidence. The TUI shows the probe in a `TOKENIZER PROBE` block below the ranking: the tokenizer class, its lab, and the check against `--model`. A match shows only that the tokenizer is the same, because many models share one tokenizer. Relays that estimate usage with tiktoken give o200k_base or cl100k_base counts. If the probe is still running after the last round, the status line shows `Ranking final · tokenizer probe running`. The CLI waits for the probe before it exits, so the report contains it. `q` or `Ctrl+C` stops the probe and keeps the results.
 
-`--output` and `--json` add a `tokenizer` object with every probe request and count, without credentials. `--input` recomputes a saved probe against the current tokenizer bank; `-m` or `MODEL` overrides the saved model for the claim check. A probe that stops partway still contributes the counts received so far. An API without usage, a failed baseline request, or no answered probe text leaves detection on the number fingerprint only. Probe failures never change the exit code. A match shows only that the tokenizer is the same; relays that estimate usage with tiktoken report o200k_base or cl100k_base counts.
+With `--tokenizer`, `--output` and `--json` add a `tokenizer` object with each probe request and count, without credentials. Each round's `analysis` does not change. `--input` reads a saved probe without requests and recomputes it with the current tokenizer bank. `-m` or `MODEL` replaces the saved model name for the check. If the current bank does not contain a probe text, the CLI skips its count and shows a warning. If the probe stops partway, the verdict uses the counts received before the stop. If the API reports no usage, the baseline request fails, or no probe text gets an answer, there is no tokenizer result. Probe failures do not change the exit code.
 
 ## Reference collection and enrollment
 

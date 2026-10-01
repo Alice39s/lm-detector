@@ -1,7 +1,6 @@
 import { redactPrivateMetadata } from '@fingerpoint/shared/privacy'
-import { endpoint, testApi as testApiShared, type CompletionTransport } from '@fingerpoint/shared/detection'
+import { coded, endpoint, testApi as testApiShared, type CompletionTransport } from '@fingerpoint/shared/detection'
 import { assertTokenizerBank, type TokenizerBank } from '@fingerpoint/shared/tokenizer-bank'
-import { fuseTokenizerEvidence } from '@fingerpoint/shared/tokenizer-fusion'
 import { probeTokenizer as probeTokenizerShared, tokenizerReport, type TokenizerRun } from '@fingerpoint/shared/tokenizer-probe'
 import { generateChallenges } from '@fingerpoint/shared/challenge-browser.js'
 import { parseNumbers } from '@fingerpoint/shared/fingerprint-core.js'
@@ -69,18 +68,14 @@ function download(name:string,content:string,type='application/json'){
 }
 export async function exportReferences(){download('unified_reference.jsonl',(await loadReferences()).map(batch=>JSON.stringify(sanitize(batch))).join('\n')+'\n','application/x-ndjson')}
 export function exportBank(bank:Bank){download('unified_bank.json',JSON.stringify(sanitize(bank),null,2)+'\n')}
-/** Probe data travels with the result it was fused into, so an export always matches the ranking on screen. */
+/** The tokenizer probe shown beside the result; it travels as reference information and never changes the candidates. */
 export interface ResultTokenizer { run:TokenizerRun; bank:TokenizerBank; startedAt:number; model:string }
 export function exportAnalysis(result:Analysis,probe?:ResultTokenizer){
-  const candidates=result.results.map(r=>({model:r.model,name:r.display_name,confidence:r.verification_confidence??r.probability??null,
-    ...(r.tokenizer?{fingerprint_confidence:r.fingerprint_confidence??null,tokenizer:r.tokenizer.status,tokenizer_factor:r.tokenizer.factor}:{})}))
+  const candidates=result.results.map(r=>({model:r.model,name:r.display_name,confidence:r.verification_confidence??r.probability??null}))
   // Counts, probe ids, response model names and the claimed model leave with the result; the address and key stay behind.
-  const tokenizer=probe?{...tokenizerReport(probe.run,probe.bank,{createdAt:probe.startedAt,model:probe.model}),fused:result.tokenizer?.fused??false}:undefined
+  const tokenizer=probe?tokenizerReport(probe.run,probe.bank,{createdAt:probe.startedAt,model:probe.model}):undefined
   download('fingerpoint-result.json',JSON.stringify(sanitize({candidates,tokenizer}),null,2)+'\n')
 }
-/** Combines a settled probe with the fingerprint analysis. Without an answered probe there is no evidence to add. */
-export const fuseTokenizer=(analysis:Analysis,probe:ResultTokenizer)=>
-  probe.run.posterior?.answered?fuseTokenizerEvidence(analysis,probe.bank,probe.run.posterior,probe.run.verdict):analysis
 /** Chat Completions and Responses omit their optional output limits on both routes. */
 function browserBody(config:ApiConfig,body:Record<string,unknown>){
   const requestBody={...body}
@@ -93,10 +88,14 @@ const proxyTransport = (proxy:string):CompletionTransport => (url,config,body,si
   const headers={'Content-Type':'application/json',Authorization:`Bearer ${config.apiKey}`,Accept:body.stream?'text/event-stream':'application/json'}
   return fetch(proxy,{method:'POST',headers,body:JSON.stringify({url,format:config.format,body:browserBody(config,body)}),signal,redirect:'error',credentials:'omit',cache:'no-store'})
 }
-/** Calls a CORS-enabled endpoint from the browser with the header names the sniff already tested. */
+/**
+ * Calls the endpoint from the browser. A network-level failure here may be a wrong address or network, or an API that
+ * does not allow browser CORS; the browser cannot tell them apart, so it gets its own code.
+ */
 const directTransport:CompletionTransport = (url,config,body,signal) =>
   fetch(url,{...directInit,method:'POST',headers:directHeaders(config.format,config.apiKey,Boolean(body.stream)),body:JSON.stringify(browserBody(config,body)),signal})
-/** A proxied route names the relay the user agreed to, so a later settings change cannot redirect a running job. */
+    .catch(error=>{throw error instanceof TypeError?coded('The browser could not call the API directly.','direct_network'):error})
+/** A proxied route names its relay, so a later settings change cannot redirect a running job. */
 export type Route = {kind:'direct'}|{kind:'proxy';endpoint:string}
 export const transportFor = (route:Route):CompletionTransport => route.kind==='direct'?directTransport:proxyTransport(route.endpoint)
 export const testApi = (config:ApiConfig,challenges:Challenge[],onProgress:(p:CollectionProgress)=>void,route:Route,signal?:AbortSignal) =>

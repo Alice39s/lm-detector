@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, type ComponentProps } from 'react'
-import { attachPixelView, type PixelEffect, type PixelViewHandle } from '@/lib/pixel-renderer'
-import { cn } from '@/lib/utils'
+import { attachPixelView, type PixelEffect, type PixelViewHandle } from '../lib/pixel-renderer'
+import { cn } from '../lib/utils'
 
 type PixelShaderProps = Omit<ComponentProps<'span'>, 'children'> & {
   effect: PixelEffect
