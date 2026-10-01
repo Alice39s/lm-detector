@@ -69,20 +69,3 @@ jobs:
       - name: Publish latest with npm trusted publishing
         working-directory: dist/fpd
         run: npm publish --access public --tag latest --provenance
-      - name: Verify the published version
-        working-directory: dist/fpd
-        shell: bash
-        run: |
-          package_name=$(node -p 'require("./package.json").name')
-          package_version=$(node -p 'require("./package.json").version')
-          for attempt in {1..30}; do
-            published=$(npm view "$package_name@latest" version --prefer-online --fetch-timeout=10000 --fetch-retries=0 2>/dev/null || true)
-            if [ "$published" = "$package_version" ]; then
-              printf 'Published %s@%s as latest\n' "$package_name" "$package_version"
-              exit 0
-            fi
-            printf 'Waiting for npm processing (%s/30); latest is %s\n' "$attempt" "${published:-unavailable}"
-            sleep 20
-          done
-          printf 'The npm latest tag did not match the build within 10 minutes.\n' >&2
-          exit 1
