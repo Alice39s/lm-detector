@@ -2,14 +2,15 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { endpoint } from '@fingerpoint/shared/detection'
 import type { ApiConfig } from '@fingerpoint/shared/types'
 import type { Route } from '@/lib/client'
-import { grantProxyConsent, hasProxyConsent, sniffReachability, upstreamOrigin, type Reachability } from '@/lib/route'
+import { grantProxyConsent, hasProxyConsent, proxyEndpoint, sniffReachability, upstreamOrigin, type Reachability } from '@/lib/route'
 
 export type ProxyConsentAnswer = 'once' | 'always' | null
-export interface ProxyConsentRequest { origin: string; reachability: Exclude<Reachability, 'direct'> }
+export interface ProxyConsentRequest { origin: string; proxy: string; reachability: Exclude<Reachability, 'direct'> }
 
 /**
- * Decides the route for one run: direct when the endpoint allows browser CORS, otherwise the proxy after the user
- * agrees for this origin. Resolves null when the user dismisses the consent dialog; nothing is sent in that case.
+ * Decides the route for one run: direct when the endpoint allows browser CORS, otherwise the configured proxy after
+ * the user agrees for this proxy and origin. Resolves null when the user dismisses the consent dialog, and rejects
+ * with `proxy_missing` when Worker mode has no valid address; nothing is sent in either case.
  */
 export function useConnectionRoute() {
   const [request, setRequest] = useState<ProxyConsentRequest | null>(null)
@@ -28,17 +29,18 @@ export function useConnectionRoute() {
     setChecking(true)
     let reachability: Reachability
     try { reachability = await sniffReachability(url, config.format) } finally { setChecking(false) }
-    if (reachability === 'direct') return 'direct'
-    const origin = upstreamOrigin(url)
-    if (hasProxyConsent(origin)) return 'proxy'
+    if (reachability === 'direct') return { kind: 'direct' }
+    const origin = upstreamOrigin(url), proxy = proxyEndpoint()
+    if (!proxy) throw Object.assign(new Error('Worker mode has no valid Worker address.'), { code: 'proxy_missing' as const })
+    if (hasProxyConsent(proxy, origin)) return { kind: 'proxy', endpoint: proxy }
     const choice = await new Promise<ProxyConsentAnswer>(settle => {
       pending.current?.(null)
       pending.current = settle
-      setRequest({ origin, reachability })
+      setRequest({ origin, proxy, reachability })
     })
     if (!choice) return null
-    grantProxyConsent(origin, choice === 'always')
-    return 'proxy'
+    grantProxyConsent(proxy, origin, choice === 'always')
+    return { kind: 'proxy', endpoint: proxy }
   }, [])
 
   // Leaving the page while the dialog is open counts as dismissing it.

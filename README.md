@@ -43,7 +43,7 @@
 
 每条回答至少需要 80 个有效整数，且不少于要求数量的 55%。三条回答都有效时，页面给出排名、核验分数和置信度。只有一两条有效时，页面只给出排名。
 
-API 模式开始取样和分词器探测前，页面先用假 Key 发一次与真实请求同形的请求，检查接口是否允许浏览器跨域（CORS）。允许时浏览器直接请求接口，密钥不经过本站；不允许或无法直连时，页面弹窗说明原因，经你选择“仅本次允许”或“始终允许此接口”后才通过同源 `/api/proxy` 转发，记住的授权可以在 API 配置中撤销。代理不限制供应商，但只接受使用 HTTPS 默认端口的完整域名。API 设置保存在浏览器 localStorage 中。导出的结果图片不含密钥、接口地址和回答正文。
+API 模式开始取样和分词器探测前，页面先用假 Key 发一次与真实请求同形的请求，检查接口是否允许浏览器跨域（CORS）。允许时浏览器直接请求接口，密钥不经过本站；不允许或无法直连时，页面弹窗说明原因，经你选择“仅本次允许”或“始终允许此接口”后才通过转发代理发送，记住的授权可以在 API 配置中撤销。转发代理默认为本站的 `/api/proxy`，也可以在 API 配置中换成自己部署的 Cloudflare Worker（[worker/](./worker/README.md) 提供一键部署和 Playground 导入）。代理不限制供应商，但只接受使用 HTTPS 默认端口的完整域名。API 设置保存在浏览器 localStorage 中。导出的结果图片不含密钥、接口地址和回答正文。
 
 ### 命令行
 
@@ -68,6 +68,7 @@ bun run typecheck    # TypeScript 类型检查
 bun run build        # 构建网站到 web/dist
 bun run build:cli    # 打包 npm CLI 到 dist/fpd
 bun run fpd --help   # 在仓库内直接运行 CLI
+bun run dev:worker   # 在 127.0.0.1:8787 本地运行代理 Worker
 ```
 
 部署到 Cloudflare Pages 或 GitHub Pages 的步骤见 [docs/deployment.md](./docs/deployment.md)。
@@ -314,7 +315,7 @@ $$
 ├── shared/     Web 与 CLI 共用的挑战、解析和评分算法
 ├── data/       参考数据、派生库、冻结检测器和固定挑战
 ├── offline/    离线重训与校准（Python，由 uv 运行）
-├── server/     同源 API 代理实现
+├── worker/     单文件 Cloudflare Worker API 代理，也供同源代理入口复用
 ├── functions/  Cloudflare Pages Functions 入口
 ├── api/        Vercel Functions 入口
 └── docs/       部署说明

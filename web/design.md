@@ -1,7 +1,7 @@
 ---
 name: fingerpoint-design
 description: 用于 Fingerpoint 的三样本检测、分词器探测、API 配置、候选结果、图片导出和只读样本库。服务需要比较 LLM 指纹的用户，支持简体中文和英文、浅色和深色主题。
-version: 2026-10-01.2
+version: 2026-10-01.3
 ---
 
 # Fingerpoint design.md
@@ -14,7 +14,7 @@ version: 2026-10-01.2
 [必须] 保留三条算法生成的提示词和对应回复。
 [必须] 将评分算法视为黑盒。界面不生成特征命中、贡献分或推理解释。
 [必须] 不提供 URL 分享结果或网页端贡献样本功能。
-[必须] 前端发布静态资源。接口允许浏览器跨域（CORS）时由浏览器直接请求；否则只在用户授权后经同源 `/api/proxy` 转发到用户指定且站点允许的 HTTPS 服务，仅该路径进入 Cloudflare Pages Function。
+[必须] 前端发布静态资源。接口允许浏览器跨域（CORS）时由浏览器直接请求；否则只在用户授权后经转发代理（同源 `/api/proxy`，或用户保存的自建 Worker）转发到用户指定且代理允许的 HTTPS 服务，仅 `/api/proxy` 进入 Cloudflare Pages Function。
 [必须] 不使用固定评估集建库、校准或生成模型中心。
 
 ## 2. 品牌与读者
@@ -95,8 +95,11 @@ version: 2026-10-01.2
 - 表单修改直接更新配置；折叠或切换模式时保留填写内容。取样仍由主操作触发，修改字段不发送请求。
 - 配置不完整时默认展开。点击开始取样时若有缺项，展开并聚焦第一个缺失字段。
 - 取样及计算期间禁用配置编辑；重新展开配置时 Key 恢复隐藏。
-- 接口地址下方用次级文字显示连接方式：尚未检查、可直连、经代理（已授权）、需要授权、无法直连；记住的授权旁提供“撤销代理授权”链接按钮，撤销立即生效。
-- 代理授权对话框使用 `Dialog`：标题前放 warning 色 `ShieldAlert` 图标，正文写明接口主机和原因（拒绝跨域或无法连接），列表说明密钥与内容经代理转发、代理不保存、授权可撤销；底部按钮依次为取消（ghost，默认焦点）、仅本次允许（outline）、始终允许此接口（主按钮）。Esc、关闭按钮与点击遮罩都等同取消。
+- 接口地址下方用次级文字显示连接方式：尚未检查、可直连、经代理（已授权）、需要授权、无法直连、Worker 地址缺失；记住的授权旁提供“撤销代理授权”链接按钮，撤销立即生效。
+- 代理授权对话框使用 `Dialog`：标题前放 warning 色 `ShieldAlert` 图标，正文写明接口主机、原因（拒绝跨域或无法连接）和将要经过的代理（“本站代理”或“代理 {主机}”），列表说明密钥与内容经该代理转发、代理如何处理密钥、授权可撤销；自建 Worker 如实说明本站无法确认它如何处理密钥。底部按钮依次为取消（ghost，默认焦点）、仅本次允许（outline）、始终允许此接口（主按钮）。Esc、关闭按钮与点击遮罩都等同取消。
+- 配置开关之后用分隔线隔出“转发代理”（`ProxySettings`）：说明文字写明只用于不能直连的接口、对所有配置生效；`Segmented` 选择本站代理或自建 Worker，右侧为“检查代理”按钮。转发代理是浏览器级设置，不写入配置预设或导出的配置文件。
+- 自建 Worker 显示等宽的 Worker 地址输入框：接受 HTTPS，或本机调试用的 `http://localhost`、`http://127.0.0.1`；有效地址随输入保存，失焦后规范化；清空或改成无效地址时同时清除已保存的地址，失焦后用 `FieldError` 提示。其他标签页保存的新地址会替换输入框内容。检查结果写在 `role="status"` 的次级文字中，可用时为 success 色；结果只对应当前选中的代理，切换后不沿用。
+- 自建 Worker 下方用细边框区块放“部署自己的 Worker”：“部署到 Cloudflare”为 outline 链接按钮（新标签打开 Deploy 按钮页），“在 Playground 中打开”为 outline 按钮，下方列表说明两者差别；当前页面 origin 不在 Worker 默认 `ALLOWED_ORIGINS` 中时，追加一条需要加入该 origin 的提示。导入按钮在点击时先打开新标签，下载失败则关闭该标签并用 toast 报错；浏览器拦截新标签时单独提示允许弹出窗口。
 - 试探期间主按钮禁用并显示 `Loader2` 与“检查连接…”，配置与模式切换同时锁定。
 - API 设置支持本地多配置预设（Profiles）：收起时摘要条左侧提供快速切换菜单，展开后顶部工具栏支持配置重命名、新建、一键克隆副本与安全删除。设置（包括密钥）自动保存在 localStorage，刷新或重新打开浏览器后恢复，兼容迁移旧版单项配置与 sessionStorage 密钥。
 - “保存”只把当前配置确认保存到浏览器并清除未保存标记，不下载文件；JSON 配置文件通过配置菜单的“导出”生成，“加载”读取该文件。（来源：2026-09-27 用户要求保存按钮不下载 JSON。）
@@ -241,6 +244,7 @@ version: 2026-10-01.2
 | 浮层 | Dialog、DropdownMenu、Tooltip、Sonner | `src/components/ui/` | 已实现 |
 | 数据反馈 | Table、Badge、Empty、Skeleton、Alert | `src/components/ui/` | 已实现 |
 | 检测对象 | SampleCard、SampleStrip、ResultPanel、ApiConfigPanel（摘要类 fp-api-summary） | `src/components/`、`src/index.css` | 已实现 |
+| 连接与代理 | ProxyConsentDialog、ProxySettings、useConnectionRoute | `src/components/proxy-consent-dialog.tsx`、`src/components/proxy-settings.tsx`、`src/lib/use-connection-route.ts` | 已实现 |
 | 分词器探测 | TokenizerCard、TokenizerStripButton、TokenizerDetails、ClaimAlert、useTokenizerProbe；复用 ConfidenceBar | `src/components/tokenizer-panel.tsx`、`src/components/tokenizer-claim.tsx`、`src/lib/use-tokenizer-probe.ts` | 已实现 |
 | 动效 | useMotionPreset、spring、listStagger、listItem | `src/lib/motion.ts` | 已实现 |
 | 像素装饰 | PixelShader、PixelSpinner、fp-pixel、fp-brand-mark | `src/components/pixel-shader.tsx`、`src/lib/pixel-effects.ts`、`src/lib/pixel-renderer.ts`、`src/index.css` | 已实现 |
@@ -270,7 +274,7 @@ version: 2026-10-01.2
 [必须] 不把分词器一致写成“已确认模型身份”；同一种分词器常被多个模型复用。
 [必须] 不把未知置信度显示为 0%，不自行添加判定阈值。
 [必须] 不把密钥写入 URL、导出图片或日志。
-[必须] 不在用户授权前把请求或密钥发给本站代理。
+[必须] 不在用户授权前把请求或密钥发给任何代理；换用另一个代理时重新询问。
 [必须] 不在设置草稿变化时自动发送模型请求。
 [必须] 不自动向参考库写入检测回复。
 [必须] 不添加 URL 分享、贡献样本、登录等未请求入口。
@@ -289,8 +293,11 @@ version: 2026-10-01.2
 - `src/lib/client.ts` 载入静态参考库，在 Worker 中调用共享算法，Worker 不可用时使用同一实现回退。
 - 每次取样或探测前，`src/lib/route.ts` 用真实请求的方法与头名、假 Key 和 `{}` 请求体试探 CORS；读到任何 HTTP 状态即视为可直连。试探失败时再发 no-cors GET：收到不透明响应为“拒绝跨域”，仍失败为“无法连接”。结论在本页会话缓存 10 分钟；直连请求出现网络错误后下一次重新试探。
 - 直连请求与试探共用 `directHeaders` 与 `directInit`：不携带 Cookie 和 Referer，`redirect: 'error'`；Messages 附带 `anthropic-dangerous-direct-browser-access: true`。
-- 需要代理时按接口 origin 检查授权：仅本次允许只在本页会话有效，始终允许写入 localStorage 的 `fingerpoint-proxy-consent-v1`，其他标签页通过 storage 事件同步。不把失败的直连请求自动改走代理。
-- 经代理时浏览器向同源 `/api/proxy` 发送请求及认证头，不携带 Cookie。代理只转发允许的 HTTPS 域名和三种协议端点，不跟随重定向，不保存或记录密钥，不转发 Cookie；Messages 由服务器发送 x-api-key 和 anthropic-version。
+- 需要代理时按“代理 + 接口 origin”检查授权：仅本次允许只在本页会话有效，始终允许写入 localStorage 的 `fingerpoint-proxy-consent-v1`，其他标签页通过 storage 事件同步。不把失败的直连请求自动改走代理。
+- 转发代理设置以 `{ mode, endpoint }` 保存在 localStorage 的 `fingerpoint-proxy-v1`，缺省为本站代理 `/api/proxy`。自建 Worker 模式只使用该模式下保存的有效地址：地址为空或无效时，需要代理的运行不开始，提示并聚焦 Worker 地址输入框，不回退到本站代理或旧地址。每次运行开始时把选定的代理写进路由（`Route`），运行中修改设置不影响正在进行的请求。
+- 经代理时浏览器向该代理发送请求及认证头，不携带 Cookie。代理实现为单文件 Worker `worker/main.js`：只转发允许的 HTTPS 域名和三种协议端点，不跟随重定向，不保存或记录密钥，不转发 Cookie；Messages 由代理发送 x-api-key 和 anthropic-version。跨域调用自建 Worker 时，Worker 按 `ALLOWED_ORIGINS` 回应预检和 CORS 头。
+- “检查代理”向代理发 GET，读到 `service: fingerpoint-api-proxy` 为可用；读不到响应时再发 no-cors GET，得到不透明响应说明能连上但浏览器无法读取，仍失败则为无法连接。
+- `src/lib/worker-deploy.ts` 生成 Deploy to Cloudflare 链接，并把 GitHub 上的 `worker/main.js` 与 `worker/wrangler.json` 的兼容日期、兼容标志打包成 Workers Playground 链接（multipart 正文经 lz-string 压缩后放在片段中）。
 - `shared/detection.ts` 与 `shared/completion.ts` 负责请求和 JSON/SSE 解析；UI 使用结构化状态和错误 code。
 - 分词器探测的请求、用量解析、后验概率、测试文本选择与融合在 `shared/tokenizer-*.ts`；`src/lib/client.ts` 从静态数据载入 `tokenizer_bank.json`，测试请求与取样请求走同一条已确定的连接方式（直连或代理），并在数字指纹的分析结果上调用 `fuseTokenizerEvidence`。
 - `src/lib/export-image.ts` 在 Canvas 中生成 PNG。JSON 导出包含候选列表；有分词器结果时，每个候选另带数字指纹置信度和分词器一致性，并附每个测试请求的计数，不含请求配置和 API Key。
@@ -313,3 +320,5 @@ version: 2026-10-01.2
 | 只含固定前后缀、不含测试文本的请求 | 对照请求 / Baseline |
 | 上游在请求里额外加入的内容，例如系统提示词 | 隐藏内容 / Hidden input |
 | 接口返回的 token 数 | 用量 / Usage |
+| 替浏览器转发请求的服务 | 转发代理 / Forwarding proxy |
+| 用户自己部署的 `worker/main.js` | 自建 Worker / Own Worker |
