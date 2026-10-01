@@ -53,6 +53,9 @@ Explicit flags override environment variables. Credentials do not appear in the 
 | `-e`, `--effort` | Optional provider reasoning effort. Accepts any string, including `none`, `minimal`, `low`, `medium`, `high`, `xhigh`, and `max`. Omitted from API requests by default. |
 | `--challenges FILE` | Reuse a JSON array of challenges in every round. Its length must match `--count` (default: 3). |
 | `--bank FILE` | Use a custom reference bank. |
+| `--no-tokenizer` | Skip the tokenizer probe and rank by the number fingerprint only. |
+| `--max-probes` | Maximum number of probe texts for the tokenizer probe, 4 to 60. Default: 20. Two baseline requests are sent in addition. |
+| `--tokenizer-bank FILE` | Use a custom tokenizer bank. |
 | `--input FILE` | Analyze saved outputs without API requests. |
 | `--output FILE` | Save all rounds, request settings, challenges, received text, and results. |
 | `--json` | Write machine-readable JSON to stdout. Disable the TUI. |
@@ -108,6 +111,22 @@ The input can be a saved report, a report with `outputs`, an array of one to thr
 The TUI shows the latest ranking and recent round summaries. After at least one scored round, a dimmed final line links the GitHub repository. JSON retains every round. The most frequent candidate counts round winners; it is not a combined probability. Confidence is relative to models in the reference bank and does not establish the upstream model's identity. An incompatible custom bank uses the existing legacy ranker without confidence scores.
 
 Exit codes: `0` when all requested rounds produce a ranking, `1` for invalid input or any unscored round, `130` after cancellation, and `143` after SIGTERM. A partial ranking is a successful relaxed-mode result.
+
+## Tokenizer probe
+
+```sh
+npx lmfpd@latest -b https://api.example.com/v1 -k sk-xxx -m deepseek-v4-pro -a cc
+npx lmfpd@latest -a cc --no-tokenizer
+npx lmfpd@latest --input result.json --json
+```
+
+Beside the first round, detection identifies the upstream tokenizer from the token counts in each response's usage. A run usually takes about 12 extra short requests and at most 22; APIs billed per request charge for them. Four requests are in flight when `--parallel` is above 1, one otherwise, and each has a 90-second deadline. Messages requests ask for at most 16 output tokens; the other protocols omit the output limit, like detection requests.
+
+Each request places a short probe text inside a fixed prefix and suffix (the wrapper). A baseline request sends the wrapper alone, so hidden input such as a system prompt cancels out of the difference. Probe texts are chosen one batch at a time to separate the tokenizer classes still in doubt; a class groups open tokenizers that count almost identically. Probing stops once one class, or an unlisted tokenizer, reaches 99% posterior probability, and a second baseline request checks that the hidden input is stable.
+
+Every round waits for the probe before it is scored. Rounds with three valid samples multiply each candidate's calibrated confidence by the Bayes factor of its tokenizer, bounded by a 10% allowance for usage that was not counted with the model's tokenizer, and renormalize; the `Tok` column marks each candidate's tokenizer as matching (`✓`), mismatching (`×`), unclear (`?`), or unknown to this tool (`·`). Rounds with one or two samples only report the tokenizer. The TUI also shows the tokenizer class, its authoring lab, and whether it matches the tokenizer of `--model`.
+
+`--output` and `--json` add a `tokenizer` object with every probe request and count, without credentials. `--input` recomputes a saved probe against the current tokenizer bank; `-m` or `MODEL` overrides the saved model for the claim check. A probe that stops partway still contributes the counts received so far. An API without usage, a failed baseline request, or no answered probe text leaves detection on the number fingerprint only. Probe failures never change the exit code. A match shows only that the tokenizer is the same; relays that estimate usage with tiktoken report o200k_base or cl100k_base counts.
 
 ## Reference collection and enrollment
 

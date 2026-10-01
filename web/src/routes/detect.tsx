@@ -10,8 +10,9 @@ import { ApiConfigPanel } from '@/components/api-config-panel'
 import { PixelShader, PixelSpinner } from '@/components/pixel-shader'
 import { Segmented } from '@/components/segmented'
 import { useLoadedBank } from '@/lib/bank-context'
-import { ResultPanel } from '@/components/result-panel'
+import { ResultPanel, type ResultEvidence } from '@/components/result-panel'
 import { SampleCard, SampleStrip, isBusyState, type Mode, type SampleUI } from '@/components/sample-card'
+import { TokenizerCard, TokenizerDetails, TokenizerStripButton } from '@/components/tokenizer-panel'
 import { useI18n } from '@/i18n'
 import * as client from '@/lib/client'
 import { configComplete, useApiConfig, type WebApiConfig } from '@/lib/config'
@@ -19,12 +20,15 @@ import { describeError } from '@/lib/errors'
 import { exportResultImage } from '@/lib/export-image'
 import { useMotionPreset } from '@/lib/motion'
 import { useModelMatchCelebration } from '@/lib/use-model-match-celebration'
+import { probeSignature, useTokenizerProbe, type SettledProbe } from '@/lib/use-tokenizer-probe'
 import { cn } from '@/lib/utils'
 import type { Analysis, Challenge, CodedError, CollectionProgress } from '@fingerpoint/shared/types'
 import { redactPrivateMetadata } from '@fingerpoint/shared/privacy'
 import { anomalousSamples } from '@fingerpoint/shared/sample-distribution'
 
 type Phase = 'edit' | 'sampling' | 'computing' | 'result'
+/** A sample index, or the tokenizer probe in the fourth slot of the sample strip. */
+type Expanded = number | 'tokenizer' | null
 const idle = (): SampleUI => ({ text: '', state: 'idle' })
 const cliCommand = 'bunx lmfpd@latest --help'
 
@@ -50,13 +54,17 @@ export default function DetectRoute() {
       setParams(mode === 'api' ? { mode: 'api' } : {}, { replace: true })
     }
   }, [active, mode, params, setParams])
+  const tokenizer = useTokenizerProbe(active)
 
   const [challenges, setChallenges] = useState<Challenge[]>(() => client.generateChallenges(3))
   const [samples, setSamples] = useState<SampleUI[]>(() => [idle(), idle(), idle()])
   const [computing, setComputing] = useState(false)
   const [result, setResult] = useState<Analysis | null>(null)
   const [resultModel, setResultModel] = useState<string | null>(null)
-  const [expanded, setExpanded] = useState<number | null>(null)
+  const [resultEvidence, setResultEvidence] = useState<ResultEvidence | null>(null)
+  const [expanded, setExpanded] = useState<Expanded>(null)
+  /** Verification is waiting for the probe to settle before it fuses the result. */
+  const [awaitingProbe, setAwaitingProbe] = useState(false)
   const [errorDetail, setErrorDetail] = useState<string | null>(null)
   const [config, update, profileManager] = useApiConfig(() => toast.error(t('errors.unknown')))
   const previousProfileId = useRef(profileManager.activeId)
@@ -69,6 +77,8 @@ export default function DetectRoute() {
   const samplesRef = useRef(samples)
   const challengesRef = useRef(challenges)
   const sampledConfigs = useRef<(WebApiConfig | undefined)[]>([])
+  /** The number-only analysis of the current result and the probe signature it may be fused with. */
+  const fingerprint = useRef<{ analysis: Analysis; signature: string | null } | null>(null)
   useLayoutEffect(() => {
     if (previousProfileId.current === profileManager.activeId) return
     previousProfileId.current = profileManager.activeId
@@ -88,6 +98,7 @@ export default function DetectRoute() {
   const phase: Phase = computing ? 'computing' : sampling ? 'sampling' : result ? 'result' : 'edit'
   const locked = sampling || computing
   const canSample = configComplete(config) && !computing
+  const probeShown = mode === 'api' && tokenizer.session.phase !== 'idle'
   useModelMatchCelebration(result, resultModel, active && mode === 'api' && phase === 'result')
 
   function replaceSamples(next: SampleUI[]) {
@@ -104,9 +115,31 @@ export default function DetectRoute() {
     replaceSamples(samplesRef.current.map((sample, i) => i === index ? { ...sample, ...changes } : sample))
   }
 
-  /** Stops the given samples, or all of them; other samples keep running. */
-  function stop(indexes = [...runs.current.keys()]) {
-    const stopped = indexes.filter(i => runs.current.has(i))
+  function clearResult() {
+    fingerprint.current = null
+    setResult(null)
+    setResultEvidence(null)
+  }
+
+  /** Fuses a settled probe into the number-only analysis when it measured the configuration the samples came from. */
+  function showResult(analysis: Analysis, signature: string | null, probe: SettledProbe | null) {
+    const matching = probe && probe.signature === signature ? probe : null
+    // A baseline without any answered probe carries no evidence; the result then says why.
+    const evidence = matching?.run?.posterior?.answered && matching.bank
+      ? { run: matching.run, bank: matching.bank, startedAt: matching.startedAt, model: matching.model } : null
+    const fused = evidence ? client.fuseTokenizer(analysis, evidence) : analysis
+    fingerprint.current = { analysis, signature }
+    setResult(fused)
+    setResultEvidence(matching ? { probe: evidence, error: evidence ? null : matching.error, model: matching.model } : null)
+  }
+
+  /**
+   * Stops the given samples, or all of them; other samples keep running.
+   * Stopping all of them also stops the tokenizer probe, which serves every sample.
+   */
+  function stop(indexes?: number[]) {
+    if (!indexes) tokenizer.stop()
+    const stopped = (indexes ?? [...runs.current.keys()]).filter(i => runs.current.has(i))
     if (!stopped.length) return
     for (const i of stopped) {
       runs.current.get(i)!.abort()
@@ -124,21 +157,27 @@ export default function DetectRoute() {
     }
   }, [active])
 
+  /** Opens the API configuration and focuses the first missing field. Returns whether the configuration is usable. */
+  function requireConfig(requestConfig: WebApiConfig) {
+    if (configComplete(requestConfig)) return true
+    setApiConfigOpen(true)
+    requestAnimationFrame(() => {
+      const inputs = apiConfigRef.current?.querySelectorAll<HTMLInputElement>('[data-api-required]')
+      Array.from(inputs ?? []).find(input => !input.value.trim())?.focus()
+    })
+    toast.error(t('api.incomplete'))
+    return false
+  }
+
   async function sampleIndexes(requested: number[], requestConfig: WebApiConfig = config) {
     const indexes = requested.filter(i => !runs.current.has(i))
     if (!indexes.length || verifying.current || !mounted.current) return
-    if (!configComplete(requestConfig)) {
-      setApiConfigOpen(true)
-      requestAnimationFrame(() => {
-        const inputs = apiConfigRef.current?.querySelectorAll<HTMLInputElement>('[data-api-required]')
-        Array.from(inputs ?? []).find(input => !input.value.trim())?.focus()
-      })
-      toast.error(t('api.incomplete'))
-      return
-    }
+    if (!requireConfig(requestConfig)) return
     const frozenConfig = { ...requestConfig, parallel: indexes.length > 1 && (requestConfig.parallel ?? false) }
     const controllers = new Map(indexes.map(i => [i, new AbortController()]))
     for (const [i, controller] of controllers) runs.current.set(i, controller)
+    // The probe measures the upstream itself, so one probe serves every sample drawn with this configuration.
+    if (requestConfig.tokenizerProbe && tokenizer.needed(requestConfig)) void tokenizer.start(requestConfig)
     replaceSamples(samplesRef.current.map((sample, i) => indexes.includes(i)
       ? { ...sample, draftText: '', state: 'pending', errorCode: undefined, httpStatus: undefined, errorText: undefined, elapsedMs: undefined, throughput: undefined }
       : sample))
@@ -168,7 +207,7 @@ export default function DetectRoute() {
         accepted = true
         sampledConfigs.current[index] = requestConfig
         patch(index, { text: challenge.text, draftText: undefined, state, elapsedMs, throughput: challenge.throughput, errorCode: undefined, httpStatus: undefined, errorText: undefined })
-        setResult(null)
+        clearResult()
       } else {
         const previous = samplesRef.current[index]
         patch(index, {
@@ -198,17 +237,28 @@ export default function DetectRoute() {
     const token = {}
     verifying.current = token
     const outputs = samplesRef.current.map((sample, i) => ({ text: sample.text, expected_count: challengesRef.current[i].expected_count }))
+    // Only replies the API returned unedited take the evidence, and only from a probe of the configuration that produced
+    // them. An edited reply is idle again; a failed replacement keeps the earlier API reply and its configuration.
+    const signatures = new Set(samplesRef.current.flatMap((sample, i) => {
+      if (!sample.text.trim()) return []
+      const sampled = sampledConfigs.current[i]
+      return [sampled?.tokenizerProbe && sample.state !== 'idle' ? probeSignature(sampled) : null]
+    }))
+    const signature = mode === 'api' && signatures.size === 1 ? [...signatures][0] : null
     setComputing(true)
     setExpanded(null)
     try {
-      const analysis = await client.analyze(outputs, bank)
+      const waiting = signature ? tokenizer.settled() : null
+      setAwaitingProbe(Boolean(waiting))
+      const [analysis, probe] = await Promise.all([client.analyze(outputs, bank), waiting])
       if (!mounted.current || verifying.current !== token) return
       setResultModel(mode === 'api' ? config.model : null)
-      setResult(analysis)
+      showResult(analysis, signature, probe)
     } catch (error) {
       if (!mounted.current || verifying.current !== token) return
       toast.error(describeError(i18n, error, 'errors.analyze'))
     } finally {
+      if (mounted.current) setAwaitingProbe(false)
       if (verifying.current === token) {
         verifying.current = null
         setComputing(false)
@@ -216,14 +266,25 @@ export default function DetectRoute() {
     }
   }
 
+  /** Probes again with the sampling configuration; a result on screen takes the new evidence without resampling. */
+  async function retryProbe() {
+    const requestConfig = sampledConfigs.current.find(Boolean) ?? config
+    if (locked || tokenizer.busy || !requireConfig(requestConfig)) return
+    const shown = fingerprint.current
+    const settled = await tokenizer.start(requestConfig)
+    // A new sample or a new verification replaces the result while the probe runs; only the same result takes it.
+    if (mounted.current && shown && fingerprint.current === shown && !verifying.current) showResult(shown.analysis, shown.signature, settled)
+  }
+
   function restart() {
     stop()
+    tokenizer.reset()
     verifying.current = null
     setComputing(false)
     replaceChallenges(client.generateChallenges(3))
     replaceSamples([idle(), idle(), idle()])
     sampledConfigs.current = []
-    setResult(null)
+    clearResult()
     setExpanded(null)
   }
 
@@ -234,7 +295,7 @@ export default function DetectRoute() {
     const fresh = client.generateChallenges(indexes.length, kept)
     replaceChallenges(challengesRef.current.map((challenge, i) => indexes.includes(i) ? fresh[indexes.indexOf(i)] : challenge))
     replaceSamples(samplesRef.current.map((sample, i) => indexes.includes(i) ? idle() : sample))
-    setResult(null)
+    clearResult()
     setExpanded(null)
     if (mode === 'api') void sampleIndexes(indexes, sampledConfigs.current[indexes[0]] ?? config)
   }
@@ -242,7 +303,7 @@ export default function DetectRoute() {
   function edit(i: number, text: string) {
     if (runs.current.has(i) || verifying.current) return
     patch(i, { text, draftText: undefined, state: 'idle', errorCode: undefined, httpStatus: undefined, errorText: undefined, elapsedMs: undefined, throughput: undefined })
-    setResult(null)
+    clearResult()
   }
 
   async function saveImage() {
@@ -265,10 +326,26 @@ export default function DetectRoute() {
   const anomalous = phase === 'result' && result
     ? anomalousSamples(samples.map((sample, i) => result.diagnostics[i]?.accepted ? sample.text : ''))
     : []
+  const showProbeError = (detail: string) => setErrorDetail(safeError(detail, tokenizer.session.config?.apiKey ?? config.apiKey) ?? '')
+
+  /** The probe belongs to API mode, so manual mode stops it and closes its details. */
+  function changeMode(next: Mode) {
+    if (locked || next === mode) return
+    if (next === 'manual') {
+      tokenizer.stop()
+      if (expanded === 'tokenizer') setExpanded(null)
+    }
+    setMode(next)
+  }
 
   function collapseSample(index: number) {
     setExpanded(null)
     document.getElementById(`sample-trigger-${index}`)?.focus({ preventScroll: true })
+  }
+
+  function collapseProbe() {
+    setExpanded(null)
+    document.getElementById('tokenizer-trigger')?.focus({ preventScroll: true })
   }
 
   function renderSample(index: number, collapsible = false) {
@@ -293,7 +370,7 @@ export default function DetectRoute() {
     <div className={cn('fp-page', 'has-actionbar')}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-h1">{t('detect.title')}</h1>
-        <Segmented label={t('detect.modeLabel')} value={mode} onChange={m => { if (!locked) setMode(m) }} disabled={locked} options={[{ value: 'manual', label: t('detect.modeManual') }, { value: 'api', label: t('detect.modeApi') }]} />
+        <Segmented label={t('detect.modeLabel')} value={mode} onChange={changeMode} disabled={locked} options={[{ value: 'manual', label: t('detect.modeManual') }, { value: 'api', label: t('detect.modeApi') }]} />
       </div>
 
       <aside className="fp-cli-promo relative isolate overflow-hidden" aria-label={t('detect.cliTitle')}>
@@ -328,7 +405,9 @@ export default function DetectRoute() {
       </AnimatePresence>
 
       <section className="flex flex-col gap-4" aria-label={t('detect.samples')}>
-        {showStrip && <SampleStrip samples={samples} challenges={challenges} expanded={expanded} anomalous={anomalous} onToggle={i => setExpanded(e => (e === i ? null : i))} />}
+        {showStrip && <SampleStrip samples={samples} challenges={challenges} expanded={typeof expanded === 'number' ? expanded : null} anomalous={anomalous}
+          onToggle={i => setExpanded(e => (e === i ? null : i))}
+          extra={probeShown ? <TokenizerStripButton session={tokenizer.session} expanded={expanded === 'tokenizer'} onToggle={() => setExpanded(e => (e === 'tokenizer' ? null : 'tokenizer'))} /> : undefined} />}
         {showStrip ? (
           <AnimatePresence initial={false}>
             {expanded !== null && <motion.div
@@ -339,20 +418,25 @@ export default function DetectRoute() {
               transition={reduced ? { duration: 0 } : snappy}
               className="overflow-hidden"
             >
-              {renderSample(expanded, true)}
+              {expanded === 'tokenizer'
+                ? <TokenizerDetails session={tokenizer.session} onShowError={showProbeError} onCollapse={collapseProbe} onRetry={retryProbe} canRetry={!locked && config.tokenizerProbe} />
+                : renderSample(expanded, true)}
             </motion.div>}
           </AnimatePresence>
-        ) : <div className="fp-grid-samples">{challenges.map((_, index) => renderSample(index))}</div>}
+        ) : <>
+          <div className="fp-grid-samples">{challenges.map((_, index) => renderSample(index))}</div>
+          {probeShown && <TokenizerCard session={tokenizer.session} onShowError={showProbeError} onRetry={() => void retryProbe()} canRetry={!locked && config.tokenizerProbe} />}
+        </>}
       </section>
 
       {phase === 'computing' && (
         <div className="flex h-12 items-center gap-2 text-body text-muted-foreground" role="status">
           <PixelSpinner />
-          {t('detect.computing')}
+          {awaitingProbe && tokenizer.busy ? t('tokenizer.waiting') : t('detect.computing')}
           <PixelShader effect="scan" cell={3} className="h-6 min-w-0 flex-1 text-muted-foreground/60" />
         </div>
       )}
-      {phase === 'result' && result && <ResultPanel result={result} anomalous={anomalous} mode={mode} onReplacePrompts={() => replacePrompts(anomalous)} />}
+      {phase === 'result' && result && <ResultPanel result={result} anomalous={anomalous} mode={mode} evidence={resultEvidence} onReplacePrompts={() => replacePrompts(anomalous)} />}
 
       <div className="fp-detect-footer">
         <a href="https://github.com/Ikaleio/lm-detector" target="_blank" rel="noopener noreferrer" className="fp-star-link">
@@ -364,7 +448,7 @@ export default function DetectRoute() {
             <>
               {result && <DropdownMenu>
                 <DropdownMenuTrigger render={<Button variant="ghost" size="icon-lg" aria-label={t('detect.more')} />}><MoreVertical /></DropdownMenuTrigger>
-                <DropdownMenuContent align="end"><DropdownMenuGroup><DropdownMenuItem onClick={() => client.exportAnalysis(result)}>{t('detect.exportJson')}</DropdownMenuItem></DropdownMenuGroup></DropdownMenuContent>
+                <DropdownMenuContent align="end"><DropdownMenuGroup><DropdownMenuItem onClick={() => client.exportAnalysis(result, resultEvidence?.probe ?? undefined)}>{t('detect.exportJson')}</DropdownMenuItem></DropdownMenuGroup></DropdownMenuContent>
               </DropdownMenu>}
               <Button variant="outline" className="h-9" onClick={saveImage}>{t('detect.saveImage')}</Button>
               <Button className="h-9" onClick={restart}>{t('detect.restart')}</Button>
@@ -375,7 +459,10 @@ export default function DetectRoute() {
               <Button className="h-9" disabled><Loader2 data-icon="inline-start" className="animate-spin" />{t('detect.sampling')}</Button>
             </>
           ) : phase === 'computing' ? (
-            <Button className="h-9" disabled><PixelSpinner data-icon="inline-start" />{t('detect.computing')}</Button>
+            <>
+              {awaitingProbe && tokenizer.busy && <Button variant="outline" className="h-9" onClick={tokenizer.stop}>{t('tokenizer.stop')}</Button>}
+              <Button className="h-9" disabled><PixelSpinner data-icon="inline-start" />{t('detect.computing')}</Button>
+            </>
           ) : (
             <>
               {samples.some(s => s.text.trim() || s.draftText?.trim()) && <Button variant="ghost" className="h-9" onClick={restart}>{t('detect.restart')}</Button>}

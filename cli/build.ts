@@ -50,6 +50,7 @@ await Promise.all(offlineFiles.map(name => copyFile(resolve(root, 'offline', nam
 await Promise.all([
   copyFile(resolve(root, 'web/.generated/unified_bank.json'), resolve(destination, 'data/unified_bank.json')),
   copyFile(resolve(root, 'data/shared_detector.json'), resolve(destination, 'data/shared_detector.json')),
+  copyFile(resolve(root, 'data/tokenizer_bank.json'), resolve(destination, 'data/tokenizer_bank.json')),
   copyFile(resolve(root, 'cli/README.md'), resolve(destination, 'README.md')),
   copyFile(resolve(root, 'LICENSE'), resolve(destination, 'LICENSE')),
   writeFile(resolve(destination, 'package.json'), JSON.stringify({

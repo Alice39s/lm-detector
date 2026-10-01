@@ -2,6 +2,7 @@ import { writeFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import type { Bank } from '@fingerpoint/shared/types'
 import type { SharedDetector } from '@fingerpoint/shared/shared-detector'
+import { assertTokenizerBank, type TokenizerBank } from '@fingerpoint/shared/tokenizer-bank'
 import { parseOptions, requestEndpoint } from './detect-options'
 import { errorMessage } from './detect-request'
 import { analyzeInput, loadChallenges, readJson, runDetection, serializeResult } from './detect-run'
@@ -37,21 +38,27 @@ export async function runDetectionCommand(args: string[]) {
       if (options.updateCheck && !options.input && !options.json && process.stdout.isTTY && !process.env.CI && process.env.TERM !== 'dumb') {
         stopUpdateCheck = startUpdateCheck()
       }
-      const [bankData, detectorData, challenges] = await Promise.all([
+      const [bankData, detectorData, challenges, tokenizerData] = await Promise.all([
         readJson(options.bank ?? fileURLToPath(new URL('../data/unified_bank.json', import.meta.url))),
         readJson(fileURLToPath(new URL('../data/shared_detector.json', import.meta.url))),
         loadChallenges(options.challenges, options.count),
+        options.tokenizer ? readJson(options.tokenizerBank ?? fileURLToPath(new URL('../data/tokenizer_bank.json', import.meta.url))) : undefined,
       ])
       const bank = bankData as Bank, detector = detectorData as SharedDetector
       if (!Array.isArray(bank?.models) || !bank.models.length) throw new Error('The reference bank must contain a nonempty models array.')
       if (detector?.schema !== 'shared-detector-v1') throw new Error('The detector artifact has an unsupported schema.')
+      let tokenizerBank: TokenizerBank | undefined
+      if (tokenizerData !== undefined) {
+        assertTokenizerBank(tokenizerData)
+        tokenizerBank = tokenizerData
+      }
       process.on('SIGINT', cancel)
       process.on('SIGTERM', terminate)
-      if (!options.json) display = createDisplay(options, bank.models.length, cancel)
-      const state = options.input ? await analyzeInput(options, bank, detector)
-        : await runDetection(options, bank, detector, state => display?.update(state), abort.signal, challenges)
+      if (!options.json) display = createDisplay(options, bank.models.length, cancel, tokenizerBank)
+      const state = options.input ? await analyzeInput(options, bank, detector, tokenizerBank)
+        : await runDetection(options, bank, detector, state => display?.update(state), abort.signal, challenges, tokenizerBank)
       display?.update(state)
-      const serialized = serializeResult(state, options, bank)
+      const serialized = serializeResult(state, options, bank, tokenizerBank)
       if (options.output) await writeFile(options.output, serialized, { mode: 0o600 })
       if (options.json) process.stdout.write(serialized)
       const updateNotice = stopUpdateCheck?.()

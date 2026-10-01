@@ -36,7 +36,9 @@ export async function readProfileFile(file: File): Promise<{ name: string; confi
   for (const field of ['stream', 'parallel', 'autoVerify']) {
     if (typeof value[field] !== 'boolean') throw new Error('Invalid profile file')
   }
-  if (value.relaxed !== undefined && typeof value.relaxed !== 'boolean') throw new Error('Invalid profile file')
+  for (const field of ['relaxed', 'tokenizerProbe']) {
+    if (value[field] !== undefined && typeof value[field] !== 'boolean') throw new Error('Invalid profile file')
+  }
   return {
     name: value.name.trim(),
     config: {
@@ -49,6 +51,7 @@ export async function readProfileFile(file: File): Promise<{ name: string; confi
       parallel: value.parallel as boolean,
       relaxed: value.relaxed === undefined ? true : value.relaxed as boolean,
       autoVerify: value.autoVerify as boolean,
+      tokenizerProbe: value.tokenizerProbe === undefined ? true : value.tokenizerProbe as boolean,
     },
   }
 }
@@ -67,6 +70,7 @@ export async function saveProfileFile(profile: ApiProfile, name: string): Promis
     parallel: profile.parallel,
     relaxed: profile.relaxed,
     autoVerify: profile.autoVerify,
+    tokenizerProbe: profile.tokenizerProbe,
   }
   const json = JSON.stringify(contents, null, 2) + '\n'
   const suggestedName = fileName(name)

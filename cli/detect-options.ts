@@ -1,4 +1,5 @@
 import { parseArgs } from 'node:util'
+import { TOKENIZER_MODEL } from '@fingerpoint/shared/tokenizer-posterior'
 import type { ApiConfig } from '@fingerpoint/shared/types'
 
 export interface DetectOptions {
@@ -15,9 +16,13 @@ export interface DetectOptions {
   challenges?: string
   json: boolean
   updateCheck: boolean
+  /** Probe the tokenizer once and fuse it into every round. */
+  tokenizer: boolean
+  maxProbes: number
+  tokenizerBank?: string
 }
 
-function positiveInteger(value: string, name: string, maximum = Number.MAX_SAFE_INTEGER) {
+export function positiveInteger(value: string, name: string, maximum = Number.MAX_SAFE_INTEGER) {
   const number = Number(value)
   if (!/^\d+$/.test(value) || !Number.isSafeInteger(number) || number < 1 || number > maximum) {
     throw new Error(`${name} must be an integer from 1 to ${maximum}.`)
@@ -34,7 +39,8 @@ export function parseOptions(args: string[], env = process.env): DetectOptions |
     input: { type: 'string' }, output: { type: 'string' }, bank: { type: 'string' },
     challenges: { type: 'string' }, json: { type: 'boolean' }, help: { type: 'boolean', short: 'h' },
     'base-url': { type: 'string' }, 'api-key': { type: 'string' },
-    'no-update-check': { type: 'boolean' },
+    'no-update-check': { type: 'boolean' }, 'no-tokenizer': { type: 'boolean' },
+    'max-probes': { type: 'string' }, 'tokenizer-bank': { type: 'string' },
   }, strict: true, allowPositionals: false })
   if (values.help) return undefined
   const apiInput = (values.api ?? 'responses').toLowerCase()
@@ -53,6 +59,11 @@ export function parseOptions(args: string[], env = process.env): DetectOptions |
   }
   if (values.strict && count !== 3) {
     throw new Error('--strict requires --count 3. Use relaxed mode for one or two samples without confidence scores.')
+  }
+  const maxProbes = positiveInteger(values['max-probes'] ?? String(TOKENIZER_MODEL.maximumProbes), '--max-probes', 60)
+  if (maxProbes < TOKENIZER_MODEL.minimumProbes) throw new Error(`--max-probes must be an integer from ${TOKENIZER_MODEL.minimumProbes} to 60.`)
+  if (values['no-tokenizer'] && (values['max-probes'] !== undefined || values['tokenizer-bank'] !== undefined)) {
+    throw new Error('--no-tokenizer cannot be combined with --max-probes or --tokenizer-bank.')
   }
   const config: ApiConfig = {
     model: (values.model ?? env.MODEL ?? '').trim(),
@@ -73,6 +84,7 @@ export function parseOptions(args: string[], env = process.env): DetectOptions |
     strict: !!values.strict, json: !!values.json,
     updateCheck: !values['no-update-check'] && !env.FPD_NO_UPDATE_CHECK && !env.NO_UPDATE_NOTIFIER,
     input: values.input, output: values.output, bank: values.bank, challenges: values.challenges,
+    tokenizer: !values['no-tokenizer'], maxProbes, tokenizerBank: values['tokenizer-bank'],
   }
 }
 

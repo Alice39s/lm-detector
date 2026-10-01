@@ -1,5 +1,8 @@
 import { redactPrivateMetadata } from '@fingerpoint/shared/privacy'
-import { testApi as testApiShared, type CompletionTransport } from '@fingerpoint/shared/detection'
+import { endpoint, testApi as testApiShared, type CompletionTransport } from '@fingerpoint/shared/detection'
+import { assertTokenizerBank, type TokenizerBank } from '@fingerpoint/shared/tokenizer-bank'
+import { fuseTokenizerEvidence } from '@fingerpoint/shared/tokenizer-fusion'
+import { probeTokenizer as probeTokenizerShared, tokenizerReport, type TokenizerRun } from '@fingerpoint/shared/tokenizer-probe'
 import { generateChallenges } from '@fingerpoint/shared/challenge-browser.js'
 import { parseNumbers } from '@fingerpoint/shared/fingerprint-core.js'
 import { analyzeSharedOutputs, type SharedDetector } from '@fingerpoint/shared/shared-detector'
@@ -65,10 +68,18 @@ function download(name:string,content:string,type='application/json'){
 }
 export async function exportReferences(){download('unified_reference.jsonl',(await loadReferences()).map(batch=>JSON.stringify(sanitize(batch))).join('\n')+'\n','application/x-ndjson')}
 export function exportBank(bank:Bank){download('unified_bank.json',JSON.stringify(sanitize(bank),null,2)+'\n')}
-export function exportAnalysis(result:Analysis){
-  const candidates=result.results.map(r=>({model:r.model,name:r.display_name,confidence:r.verification_confidence??r.probability??null}))
-  download('fingerpoint-result.json',JSON.stringify(candidates,null,2)+'\n')
+/** Probe data travels with the result it was fused into, so an export always matches the ranking on screen. */
+export interface ResultTokenizer { run:TokenizerRun; bank:TokenizerBank; startedAt:number; model:string }
+export function exportAnalysis(result:Analysis,probe?:ResultTokenizer){
+  const candidates=result.results.map(r=>({model:r.model,name:r.display_name,confidence:r.verification_confidence??r.probability??null,
+    ...(r.tokenizer?{fingerprint_confidence:r.fingerprint_confidence??null,tokenizer:r.tokenizer.status,tokenizer_factor:r.tokenizer.factor}:{})}))
+  // Counts, probe ids, response model names and the claimed model leave with the result; the address and key stay behind.
+  const tokenizer=probe?{...tokenizerReport(probe.run,probe.bank,{createdAt:probe.startedAt,model:probe.model}),fused:result.tokenizer?.fused??false}:undefined
+  download('fingerpoint-result.json',JSON.stringify(sanitize({candidates,tokenizer}),null,2)+'\n')
 }
+/** Combines a settled probe with the fingerprint analysis. Without an answered probe there is no evidence to add. */
+export const fuseTokenizer=(analysis:Analysis,probe:ResultTokenizer)=>
+  probe.run.posterior?.answered?fuseTokenizerEvidence(analysis,probe.bank,probe.run.posterior,probe.run.verdict):analysis
 const browserTransport:CompletionTransport = (url,config,body,signal) => {
   const headers={'Content-Type':'application/json',Authorization:`Bearer ${config.apiKey}`,Accept:body.stream?'text/event-stream':'application/json'}
   const requestBody={...body}
@@ -78,3 +89,15 @@ const browserTransport:CompletionTransport = (url,config,body,signal) => {
 }
 export const testApi = (config:ApiConfig,challenges:Challenge[],onProgress:(p:CollectionProgress)=>void,signal?:AbortSignal) =>
   testApiShared(config,challenges,onProgress,signal,browserTransport)
+
+let tokenizerBankLoading:Promise<TokenizerBank>|undefined
+export function loadTokenizerBank():Promise<TokenizerBank>{
+  return tokenizerBankLoading ??= readStaticData('tokenizer_bank.json').then(text=>{
+    const bank=JSON.parse(text) as unknown
+    assertTokenizerBank(bank)
+    return bank
+  }).catch(error=>{tokenizerBankLoading=undefined;throw error})
+}
+/** Four probes in flight when parallel requests are on, otherwise one at a time for the fewest requests. */
+export const probeTokenizer = (config:ApiConfig,bank:TokenizerBank,signal:AbortSignal,onUpdate:(run:TokenizerRun)=>void) =>
+  probeTokenizerShared(config,bank,{url:endpoint(config),transport:browserTransport,concurrency:config.parallel?4:1,signal,onUpdate})

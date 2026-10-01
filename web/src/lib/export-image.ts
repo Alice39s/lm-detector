@@ -104,7 +104,7 @@ export async function exportResultImage(result: Analysis, i18n: I18n): Promise<v
 
   ctx.fillStyle = c.mutedFg
   ctx.font = font(13)
-  ctx.fillText(i18n.t('detect.imageScope', { n: rows.length, samples: result.used_outputs }), pad, y)
+  ctx.fillText(i18n.t(result.tokenizer?.fused ? 'detect.imageScopeTokenizer' : 'detect.imageScope', { n: rows.length, samples: result.used_outputs }), pad, y)
   ctx.font = font(12)
   ctx.fillText(i18n.t('detect.disclaimer'), pad, y + 28, width - pad * 2)
 

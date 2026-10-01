@@ -1,5 +1,6 @@
 import { Box, Text, render, useWindowSize } from 'ink'
 import terminalLink from 'terminal-link'
+import { TOKENIZER_MODEL } from '@fingerpoint/shared/tokenizer-posterior'
 
 const sections = [
   { title: 'CONNECTION', options: [
@@ -18,6 +19,11 @@ const sections = [
     ['-s, --strict', 'Disable automatic truncation. Require --count 3 and all three complete, valid responses.'],
     ['--challenges FILE', 'Reuse saved challenges for every round. Array length must match --count.'],
     ['--bank FILE', 'Use a custom reference bank.'],
+  ] },
+  { title: 'TOKENIZER PROBE', options: [
+    ['--no-tokenizer', 'Skip the tokenizer probe and rank by the number fingerprint only.'],
+    ['--max-probes NUMBER', `Most probe texts to send, ${TOKENIZER_MODEL.minimumProbes} to 60. Default: ${TOKENIZER_MODEL.maximumProbes}. Probing stops at this number even if confidence is below ${TOKENIZER_MODEL.stopAt * 100}%. Two baseline requests are sent on top.`],
+    ['--tokenizer-bank FILE', 'Use a custom tokenizer bank.'],
   ] },
   { title: 'OUTPUT', options: [
     ['--input FILE', 'Analyze saved outputs offline. No API requests.'],
@@ -71,6 +77,8 @@ function Help() {
       <Text bold color="cyan">HOW ROUNDS WORK</Text>
       <Text>Relaxed mode caps each sample at its requested number count. One or two valid samples can produce a ranking without confidence scores.</Text>
       <Text>Each round waits for all requested samples to settle before the next round starts. No automatic retries. Detection never enrolls samples.</Text>
+      <Text>Beside the first round, about 12 short requests (at most {TOKENIZER_MODEL.maximumProbes + 2}) identify the upstream tokenizer from the token counts in the API usage. APIs billed per request charge for them. Three-sample rounds add the result to the confidence; one- or two-sample rounds only report it.</Text>
+      <Text>The Tok column marks each candidate's tokenizer: ✓ matches the counts, × does not, ? unclear, · unknown to this tool.</Text>
       <Text dimColor>Use q or Ctrl+C to cancel. --base-url and --api-key are also accepted.</Text>
     </Box>
     <Box flexDirection="column" marginTop={1}>

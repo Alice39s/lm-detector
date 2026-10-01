@@ -25,6 +25,7 @@ An API relay or a third-party provider can claim to serve one model and actually
 - **Three protocols**: OpenAI Responses, Chat Completions, and Anthropic Messages. SSE streaming is the default.
 - **Reference bank**: covers common model families such as GPT, Claude, Gemini, Grok, Qwen, and DeepSeek. The library page on the website shows the bank in read-only mode and can export it.
 - **Traceable data maintenance**: `fpd sample`, `fpd enroll`, and `fpd retrain` collect, enroll, and refit offline. All failures and earlier attempts stay on record.
+- **Tokenizer probe**: while sampling, API detection sends about 12 extra short requests and identifies the tokenizer behind the API (the rule a model uses to cut text into tokens) from the token counts in the API `usage`. The result is added to the candidates' confidence and checked against the model you entered.
 
 > [!IMPORTANT]
 > A result is a **closed-set ranking within the reference bank**. A model that is not in the bank still gets a "closest" candidate. Ranking scores and confidence values are not proof of identity. To judge whether a channel is trustworthy, fix the request parameters, repeat several rounds, and use other evidence too.
@@ -165,6 +166,27 @@ Sampling stops reading an answer once it reaches 500 integers and truncates it t
 
 Enrollment deduplicates by model, channel, condition, challenge, and text. If nested calibration fails during retraining, the existing `shared_detector.json` stays unchanged. Each training run saves its plan, metrics, and frozen source code under `.training/` in the data directory.
 
+### Tokenizer probe
+
+By default, detection probes the upstream tokenizer once, beside the first round, and uses the result for every round. The probe usually sends about 12 extra short requests and at most 22; APIs billed per request charge for them.
+
+```sh
+# Rank by the number fingerprint only, without the tokenizer probe
+npx lmfpd@latest -b https://api.example.com/v1 -k sk-xxx -m deepseek-v4-pro -a cc --no-tokenizer
+
+# A saved result keeps the count of every request; offline analysis recomputes it against the current tokenizer bank
+npx lmfpd@latest -a cc --output result.json
+npx lmfpd@latest --input result.json
+```
+
+| Option | Description | Default |
+| --- | --- | --- |
+| `--no-tokenizer` | Skip the tokenizer probe and rank by the number fingerprint only | Probe |
+| `--max-probes N` | Maximum number of probe texts; two baseline requests are sent in addition | `20` |
+| `--tokenizer-bank FILE` | Use a custom tokenizer bank | Built-in bank |
+
+Rounds with three valid samples add the tokenizer result to the confidence, and the `Tok` column marks whether each candidate's tokenizer matches; rounds with one or two samples only report the tokenizer. The model from `-m` is also checked against the tokenizer it should use. For example, a channel that claims `gpt-5` but shows the Qwen tokenizer is marked `inconsistent`. When probing stops partway, the counts received so far are still used; when the API reports no usage, the baseline request fails, or no probe text is answered, detection still completes with the number fingerprint only.
+
 ## How It Works
 
 ```mermaid
@@ -247,8 +269,41 @@ $$
 | `data/unified_bank.json` | Statistics derived from the reference batches |
 | `data/shared_detector.json` | Frozen ranker, verifier, and calibration, bound to the reference data by SHA-256 |
 | `data/enrollment-suite.json` | The 36 fixed sampling challenges |
+| `data/tokenizer_bank.json` | Tokenizer bank: probe texts, per-class counts, and model id mappings for the tokenizer probe |
 
 If the reference bank does not match the detector (for example, a custom bank from `--bank`), detection gives a legacy ranking only, without verification scores or confidence. See [data/README.md](./data/README.md) for the data change log.
+
+### 8. Tokenizer probe
+
+The goal is to find out which tokenizer the upstream uses with as few short requests as possible, and to add that finding to the confidence of the number fingerprint.
+
+Each request holds one user message: a fixed prefix $P$, a short probe text $t_j$, and a fixed suffix $S$; the prefix and suffix together are the wrapper. The prefix starts and the suffix ends with a non-whitespace character, so a chat template that trims the message does not change the count. The baseline request sends the wrapper alone, $P + S$. Then
+
+$$
+x_j - x_0 = \operatorname{count}(P\,t_j\,S) - \operatorname{count}(P\,S)
+$$
+
+and hidden input such as the chat template, injected system prompts, and special tokens cancels out. The tokenizer bank holds the same difference for every open tokenizer, computed offline. The 290 tokenizers that count identically on 280 candidate texts form classes, and classes of one lineage that differ on only a few texts are merged, giving 62 classes. A greedy cover then picks 72 probe texts so that every pair of classes differs on at least 3 of them.
+
+The posterior probability is how plausible each hypothesis is after all counts are in. There are three kinds of hypotheses: a listed class (deviations are rare measurement errors), an unlisted tokenizer close to a class (a sizable share of probe texts count differently), and a tokenizer unrelated to every class. Each residual follows a two-component discrete Laplace mixture with a floor, so one outlier costs a bounded amount of evidence. The contamination rate is marginalized over a grid, and the length of the hidden input over a ±3 window around the baseline.
+
+Each batch picks the probe texts that best separate the candidates still in doubt, by the pairwise Bhattacharyya bound
+
+$$
+F(S) = \sum_{a<b} \sqrt{w_a w_b}\,\Bigl(1 - \prod_{j \in S} \mathrm{BC}_j(a, b)\Bigr)
+$$
+
+which bounds the MAP error from above and is monotone submodular, so the greedy batch is within $1 - 1/e$ of the best batch. With exact counts it reduces to equivalence-class edge cutting (EC²). Probing stops once one class or "unlisted" reaches 99% posterior probability, and a final baseline request checks that the hidden input is stable.
+
+The tokenizer result enters the number fingerprint by Bayes' rule. Number choices and token counts are treated as independent given the model, so the calibrated posterior of each candidate $m$ is multiplied by
+
+$$
+(1-\varepsilon)\,\mathrm{BF}(m) + \varepsilon,\qquad \mathrm{BF}(m) = \frac{P(H_m \mid \text{counts})}{P(H_m)}
+$$
+
+and renormalized. $H_m$ are the tokenizer hypotheses compatible with $m$: its classes and their unlisted relatives, or "unlisted" when the vendor has not published the tokenizer. $\mathrm{BF}(m)$ is their Bayes factor against the marginal of the counts. $\varepsilon = 0.1$ is a Huber $\varepsilon$-contamination share for usage that was not counted with the model's tokenizer, such as a relay's local estimate. It bounds how far the counts alone can move the ranking: the odds between two candidates change by at most about 600 times. A library model whose tokenizer this tool does not know keeps the tokenizer of other models in its family with probability 0.8 and otherwise counts as an unlisted tokenizer. Rankings from one or two samples have no calibrated probabilities, so the tokenizer is only reported there.
+
+A tokenizer match shows only that the tokenizer is the same. One tokenizer often serves several models (for example, Xiaomi MiMo and MiniCPM-V reuse the Qwen2 to Qwen3 tokenizer), and a relay that estimates usage locally with tiktoken also measures as o200k_base or cl100k_base.
 
 ## Project Structure
 

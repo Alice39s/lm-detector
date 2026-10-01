@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react'
 import { Box, Text, render, useInput, useWindowSize } from 'ink'
 import terminalLink from 'terminal-link'
 import { anomalousSamples } from '@fingerpoint/shared/sample-distribution'
+import type { TokenizerBank } from '@fingerpoint/shared/tokenizer-bank'
+import type { TokenizerFit } from '@fingerpoint/shared/tokenizer-fusion'
+import { tokenizerVerdict, type TokenizerVerdict } from '@fingerpoint/shared/tokenizer-posterior'
 import type { Analysis } from '@fingerpoint/shared/types'
 import type { DetectOptions } from './detect-options'
 import type { DetectionState } from './detect-run'
@@ -26,32 +29,91 @@ const colors: Record<Sample['state'], string> = {
   queued: 'gray', waiting: 'yellow', streaming: 'cyan', complete: 'green', truncated: 'green', failed: 'red', cancelled: 'yellow',
 }
 
+const fitMarks: Record<TokenizerFit['status'], [string, string | undefined]> = {
+  consistent: ['✓', 'green'], inconsistent: ['×', 'red'], uncertain: ['?', 'yellow'], unmapped: ['·', undefined],
+}
+
+function verdictLine(bank: TokenizerBank, verdict: TokenizerVerdict) {
+  const item = bank.classes.find(entry => entry.id === verdict.top.id)
+  const name = item ? `${item.series} (${item.lab_name})` : verdict.top.id
+  if (verdict.kind === 'exact') return `Exact tokenizer match: ${name} · ${percentage(verdict.confidence)}`
+  if (verdict.kind === 'related') return `Unlisted tokenizer closest to ${name} · ${percentage(verdict.confidence)}`
+  return `Unlisted tokenizer · ${percentage(verdict.confidence)} · closest listed: ${name}`
+}
+
+function claimLine(bank: TokenizerBank, verdict: TokenizerVerdict, model: string) {
+  const claim = verdict.claim
+  if (!claim) return `No tokenizer information for "${model}", so consistency cannot be judged.`
+  const expected = claim.expected.length
+    ? claim.expected.map(id => bank.classes.find(item => item.id === id)?.series ?? id).join(' / ')
+    : `an unpublished ${claim.vendor} tokenizer`
+  return `Claimed "${model}" expects ${expected}: ${claim.status} (${percentage(claim.probability)} chance of a match)`
+}
+
+/** A relay that estimates usage locally with tiktoken also produces o200k_base or cl100k_base counts. */
+const estimatedUsageClasses = new Set(['o200k', 'cl100k'])
+
 function Ranking({ analysis, compact, safe }: { analysis: Analysis; compact: boolean; safe: (text: string) => string }) {
   const calibrated = analysis.probability_status === 'reference_calibrated'
   const hasConfidence = analysis.results.some(row => row.verification_confidence != null)
+  const tokenizer = analysis.tokenizer
+  const displaced = tokenizer?.fused && tokenizer.fingerprint_top !== analysis.prediction
+    ? analysis.results.find(row => row.model === tokenizer.fingerprint_top) : undefined
   return <Box flexDirection="column" marginTop={1}>
     <Text bold color="cyan">LEADING CANDIDATES</Text>
     <Box>
       <Box width={4}><Text dimColor>#</Text></Box>
       <Box flexGrow={1}><Text dimColor>Model</Text></Box>
+      {tokenizer && <Box width={5} justifyContent="flex-end"><Text dimColor>Tok</Text></Box>}
       <Box width={9} justifyContent="flex-end"><Text dimColor>Score</Text></Box>
       <Box width={12} justifyContent="flex-end"><Text dimColor>{calibrated ? 'Confidence' : hasConfidence ? 'Verifier' : 'Confidence'}</Text></Box>
     </Box>
     {analysis.results.slice(0, compact ? 3 : 5).map((row, index) => <Box key={row.model}>
       <Box width={4}><Text color={index === 0 ? 'cyan' : undefined}>{index + 1}</Text></Box>
       <Box flexGrow={1} flexBasis={0}><Text wrap="truncate-end" bold={index === 0}>{safe(row.display_name)}</Text></Box>
+      {tokenizer && <Box width={5} justifyContent="flex-end">{row.tokenizer
+        ? <Text color={fitMarks[row.tokenizer.status][1]} dimColor={!fitMarks[row.tokenizer.status][1]}>{fitMarks[row.tokenizer.status][0]}</Text> : <Text dimColor>·</Text>}</Box>}
       <Box width={9} justifyContent="flex-end"><Text>{row.score.toFixed(3)}</Text></Box>
       <Box width={12} justifyContent="flex-end"><Text color={index === 0 ? 'cyan' : undefined}>{percentage(row.verification_confidence)}</Text></Box>
     </Box>)}
     <Text dimColor>{analysis.decision === 'partial' ? 'Partial ranking · confidence unavailable'
-      : calibrated ? 'Confidence is relative to the reference bank; it does not prove identity.'
+      : calibrated ? `Confidence is relative to the reference bank${tokenizer?.fused ? ' and includes the tokenizer result' : ''}; it does not prove identity.`
       : hasConfidence ? 'Verifier values are uncalibrated scores, not identity probabilities.' : 'Confidence unavailable for this bank.'}</Text>
+    {displaced && <Text color="yellow">{displaced.tokenizer?.status === 'inconsistent'
+      ? `The numbers are closest to ${safe(displaced.display_name)}, whose tokenizer does not match the counts.`
+      : `The numbers are closest to ${safe(displaced.display_name)}; with the tokenizer evidence, ${safe(analysis.prediction_name)} ranks first.`}</Text>}
     {!compact && <Text dimColor>{safe(analysis.evidence.label)}</Text>}
   </Box>
 }
 
-function Dashboard({ state, options, bankSize, cancel, saved, fatal, updateNotice }: {
-  state: DetectionState; options: DetectOptions; bankSize: number; cancel: () => void; saved?: string; fatal?: string; updateNotice?: UpdateNotice
+function Tokenizer({ state, bank, options, spinner, safe }: {
+  state: DetectionState; bank: TokenizerBank; options: DetectOptions; spinner: string; safe: (text: string) => string
+}) {
+  const run = state.tokenizer
+  if (!run) return null
+  const settled = state.tokenizerSettled !== false
+  const answered = run.steps.filter(step => step.state === 'done').length
+  // While probing, the leader is recomputed from the answers so far.
+  const verdict = run.verdict ?? (!settled && run.posterior && run.posterior.answered > 0
+    ? tokenizerVerdict(bank, run.posterior, options.config.model) : null)
+  const error = run.error && run.error.code !== 'aborted' ? run.error : undefined
+  const model = state.tokenizerModel ?? options.config.model
+  return <Box flexDirection="column" marginTop={1}>
+    <Text bold color="cyan">TOKENIZER <Text dimColor> · {answered} request{answered === 1 ? '' : 's'} answered</Text></Text>
+    {!settled && <Text>{spinner} {verdict ? `Leading so far · ${verdictLine(bank, verdict)}` : 'Measuring the baseline'}</Text>}
+    {settled && verdict && <>
+      <Text bold>{verdictLine(bank, verdict)}</Text>
+      {model && <Text color={verdict.claim?.status === 'inconsistent' ? 'red' : verdict.claim?.status === 'consistent' ? 'green' : 'yellow'}>{safe(claimLine(bank, verdict, model))}</Text>}
+      {verdict.kind === 'exact' && estimatedUsageClasses.has(verdict.top.id) && verdict.claim?.status !== 'consistent' && <Text color="yellow">Some relays estimate usage locally with tiktoken and report that. This result may only reflect the relay's estimate.</Text>}
+    </>}
+    {settled && !verdict && <Text color="yellow">No tokenizer result{error ? `: ${safe(error.message)}` : ''}. Rounds use the number fingerprint only.</Text>}
+    {settled && verdict && error && <Text color="yellow">Probing stopped early: {safe(error.message)}</Text>}
+    {run.baselineDrift && <Text color="yellow">The two baseline requests counted differently, so the API adds hidden input that varies between requests. The result may be inaccurate; run the command again to check.</Text>}
+  </Box>
+}
+
+function Dashboard({ state, options, bankSize, tokenizerBank, cancel, saved, fatal, updateNotice }: {
+  state: DetectionState; options: DetectOptions; bankSize: number; tokenizerBank?: TokenizerBank; cancel: () => void; saved?: string; fatal?: string; updateNotice?: UpdateNotice
 }) {
   const [now, setNow] = useState(Date.now())
   const { columns, rows } = useWindowSize()
@@ -88,7 +150,7 @@ function Dashboard({ state, options, bankSize, cancel, saved, fatal, updateNotic
       <Text><Text bold color="cyan">FPD</Text><Text dimColor> / MODEL FINGERPOINT DETECTOR (</Text><Text color="cyan">{terminalLink('lm.ikale.io', 'https://lm.ikale.io', { fallback: false })}</Text><Text dimColor>)</Text></Text>
       <Text wrap="truncate-end" bold>{options.input ? `Offline · ${safe(options.input)}` : safe(options.config.model)}</Text>
       {!compact && !options.input && <Text dimColor wrap="truncate-middle">{safe(options.config.baseUrl)}</Text>}
-      <Text dimColor>{options.input ? 'Saved outputs' : `${options.api} · ${options.config.stream ? 'SSE' : 'JSON'} · count ${options.count} · parallel ${options.parallel}`} · {options.strict ? 'strict' : 'relaxed'} · {bankSize} models</Text>
+      <Text dimColor>{options.input ? 'Saved outputs' : `${options.api} · ${options.config.stream ? 'SSE' : 'JSON'} · count ${options.count} · parallel ${options.parallel}`} · {options.strict ? 'strict' : 'relaxed'} · {bankSize} models{tokenizerBank ? ` · ${tokenizerBank.classes.length} tokenizer classes` : ''}</Text>
     </Box>
     <Box justifyContent="space-between">
       <Text bold>{state.finishedAt ? '●' : spinner} {phase} · round {latest?.index ?? 1}/{state.total}</Text>
@@ -116,6 +178,7 @@ function Dashboard({ state, options, bankSize, cancel, saved, fatal, updateNotic
         </Box>
       })}
     </Box>}
+    {tokenizerBank && <Tokenizer state={state} bank={tokenizerBank} options={options} spinner={spinner} safe={safe} />}
     {latest?.error && <Text color="yellow">{safe(latest.error)}</Text>}
     {anomalous.length > 0 && <Text color="yellow">Sample {anomalous.map(index => index + 1).join(', ')}: abnormal distribution. This result is unreliable. The prompt causes it, so {options.challenges ? 'replace these prompts in the --challenges file' : 'rerun to draw new prompts'}.</Text>}
     {latest?.analysis && latest.analysis.results.length > 0 && <Ranking analysis={latest.analysis} compact={compact} safe={safe} />}
@@ -148,13 +211,14 @@ export interface DetectionDisplay {
   finish(saved?: string, fatal?: string, updateNotice?: UpdateNotice): Promise<void>
 }
 
-export function createDisplay(options: DetectOptions, bankSize: number, cancel: () => void): DetectionDisplay {
+export function createDisplay(options: DetectOptions, bankSize: number, cancel: () => void, tokenizerBank?: TokenizerBank): DetectionDisplay {
   let state: DetectionState = { rounds: [], total: options.repeat, startedAt: Date.now(), cancelled: false }
   const terminal = !!process.stdout.isTTY && !process.env.CI && process.env.TERM !== 'dumb'
-  const view = render(<Dashboard state={state} options={options} bankSize={bankSize} cancel={cancel} />, {
+  const view = render(<Dashboard state={state} options={options} bankSize={bankSize} tokenizerBank={tokenizerBank} cancel={cancel} />, {
     exitOnCtrlC: false, patchConsole: false, maxFps: 10, interactive: terminal,
   })
   const settled = new Set<string>()
+  const clean = (text: string) => cleanText(options.config.apiKey ? text.replaceAll(options.config.apiKey, '[REDACTED]') : text)
   return {
     update(next: DetectionState) {
       state = next
@@ -166,12 +230,18 @@ export function createDisplay(options: DetectOptions, bankSize: number, cancel: 
           settled.add(id)
           process.stderr.write(`[${round.index}/${state.total}] Sample ${index + 1}: ${labels[sample.state]} (${sample.count}/${sample.expectedCount})${sample.throughput ? ` · ${speed(sample, true)}` : ''}${sample.error ? ` · ${sample.error}` : ''}\n`)
         })
+        const run = state.tokenizer
+        if (run && tokenizerBank && state.tokenizerSettled && !settled.has('tokenizer')) {
+          settled.add('tokenizer')
+          const answered = run.steps.filter(step => step.state === 'done').length
+          process.stderr.write(`Tokenizer: ${run.verdict ? verdictLine(tokenizerBank, run.verdict) : `no result${run.error ? `: ${clean(run.error.message)}` : ''}`} (${answered} requests)\n`)
+        }
       }
-      view.rerender(<Dashboard state={state} options={options} bankSize={bankSize} cancel={cancel} />)
+      view.rerender(<Dashboard state={state} options={options} bankSize={bankSize} tokenizerBank={tokenizerBank} cancel={cancel} />)
     },
     async finish(saved?: string, fatal?: string, updateNotice?: UpdateNotice) {
       state = { ...state, finishedAt: state.finishedAt ?? Date.now() }
-      view.rerender(<Dashboard state={state} options={options} bankSize={bankSize} cancel={cancel} saved={saved} fatal={fatal} updateNotice={updateNotice} />)
+      view.rerender(<Dashboard state={state} options={options} bankSize={bankSize} tokenizerBank={tokenizerBank} cancel={cancel} saved={saved} fatal={fatal} updateNotice={updateNotice} />)
       await view.waitUntilRenderFlush()
       view.unmount()
     },
