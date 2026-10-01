@@ -1,0 +1,23 @@
+---
+title: 代理 API
+description: 转发代理的 HTTP 接口：健康检查、转发请求和跨域预检。本站代理与自建 Worker 使用同一套接口。
+---
+
+有些 LLM 接口不允许网页直接访问（浏览器的跨域限制，CORS），转发代理替网页把请求转发给上游（你填写的接口背后的服务）。它有三个方法，路径都是 `/api/proxy`：`GET` 做健康检查，`POST` 转发 API 请求，`OPTIONS` 回应浏览器的跨域预检。
+
+本站代理只处理 `/api/proxy`，发往其他路径的请求不会到达它。自建 Worker 不看路径，对任何路径（包括根路径 `/`）的回答都相同，所以调用时可以直接使用它的域名。
+
+两者接受的网页不同。本站代理只接受部署它的那个站点上的网页，其他网站的网页调用会得到 403。自建 Worker 还接受 `ALLOWED_ORIGINS` 里列出的网页，来源（origin）是网址里协议、域名和端口的部分，例如 `https://example.com`。
+
+<Cards>
+  <Card title="Health check" href="./checkProxy.mdx">`GET /api/proxy`：确认地址是 Fingerpoint 代理。</Card>
+  <Card title="Relay an API request" href="./relayRequest.mdx">`POST /api/proxy`：用你的密钥转发请求，原样流式返回。</Card>
+</Cards>
+
+浏览器向另一个来源发 `POST` 之前，会自动先发一个 `OPTIONS` 请求（预检）询问是否允许。允许的来源得到 204 和 `Access-Control-Allow-*` 头，其他来源得到不带这些头的 403。
+
+每个接口页都带有 Playground，可以直接发请求试用。请求从你的浏览器发出，你填写的 Key 和请求体会经过 Playground 里选中的服务器（本站代理或你的 Worker）转发给上游，与网页检测经本站代理时一样。
+
+<Callout type="warn">
+  Playground 发出的是真实请求，会消耗你在上游的额度。不要在不信任的站点上填写 API Key。
+</Callout>

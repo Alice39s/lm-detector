@@ -1,0 +1,69 @@
+---
+title: 分词器探测
+description: fpd 在检测的同时识别接口背后使用的分词器，把结果并入每一轮的置信度，并核对它与所填模型是否一致。
+---
+
+```sh
+# 默认会做分词器探测
+npx lmfpd@latest -b https://api.example.com/v1 -k sk-xxx -m deepseek-v4-pro -a cc
+
+# 只用数字指纹，不做分词器探测
+npx lmfpd@latest -a cc --no-tokenizer
+
+# 离线分析保存的报告，按当前的分词器库重新计算
+npx lmfpd@latest --input result.json --json
+```
+
+分词器是模型把文字切成 token 的规则，不同模型家族的规则不同，所以接口返回的 token 用量能暴露它背后实际用的模型。检测在第一轮取样的同时探测一次接口背后的分词器，每一轮评分前都等探测结束，结果用于每一轮。一次探测通常多发约 12 个短请求，最多 22 个；按次计费的接口会多计这些请求。`--parallel` 大于 1 时同时发 4 个请求，否则逐个发送；每个请求的时限是 90 秒。Messages 协议的请求最多输出 16 个 token，其余协议与取样请求一样不设输出上限。网页的做法相同，见[网页的分词器探测](../web/tokenizer.mdx)，方法见[原理](../principles/tokenizer.mdx)。
+
+## 参数
+
+| 参数 | 说明 | 默认值 |
+| --- | --- | --- |
+| `--no-tokenizer` | 不做分词器探测，只按数字指纹排名 | 探测 |
+| `--max-probes N` | 测试文本数量上限，4–60。另发两次对照请求，它们不含测试文本，用来扣除接口自己加入的隐藏内容 | `20` |
+| `--tokenizer-bank FILE` | 使用自定义分词器库 | 内置分词器库 |
+
+连接参数与[检测命令](./detect.mdx#options)相同。`-m` 填写的模型名同时用来核对分词器：例如声称 `gpt-5` 却测得 Qwen 的分词器，结果标为 `inconsistent`。
+
+## 终端界面
+
+每一轮都等分词器探测结束后再计算。`TOKENIZER` 区块显示已完成的请求数、暂时领先的分词器，结束后显示判定、作者实验室，以及它与 `--model` 使用的分词器是否一致。
+
+三条样本都有效的轮次把分词器结果并入置信度，候选表多出 `Tok` 列：
+
+| 标记 | 含义 |
+| --- | --- |
+| `✓` | 该候选的分词器与实测一致 |
+| `×` | 该候选的分词器与实测不符 |
+| `?` | 还不能判断 |
+| `·` | 本工具不知道该候选使用哪种分词器 |
+
+只有一两条样本的轮次只报告分词器结果，不改变排名。
+
+## 报告格式
+
+`--output` 与 `--json` 的报告多出 `tokenizer` 对象：
+
+| 字段 | 内容 |
+| --- | --- |
+| `schema` | 固定为 `fpd-tokenizer-v1` |
+| `model` | 核对时使用的所填模型名 |
+| `bank` | 所用分词器库的生成日期、类数、测试文本数与归档清单哈希 |
+| `steps`、`observations` | 每个请求的测试文本、状态与输入 token 数，`probe` 为 `null` 的是对照请求（只含固定前后缀、不含测试文本） |
+| `verdict` | 判定 `kind`（`exact`、`related` 或 `unknown`）、最接近的类 `top`、置信度 `confidence`，以及与所填模型的核对 `claim` |
+| `classes`、`labs`、`unknown` | 前 10 类、前 5 个实验室的概率，以及“未收录”的概率 |
+| `baseline_drift` | 两次对照请求的计数是否不同 |
+| `cancelled`、`error` | 是否被取消，以及失败请求的错误码与 HTTP 状态 |
+
+并入分词器结果的轮次，`analysis.tokenizer` 记录是否并入（`fused`）和数字指纹原本的第一候选（`fingerprint_top`）；`analysis.results[]` 的每个候选另有 `fingerprint_confidence`（并入前的置信度）和 `tokenizer`（一致性 `status` 与乘到置信度上的系数 `factor`）。报告不含 API Key。
+
+`--input` 读取报告里的 `tokenizer.observations`，按当前的分词器库重新计算，不发送请求；`-m` 或 `MODEL` 会覆盖报告里保存的模型名。
+
+## 失败与退出码
+
+探测中途失败时，已收到的计数照样并入。接口不返回用量、对照请求失败或没有任何测试文本得到回答时，检测照常完成，只使用数字指纹。分词器探测失败不改变[退出码](./detect.mdx#exit-codes)。
+
+<Callout type="warn" title="测到的是分词器">
+  用 OpenAI 的开源分词库 tiktoken 在本地估算用量的中转站会报告 o200k_base 或 cl100k_base 的计数。判定为这两类且与所填模型不一致时，可能是中转站的计数方式造成的，模型本身未必被替换。
+</Callout>

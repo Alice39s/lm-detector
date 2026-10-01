@@ -1,0 +1,61 @@
+---
+title: 命令行
+description: fpd 的运行方式、子命令、环境变量与更新提示。
+icon: Terminal
+---
+
+`fpd` 用 Ink 提供实时终端界面，负责检测（含分词器探测）、参考采样和入库。发布包 `lmfpd` 可以在 Node.js 22+ 或 Bun 1.4.2+ 上运行，自带检测算法、参考库和核验器，不需要检出仓库。安装后的可执行文件名为 `fpd`；支持的终端会把检测标题中的 `lm.ikale.io` 显示为可点击的链接。
+
+## 子命令
+
+```text
+fpd [detect] [options]        检测（默认命令）
+fpd sample [options]          采集一个可移植的参考批次
+fpd enroll DIR [options]      校验批次并写入参考库
+fpd retrain --data-dir DIR    离线重训核验器与置信度校准
+```
+
+<Cards>
+  <Card title="检测" href="./detect.mdx">随机挑战、多轮检测、保存与离线重新计算。</Card>
+  <Card title="分词器探测" href="./tokenizer.mdx">检测时识别上游的分词器：参数、终端界面和报告字段。</Card>
+  <Card title="采样与续采" href="./sampling.mdx">维护参考库用：用 36 道固定挑战采集参考批次。</Card>
+  <Card title="入库与重训" href="./enroll.mdx">维护参考库用：校验批次、写入参考库，再离线重训核验器。</Card>
+</Cards>
+
+## 运行方式
+
+```sh tab="npm"
+npx lmfpd@latest [command] [options]
+```
+
+```sh tab="Bun"
+bunx --bun lmfpd@latest [command] [options]
+```
+
+```sh tab="仓库内"
+bun install --frozen-lockfile
+bun run fpd [command] [options]
+```
+
+运行器会在需要时下载包。下文示例使用 `npx`；使用 Bun 时，把 `npx lmfpd@latest` 换成 `bunx --bun lmfpd@latest`。每个子命令都支持 `--help`，帮助页按类别分组列出参数和示例，并适配窄终端和纯文本输出。
+
+## 环境变量
+
+连接参数可以来自环境变量，命令行参数优先：
+
+```sh
+export API_KEY=sk-xxx
+export MODEL=gpt-5.6-sol
+export BASE_URL=https://openrouter.ai/api/v1
+npx lmfpd@latest -p 3 -n 5
+```
+
+凭据不会出现在界面或保存的结果中。`--base-url` 与 `--api-key` 是 `-b`、`-k` 的别名。
+
+## 更新提示
+
+发布版在交互式检测时于后台检查更新：同时查询 npm、[npmmirror](https://github.com/cnpm/cnpm) 和腾讯云镜像，共用三秒时限，取检测结束前返回的最高有效版本。请求不含模型凭据、提示词或结果。检查从不延迟检测或退出；检测结束时已经知道新版本，界面在结果下方显示一条提示，否则静默取消。
+
+提示中的命令跟随检测到的安装方式：Bun、npm、pnpm 或 Yarn，全局安装与项目安装分别给出对应命令；临时运行器给出固定到新版本的 `bunx`、`npx`、`pnpm dlx` 或 `yarn dlx` 命令，避免命中缓存的 `latest`。CLI 只建议命令，从不自动安装。
+
+检查结果缓存在系统缓存目录的 `lmfpd/update.json` 中：任一来源成功时缓存六小时，全部失败时一小时后重试。从源码运行、预发布版本、帮助、离线分析、JSON 输出、重定向输出和 CI 都跳过检查。用 `--no-update-check`、`FPD_NO_UPDATE_CHECK=1` 或 `NO_UPDATE_NOTIFIER=1` 可以关闭。

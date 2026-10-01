@@ -1,0 +1,49 @@
+---
+title: 入库与重训
+description: 校验采样批次、去重并写入参考库，再离线重训核验器与置信度校准。
+---
+
+## 入库
+
+```sh
+fpd enroll ./my-run --dry-run
+fpd enroll ./my-run
+```
+
+交互模式从当前目录向上查找本仓库，也识别外层目录下的 `projects/`。识别依赖包名、workspace 和正式数据文件，不依赖 Git，也从不使用安装目录。预览显示完整目标路径、新增及去重数量；确认默认为“否”。
+
+仓库外或非交互模式需要显式指定目标：
+
+```sh
+mkdir -p ./reference-data
+fpd enroll ./my-run --data-dir ./reference-data --dry-run --json
+fpd enroll ./my-run --data-dir ./reference-data --json
+```
+
+目标必须是已有目录；空目录可以建立单独的参考库。显式路径无效时直接报错，不回退到自动识别的结果。`--yes` 只在指定 `--data-dir` 时跳过交互确认，不能与 `--dry-run` 同用。采样时加 `--enroll`，也可以在完整采样后直接进入入库流程。
+
+入库重新解析原始响应，校验请求、文本、型号、批次哈希及正式库哈希，然后去重、重建和写入。相同模型、渠道、条件、题目和文本的重复记录不会再次计数；不同渠道的证据不互相吞并。写入使用锁和可恢复事务，收据与备份位于目标目录的 `.enrollments/`。
+
+存在未完成的事务时，预览核对暂存文件和正式文件的哈希，按恢复后的状态计算数量，但不写文件；确认入库后才完成恢复。发现事务之外的改动时拒绝覆盖。
+
+随 CLI 安装的参考库始终只读。入库会重建目标参考库，但不会自动重训核验器或置信度校准层；两者不匹配时，检测退回基础排名，置信度为空。入库之后需要再运行 `fpd retrain`。
+
+## 重训 [#retrain]
+
+```sh
+fpd retrain --data-dir ./reference-data
+```
+
+在仓库内更新正式数据后，也可以在根目录运行 `bun run retrain --data-dir ./data`。重训需要 `uv` 和 Python；CLI 用 Bun 管理目录锁、参数和进程，数值拟合由包内的 `offline/` 模块完成。命令不请求模型 API，也不读取固定评估集。
+
+重训先检查参考库与指纹库的哈希，再按固定参考环境重新拟合排名器、核验器和置信度温度。训练的计划、指标和冻结源码保存在目标目录的 `.training/`；已有参数时，同一运行目录还保存 `before-shared-detector.json`。校准必须通过[嵌套留出验收](../principles/ranking.mdx#calibration)，才会原子替换 `shared_detector.json`；失败时保留原参数，检测继续使用基础排名。`--data-dir` 必须指向已有目录，发布包自带的库仍然只读。
+
+<Callout type="warn" title="评估数据不能进入参考库">
+  固定评估集不得用于建库、训练或校准，也不能加入参考库或模型中心。在完整的研究仓库中，先运行 `bun run rebuild-bank`，再运行 `bun run evaluate:holdout`，检查 `reports/holdout/latest.md` 的覆盖率、识别结果及前后变化；`rebuild-bank` 必须在重训之前运行，重训之后不能再改动参考库。
+</Callout>
+
+## 发布
+
+在根目录运行 `bun run build` 构建网站数据，运行 `bun run build:cli` 打包独立 CLI；这两个命令本身不发布。自动发布见[打包与发布](../development/release.mdx)。
+
+入库的退出码：`0` 完成或校验通过，`1` 参数、文件或运行错误，`2` 在交互步骤中取消。

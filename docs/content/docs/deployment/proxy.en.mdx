@@ -1,0 +1,33 @@
+---
+title: Proxy constraints and local development
+description: Which upstream addresses the same-origin proxy accepts, how it checks where requests come from, and how the dev and preview servers use the same implementation.
+icon: Network
+---
+
+## Upstream addresses
+
+The proxy does not restrict provider domains. Enter a custom HTTPS API address on the website and it works, with no server environment variables to configure. The address must use a fully qualified domain name. IP literals, single-label host names, and `localhost`, `.local`, and `.internal` domains are not accepted.
+
+The proxy accepts only HTTPS on the default port 443, the three protocol endpoints, and JSON requests of at most 128 KiB. It follows no redirects and does not pass through cookies or arbitrary request headers. The client must provide its own upstream key.
+
+| Status code | Reason |
+| --- | --- |
+| 400 | The body is not a JSON object, the protocol is not supported, the model is missing, or the upstream address does not meet the requirements above |
+| 401 | `Authorization: Bearer <key>` is missing |
+| 403 | Cross-site request: `Origin` differs from the site, or `Sec-Fetch-Site` is not same-origin |
+| 405 | A method other than `GET`, `POST`, or `OPTIONS` was used |
+| 413 | The body exceeds 128 KiB |
+| 415 | The request is not `application/json` |
+| 499 | The client canceled the request |
+| 502 | The upstream returned a redirect or a success status with an unsupported response type, or it could not be reached |
+| 504 | The upstream did not respond within 250 seconds |
+
+These are the proxy's own errors, with the body `{"error":{"message":"…"}}`. JSON or SSE responses from the upstream are forwarded unchanged together with their status code, such as an upstream 401 or 429. When the upstream returns another content type with an error status, the proxy keeps that status code and replaces only the body.
+
+The `Origin` and `Sec-Fetch-Site` checks of the same-origin proxy limit cross-site browser calls, but they do not replace site authentication or platform rate limiting. Your own Worker also accepts the cross-origin pages listed in `ALLOWED_ORIGINS`. See [Own Worker proxy](./worker.mdx).
+
+## Local development
+
+`bun run dev` and `bun run preview` already include the same proxy, so you do not need to start a separate backend service. For a local Pages preview, use `bun run preview:pages`, which runs at `http://127.0.0.1:8788`. For a local Worker, use `bun run dev:worker`, which runs at `http://127.0.0.1:8787`.
+
+The CLI does not use the proxy. It always connects to the upstream directly and also accepts `http://` endpoints.

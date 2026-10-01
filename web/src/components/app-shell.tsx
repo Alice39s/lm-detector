@@ -13,6 +13,7 @@ import { PixelShader } from '@/components/pixel-shader'
 import { useI18n } from '@/i18n'
 import { useMotionPreset } from '@/lib/motion'
 import { BankContext } from '@/lib/bank-context'
+import { docsHref } from '@/lib/docs'
 import * as client from '@/lib/client'
 import type { Bank } from '@fingerpoint/shared/types'
 
@@ -74,7 +75,7 @@ function LanguageToggle() {
 }
 
 export function AppShell({ detect }: { detect: ReactNode }) {
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
   const { smooth, reduced } = useMotionPreset()
   const { pathname } = useLocation()
   const navigate = useNavigate()
@@ -147,6 +148,8 @@ export function AppShell({ detect }: { detect: ReactNode }) {
                 {link.label}
               </NavLink>
             ))}
+            {/* The docs are a separate app served next to the detector, so this is a plain page link. */}
+            <a href={docsHref(locale)}>{t('app.docs')}</a>
             {indicator && <motion.span aria-hidden="true" className="fp-nav-indicator" initial={false} animate={indicator} transition={reduced ? { duration: 0 } : smooth} />}
           </nav>
           <div className="fp-topbar-actions flex items-center gap-1 justify-self-end">

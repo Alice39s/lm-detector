@@ -1,0 +1,126 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Fingerpoint API proxy",
+    "version": "1.0.0",
+    "description": "A transparent HTTPS relay for LLM API requests from browsers, implemented by `worker/main.js`. The site proxy at `/api/proxy` accepts same-origin calls only; a self-deployed Worker also accepts the origins listed in `ALLOWED_ORIGINS` and answers on any path.",
+    "license": { "name": "MIT", "url": "https://github.com/Ikaleio/lm-detector/blob/main/LICENSE" }
+  },
+  "servers": [
+    { "url": "https://lm.ikale.io", "description": "Site proxy, for pages served from lm.ikale.io" },
+    {
+      "url": "https://{worker}",
+      "description": "A self-deployed Worker",
+      "variables": { "worker": { "default": "fingerpoint-api-proxy.example.workers.dev", "description": "Host name of the Worker" } }
+    }
+  ],
+  "tags": [{ "name": "proxy", "description": "Relay and health check" }],
+  "paths": {
+    "/api/proxy": {
+      "get": {
+        "operationId": "checkProxy",
+        "tags": ["proxy"],
+        "summary": "Health check",
+        "description": "Identifies a Fingerpoint proxy. The web app calls it from Check proxy; it takes no key and sends nothing upstream.",
+        "responses": {
+          "200": { "description": "The proxy is available.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Health" } } } },
+          "403": { "$ref": "#/components/responses/Forbidden" }
+        }
+      },
+      "post": {
+        "operationId": "relayRequest",
+        "tags": ["proxy"],
+        "summary": "Relay an API request",
+        "description": "Sends `body` to the upstream endpoint `url` with the caller's key and streams the JSON or SSE response back unchanged, including the upstream status. For `anthropic`, the key goes upstream as `x-api-key` with `anthropic-version: 2023-06-01`; otherwise as `Authorization`. Redirects are not followed and cookies are not forwarded. The upstream request times out after 250 seconds, and cancelling the call cancels it.",
+        "security": [{ "upstreamKey": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RelayRequest" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "The upstream response, streamed unchanged. Other upstream statuses, such as 401 or 429, are relayed as they are.",
+            "content": {
+              "application/json": { "schema": { "type": "object", "description": "The upstream JSON body." } },
+              "text/event-stream": { "schema": { "type": "string", "description": "The upstream SSE stream." } }
+            }
+          },
+          "400": { "$ref": "#/components/responses/Error", "description": "The body is not a JSON object, the protocol is unsupported, the model is missing, or the upstream URL is not a public HTTPS endpoint of the protocol." },
+          "401": { "$ref": "#/components/responses/Error", "description": "The `Authorization: Bearer` header is missing." },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "413": { "$ref": "#/components/responses/Error", "description": "The request body exceeds 128 KiB." },
+          "415": { "$ref": "#/components/responses/Error", "description": "The request is not `application/json`." },
+          "499": { "$ref": "#/components/responses/Error", "description": "The caller cancelled the request." },
+          "502": { "$ref": "#/components/responses/Error", "description": "The upstream redirected, returned an unsupported content type with a success status, or could not be reached." },
+          "504": { "$ref": "#/components/responses/Error", "description": "The upstream did not answer within 250 seconds." }
+        }
+      },
+      "options": {
+        "operationId": "preflight",
+        "tags": ["proxy"],
+        "summary": "CORS preflight",
+        "description": "Answered by a self-deployed Worker for the origins in `ALLOWED_ORIGINS`. Browsers send it on their own before a cross-origin `POST`.",
+        "parameters": [
+          { "name": "Origin", "in": "header", "required": true, "schema": { "type": "string" }, "example": "https://lm.ikale.io" },
+          { "name": "Access-Control-Request-Method", "in": "header", "required": true, "schema": { "type": "string" }, "example": "POST" }
+        ],
+        "responses": {
+          "204": {
+            "description": "The origin is allowed. The response carries `Access-Control-Allow-Origin`, `Access-Control-Allow-Methods: GET, POST, OPTIONS`, `Access-Control-Allow-Headers: authorization, content-type` and `Access-Control-Max-Age: 7200`."
+          },
+          "403": { "description": "The origin is not allowed; the response has no CORS headers." }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "upstreamKey": { "type": "http", "scheme": "bearer", "description": "The API key of the upstream service. The proxy does not store it." }
+    },
+    "schemas": {
+      "RelayRequest": {
+        "type": "object",
+        "required": ["url", "format", "body"],
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "The complete upstream endpoint: HTTPS on port 443, a public host name, no credentials, query or fragment, ending in `/chat/completions`, `/responses` or `/messages` for the chosen format.",
+            "examples": ["https://api.example.com/v1/chat/completions"]
+          },
+          "format": { "type": "string", "enum": ["openai", "responses", "anthropic"], "description": "Chat Completions, Responses or Messages." },
+          "body": {
+            "type": "object",
+            "required": ["model"],
+            "properties": {
+              "model": { "type": "string", "minLength": 1 },
+              "stream": { "type": "boolean", "description": "Selects the SSE `Accept` header upstream." }
+            },
+            "additionalProperties": true,
+            "description": "The request body for the upstream API, sent as it is."
+          }
+        }
+      },
+      "Health": {
+        "type": "object",
+        "required": ["service", "formats"],
+        "properties": {
+          "service": { "type": "string", "const": "fingerpoint-api-proxy" },
+          "formats": { "type": "array", "items": { "type": "string", "enum": ["openai", "responses", "anthropic"] } }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": ["error"],
+        "properties": { "error": { "type": "object", "required": ["message"], "properties": { "message": { "type": "string" } } } }
+      }
+    },
+    "responses": {
+      "Error": { "description": "An error raised by the proxy itself.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+      "Forbidden": {
+        "description": "The page's origin may not use this proxy, or a same-origin proxy received a cross-site request.",
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+      }
+    }
+  }
+}

@@ -1,0 +1,61 @@
+---
+title: Command line
+description: How to run fpd, its subcommands, environment variables, and update notifications.
+icon: Terminal
+---
+
+`fpd` provides a live terminal interface built with Ink. It handles detection (including the tokenizer probe), reference sampling, and enrollment. The published package `lmfpd` runs with Node.js 22+ or Bun 1.4.2+. It includes the detection algorithms, reference bank, and verifier, and requires no repository checkout. The installed executable is named `fpd`. Compatible terminals display `lm.ikale.io` in the detection header as a clickable link.
+
+## Subcommands
+
+```text
+fpd [detect] [options]        Detect a model (default command)
+fpd sample [options]          Collect a portable reference batch
+fpd enroll DIR [options]      Validate a batch and write it to the reference bank
+fpd retrain --data-dir DIR    Refit the verifier and confidence calibration offline
+```
+
+<Cards>
+  <Card title="Detection" href="./detect.mdx">Random challenges, multi-round detection, saving, and offline recomputation.</Card>
+  <Card title="Tokenizer probe" href="./tokenizer.mdx">How detection identifies the upstream tokenizer: options, terminal interface, and report fields.</Card>
+  <Card title="Sampling and resuming" href="./sampling.mdx">For maintaining the reference bank: collect reference batches with the 36 fixed challenges.</Card>
+  <Card title="Enrollment and retraining" href="./enroll.mdx">For maintaining the reference bank: validate batches, write them to the reference bank, then retrain the verifier offline.</Card>
+</Cards>
+
+## Running
+
+```sh tab="npm"
+npx lmfpd@latest [command] [options]
+```
+
+```sh tab="Bun"
+bunx --bun lmfpd@latest [command] [options]
+```
+
+```sh tab="From source"
+bun install --frozen-lockfile
+bun run fpd [command] [options]
+```
+
+The runner downloads the package when needed. The examples below use `npx`. With Bun, replace `npx lmfpd@latest` with `bunx --bun lmfpd@latest`. Every subcommand accepts `--help`. The help page groups options and examples by category and adapts to narrow terminals and plain-text output.
+
+## Environment variables
+
+Connection settings can come from environment variables. Command line flags take precedence over them.
+
+```sh
+export API_KEY=sk-xxx
+export MODEL=gpt-5.6-sol
+export BASE_URL=https://openrouter.ai/api/v1
+npx lmfpd@latest -p 3 -n 5
+```
+
+Credentials do not appear in the interface or in saved results. `--base-url` and `--api-key` are aliases for `-b` and `-k`.
+
+## Update notifications
+
+Published releases check for updates in the background during interactive detection. The CLI queries npm, [npmmirror](https://github.com/cnpm/cnpm), and the Tencent Cloud mirror concurrently with a shared three-second deadline, and selects the highest valid version returned before detection ends. Requests contain no model credentials, prompts, or results. The check never delays detection or exit. If an update is already known when detection finishes, the interface shows one notice below the results. Otherwise, it cancels the check silently.
+
+The command in the notice follows the detected installer: Bun, npm, pnpm, or Yarn. Global and project installations receive the corresponding update command. Temporary runners receive a `bunx`, `npx`, `pnpm dlx`, or `yarn dlx` command pinned to the new version, avoiding a cached `latest` alias. The CLI only suggests a command; it never installs updates automatically.
+
+Results are cached in the operating system's cache directory under `lmfpd/update.json`. If any source succeeds, the result lasts six hours. If all sources fail, the check retries after one hour. Source runs, prerelease builds, help, offline analysis, JSON output, redirected output, and CI skip update checks. Use `--no-update-check`, `FPD_NO_UPDATE_CHECK=1`, or `NO_UPDATE_NOTIFIER=1` to disable the feature.

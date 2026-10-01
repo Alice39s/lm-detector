@@ -1,0 +1,81 @@
+---
+title: Project structure
+description: What each directory in the Bun workspace does, the shared algorithm modules, and the conventions to follow when you change the code.
+icon: Code
+---
+
+```files
+.
+├── cli/
+├── web/
+├── shared/
+├── data/
+├── docs/
+├── offline/
+├── worker/
+├── functions/
+├── api/
+├── package.json
+└── wrangler.jsonc
+```
+
+| Directory | Role |
+| --- | --- |
+| `cli/` | `fpd` command line tool (Bun + Ink), published as the npm package `lmfpd` |
+| `web/` | Detection website and read-only reference library (React, shadcn/ui, Tailwind CSS) |
+| `shared/` | Challenge, parsing, scoring, and tokenizer probe algorithms shared by the website and the CLI |
+| `data/` | Reference data, derived bank, frozen detector, fixed challenges, and tokenizer bank. See [Data files](../reference/data.mdx) |
+| `docs/` | These docs (Fumadocs + React Router, all pages prerendered) |
+| `offline/` | Offline retraining and calibration (Python, run with uv) |
+| `worker/` | Single-file Cloudflare Worker API proxy, also used by the same-origin proxy entry points |
+| `functions/` | Cloudflare Pages Functions entry point |
+| `api/` | Vercel Functions entry point |
+
+## Shared algorithms [#shared]
+
+`shared/` does not depend on React, browser storage, or the outer research directory:
+
+| Module | Role |
+| --- | --- |
+| `challenge-browser.js` | Detection challenge generation |
+| `completion-request.ts`, `completion.ts`, `detection.ts` | Request bodies, response parsing, and the detection flow |
+| `fingerprint-core.js`, `number-features.js`, `gaussian-core.js` | Number features and base scoring |
+| `shared-detector.ts` | Frozen ranker and verifier |
+| `sample-distribution.ts` | Flags anomalous samples whose smallest valid number is at least 200. Used only for interface hints, not for scoring |
+| `builder.ts` | Builds the bank offline from reference samples. Rejects samples with an evaluation mark |
+| `tokenizer-bank.ts`, `tokenizer-usage.ts` | Tokenizer bank types and validation, and reading usage from JSON or SSE responses |
+| `tokenizer-posterior.ts`, `tokenizer-probe.ts` | Tokenizer posterior, probe selection, and the probe flow |
+| `tokenizer-fusion.ts` | Adds the tokenizer result to the confidence of the number fingerprint by Bayes' rule |
+| `privacy.ts`, `types.ts` | Redaction and shared types |
+
+The official data and frozen parameters are in `data/`. The website calls only the detection modules and does not bundle the bank-building entry point.
+
+## Detection website
+
+`web/src/` contains the detection pages, the read-only sample library, and the Chinese and English copy. Routing uses the HashRouter of React Router. The interface uses shadcn/ui (Base UI), Tailwind CSS v4, and Framer Motion. The [design spec](./design.mdx) defines the visual primitives and interaction constraints. Colors and brand fonts are in `web/src/tokens.css`, and these docs use the same file.
+
+- `src/i18n/messages.ts` contains the Chinese and English copy. `src/i18n/index.tsx` provides the language preference, interpolation, and date and number formatting. Switching the language does not change the algorithm prompts or user answers.
+- The website has no enrollment feature. It does not read the old IndexedDB custom bank, and it does not merge or rebuild reference data.
+- Before the build, `scripts/sync-data.ts` validates and redacts the official data, compresses the reference bank, derived bank, and detector into static zstd chunks, and generates the data manifest.
+- The production build injects the Koitoyu and Recorder scripts from `telemetry.json`. Local development does not load them. Recorder replays mask the API configuration area and error details, and input fields are masked by default.
+
+## These docs
+
+`docs/` is a React Router SPA. It declares its content collections with the macro API of Fumadocs MDX. Pages are stored in pairs, as `page.mdx` (Chinese) and `page.en.mdx` (English). A page without an English file falls back to Chinese on the English site. Links in pages are written as relative paths to content files (for example `../cli/detect.mdx#options`), and the build resolves them to URLs in the current language.
+
+| File | Purpose |
+| --- | --- |
+| `site.config.ts` | Path prefix `DOCS_BASE`, `/docs` by default |
+| `source.config.ts` | Global MDX plugins: math, Mermaid, file trees, and steps |
+| `app/lib/source.ts` | Content collections, page tree, and `llms.txt` |
+| `app/routes/*.ts(x)` | Pages, search index, Markdown versions, and Open Graph images |
+| `scripts/generate-openapi.ts` | Generates the [Proxy API](../reference/proxy-api/index.mdx) pages from `worker/openapi.json` |
+
+## Conventions
+
+- Use Bun to manage dependencies and run TypeScript. The product build does not depend on files outside the repository. Configuration, lock files, and deployment entry points are all in the root directory.
+- `web/` provides only the detection and read-only reference library pages. Sampling is in `cli/`, algorithms are in `shared/`, and data is in `data/`.
+- Do not add test files. After a change, run `bun run typecheck` and `bun run build`.
+- Numeric versions in reference bank model labels use a decimal point (for example `claude-opus-5.5`). The display and reference label of `claude-haiku-4-5-20251001` is always `claude-haiku-4.5`. API request models and raw sampling evidence keep the original upstream values.
+- Do not call model APIs automatically. Send requests only when the user asks to collect samples from an upstream or to detect it.
+- Evaluation samples must not enter the reference bank, the model centroids, or the calibration. Sampling records keep failures and earlier attempts.

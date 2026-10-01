@@ -1,0 +1,23 @@
+---
+title: Proxy API
+description: The HTTP API of the forwarding proxy, with a health check, request forwarding, and the cross-origin preflight. This site's proxy and your own Worker share the same API.
+---
+
+Some LLM APIs do not allow web pages to call them directly (the browser's cross-origin restriction, CORS), so the forwarding proxy forwards requests for the page to the upstream (the service behind the API address you enter). It has three methods, all on the path `/api/proxy`: `GET` runs a health check, `POST` forwards an API request, and `OPTIONS` answers the browser's cross-origin preflight.
+
+This site's proxy handles only `/api/proxy`, and requests to other paths never reach it. Your own Worker ignores the path and gives the same response on any path, including the root `/`, so you can call it at its bare domain.
+
+The two accept different pages. This site's proxy accepts only pages on the site that hosts it, and a page from another site gets 403. Your own Worker also accepts the pages listed in `ALLOWED_ORIGINS`. An origin is the scheme, domain, and port part of a URL, such as `https://example.com`.
+
+<Cards>
+  <Card title="Health check" href="./checkProxy.mdx">`GET /api/proxy`: confirm that the address is a Fingerpoint proxy.</Card>
+  <Card title="Relay an API request" href="./relayRequest.mdx">`POST /api/proxy`: forward a request with your key and stream the response back unchanged.</Card>
+</Cards>
+
+Before a `POST` to another origin, the browser automatically sends an `OPTIONS` request (the preflight) to ask whether it is allowed. An allowed origin gets 204 with `Access-Control-Allow-*` headers. Any other origin gets 403 without those headers.
+
+Every endpoint page has a Playground where you can send a request to try it. The request goes out from your browser, and the key and request body you enter are forwarded to the upstream through the server selected in the Playground (this site's proxy or your Worker), the same way web detection does when it goes through this site's proxy.
+
+<Callout type="warn">
+  The Playground sends real requests and uses your quota at the upstream. Do not enter your API key on a site you do not trust.
+</Callout>

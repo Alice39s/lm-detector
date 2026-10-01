@@ -1,0 +1,81 @@
+---
+title: 自建 Worker 代理
+description: 把 worker/main.js 部署到自己的 Cloudflare 账号，得到一个 workers.dev 地址，让 API Key 不经过本站代理。
+icon: Server
+---
+
+有些接口不允许网页直接访问（浏览器的跨域限制，CORS），请求要经一台服务器转发。网页默认用「本站代理」转发，你的 API Key 会经过本站的服务器。自建一个 Worker（运行在你自己 Cloudflare 账号里的小程序）之后，请求改走你的 Worker，Key 不再经过本站。GitHub Pages 这类没有本站代理的静态站点，也要靠自建 Worker 才能检测这类接口。
+
+你需要一个 Cloudflare 账号，免费套餐即可；用「部署到 Cloudflare」按钮还需要 GitHub 或 GitLab 账号。Workers 免费套餐每天可处理 100,000 次请求（UTC 零点重置），个人检测用不完，完整限制见 [Cloudflare 文档](https://developers.cloudflare.com/workers/platform/limits/)。部署完成后你会得到一个形如 `https://fingerpoint-api-proxy.<子域名>.workers.dev` 的地址（`<子域名>` 是你账号的 workers.dev 子域名），把它填进网页「转发代理」里的「自建 Worker」。
+
+Worker 的代码只有 `worker/main.js` 一个文件，不依赖其他包，部署前可以先读一遍。
+
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/Ikaleio/lm-detector/tree/main/worker)
+
+## 选择部署方式
+
+三种方式部署的是同一份代码，区别在于要不要 GitHub 或 GitLab 账号，以及以后怎么更新。网页「转发代理」里选「自建 Worker」后，「部署自己的 Worker」区域有「部署到 Cloudflare」和「在 Playground 中打开」两个按钮，与下面前两种方式相同。
+
+<Tabs items={['部署到 Cloudflare', '在 Playground 中打开', 'Wrangler']}>
+  <Tab value="部署到 Cloudflare">
+    适合有 GitHub 或 GitLab 账号、想以后自己更新的人。点击上面的按钮，登录 Cloudflare，在设置页确认名称和 `ALLOWED_ORIGINS`（见下一节），然后部署。
+
+    首次使用时，Cloudflare 会请你安装并授权它的 GitHub（或 GitLab）应用，用来在你的账号下创建仓库，并在你推送后自动构建。授权页会列出具体权限，可以选择个人账号，也可以选择你所在的组织。授权之后可以在 GitHub 的 Settings → Applications 里查看和撤销。
+
+    Cloudflare 会把 `worker/` 目录克隆成你账号下的新仓库。设置页的「Create private Git repository」决定它是私有还是公开。仓库里只有 Worker 的代码和配置，没有 API Key。
+
+    向这个仓库推送提交，Cloudflare 会自动重新部署。新仓库是一份独立的副本，本项目以后修改 `worker/main.js` 不会自动同步过来，需要更新时，把新的内容复制进去并提交。
+  </Tab>
+  <Tab value="在 Playground 中打开">
+    适合没有 GitHub 账号，或者只想尽快用起来的人。在网页 API 配置的「转发代理」里选「自建 Worker」，点击「在 Playground 中打开」。页面会从本项目的 GitHub 仓库读取最新的 `worker/main.js`，连同 `worker/wrangler.json` 里的兼容日期和兼容标志，在 Cloudflare 的在线编辑器 Workers Playground 中打开。登录 Cloudflare 后点击 Playground 的 Deploy，就会在你的账号里创建这个 Worker。
+
+    这种方式不创建仓库，Worker 一直使用部署时的代码，本项目以后更新代码不会自动带过来。需要更新时，再从「在 Playground 中打开」部署一次。
+  </Tab>
+  <Tab value="Wrangler">
+    适合已经会用命令行的开发者。克隆本仓库，运行 `bun install` 安装依赖，再在仓库根目录运行 `bun run deploy:worker`。Wrangler 是 Cloudflare 的命令行工具，它按 `worker/wrangler.json` 部署，首次运行时会引导你登录 Cloudflare。
+
+    本机调试用 `bun run dev:worker`，Worker 运行在 `http://127.0.0.1:8787`，把这个地址填进网页的 Worker 地址即可。
+  </Tab>
+</Tabs>
+
+## 填写地址并检查
+
+部署完成后，把 Worker 的地址填进网页「转发代理」里的「自建 Worker」，点击「检查代理」，看到「代理可用。」就成功了。地址填到域名为止即可，Worker 对任何路径的回答都相同。第一次经过这个 Worker 发送请求前，网页会弹窗询问是否允许，并写明 Worker 的主机名。
+
+如果检查结果要你把当前页面的来源加入 `ALLOWED_ORIGINS`，按下一节添加。Worker 的限制与本站代理相同，见[代理约束](./proxy.mdx)；请求与响应的格式见[代理 API](../reference/proxy-api/index.mdx)。
+
+## 设置 ALLOWED_ORIGINS [#allowed-origins]
+
+`ALLOWED_ORIGINS` 决定哪些网页可以调用你的 Worker。它的默认值是 `https://lm.ikale.io`，所以只在 `lm.ikale.io` 上使用你的 Worker 时，什么都不用改。如果你自己部署了网页，或者想在别的网站上使用，就把那个网页的来源加进去。
+
+来源（origin）是网址里协议、域名和端口的部分，不含路径。写法如下：
+
+| 网页地址 | 要填的来源 |
+| --- | --- |
+| `https://example.com/app/index.html` | `https://example.com` |
+| `https://alice.github.io/lm-detector/`（GitHub Pages 项目站点） | `https://alice.github.io`，不带仓库名 |
+| `http://127.0.0.1:5173/`（本机开发服务器，端口以实际为准） | `http://127.0.0.1:5173` |
+
+多个来源用英文逗号分隔，例如 `https://lm.ikale.io,https://alice.github.io`。`*` 表示允许任何网页，不建议长期使用。
+
+修改的位置取决于你怎么部署的：
+
+<Tabs items={['部署到 Cloudflare', '在 Playground 中打开', 'Wrangler']}>
+  <Tab value="部署到 Cloudflare">
+    修改新仓库里 `wrangler.json` 的 `vars.ALLOWED_ORIGINS` 并提交，Cloudflare 会自动重新部署，新值会一直有效。不要只在控制台改：在控制台 Settings → Variables and Secrets 里改的值，会在下一次部署时被 `wrangler.json` 覆盖。部署时在设置页填的值，请在部署后对照新仓库的 `wrangler.json` 确认。
+  </Tab>
+  <Tab value="在 Playground 中打开">
+    Playground 只带入代码和兼容设置，不带 `wrangler.json` 里的变量，所以 Worker 使用默认值 `https://lm.ikale.io`。需要其他来源时，在 Cloudflare 控制台打开这个 Worker，进入 Settings → Variables and Secrets，添加变量 `ALLOWED_ORIGINS`。
+  </Tab>
+  <Tab value="Wrangler">
+    修改你克隆的仓库里 `worker/wrangler.json` 的 `vars.ALLOWED_ORIGINS`，再运行 `bun run deploy:worker`。在控制台里改的值，同样会在下一次部署时被覆盖。
+  </Tab>
+</Tabs>
+
+## 日志
+
+用「部署到 Cloudflare」按钮或 Wrangler 部署时，`wrangler.json` 会关闭 Workers Logs（Cloudflare 保存 Worker 调用记录的功能），所以这份日志里不会留下你的请求，包括 API Key 和提示词。Playground 部署不带这项设置，请在控制台确认该 Worker 的 Workers Logs 已关闭。
+
+<Callout type="warn" title="命令行工具不受 ALLOWED_ORIGINS 限制">
+  `ALLOWED_ORIGINS` 只限制哪些网页可以调用 Worker。curl 这类不带 `Origin` 头的客户端，只要知道 Worker 的地址，就能用自己的 Key 经它转发请求，这些请求会计入你的 Cloudflare 额度。不要公开 Worker 的地址。地址泄露后，删除这个 Worker，换一个名称重新部署，就会得到新地址。
+</Callout>

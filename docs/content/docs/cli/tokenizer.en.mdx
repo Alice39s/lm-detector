@@ -1,0 +1,69 @@
+---
+title: Tokenizer probe
+description: While detecting, fpd identifies the tokenizer behind the API, adds the result to the confidence of every round, and checks whether it matches the model you entered.
+---
+
+```sh
+# The tokenizer probe runs by default
+npx lmfpd@latest -b https://api.example.com/v1 -k sk-xxx -m deepseek-v4-pro -a cc
+
+# Rank by the number fingerprint only, without the tokenizer probe
+npx lmfpd@latest -a cc --no-tokenizer
+
+# Analyze a saved report offline and recompute it against the current tokenizer bank
+npx lmfpd@latest --input result.json --json
+```
+
+A tokenizer is the rule a model uses to cut text into tokens. Different model families use different rules, so the token counts an API reports can reveal the model behind it. Alongside the first round, detection probes the tokenizer behind the API once; every round waits for the probe before it is scored, and all rounds use the result. A probe usually sends about 12 extra short requests and at most 22; APIs billed per request charge for them. With `--parallel` above 1, requests go four at a time, otherwise one by one, and each has a 90-second deadline. Messages requests ask for at most 16 output tokens; the other protocols omit the output limit, like sampling requests. The website does the same; see [Tokenizer probe on the website](../web/tokenizer.mdx), and [How it works](../principles/tokenizer.mdx) for the method.
+
+## Options
+
+| Option | Description | Default |
+| --- | --- | --- |
+| `--no-tokenizer` | Skip the tokenizer probe and rank by the number fingerprint only | Probe |
+| `--max-probes N` | Maximum number of probe texts, 4–60. Two baseline requests, which contain no probe text, are sent in addition to cancel out hidden input the API adds | `20` |
+| `--tokenizer-bank FILE` | Use a custom tokenizer bank | Bundled tokenizer bank |
+
+The connection options are the same as for the [detection command](./detect.mdx#options). The model name from `-m` is also checked against the tokenizer it should use. For example, a channel that claims `gpt-5` but shows the Qwen tokenizer is marked `inconsistent`.
+
+## Terminal interface
+
+Every round waits for the tokenizer probe before it is scored. The `TOKENIZER` block shows the number of answered requests and the tokenizer leading so far; when probing ends, it shows the verdict, the authoring lab, and whether it matches the tokenizer of `--model`.
+
+Rounds with three valid samples add the tokenizer result to the confidence, and the candidate table gains a `Tok` column:
+
+| Mark | Meaning |
+| --- | --- |
+| `✓` | The candidate's tokenizer matches the counts |
+| `×` | The candidate's tokenizer does not match the counts |
+| `?` | Not yet clear |
+| `·` | This tool does not know which tokenizer the candidate uses |
+
+Rounds with one or two samples only report the tokenizer result and keep their ranking.
+
+## Report format
+
+Reports from `--output` and `--json` gain a `tokenizer` object:
+
+| Field | Content |
+| --- | --- |
+| `schema` | Always `fpd-tokenizer-v1` |
+| `model` | The entered model name the result was checked against |
+| `bank` | Generation date, class count, probe count, and archive manifest hash of the tokenizer bank used |
+| `steps`, `observations` | Probe text, status, and input token count of each request; a `probe` of `null` is a baseline request (only the fixed prefix and suffix, no probe text) |
+| `verdict` | The verdict `kind` (`exact`, `related`, or `unknown`), the closest class `top`, its confidence `confidence`, and `claim`, the check against the entered model |
+| `classes`, `labs`, `unknown` | Probabilities of the top 10 classes and the top 5 labs, and the probability of "unlisted" |
+| `baseline_drift` | Whether the two baseline requests counted differently |
+| `cancelled`, `error` | Whether the run was canceled, and the error code and HTTP status of a failed request |
+
+In rounds that include the tokenizer result, `analysis.tokenizer` records whether it was added (`fused`) and the top candidate of the number fingerprint alone (`fingerprint_top`). Each candidate in `analysis.results[]` also has `fingerprint_confidence`, its confidence before the tokenizer result, and `tokenizer`, with the match `status` and the `factor` its confidence was multiplied by. The report contains no API key.
+
+`--input` reads `tokenizer.observations` from the report and recomputes them against the current tokenizer bank without sending requests; `-m` or `MODEL` overrides the model name saved in the report.
+
+## Failures and exit codes
+
+When probing stops partway, the counts received so far are still used. When the API reports no usage, the baseline request fails, or no probe text is answered, detection still completes with the number fingerprint only. A failed tokenizer probe never changes the [exit code](./detect.mdx#exit-codes).
+
+<Callout type="warn" title="This measures the tokenizer">
+  Relays that estimate usage locally with tiktoken, OpenAI's open-source tokenizer library, report o200k_base or cl100k_base counts. When the verdict is one of these and does not match the entered model, the relay's counting method may be the cause, and the model itself may be unchanged.
+</Callout>

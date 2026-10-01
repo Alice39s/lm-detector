@@ -1,7 +1,7 @@
 ---
 name: fingerpoint-design
 description: 用于 Fingerpoint 的三样本检测、分词器探测、API 配置、候选结果、图片导出和只读样本库。服务需要比较 LLM 指纹的用户，支持简体中文和英文、浅色和深色主题。
-version: 2026-10-01.3
+version: 2026-10-01.4
 ---
 
 # Fingerpoint design.md
@@ -32,12 +32,13 @@ version: 2026-10-01.3
 
 ### 应用外壳
 
-- 桌面顶栏高 56px；左侧站名，中间“检测 / 样本库”，右侧仓库入口、语言和主题切换。仓库入口在 1024px 以下收为图标。640px 以下使用 88px 双行顶栏，将主导航排在第二行。
+- 桌面顶栏高 56px；左侧站名，中间“检测 / 样本库 / 文档”，右侧仓库入口、语言和主题切换。仓库入口在 1024px 以下收为图标。640px 以下使用 88px 双行顶栏，将主导航排在第二行。
 - 左上标识左侧放 32px 像素指纹动画 `.fp-brand-mark`，使用 muted-foreground；右侧为两行文字。（来源：2026-09-28 用户要求图标改为 muted 色。）
 - 左上标识使用两行：`Fingerpoint Detector` 使用 `--font-brand-title`、14px、500 字重、1.25 行高；`by Ikaleio` 使用 `--font-brand-byline`、12px、400 字重、16px 行高，颜色为前景色的 70% 不透明度。（来源：2026-09-22 用户指定 FisProxy 截图，参数取自其品牌标识实现。）
 - 主题菜单提供“浅色 / 深色 / 跟随系统”，用单选标记显示当前选择；默认跟随系统。
 - 保存手动选择；选择“跟随系统”后实时响应系统外观变化。切换主题不清除检测内容。
 - 当前导航用顶栏内独立的下划线表示，只在导航容器内横向移动，不参与页面滚动坐标或共享 layoutId。
+- “文档”是指向相对路径 `docs/`（英文为 `docs/en/`）的普通链接，整页进入文档站，不属于 HashRouter，也不参与下划线。检测页 CLI 卡片的“查看用法”在新标签中打开文档对应的 CLI 页面。
 - 切换页面路径时回到顶部。模型列表与详情标题不做跨页位置变形。
 - 检测页与样本库主体统一最大宽度 1440px。全局预留滚动条空间，内容不随滚动条出现或消失而横移。
 - 两个主导航页面按桌面切换方式横向滑动：进入样本库向左，返回检测向右，顶栏固定。使用视口快照避免长页面滚动位置影响动画，不卸载检测会话。
@@ -236,7 +237,7 @@ version: 2026-10-01.3
 
 | 角色 | 实现名称 | 路径 | 状态 |
 |---|---|---|---|
-| 颜色与主题 | background、foreground、card、popover、primary、muted、muted-foreground、border、input、ring、success、warning、destructive、star | `src/index.css` | 已实现 |
+| 颜色与主题 | background、foreground、card、popover、primary、muted、muted-foreground、border、input、ring、success、warning、destructive、star | `src/tokens.css`、`src/index.css` | 已实现 |
 | 字号 | text-display、text-display-number、text-h1、text-section-title、text-card-title、text-body、text-meta | `src/index.css` | 已实现 |
 | 容器 | fp-shell、fp-page、fp-page-wide、fp-grid-samples、fp-detect-footer、fp-actionbar、fp-result-row | `src/index.css` | 已实现 |
 | 表面与数据 | fp-card、fp-bar、fp-reply、fp-mono | `src/index.css` | 已实现 |
@@ -289,7 +290,8 @@ version: 2026-10-01.3
 - 样式为 Tailwind v4；shadcn 使用现有 base-nova / Base UI 组件，不切换到另一套组件系统。
 - 动效使用已安装的 `framer-motion`。
 - `next-themes` 通过 html.dark 应用主题，`index.html` 在加载前恢复偏好。
-- 主题偏好保存到 `fp-theme`。存储不可用时，首屏按系统外观显示；原生控件和滚动条使用当前主题的 color-scheme。
+- 主题偏好保存到 `fp-theme`。存储不可用时，首屏按系统外观显示；原生控件和滚动条使用当前主题的 color-scheme。文档站使用同一个键，两处的主题选择互相同步。
+- 颜色 token 与品牌字体在 `src/tokens.css`。文档站 `docs/` 直接导入该文件，经 Fumadocs 的 shadcn 预设映射为文档配色；文档顶栏沿用两行品牌标识，副行写“文档”。新增或修改 token 时同时检查两处。
 - `src/lib/client.ts` 载入静态参考库，在 Worker 中调用共享算法，Worker 不可用时使用同一实现回退。
 - 每次取样或探测前，`src/lib/route.ts` 用真实请求的方法与头名、假 Key 和 `{}` 请求体试探 CORS；读到任何 HTTP 状态即视为可直连。试探失败时再发 no-cors GET：收到不透明响应为“拒绝跨域”，仍失败为“无法连接”。结论在本页会话缓存 10 分钟；直连请求出现网络错误后下一次重新试探。
 - 直连请求与试探共用 `directHeaders` 与 `directInit`：不携带 Cookie 和 Referer，`redirect: 'error'`；Messages 附带 `anthropic-dangerous-direct-browser-access: true`。

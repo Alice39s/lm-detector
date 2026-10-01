@@ -1,0 +1,37 @@
+---
+title: LM Fingerpoint Detector
+description: 让模型随手写几百个整数，识别 API 背后的大语言模型；API 检测还用接口返回的用量识别上游的分词器。
+icon: ScanSearch
+---
+
+import { FlaskConical, Globe, Rocket, Terminal } from 'lucide-react'
+
+中转站或第三方 API 声称提供某个模型，实际接入的可能是另一个模型。LM Fingerpoint Detector 用一个与语义无关的任务核对这一点：让模型凭第一反应写出约 300 个 1–355 之间的整数。语言模型写出的“随机数”并不均匀，每个模型偏好的数值、区间和末位数字相对稳定。检测器把这组分布与参考库比对，给出最接近的候选模型。
+
+<Cards>
+  <Card icon={<Rocket />} title="快速开始" href="./quick-start.mdx">在网页上检测，或用 `npx lmfpd` 在终端运行。</Card>
+  <Card icon={<Globe />} title="网页检测" href="./web/index.mdx">手动与 API 两种模式、分词器探测，以及接口的连接方式。</Card>
+  <Card icon={<Terminal />} title="命令行" href="./cli/index.mdx">`fpd` 的检测（含分词器探测）、采样与入库。</Card>
+  <Card icon={<FlaskConical />} title="原理" href="./principles/index.mdx">从挑战、特征到排名、核验与置信度校准。</Card>
+</Cards>
+
+## 功能
+
+- **两种入口**：[网页](https://lm.ikale.io)支持手动粘贴和直连 API；命令行 `fpd` 提供实时终端界面、多轮检测和 JSON 输出。
+- **三种协议**：OpenAI Responses、Chat Completions 和 Anthropic Messages，默认使用 SSE 流式响应。
+- **参考库**：覆盖 GPT、Claude、Gemini、Grok、Qwen、DeepSeek 等常见模型家族。网页的参考库页面可以只读浏览和导出。
+- **分词器探测**：API 检测在取样的同时多发约 12 个短请求，从接口返回的用量识别接口背后使用的分词器（模型把文字切成 token 的规则），把结果并入候选的置信度，并核对它与所填模型是否一致。
+- **直连优先**：接口允许网页直接访问时由浏览器直接请求；受浏览器跨域限制（CORS）不允许时，经你授权后才把 API Key 和请求交给转发代理，代理可以换成自己部署的 Cloudflare Worker。
+- **可追溯的数据维护**：`fpd sample`、`fpd enroll`、`fpd retrain` 依次完成采样、入库和离线重训。失败记录和旧尝试全部保留。
+
+<Callout type="warn" title="结果只是参考库内的排序">
+  检测结果是**参考库内的封闭集合排序**。不在库中的模型也会得到一个“最像”的候选，排名分数和置信度都不是身份证明。判断渠道是否可信时，请固定请求参数、重复多轮，并结合其他证据。
+</Callout>
+
+## 本文档
+
+本文档随仓库一起构建，发布在检测网站的 `/docs` 下，每页都有中英文两个版本。页面顶部的按钮可以复制该页的 Markdown，或在 GitHub 上查看源文件；文档根目录（`/docs/`）下的 `llms.txt` 与 `llms-full.txt` 提供整站的纯文本版本，供 LLM 工具读取。
+
+## 致谢
+
+感谢 [xqy2006/ModelTrace](https://github.com/xqy2006/ModelTrace) 提供了算法思路参考和部分原始数据。项目以 [MIT](https://github.com/Ikaleio/lm-detector/blob/main/LICENSE) 许可证发布。
