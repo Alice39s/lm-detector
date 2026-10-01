@@ -56,6 +56,9 @@ data
 ## 变更记录
 
 <Accordions type="multiple">
+  <Accordion title="2026-10-01 gpt-5.x 与 gpt-6 系列映射到 o200k_base" id="2026-10-01-gpt-tokenizer">
+    `tokenizer_bank.json` 的 OpenAI o200k_base 映射覆盖所有以 `gpt-5` 或 `gpt-6` 开头的型号（维护者确认）。此前 `gpt-5` 已覆盖 gpt-5.x；`gpt-6` 开头的型号原本只有 gpt-6-astra 经 o200k 类的别名匹配，这条别名随之删除。这些型号按厂商公开的分词器核对，只有完全一致才算一致；排名不受影响。这是对生成文件的手工修改：重新运行 `token-fp export-api-bank` 前，需要先把这些映射加入生成工具。
+  </Accordion>
   <Accordion title="2026-09-30 六个 OpenAI 参考模型改为直连低推理强度" id="2026-09-30-openai-direct">
     将 gpt-5.4、gpt-5.5、gpt-5.6-sol、gpt-5.6-terra、gpt-5.6-luna、gpt-6-astra 的 16 个 `codex-subscription` 批次（216 条，推理强度未记录）全部退出正式库，原始行保存在 `archive/codex-subscription-20260930/unified_reference.rows.jsonl`。替换原因：配对研究（`research/studies/astra-sol-separation/`）发现，原参考库的采集渠道和推理设置不一致，会干扰 gpt-6-astra 与 gpt-6.1-sol 的指纹比较。新批次使用 OpenAI Key 从本机直连 `api.openai.com` 的 Responses 接口，流式、`reasoning_effort=low`，与 `gpt-6-sol` 一致；各完成 36 道固定挑战，提示词与系统提示和原批次逐条相同，证据保存在 `collections/<型号>-openai-direct-20260930/`。返回型号为 `gpt-5.4-2026-03-05`、`gpt-5.5-2026-04-23`，其余与请求名相同。截断（达到采样上限）：gpt-5.6-luna 7 条、gpt-5.6-terra 1 条、gpt-5.4 1 条，其余自然完成。失败尝试均保留：gpt-6-astra 4 次、gpt-5.4 3 次连接中断，gpt-5.6-terra 1 次、gpt-5.6-luna 2 次有效数字不足，均在下一次尝试成功。
   </Accordion>
