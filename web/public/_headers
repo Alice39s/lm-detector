@@ -1,11 +1,5 @@
-/assets/*
-  Cache-Control: public, max-age=31536000, immutable
-
-/data/chunks/*
-  Cache-Control: public, max-age=31536000, immutable
-
-/docs/assets/*
-  Cache-Control: public, max-age=31536000, immutable
+# Hashed assets keep the Pages default (revalidate on every load). A one-year immutable header once made browsers
+# and the edge keep the HTML fallback that Pages served for a not-yet-propagated asset during a deploy.
 
 /docs/api/search
   Content-Type: application/json; charset=utf-8

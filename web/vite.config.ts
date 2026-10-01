@@ -31,6 +31,9 @@ export default defineConfig({
   build: {
     rolldownOptions: {
       output: {
+        // Hex hashes moved every asset to a new URL on 2026-10-01, after browsers cached an HTML fallback under the old
+        // entry name with a one-year immutable header.
+        hashCharacters: 'hex',
         // 依赖按用途拆成独立分块，应用代码更新时浏览器仍可复用已缓存的依赖。
         codeSplitting: {
           groups: [

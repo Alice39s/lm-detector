@@ -35,7 +35,7 @@ The Pages project uses the repository root as its root directory and deploys thr
 `web/public/_routes.json` sends only `/api/proxy` to the Pages Function. The home page, hash routes, docs pages, JS/CSS, fonts, the data manifest, and the zstd chunks are all served directly by Pages static hosting. Responses from `/api/proxy` are marked `no-store`.
 
 <Callout type="warn" title="Do not turn on Cache Everything">
-  Do not add a Cache Everything rule for the whole custom domain. Otherwise it may cache API responses or hold back deployment updates. Pages comes with its own CDN and Tiered Cache. Hash-named JS/CSS and data chunks are cached in the browser for one year, and `index.html` and the data manifest keep the Pages revalidation policy.
+  Do not add a Cache Everything rule for the whole custom domain. Otherwise it may cache API responses or hold back deployment updates. Pages comes with its own CDN and Tiered Cache. All static files, including hash-named JS/CSS and data chunks, keep the Pages revalidation policy and get no long-lived cache: while a deployment switches over, a request for an asset that is not yet live gets the `index.html` fallback, and a long-lived cache keeps that wrong content in browsers and at the edge. (On 2026-10-01 this left the site blank until the Cloudflare cache was purged and the asset hashes changed.)
 </Callout>
 
 ### Bind the custom domain [step]
