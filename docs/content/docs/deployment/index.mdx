@@ -35,7 +35,7 @@ Pages 项目使用仓库根目录作为根目录，通过 Git 集成部署：
 `web/public/_routes.json` 只让 `/api/proxy` 进入 Pages Function。首页、哈希路由、文档页面、JS/CSS、字体、数据清单和 zstd 分段都由 Pages 静态服务直接返回。`/api/proxy` 的响应标记为 `no-store`。
 
 <Callout type="warn" title="不要开启 Cache Everything">
-  不要为整个自定义域添加 Cache Everything 规则，否则可能缓存 API 响应或阻碍部署更新。Pages 自带 CDN 和 Tiered Cache。所有静态文件（包括哈希命名的 JS/CSS 与数据分段）都沿用 Pages 的重新验证策略，不设长期缓存：部署切换期间，尚未生效的资源地址会得到 `index.html` 回退页，长期缓存会让浏览器和边缘节点一直保留这个错误内容。（2026-10-01 曾因此白屏，需要清除 Cloudflare 缓存并更换资源哈希才恢复。）
+  不要为整个自定义域添加 Cache Everything 规则，否则可能缓存 API 响应或阻碍部署更新。Pages 自带 CDN 和 Tiered Cache。哈希命名的 JS/CSS 与数据分段（`/assets/*`、`/data/chunks/*`、`/docs/assets/*`）按 `web/public/_headers` 在浏览器缓存一年并标记 `immutable`；`index.html` 与数据清单沿用 Pages 的重新验证策略。长期缓存依赖 `web/public/404.html`：有这个文件时，Pages 对不存在的文件返回 404；没有它时，Pages 会返回 `index.html` 和状态 200，部署切换期间这份 HTML 会被当作脚本缓存一年，页面白屏。（2026-10-01 曾因缺少 `404.html` 白屏，清除 Cloudflare 缓存并更换资源哈希后恢复。）不要删除 `404.html`。
 </Callout>
 
 ### 绑定自定义域 [step]
