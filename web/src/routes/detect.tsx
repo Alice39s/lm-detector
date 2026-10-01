@@ -13,6 +13,7 @@ import { useLoadedBank } from '@/lib/bank-context'
 import { ResultPanel, type ResultEvidence } from '@/components/result-panel'
 import { SampleCard, SampleStrip, isBusyState, type Mode, type SampleUI } from '@/components/sample-card'
 import { TokenizerCard, TokenizerDetails, TokenizerStripButton } from '@/components/tokenizer-panel'
+import { ProxyConsentDialog } from '@/components/proxy-consent-dialog'
 import { useI18n } from '@/i18n'
 import * as client from '@/lib/client'
 import { configComplete, useApiConfig, type WebApiConfig } from '@/lib/config'
@@ -21,7 +22,10 @@ import { exportResultImage } from '@/lib/export-image'
 import { useMotionPreset } from '@/lib/motion'
 import { useModelMatchCelebration } from '@/lib/use-model-match-celebration'
 import { probeSignature, useTokenizerProbe, type SettledProbe } from '@/lib/use-tokenizer-probe'
+import { useConnectionRoute } from '@/lib/use-connection-route'
+import { forgetReachability } from '@/lib/route'
 import { cn } from '@/lib/utils'
+import { endpoint } from '@fingerpoint/shared/detection'
 import type { Analysis, Challenge, CodedError, CollectionProgress } from '@fingerpoint/shared/types'
 import { redactPrivateMetadata } from '@fingerpoint/shared/privacy'
 import { anomalousSamples } from '@fingerpoint/shared/sample-distribution'
@@ -55,6 +59,7 @@ export default function DetectRoute() {
     }
   }, [active, mode, params, setParams])
   const tokenizer = useTokenizerProbe(active)
+  const connection = useConnectionRoute()
 
   const [challenges, setChallenges] = useState<Challenge[]>(() => client.generateChallenges(3))
   const [samples, setSamples] = useState<SampleUI[]>(() => [idle(), idle(), idle()])
@@ -96,8 +101,10 @@ export default function DetectRoute() {
   const filled = samples.filter(s => s.text.trim()).length
   const sampling = samples.some(sample => isBusyState(sample.state))
   const phase: Phase = computing ? 'computing' : sampling ? 'sampling' : result ? 'result' : 'edit'
-  const locked = sampling || computing
-  const canSample = configComplete(config) && !computing
+  /** Checking the endpoint or waiting for proxy consent holds back every new request. */
+  const connecting = connection.checking || connection.request !== null
+  const locked = sampling || computing || connecting
+  const canSample = configComplete(config) && !computing && !connecting
   const probeShown = mode === 'api' && tokenizer.session.phase !== 'idle'
   useModelMatchCelebration(result, resultModel, active && mode === 'api' && phase === 'result')
 
@@ -169,28 +176,52 @@ export default function DetectRoute() {
     return false
   }
 
+  /** Sniffs CORS for the endpoint and asks for proxy consent when needed. Returns null when nothing may be sent. */
+  async function resolveRoute(requestConfig: WebApiConfig): Promise<client.Route | null> {
+    try {
+      return await connection.resolve(requestConfig)
+    } catch (error) {
+      toast.error(describeError(i18n, error))
+      return null
+    }
+  }
+
+  /** A direct request that failed at the network level re-sniffs the endpoint next time. */
+  function recheckAfter(route: client.Route, requestConfig: WebApiConfig, failed: boolean) {
+    if (route === 'direct' && failed) forgetReachability(endpoint(requestConfig), requestConfig.format)
+  }
+
+  /** Probes over the route the samples use; a network failure on a direct route re-sniffs the endpoint next time. */
+  function startProbe(requestConfig: WebApiConfig, route: client.Route) {
+    const settled = tokenizer.start(requestConfig, route)
+    void settled.then(probe => recheckAfter(route, requestConfig, probe.error?.code === 'network'))
+    return settled
+  }
+
   async function sampleIndexes(requested: number[], requestConfig: WebApiConfig = config) {
     const indexes = requested.filter(i => !runs.current.has(i))
-    if (!indexes.length || verifying.current || !mounted.current) return
+    if (!indexes.length || verifying.current || !mounted.current || connection.checking) return
     if (!requireConfig(requestConfig)) return
+    const route = await resolveRoute(requestConfig)
+    if (!route || verifying.current || !mounted.current || indexes.some(i => runs.current.has(i))) return
     const frozenConfig = { ...requestConfig, parallel: indexes.length > 1 && (requestConfig.parallel ?? false) }
     const controllers = new Map(indexes.map(i => [i, new AbortController()]))
     for (const [i, controller] of controllers) runs.current.set(i, controller)
     // The probe measures the upstream itself, so one probe serves every sample drawn with this configuration.
-    if (requestConfig.tokenizerProbe && tokenizer.needed(requestConfig)) void tokenizer.start(requestConfig)
+    if (requestConfig.tokenizerProbe && tokenizer.needed(requestConfig)) void startProbe(requestConfig, route)
     replaceSamples(samplesRef.current.map((sample, i) => indexes.includes(i)
       ? { ...sample, draftText: '', state: 'pending', errorCode: undefined, httpStatus: undefined, errorText: undefined, elapsedMs: undefined, throughput: undefined }
       : sample))
 
     const accepted: boolean[] = []
-    if (frozenConfig.parallel) accepted.push(...await Promise.all(indexes.map(i => sampleOne(i, frozenConfig, controllers.get(i)!))))
-    else for (const i of indexes) accepted.push(await sampleOne(i, frozenConfig, controllers.get(i)!))
+    if (frozenConfig.parallel) accepted.push(...await Promise.all(indexes.map(i => sampleOne(i, frozenConfig, controllers.get(i)!, route))))
+    else for (const i of indexes) accepted.push(await sampleOne(i, frozenConfig, controllers.get(i)!, route))
     if (frozenConfig.autoVerify && accepted.every(Boolean) && samplesRef.current.every(sample => sample.text.trim())) {
       void verify()
     }
   }
 
-  async function sampleOne(index: number, requestConfig: WebApiConfig, controller: AbortController): Promise<boolean> {
+  async function sampleOne(index: number, requestConfig: WebApiConfig, controller: AbortController, route: client.Route): Promise<boolean> {
     const current = () => mounted.current && runs.current.get(index) === controller
     if (!current()) return false
     let accepted = false
@@ -221,13 +252,14 @@ export default function DetectRoute() {
     }
 
     try {
-      await client.testApi(requestConfig, [challengesRef.current[index]], applyProgress, controller.signal)
+      await client.testApi(requestConfig, [challengesRef.current[index]], applyProgress, route, controller.signal)
     } catch (error) {
       if (!current()) return false
       const coded = error as CodedError
       const sample = samplesRef.current[index]
       if (isBusyState(sample.state)) patch(index, { state: 'rejected', draftText: sample.text.trim() ? undefined : sample.draftText, errorCode: coded?.code, httpStatus: coded?.httpStatus, errorText: safeError(error instanceof Error ? error.message : undefined, requestConfig.apiKey) })
     }
+    recheckAfter(route, requestConfig, samplesRef.current[index].errorCode === 'network')
     if (current()) runs.current.delete(index)
     return accepted
   }
@@ -271,7 +303,9 @@ export default function DetectRoute() {
     const requestConfig = sampledConfigs.current.find(Boolean) ?? config
     if (locked || tokenizer.busy || !requireConfig(requestConfig)) return
     const shown = fingerprint.current
-    const settled = await tokenizer.start(requestConfig)
+    const route = await resolveRoute(requestConfig)
+    if (!route || !mounted.current) return
+    const settled = await startProbe(requestConfig, route)
     // A new sample or a new verification replaces the result while the probe runs; only the same result takes it.
     if (mounted.current && shown && fingerprint.current === shown && !verifying.current) showResult(shown.analysis, shown.signature, settled)
   }
@@ -469,7 +503,7 @@ export default function DetectRoute() {
               {mode === 'api' && emptyIndexes.length > 0 ? (
                 <>
                   {filled > 0 && <Button variant="outline" className="h-9" onClick={() => verify()}>{t('detect.verifyPartial', { n: filled })}</Button>}
-                  <Button className="h-9" onClick={() => sampleIndexes(emptyIndexes)}>{t('detect.startSampling')}</Button>
+                  <Button className="h-9" disabled={locked} onClick={() => sampleIndexes(emptyIndexes)}>{connection.checking ? <><Loader2 data-icon="inline-start" className="animate-spin" />{t('proxy.checking')}</> : t('detect.startSampling')}</Button>
                 </>
               ) : (
                 <Button className="h-9" disabled={filled === 0} onClick={() => verify()}>{filled === 0 ? t('detect.verifyLocked') : filled < 3 ? t('detect.verifyPartial', { n: filled }) : t('detect.verify')}</Button>
@@ -478,6 +512,8 @@ export default function DetectRoute() {
           )}
         </div>
       </div>
+
+      <ProxyConsentDialog request={active ? connection.request : null} onAnswer={connection.answer} />
 
       <Dialog open={active && errorDetail !== null} onOpenChange={open => !open && setErrorDetail(null)}>
         <DialogContent>
