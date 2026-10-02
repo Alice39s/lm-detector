@@ -9,6 +9,11 @@
 export const docsBase = normalizeBase(process.env.DOCS_BASE ?? '/docs')
 /** The public origin for absolute URLs in Open Graph tags and the Markdown twins, set with `SITE_ORIGIN`. */
 export const siteOrigin = normalizeOrigin(process.env.SITE_ORIGIN ?? 'https://lm.ikale.io')
+/**
+ * The preview image of the detector's home page, relative to `docsBase`. The docs build renders it next to the pages'
+ * images, and web/vite.config.ts points the detector's Open Graph tags at it.
+ */
+export const detectorImage = 'og/detector.png'
 
 function normalizeBase(value: string) {
   const base = value.replace(/\/+$/, '')

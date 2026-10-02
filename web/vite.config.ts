@@ -2,8 +2,16 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { fileURLToPath, URL } from 'node:url'
+import { detectorImage, docsBase, siteOrigin } from '../docs/site.config.ts'
+import { zh } from './src/i18n/messages.ts'
 import { apiProxy } from './scripts/vite-proxy.ts'
 import telemetry from './telemetry.json' with { type: 'json' }
+
+// The detector sits one level above the docs, and its preview image is rendered by the docs build.
+const docsUrl = `${siteOrigin}${docsBase}/`
+const pageUrl = new URL('..', docsUrl).href
+const imageUrl = new URL(detectorImage, docsUrl).href
+const meta = (key: 'name' | 'property', name: string, content: string) => ({ tag: 'meta', attrs: { [key]: name, content }, injectTo: 'head' as const })
 
 export default defineConfig({
   root: fileURLToPath(new URL('.', import.meta.url)),
@@ -25,6 +33,22 @@ export default defineConfig({
         },
         injectTo: 'head' as const,
       })),
+    },
+    {
+      // index.html is Chinese, so link previews use the Chinese title and description.
+      name: 'open-graph',
+      transformIndexHtml: () => [
+        meta('name', 'description', zh.app.description),
+        meta('property', 'og:type', 'website'),
+        meta('property', 'og:site_name', zh.app.name),
+        meta('property', 'og:locale', 'zh_CN'),
+        meta('property', 'og:title', `${zh.detect.title} · ${zh.app.name}`),
+        meta('property', 'og:description', zh.app.description),
+        meta('property', 'og:url', pageUrl),
+        meta('property', 'og:image', imageUrl),
+        meta('name', 'twitter:card', 'summary_large_image'),
+        meta('name', 'twitter:image', imageUrl),
+      ],
     },
   ],
   resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },

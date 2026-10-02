@@ -1,7 +1,7 @@
 ---
 name: fingerpoint-design
 description: 用于 Fingerpoint 的三样本检测、分词器探测、API 配置、候选结果、图片导出、只读样本库和文档站。服务需要比较 LLM 指纹的用户，支持简体中文和英文、浅色和深色主题。
-version: 2026-10-01.10
+version: 2026-10-02.1
 ---
 
 # Fingerpoint design.md
@@ -171,6 +171,18 @@ version: 2026-10-01.10
 - 公式由 rehype-katex 渲染。`docs/package.json` 中的 `katex` 版本与 rehype-katex 依赖的版本一致。（来源：2026-10-01 审查发现版本不一致，公式失去排版规则。）
 - 减少动效与 focus-visible 的要求同第 4 章。Fumadocs 控件去掉 outline 而没有替代样式时，补 2px ring。
 
+### Open Graph 图片
+
+- 每个文档页在构建时预渲染一张 1200×630 PNG（`/docs/og/<页面>/image.png`，英文为 `/docs/en/og/…`）。`docs/app/routes/og.ts` 经 `docs/app/lib/og-response.ts` 用 Takumi 渲染 `docs/app/lib/og-image.tsx` 的 `OgImage`，不使用 Fumadocs 自带的 `generateOGImage`。（来源：2026-10-02 用户要求按 design.md 优化 OG 模板。）
+- 检测站首页用同一模板：`docs/app/routes/og-detector.ts` 预渲染 `/docs/og/detector.png`（路径在 `docs/site.config.ts` 的 `detectorImage`），标题为 `detect.title`，描述为 `app.description`，署名为 `by Ikaleio`，不显示栏目。`web/vite.config.ts` 在 `index.html` 写入 description、`og:*` 和 `twitter:card`（`summary_large_image`）、`twitter:image`，绝对网址由 `SITE_ORIGIN` 与 `DOCS_BASE` 得出。index.html 的语言是 zh-CN，所以首页只有中文图片和中文标签。（来源：2026-10-02 用户要求官网首页也生成 OG 并支持 Twitter 大图卡片。）
+- 构图：深色主题；顶部一行左侧为品牌、右侧为 `SITE_ORIGIN` 的主机名（22px、muted-foreground）；中间垂直居中依次为栏目、标题、描述；底部为 128px 高的数字雨像素带，上边 2px border 分隔。像素带与检测页 CLI 提示条一致：`rain` 效果，每格 8px，muted-foreground/30，`mask-image: linear-gradient(90deg, transparent 25%, #000 70%)` 向左渐隐。（来源：2026-10-02 用户从六套构图中选定“数字雨”。）
+- 颜色只用 token：Takumi 读入 `web/src/tokens.css` 和 Fumadocs 的 `shadcn.css`，模板使用 `bg-fd-background`、`text-fd-muted-foreground` 等与文档站相同的类名，不写色值字面量。
+- 字号角色只用于 OG 图（决策：图片在链接卡片里约缩小到 0.4 倍，正文字号需要放大）：品牌为顶栏尺寸的 1.5 倍（指纹 48px、标题 21px、署名 18px）；栏目 24px、行高 1.4、muted-foreground；标题 68px、行高 1.12、600 字重、`text-balance`，最多 2 行；描述 30px、行高 1.5、muted-foreground、`text-pretty`，最多 2 行。
+- [必须] 限制行数的文字同时使用 `line-clamp-*` 和 `text-ellipsis`。只写 `line-clamp-*` 时 Takumi 直接截掉后半句，不画省略号。（来源：2026-10-02 布局检查发现。）
+- 栏目取页面树中页面上方的文件夹名，用“ / ”连接；最后一个文件夹名与标题相同（文件夹的首页）时去掉它；顶层页面不显示栏目。没有描述的页面不输出描述节点。
+- 品牌与顶栏一致：16 格像素指纹、`--font-brand-title` 的 `Fingerpoint Detector`（不换行）、`--font-brand-byline` 的“文档”/“Docs”。像素指纹和数字雨都是对应效果在减少动效时的静帧（3.7 秒、固定种子），用 currentColor 的方格绘制，带 `aria-hidden`。
+- [必须] 文字框离左右边缘至少 48px、上下至少 20px，文字框之间不重叠，`aria-hidden` 装饰不压在文字上。检查方法：对全部页面用 Takumi `measure()` 比较文字框与装饰框。（来源：2026-10-02 检查发现原模板在 7 个英文页把站名挤出画布。）
+
 ### 样本库
 
 - 使用 `.fp-page-wide`，最大宽度 1440px。
@@ -238,8 +250,8 @@ version: 2026-10-01.10
 
 | 效果 | 位置 | 颜色 |
 |---|---|---|
-| fingerprint | 顶栏标识，2px 格 | muted-foreground |
-| rain | CLI 提示条背景，向左渐隐；API 请求尚无回复时的回复区 | muted-foreground/30 |
+| fingerprint | 顶栏标识，2px 格；文档 OG 图的品牌标识（静帧） | muted-foreground |
+| rain | CLI 提示条背景，向左渐隐；API 请求尚无回复时的回复区；文档 OG 图底部像素带（静帧，向左渐隐） | muted-foreground/30 |
 | dither | API 模式的等待取样区域 | muted-foreground/20 |
 | march | 取样中样本卡标题下的分隔线 | muted-foreground/60 |
 | scan | 计算状态行 | muted-foreground/60 |
@@ -266,6 +278,7 @@ version: 2026-10-01.10
 | 动效 | useMotionPreset、spring、listStagger、listItem | `src/lib/motion.ts` | 已实现 |
 | 像素装饰 | PixelShader、PixelSpinner、fp-pixel、fp-brand-mark | `src/components/pixel-shader.tsx`、`src/lib/pixel-effects.ts`、`src/lib/pixel-renderer.ts`、`src/shell.css` | 已实现 |
 | 文档站 | SiteHeader、DocsBar、Callout、Card | `docs/app/components/` | 已实现 |
+| Open Graph 图片 | OgImage、Brand、PixelFingerprint、ogRenderer、ogFontFamilies、ogResponse | `docs/app/lib/og-image.tsx`、`docs/app/lib/og.server.ts`、`docs/app/lib/og-response.ts` | 已实现 |
 | 图标 | lucide-react | `package.json` | 已安装 |
 
 [必须] 公开原语是本表的组件、类和 token；使用前确认 API 存在。
@@ -309,6 +322,7 @@ version: 2026-10-01.10
 - `next-themes` 通过 html.dark 应用主题，`index.html` 在加载前恢复偏好。
 - 主题偏好保存到 `fp-theme`。存储不可用时，首屏按系统外观显示；原生控件和滚动条使用当前主题的 color-scheme。文档站通过 Fumadocs RootProvider 的 next-themes `storageKey` 使用同一个键，主题菜单同为三项单选，两处的主题选择互相同步。
 - 颜色 token、字号角色（`text-*`）与品牌字体在 `src/tokens.css`；顶栏外壳类与像素装饰宿主 `.fp-pixel` 在 `src/shell.css`。两个文件都在 `@import "tailwindcss"` 之后导入：检测站由 `src/index.css` 导入，文档站由 `docs/app/app.css` 直接导入，Fumadocs 的 shadcn 预设把颜色映射为文档配色。文档顶栏通过相对路径导入 `src/components/pixel-shader.tsx`，只在浏览器中懒加载。新增或修改 token 或外壳类时同时检查两处。
+- 文档站和检测站首页的 OG 图由 `docs/app/lib/og-response.ts` 以 `?raw` 读入 `src/tokens.css` 与 `fumadocs-ui/css/shadcn.css` 交给 Takumi；`docs/app/lib/og.server.ts` 用 tokens.css 的族名注册 Geist Variable、Noto Sans SC Variable 与 Noto Serif SC Variable 的 Latin 子集，没有指定字体的文字按 Geist、Noto Sans SC 回退（Takumi 不读系统字体）。修改 token、品牌字体或 shadcn 映射时同时检查 OG 图。
 - `src/lib/client.ts` 载入静态参考库，在 Worker 中调用共享算法，Worker 不可用时使用同一实现回退。
 - 每次取样或探测开始时，`src/lib/use-connection-route.ts` 按连接方式确定路由：直连；本站代理 `/api/proxy`；自建 Worker 的已保存有效地址；自动模式用真实请求的方法与头名、假 Key（`sk-cors-check`）和 `{}` 请求体检查一次（8 秒超时），读到任何 HTTP 响应即直连，否则经本站代理。检查结果不缓存，每次运行重新检查。
 - 直连请求与自动检查共用 `directHeaders` 与 `directInit`：不携带 Cookie 和 Referer，`redirect: 'error'`；Messages 附带 `anthropic-dangerous-direct-browser-access: true`。
