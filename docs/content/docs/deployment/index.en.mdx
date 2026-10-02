@@ -83,6 +83,7 @@ The docs live in `docs/`. They are a React Router SPA, and every page is prerend
 - The HTML and data files of each page.
 - The Markdown version of each page, `/docs/llms.mdx/<page>/content.md` (`/docs/en/llms.mdx/<page>/content.md` in English), for "Copy Markdown" and LLM tools.
 - The Open Graph image of each page, `/docs/og/<page>/image.png` (`/docs/en/og/<page>/image.png` in English).
+- The Open Graph image of the detection website's home page, `/docs/og/detector.png`, which the website's `index.html` uses as `og:image` and `twitter:image`.
 - The static search index `api/search`, plus `llms.txt` and `llms-full.txt`.
 
-`DOCS_BASE` sets the path prefix of the docs. The default is `/docs`, and every path above starts with it. `SITE_ORIGIN` is the public origin of the docs, `https://lm.ikale.io` by default, used for absolute URLs in the Open Graph tags and the Markdown versions; set it to the deployment's own origin when you deploy elsewhere, such as Vercel, a Pages preview, or a fork. For local development, use `bun run dev:docs`. To build the docs alone, use `bun run --cwd docs build`.
+`DOCS_BASE` sets the path prefix of the docs. The default is `/docs`, and every path above starts with it. `SITE_ORIGIN` is the public origin of the docs and the detection website, `https://lm.ikale.io` by default, used for absolute URLs in the Open Graph tags of both and in the Markdown versions; set it to the deployment's own origin when you deploy elsewhere, such as Vercel, a Pages preview, or a fork. For local development, use `bun run dev:docs`. To build the docs alone, use `bun run --cwd docs build`.

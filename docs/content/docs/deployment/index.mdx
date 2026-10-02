@@ -83,6 +83,7 @@ GitHub Pages 没有服务器函数，也就没有本站代理 `/api/proxy`：连
 - 每页的 HTML 与数据文件；
 - 每页的 Markdown 版本 `/docs/llms.mdx/<页面>/content.md`（英文为 `/docs/en/llms.mdx/<页面>/content.md`），供“复制 Markdown”和 LLM 工具使用；
 - 每页的 Open Graph 图片 `/docs/og/<页面>/image.png`（英文为 `/docs/en/og/<页面>/image.png`）；
+- 检测网站首页的 Open Graph 图片 `/docs/og/detector.png`，检测网站的 `index.html` 把它用作 `og:image` 和 `twitter:image`；
 - 静态搜索索引 `api/search`，以及 `llms.txt` 与 `llms-full.txt`。
 
-`DOCS_BASE` 决定文档的路径前缀，默认 `/docs`；上面的路径都以它开头。`SITE_ORIGIN` 是文档的公开来源，默认 `https://lm.ikale.io`，用于 Open Graph 标签和 Markdown 版本里的绝对网址；部署到其他域名（Vercel、Pages 预览或分支站点）时设为该域名的来源。本地开发用 `bun run dev:docs`，单独构建用 `bun run --cwd docs build`。
+`DOCS_BASE` 决定文档的路径前缀，默认 `/docs`；上面的路径都以它开头。`SITE_ORIGIN` 是文档和检测网站的公开来源，默认 `https://lm.ikale.io`，用于两者的 Open Graph 标签和 Markdown 版本里的绝对网址；部署到其他域名（Vercel、Pages 预览或分支站点）时设为该域名的来源。本地开发用 `bun run dev:docs`，单独构建用 `bun run --cwd docs build`。

@@ -1,6 +1,7 @@
 export const zh = {
   app: {
     name: 'Fingerpoint Detector',
+    description: '让模型随手写几百个整数，识别 API 背后的大语言模型。',
     detect: '检测',
     library: '样本库',
     docs: '文档',
@@ -353,6 +354,7 @@ export type Messages = typeof zh
 export const en: Messages = {
   app: {
     name: 'Fingerpoint Detector',
+    description: 'Identify the large language model behind an API from a few hundred first-instinct integers.',
     detect: 'Detect',
     library: 'Library',
     docs: 'Docs',
