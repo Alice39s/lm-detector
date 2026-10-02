@@ -80,8 +80,7 @@ html > body[data-scroll-locked] {
 .fd-mermaid svg { max-width: 100%; height: auto; }
 .fd-mermaid-source { white-space: pre-wrap; color: var(--muted-foreground); font-size: 0.8125rem; }
 
-/* Wide tables and formulas scroll inside the article instead of widening the page. */
-.prose table { display: block; max-width: 100%; overflow-x: auto; }
+/* Wide formulas scroll inside the article instead of widening the page; wide tables scroll in Fumadocs' table wrapper. */
 .katex-display { overflow-x: auto; overflow-y: hidden; padding-block: 0.25rem; }
 
 @media (prefers-reduced-motion: reduce) {

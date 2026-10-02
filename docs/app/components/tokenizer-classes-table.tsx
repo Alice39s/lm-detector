@@ -1,6 +1,10 @@
 import bankJson from '../../../data/tokenizer_bank.json'
 import { assertTokenizerBank, type TokenizerBank, type TokenizerClass } from '@fingerpoint/shared/tokenizer-bank'
 import { useI18n } from 'fumadocs-ui/contexts/i18n'
+import defaultMdxComponents from 'fumadocs-ui/mdx'
+
+// The scrolling wrapper that Markdown tables get, so wide tables scroll instead of widening the page.
+const { table: Table } = defaultMdxComponents
 
 function checked(value: unknown): TokenizerBank {
   assertTokenizerBank(value)
@@ -27,8 +31,8 @@ export default function TokenizerClassesTable({ view = 'classes' }: { view?: 'cl
   const t = locale === 'en' ? text.en : text.zh
   if (view === 'models') {
     return (
-      <table>
-        <thead><tr><th>{t.pattern}</th><th>{t.vendor}</th><th>{t.klass}</th></tr></thead>
+      <Table>
+        <thead className="whitespace-nowrap"><tr><th>{t.pattern}</th><th>{t.vendor}</th><th>{t.klass}</th></tr></thead>
         <tbody>
           {bank.api_models.map(model => {
             const klass = model.class ? classNames.get(model.class) : undefined
@@ -41,12 +45,12 @@ export default function TokenizerClassesTable({ view = 'classes' }: { view?: 'cl
             )
           })}
         </tbody>
-      </table>
+      </Table>
     )
   }
   return (
-    <table>
-      <thead><tr><th>{t.lab}</th><th>{t.series}</th><th>{t.members}</th><th>{t.aliases}</th></tr></thead>
+    <Table>
+      <thead className="whitespace-nowrap"><tr><th>{t.lab}</th><th>{t.series}</th><th>{t.members}</th><th>{t.aliases}</th></tr></thead>
       <tbody>
         {[...byLab].flatMap(([lab, classes]) => classes.map((klass, index) => (
           <tr key={klass.id}>
@@ -66,6 +70,6 @@ export default function TokenizerClassesTable({ view = 'classes' }: { view?: 'cl
           </tr>
         )))}
       </tbody>
-    </table>
+    </Table>
   )
 }
