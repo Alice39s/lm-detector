@@ -62,6 +62,8 @@ The official data and frozen parameters are in `data/`. The website calls only t
 
 `docs/` is a React Router SPA. It declares its content collections with the macro API of Fumadocs MDX. Pages are stored in pairs, as `page.mdx` (Chinese) and `page.en.mdx` (English). A page without an English file falls back to Chinese on the English site. Links in pages are written as relative paths to content files (for example `../cli/detect.mdx#options`), and the build resolves them to URLs in the current language.
 
+Run `bun run dev:docs` for local development. `vite.config.ts` scans shared component dependencies from `app/root.tsx` and pre-bundles Fumadocs' internal client dependencies through `optimizeDeps.include`. After upgrading Fumadocs or adding an internal client dependency, check page interactions on a cold start. Add any missed dependency to this list: a second pre-bundling pass at runtime can mix React runtime exports and prevent hydration.
+
 | File | Purpose |
 | --- | --- |
 | `site.config.ts` | Path prefix `DOCS_BASE` (`/docs` by default) and public origin `SITE_ORIGIN` (`https://lm.ikale.io` by default) |

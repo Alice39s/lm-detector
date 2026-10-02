@@ -14,6 +14,28 @@ export default defineConfig({
   },
   plugins: [fumadocsMdx(), tailwindcss(), reactRouter()],
   resolve: { tsconfigPaths: true },
+  optimizeDeps: {
+    // React Router has no HTML scan entry; the root also reaches the shared, lazy-loaded pixel renderer and `cn`.
+    entries: ['app/root.tsx'],
+    // Fumadocs serves its packages as source. Include their client dependencies up front so a later optimizer pass
+    // cannot change React's shared runtime exports while the browser still has the first pass cached.
+    include: [
+      '@base-ui/react/accordion',
+      '@base-ui/react/collapsible',
+      '@base-ui/react/dialog',
+      '@base-ui/react/direction-provider',
+      '@base-ui/react/menu',
+      '@base-ui/react/popover',
+      '@base-ui/react/scroll-area',
+      '@base-ui/react/select',
+      '@base-ui/react/tabs',
+      'lucide-react',
+      'mermaid',
+      'next-themes',
+      'unist-util-visit',
+      'vfile',
+    ],
+  },
   build: {
     assetsDir: `${docsBase.slice(1)}/assets`,
     // Mermaid and KaTeX stay in lazily loaded chunks; the warning threshold is for the entry chunks.

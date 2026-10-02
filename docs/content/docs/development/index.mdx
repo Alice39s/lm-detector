@@ -62,6 +62,8 @@ icon: Code
 
 `docs/` 是 React Router 的 SPA，用 Fumadocs MDX 的宏 API 声明内容集合。页面按 `页面.mdx`（中文）与 `页面.en.mdx`（英文）成对存放；缺少英文文件的页面在英文站点中回退为中文。页面中的链接写成内容文件的相对路径（例如 `../cli/detect.mdx#options`），构建时解析为当前语言的 URL。
 
+本地开发运行 `bun run dev:docs`。`vite.config.ts` 从 `app/root.tsx` 扫描共享组件的依赖，并通过 `optimizeDeps.include` 预构建 Fumadocs 内部的客户端依赖。升级 Fumadocs 或引入新的内部客户端依赖时，检查冷启动后的页面交互；漏扫的依赖应加入此列表，避免运行时重新预构建混用 React 运行时的导出，导致页面无法水合。
+
 | 文件 | 作用 |
 | --- | --- |
 | `site.config.ts` | 路径前缀 `DOCS_BASE`（默认 `/docs`）与公开来源 `SITE_ORIGIN`（默认 `https://lm.ikale.io`） |
