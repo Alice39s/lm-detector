@@ -1,4 +1,4 @@
-/* design.md 3「应用外壳」顶栏与 4.4 像素着色器宿主。检测网站和文档站（docs/）共用本文件，改动会同时作用于两处。 */
+/* design.md「应用外壳」顶栏与「像素装饰」宿主。检测网站和文档站（docs/）共用本文件，改动会同时作用于两处。 */
 :root { --fp-topbar-height: 56px; }
 .fp-topbar { position: sticky; top: 0; z-index: 20; height: var(--fp-topbar-height); background: var(--background); border-bottom: 1px solid var(--border); }
 .fp-topbar-inner { height: 100%; max-width: 1440px; margin: 0 auto; padding: 0 1rem; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; }

@@ -1,358 +1,316 @@
 ---
 name: fingerpoint-design
-description: 用于 Fingerpoint 的三样本检测、分词器探测、API 配置、候选结果、图片导出、只读样本库和文档站。服务需要比较 LLM 指纹的用户，支持简体中文和英文、浅色和深色主题。
-version: 2026-10-02.1
+description: 用于 Fingerpoint Detector 的网页工具界面（多卡片工作台、数据长列表、主从浏览）、文档站长文页、浏览器导出的结果图片和链接预览图。读者是逐条核对数字、标识符和百分比的技术用户；目标是中性灰阶表面、单一蓝色强调、像素指纹装饰和无回弹弹簧动效，中英文混排，浅色与深色主题。
+version: 2026-10-02
 ---
-
-# Fingerpoint design.md
 
 ## 1. 范围与优先级
 
-[必须] 将本文件用于 `web/` 的检测、样本库、反馈状态和结果图片，以及 `docs/` 的文档站。
-[必须] 不参考旧站点的视觉外观。
-[必须] 按用户要求、真实算法输出、安全与无障碍、当前任务、视觉表达的顺序处理冲突。
-[必须] 保留三条算法生成的提示词和对应回复。
-[必须] 将评分算法视为黑盒。界面不生成特征命中、贡献分或推理解释。
-[必须] 不提供 URL 分享结果或网页端贡献样本功能。
-[必须] 前端发布静态资源。请求按用户选择的连接方式发送：自动（默认，每次运行检查一次接口是否允许浏览器跨域，允许时直连，否则经同源 `/api/proxy`）、直连、本站代理（同源 `/api/proxy`）或自建 Worker。代理只转发到用户指定且代理允许的 HTTPS 服务，仅 `/api/proxy` 进入 Cloudflare Pages Function。
-[必须] 不使用固定评估集建库、校准或生成模型中心。
+- [MUST] 本文件约束 `web/` 的全部页面与浮层、浏览器导出的结果图片、`docs/` 文档站，以及文档构建生成的链接预览图。
+- [MUST] 本文件不约束 CLI 的终端输出、README 和 GitHub 仓库页面。
+- [MUST] 不参考旧站点的视觉外观。
+- [MUST] 冲突时按以下顺序取舍：真实数据与用户要求、无障碍与可用性、读者当前的任务、本项目已有约定、品牌表达、装饰细节。
+- [MUST] 页面的功能、字段、状态条件和阈值以任务需求和代码为准；本文件只规定它们的呈现方式。
 
 ## 2. 品牌与读者
 
-读者需要完成三种任务：手动粘贴回复、通过 API 自动取得回复、浏览已有参考样本。
+读者在桌面上连续比较数字、模型标识符和百分比，也会在手机上查看结论；熟悉 API 术语；界面会出现中英文混排的标识符和原文。
 
-[建议] 用中性表面和单一蓝色强调当前操作。（决策：突出检测任务，不复制已有产品 UI。）
-[建议] 用空间连续的弹簧动画连接卡片、摘要条和导航状态。（决策：用户要求苹果式非线性动画。）
-[建议] 使用内容决定高度，避免全屏宣传区。（决策：这是工具页，不是营销页。）
-[必须] 用文字和颜色共同表达取样状态。
-[必须] 区分“模型排名”和“身份已确认”。相似结果不能独立证明身份。
-[必须] 区分“分词器一致”和“模型一致”。分词器探测只说明上游使用哪一种分词器。
-[必须] 分词器探测只作参考信息，不改变排名、置信度或校验分数，结果不等待探测完成。（来源：2026-10-01 用户要求把分词器改成可选参考信息，不加权算入得分，不阻塞最终结果。）
+- [SHOULD] 中性工具感：表面、文字和边框只用零彩度灰阶 token；`--primary` 蓝色只出现在主要操作、焦点环、当前导航下划线、链接和置信度条上。（决策：突出检测任务，不复制已有产品界面。来源：项目初版设计决策。）
+- [MUST] 像素指纹是唯一的品牌装饰：品牌标识、加载、等待和空状态使用 `PixelShader` 的像素效果，颜色取 muted-foreground。
+- [MUST] 动效是空间连续、无回弹的弹簧：卡片在原位伸缩，导航下划线和列表项平移到新位置。
+- [SHOULD] 工具页高度由内容决定，不放全屏宣传区或插画。（决策：这是工具页，不是营销页。来源：项目初版设计决策。）
+- [MUST] 文案语气直接、克制：陈述结果和限制，推断性的结论写成“候选”“最接近”“排名”，不写成“已确认”。
+- [MUST] 状态同时用文字和颜色表达，不只靠颜色。
 
 ## 3. 页面结构与构图
 
 ### 应用外壳
 
-- 桌面顶栏高 56px；左侧站名，中间“检测 / 样本库 / 文档”，右侧仓库入口、语言和主题切换。仓库入口在 1024px 以下收为图标。640px 以下使用 88px 双行顶栏，将主导航排在第二行。
-- 768px 以下，顶栏操作区的图标按钮至少 44×44px，仓库入口除外。（来源：2026-10-01 审查发现原规则的选择器未命中按钮。）
-- 左上标识左侧放 32px 像素指纹动画 `.fp-brand-mark`，使用 muted-foreground；右侧为两行文字。（来源：2026-09-28 用户要求图标改为 muted 色。）
-- 左上标识使用两行：`Fingerpoint Detector` 使用 `--font-brand-title`、14px、500 字重、1.25 行高；`by Ikaleio` 使用 `--font-brand-byline`、12px、400 字重、16px 行高，颜色为前景色的 70% 不透明度。（来源：2026-09-22 用户指定 FisProxy 截图，参数取自其品牌标识实现。）
-- 主题菜单提供“浅色 / 深色 / 跟随系统”，用单选标记显示当前选择；默认跟随系统。
-- 保存手动选择；选择“跟随系统”后实时响应系统外观变化。切换主题不清除检测内容。
-- 当前导航用顶栏内独立的下划线表示，只在导航容器内横向移动，不参与页面滚动坐标或共享 layoutId。
-- “文档”是指向相对路径 `docs/`（英文为 `docs/en/`）的普通链接，整页进入文档站，不属于 HashRouter，也不参与下划线。检测页 CLI 卡片的“查看用法”在新标签中打开文档对应的 CLI 页面。
-- 切换页面路径时回到顶部。模型列表与详情标题不做跨页位置变形。
-- 检测页与样本库主体统一最大宽度 1440px。全局预留滚动条空间，内容不随滚动条出现或消失而横移。
-- 两个主导航页面按桌面切换方式横向滑动：进入样本库向左，返回检测向右，顶栏固定。使用视口快照避免长页面滚动位置影响动画，不卸载检测会话。
-- 检测页与样本库不添加侧栏；文档站例外，见“文档站”。
-- 页脚说明本地分析及 API 请求去向，不声称密钥永不离开浏览器。
+- [MUST] 工具页和文档页共用顶栏 `fp-topbar`：桌面高 56px，三栏网格，左侧品牌标识，中间主导航，右侧仓库入口、语言切换和主题菜单。
+- [SHOULD] 640px 以下顶栏改为 88px 双行（56px 加 32px），主导航排在第二行；1024px 以下仓库入口只显示图标。
+- [MUST] 768px 以下，顶栏右侧的图标按钮（仓库入口除外）至少 44×44px。
+- [MUST] 品牌标识 `fp-brand`：左侧 32px 像素指纹 `fp-brand-mark`（muted-foreground），右侧两行文字，上行 `fp-brand-title`，下行 `fp-brand-byline`。
+- [SHOULD] 当前导航项用 2px primary 下划线 `fp-nav-indicator` 标出，下划线只在导航容器内横移。指向另一个站点的导航项是普通整页链接，不参与下划线动画。
+- [MUST] 主题菜单是“浅色 / 深色 / 跟随系统”三项单选，标出当前项，默认跟随系统；切换主题或语言不清除页面上已输入的内容。
+- [SHOULD] 顶栏右侧图标：仓库入口用 lucide `GitBranch`，语言切换用 `Languages`，主题按钮显示当前选项对应的 `Sun`、`Moon` 或 `Monitor`；图标 16px，按钮带可读名称。
+- [MUST] 页脚居中，使用 `text-meta` muted 文字，不放像素装饰。
 
-### 检测页
+### 多卡片工作台
 
-- 使用 `.fp-page`，最大宽度 1440px，与样本库一致。
-- 页头包含一个 h1 和手动/API 模式切换。
-- 页头下方用紧凑提示条展示 CLI 命令和使用说明入口，不占用样本操作区。命令中的执行器和参数高亮，点击命令复制完整文本并反馈结果。
-- 使用 `.fp-grid-samples`：1024px 起三列，窄屏一列。
-- 每个样本包含编号、状态、提示词、复制操作、回复输入和数字数量。
-- 提示词默认显示四行，展开后显示全文。
-- 回复区保留原始文本和换行，固定高 12rem，局部滚动，不随内容增长或允许拖拽扩高。空白等待区保持相同高度。
-- API 输出更新时，回复区自动滚动到底部；手动编辑按输入光标滚动。
-- 每条提示词对应一条独立模型请求，不拼接对话历史。
-- 切换模式不清除提示词和回复。
-- 手动/API 切换时，选中背景在控件内部滑动，API 配置区域以高度动画进入或退出；保留回复和结果。
-- 填写一条或两条回复时允许强制检测。仅对有效样本计算候选排名，并标明实际样本数；三条联合核验分数及校准百分比只在三条均有效时提供。
-- 检测页会话保留在应用外壳中。切到样本库再返回时，保留提示词、回复、结果、模式、API 配置和展开状态；刷新页面仍按现有存储规则恢复配置。
-- 计算和结果阶段显示三条样本摘要；640px 以下隐藏摘要中的数量，不缩小文字。
-- 结果阶段三张 Compact 卡片始终保留。点击卡片在下方展开对应详情，再次点击或使用详情右上角的收起按钮关闭；一次只展开一个样本。
-- Compact 卡片与详情不共用 layoutId。详情只在当前位置做高度展开，不做跨位置变形；减少动效时直接开合。
-- 操作栏靠近样本；768px 以下固定在底部，并留出内容及安全区空间。
-- 求 Star 入口使用 `.fp-star-link`，与操作栏同在 `.fp-detect-footer` 一行：Star 靠样本区左边缘，操作栏靠右，两者与样本网格左右边缘对齐，高度同为 36px。颜色使用 `--star` 柔和金色，浅色主题取深金褐以保证对比度，只用低饱和底色和细边框，不加动画或渐变。768px 以下操作栏固定在底部，Star 留在内容流末尾左侧。（来源：2026-09-28 用户要求。）
-- 点击重新检测后直接生成新提示词并清除已有回复和结果，不弹出确认框。
+用于一次处理多份同类输入并在同一页给出结论的页面。
 
-### 取样状态
+- [SHOULD] 使用 `fp-page`。首屏自上而下：页头（唯一的 h1，右侧为 `Segmented` 模式切换）、一行紧凑提示条 `fp-cli-promo`、可选的整行配置卡片、卡片网格 `fp-grid-samples`、操作行 `fp-detect-footer`。
+- [SHOULD] 提示条只占一行高度：命令片段用 `fp-cli-command`，其中的可执行名和参数为 primary 600 字重；点击命令复制全文并用 toast 反馈；行末是 primary 文字链接。
+- [SHOULD] 卡片网格 1024px 起为三列等宽，1024px 以下为一列。
+- [SHOULD] 输入卡片 `SampleCard` 自上而下：标题行（`text-card-title` 编号标题、状态徽标、更多菜单）、参考原文（默认显示四行，可展开全文）、输入区、底部 `text-meta` 计数。
+- [SHOULD] 输入区 `fp-reply` 固定 12rem 高，保留原始换行，内容超出时在区内滚动，不随内容增高，不可拖拽改变大小；空白等待区保持同一高度。流式追加文本时滚到底部，手动编辑时跟随光标。
+- [SHOULD] 操作行左侧是次要链接 `fp-star-link`，右侧是操作栏 `fp-actionbar`，两端与网格左右边缘对齐，同高 36px。
+- [SHOULD] 768px 以下操作栏固定在视口底部（最小高 64px，避开 safe-area-inset-bottom），页面底部留出同样的空间；次要链接留在内容流末尾。
+- [SHOULD] 结果状态：卡片网格收为一行摘要条 `SampleStrip`；点击一项在摘要条下方展开它的详情，一次只展开一项；再次点击该项或点详情右上角的“收起”关闭。640px 以下摘要条隐藏计数，不缩小文字。
+- [SHOULD] 结果区 `ResultPanel` 自上而下：`text-section-title` 区块标题、摘要卡片、整行警告、`text-body` muted 说明、候选列表、限制说明。区块间隔 24px。
+- [SHOULD] 摘要卡片分左右两栏。左栏依次为 `text-meta` 标签、`text-display` 名称（`overflow-wrap:anywhere`）、`text-body` muted 次级信息，名称旁放 `logo` 像素标识。右栏右对齐，依次为 `text-display-number` 主百分比、`text-meta` 标签和来源行，整组相对卡片垂直居中。窄屏保留两栏，名称和来源可以换行。
+- [SHOULD] 候选列表放在一张 `fp-card` 里，每行用 `fp-result-row`：24px 序号列、名称列（font-medium）、120px 次要标签列（muted，单行省略）、`ConfidenceBar`、64px 右对齐百分比列，最小行高 48px，行间 1px 分隔线。默认显示前 8 行，末行用 ghost 小按钮展开全部。
+- [SHOULD] 768px 以下候选行改为序号、名称、百分比三列，置信度条移到第二行，隐藏次要标签列。
+- [MUST] 置信度不可用时显示破折号或“不可用”，不显示 0%，也不画空置信度条（该行加 `data-unscored`）。
+- [SHOULD] 结果区操作：主操作在右，次要操作在左，低频操作收进更多菜单。
+- [SHOULD] 需要警示的卡片和它的详情使用 `fp-card[data-warning]`，卡片标题旁加警告图标；结果区同时用 `Alert variant="warning"` 说明原因，并排在其他警告之前。
+- [SHOULD] 可折叠配置卡片 `ApiConfigPanel`：收起时为一行 48px 等宽摘要 `fp-api-summary`，长值单行省略，完整值放在 `title`，不显示密钥；展开后为表单，桌面两列，窄屏一列。展开和收起用 220ms 高度与透明度过渡，摘要位置不动。
+- [SHOULD] 表单中的开关组之后用分隔线开始下一组。`Segmented` 下方用一行 `text-meta` muted 文字，只说明当前选中的选项。
+- [SHOULD] 提交时有缺项：展开缺项所在的区域，聚焦第一个缺失字段，字段下方用 `FieldError` 说明。
+- [SHOULD] 带检查动作的输入框：右侧放 outline 按钮；检查结果写在输入框下方 `role="status"` 的 `text-meta` 文字中，成功用 success 色。
 
-- `pending`、`requesting`、`streaming`、`done`、`capped`、`rejected`、`stopped` 分别映射到本地化状态文案。
-- 请求期间将完整旧回复与临时流式文本分开保存。
-- 正常完整结束且达到数字阈值的回复可替换旧回复；宽松模式主动达到目标数并截断的回复也可替换旧回复，标为 `capped`。
-- 宽松模式仅在收到目标数量的完整有效整数后取消 SSE 读取；尾部尚未结束的整数不计数。非流式 JSON 必须完整成功结束，超出目标数时只采用前 N 个有效整数。
-- 失败或取消单条替换时保留旧回复和旧结果。
-- 成功替换或手动编辑回复时清除旧结果。
-- 未完成且未达到目标数的流式片段不能自动参与验证。用户编辑后可手动采用。
-- 回复只在文本与该条 API 最近返回的文本一致时，才算未经编辑的 API 回复；编辑后再替换失败或被停止，仍按编辑过的回复处理。
-- 单条重新取样沿用该条成功取样时的参数和原提示词。异常分布样本的“更换提示词”例外，见“结果”。
-- 并行开关控制三个请求同时或依次执行；不自动重试失败请求。
-- 每条样本独立取样：一条取样时，其他样本仍可开始取样、停止、编辑或清空。样本卡的停止只中止该条，依次执行时跳过该条并继续其余请求；操作栏的停止中止全部。计算期间锁定全部样本。
-- 流式、并行、宽松模式、自动验证在新配置中默认开启；旧配置已明确保存的开关状态保持不变。自动验证仅在本轮指定请求全部成功、三条回复齐全且没有其他样本仍在取样时执行。
-- 离开检测页时中止正在进行的请求，保留已完成内容，忽略旧运行的后续回调。
-- 等待连接检查期间若停止全部、重新检测、开始验证、离开检测页或卸载页面，检查结束后不再开始取样或探测。
+### 两列证据详情
 
-### API 配置
+工作台里展示一组判定、核对和逐条记录的展开详情，当前实现为 `TokenizerDetails`。
 
-- 仅在 API 模式下显示 `ApiConfigPanel`，位于样本区顶部、Sample 1 前方，占内容区整行宽度；手动模式隐藏配置区域。
-- 收起时仅用一行显示当前 Base URL、model 和展开箭头。长值省略显示，完整值保留在标题提示中；不在摘要中展示 Key。
-- API 摘要整行使用等宽字体，包括 Base URL、分隔符和 model。
-- 展开后显示配置表单。桌面字段分两列，窄屏排为一列。
-- 配置卡片使用 220ms 高度和透明度过渡，展开或收起时摘要保持原位；减少动效时立即完成。
-- 字段顺序：Base URL、model、API Key、reasoning_effort、协议、流式、并行、宽松模式、自动验证、分词器探测；开关之后用分隔线隔出“连接方式”。
-- 协议选项固定为 Chat Completions、Messages、Responses。
-- reasoning_effort 可留空，允许输入上游支持的任意值，不限制为少数预设。
-- Key 默认隐藏，可通过有名称的按钮切换可见性。
-- 表单修改直接更新配置；折叠或切换模式时保留填写内容。取样仍由主操作触发，修改字段不发送请求。
-- 配置不完整时默认展开。点击开始取样时若有缺项，展开并聚焦第一个缺失字段。
-- 取样及计算期间禁用配置编辑；重新展开配置时 Key 恢复隐藏。
-- “连接方式”（`ProxySettings`）用 `Segmented` 四选一：自动（默认）、直连、本站代理、自建 Worker。下方一行次级文字只说明选中的选项：自动写明接口不允许网页直接访问时改经本站代理；直连写明接口不允许浏览器跨域时请求会失败；本站代理写明 Key 经本站中转、中转不保存密钥；自建 Worker 写明 Key 不再经过本站。连接方式是浏览器级设置，不写入配置预设或导出的配置文件；API Key 的说明写明它对所有配置生效。（来源：2026-10-01 用户要求连接方式改为四选一，不要缓存和授权系统。）
-- 自建 Worker 显示等宽的 Worker 地址输入框，右侧为“检查代理”按钮（只在自建 Worker 下出现）：接受 HTTPS，或本机调试用的 `http://localhost`、`http://127.0.0.1`；有效地址随输入保存，失焦后规范化；清空或改成无效地址时同时清除已保存的地址，失焦后用 `FieldError` 提示。检查结果写在 `role="status"` 的次级文字中，可用时为 success 色；结果只对应当前保存的地址，地址变化后不沿用。
-- 自建 Worker 下方用细边框区块放“部署自己的 Worker”：“部署到 Cloudflare”为 outline 链接按钮（新标签打开 Deploy 按钮页），“在 Playground 中打开”为 outline 按钮，下方列表说明两者差别；当前页面 origin 不在 Worker 默认 `ALLOWED_ORIGINS` 中时，追加一条需要加入该 origin 的提示。导入按钮在点击时先打开新标签，下载失败则关闭该标签并用 toast 报错；浏览器拦截新标签时单独提示允许弹出窗口。
-- 自动模式检查连接期间主按钮禁用并显示 `Loader2` 与“检查连接…”，配置与模式切换同时锁定。
-- API 设置支持本地多配置预设（Profiles）：收起时摘要条左侧提供快速切换菜单，展开后顶部工具栏支持配置重命名、新建、一键克隆副本与安全删除。设置（包括密钥）自动保存在 localStorage，刷新或重新打开浏览器后恢复，兼容迁移旧版单项配置与 sessionStorage 密钥。
-- “保存”只把当前配置确认保存到浏览器并清除未保存标记，不下载文件；JSON 配置文件通过配置菜单的“导出”生成，“加载”读取该文件。（来源：2026-09-27 用户要求保存按钮不下载 JSON。）
-- “分词器探测”开关在新配置中默认关闭；旧配置和导入的配置文件没有该字段时也按关闭处理，已明确保存的值保持不变。说明写明通常与最多多发的请求数（最多为 `TOKENIZER_MODEL.maximumProbes` + 2），以及按次计费的接口会计入这些请求；并行请求的说明同时写出“分词器探测每批发 4 个请求”。（来源：2026-10-01 用户要求默认不开分词器探测。）
+- [SHOULD] 头部与卡片详情相同：左侧标题；右侧依次为“收起”按钮、状态徽标、更多菜单；标题下一行 `text-meta` muted 说明；其下为分隔线，进行中时分隔线改为 `march` 像素效果。
+- [SHOULD] 正文网格 1024px 起为 `minmax(0,3fr) minmax(0,2fr)` 两列、一个列间距；DOM 顺序为摘要块、核对块、候选列表、记录列表，前两项为第一行。1024px 以下排成一列，顺序不变，所有块左右边缘相同。
+- [SHOULD] 摘要块和核对块各三行，字号相同：`text-meta` 标签、`text-section-title` 主值、`text-body` muted 次行；摘要块的百分比用 `fp-mono` 右对齐。核对块的状态行左侧放 16px 语义色 lucide 图标，不用 `Alert` 框。
+- [SHOULD] 候选列表和记录列表没有边框，不嵌套卡片。两者以 44px 头部行开始（左侧 `text-body` font-medium 标题，右侧 `text-meta` muted 数量，底部分隔线），行高 48px。候选列表复用 `fp-result-row`；`fp-custom-tokenizer-candidates` 在 768px 起为名称列保留 8rem。
+- [SHOULD] 记录列表 1024px 起最多显示 7 行（336px），超出部分在列表内滚动，列表可以用键盘聚焦；长原文单行省略，完整原文放在 `title`。
+- [MUST] 详情网格共享边缘和行线：上下相邻的块左边缘相同；摘要块的百分比与候选列表的百分比列右边缘相同；摘要块与核对块三行基线相同；两个列表的头部行同 y、同高，前 7 条行线同 y。检查方法：1440px 下用 `getBoundingClientRect` 比较，误差不超过 1px。
+- [SHOULD] 整行 `Alert` 放在分隔线与网格之间，左右与卡片内容边缘对齐；操作只放在更多菜单和底部行，正文里不另放按钮。
+- [SHOULD] 底部行左侧为 `text-meta` muted 统计，右侧为 ghost primary 小按钮；其下为整行 `Collapsible` 折叠项。折叠项里的数值表格：文本列左对齐，数值列右对齐。
 
-### 分词器探测
+### 数据长列表
 
-- 分词器探测是 API 检测的一部分，没有单独的检测方式。开关开启时，点击“开始取样”后与三条取样请求同时探测上游的分词器；修改配置、切换模式或打开页面都不发送请求。（来源：2026-10-01 用户要求把分词器探测融入指纹检测，不做独立模式。）
-- 一次探测对应一组“协议、Base URL、model、Key、流式”。单条重新取样、更换提示词沿用已有的探测；配置变化后的取样、或上次探测没有任何测试文本得到计数时，重新探测。接口不返回用量时不重复探测。
-- 探测为全部样本服务：样本卡的停止只中止该条取样，探测继续；操作栏的停止同时停止探测。读取分词器库期间停止时，不发送也不记录任何测试请求，探测标为已停止。
-- 编辑和取样阶段，三张样本卡下方显示一张整行的“分词器探测”卡，结构同样本卡：标题、状态徽标、更多菜单（查看错误详情、重新探测）；探测中标题下的分隔线使用 `march` 像素效果；正文一行给出暂时领先的分词器及置信度，或失败原因；次级文字为“请求数 · 说明”，说明与详情标题下的说明是同一句（参考信息，不改变排名和置信度）。
-- 状态徽标：探测中（warning，带旋转图标）、完全一致（success）、接近已收录的类（warning）、未收录（muted）、未完成（destructive）、已停止（muted）。
-- 计算和结果阶段，只要本次会话有探测，样本摘要条就增加第四项“分词器 · <系列名>”，与三条样本的摘要同样可展开；展开的详情与样本详情共用同一个展开位置，一次只展开一项。探测在结果出现后继续进行时，第四项和详情随新计数实时更新。分词器的判定和与所填模型的一致性只在这张卡、第四项和详情中显示，结果区不显示分词器信息。
-- 详情头部与样本详情相同：左侧标题；右侧依次为“收起”按钮、状态徽标、更多菜单（有失败时“查看错误详情”，以及“重新探测”）。标题行下方一行 `text-meta` muted 说明它是参考信息、不改变排名。头部下方是分隔线，探测中使用 `march` 像素效果。
-- 探测失败（`destructive`）、已停止（默认 `Alert`，muted 文字）、收尾对照请求失败与两次对照请求计数不同（`warning`）用整行 `Alert` 放在分隔线和网格之间，左右边缘与卡片内容边缘对齐。操作只放在更多菜单和底部行，正文中不另放按钮。
-- 正文是一个网格，DOM 顺序为 A 摘要、B 所填模型、C 候选分词器、D 请求记录。1024px 起两列 `minmax(0,3fr) minmax(0,2fr)`，只有一个列间距：A|B 为第一行，C|D 为第二行，第二行在两列从同一 y 开始。1024px 以下排成一列，顺序为 A、B、C、D，所有块左右边缘相同，页面不横向溢出。
-- A 是 `minmax(0,1fr) auto` 的三行：`text-meta` 标签（结束后“上游分词器”，探测中“暂时领先”）| 右对齐的“置信度”；`text-section-title` 系列名（非完全一致时为“未收录的分词器”）| `fp-mono` 百分比；`text-body` muted 实验室名（非完全一致时为“最接近 <类>”）。A 的左边缘与 C 名次列左边缘相同，百分比右边缘与 C 百分比列右边缘相同。
-- B 使用与 A 相同的三行字号：`text-meta` 标签“所填模型”；`text-section-title` `fp-mono` 模型 ID（`overflow-wrap:anywhere`）；`text-body` 状态行，左侧 16px lucide 图标按语义着色：一致 success、不一致 destructive、尚不能确定 warning、本工具不知道该模型的分词器 muted、探测中 muted（探测结束后核对）。其下可加 `text-meta` muted 行：判定为 o200k_base 或 cl100k_base 且不一致时说明中转站可能用 tiktoken 估算用量；接口返回的模型名。B 不使用 `Alert` 框。
-- C 与 D 都是无边框列表，不嵌套卡片。两者以相同的头部行开始：左侧 `text-body` font-medium 标题，右侧 `text-meta` muted 数量，同高 44px，底部分隔线。两列表的行高同为 48px（`fp-result-row` 的节奏），行线在两列对齐。
-- C 复用 `fp-result-row` 与置信度条，显示前 6 类的“完全一致”概率，最后一行固定为“未收录的分词器”；768px 起由 `fp-custom-tokenizer-candidates` 给名称列保留 8rem，名称单行省略。候选按概率排序，重排使用 smooth 弹簧的位置动画；减少动效时不做位置动画。
-- D 每行显示状态图标、测试文本的类别、测试文本原文（单行省略，完整原文在标题提示中）、输入 token 数和相对对照请求增加的 token 数（`fp-mono` 右对齐）。1024px 起列表最大高度为 7 行（336px），与 C 同时结束，超出部分局部滚动，列表可用键盘聚焦。失败行提供“失败”按钮打开错误详情；用户停止的请求标为“已停止”，不显示为错误。
-- 底部行同样本详情：左侧 `text-meta` muted 的请求数和探测耗时，右侧 ghost primary 小按钮“重新探测”（探测中或不允许时禁用）。其下为三个整行折叠项：这一类包含的开源分词器、每条测试文本的计数表（实测增加的 token、预期增加的 token、结果；测试文本列左对齐，数值列右对齐，th 与 td 一致）、如何理解探测结果（测量方法、分词器一致不能确认模型身份、用量估算的影响、只作参考）。计数表只列原始计数。
-- [必须] 分词器详情的列共享左右边缘和行线：A 与 C、B 与 D 左边缘相同，A 的百分比与 C 的百分比列右边缘相同，A 与 B 三行基线相同，C 与 D 的头部行同 y 同高、前 7 条行线同 y。检查方法：1440px 下用 `getBoundingClientRect` 比较，误差不超过 1px。（来源：2026-10-01 用户要求分词器详情保持网格对齐。）
-- 探测进行中，凡是操作栏没有取样的“停止”时（编辑、计算、结果阶段，包括取样全部失败或逐条停止之后），操作栏都提供“停止探测”；它只停止探测，停止后用已收到的计数给出判定。取样结束时探测仍在进行，验证照常计算并显示结果，不等待探测。（来源：2026-10-01 审计发现取样结束后探测仍在发送计费请求，却没有停止入口；2026-10-01 用户要求分词器不阻塞最终结果。）
-- 重新探测沿用当前显示的探测的配置，只重新探测，不重新取样，也不改变当前结果。
+- [SHOULD] 使用 `fp-page-wide`。首屏自上而下：页头行、工具行、列表；列表下方以一行 `text-meta` muted 的数据日期与显示数量结束。
+- [SHOULD] 页头行：h1 在左，`text-body` muted 的总量在右，两者基线对齐；宽度不足时总量换到 h1 下方（`flex flex-wrap items-baseline justify-between gap-3`）。
+- [SHOULD] 工具行是一行 `flex flex-wrap items-center gap-2`：288px 搜索框（`w-72 max-w-full`）、outline 筛选菜单按钮（文字后加 `ChevronDown`，已选时在文字后追加“ · 数量”）、`Segmented` 排序依次排列；导出等次要操作用 `ms-auto` 靠右，是文字前带图标的 outline 菜单按钮。控件同高 36px（`h-9`）；宽度不足时按顺序换行。
+- [SHOULD] 768px 起用 `Table`，放在 `fp-card` 里：表头行高 44px，数据行高 48px，单元格左右内边距 16px，数值列右对齐，次要列用 muted 文字。
+- [SHOULD] 768px 以下改为 `fp-card` 里的两层信息列表：每项是一个整块链接，最小高 56px，左右内边距 16px、上下 8px，项之间 1px 分隔线，悬停为 muted 底色，焦点为内收 2px ring 轮廓。第一层是 `text-body` font-medium 名称，第二层是 `text-meta` muted 的次要信息，两层间隔 4px；长名称和标识符换行，不压缩字号。
+- [SHOULD] 名称是真实链接；桌面上整行普通点击进入详情，键盘聚焦行时整行显示 muted 底色。
+- [SHOULD] 载入时显示 `blocks` 骨架；载入失败显示 `static`（destructive/35）和重试按钮；没有数据和搜索无结果分别用 `Empty` 显示。
 
-### 结果
+### 主从浏览
 
-- 展示算法返回顺序，不以置信度重新排序。排名、置信度、检验分数和结果文字只来自数字指纹。
-- 第一项使用模型名和置信度作为主要信息。
-- 主百分数下方显示右对齐的次级文字“检验分数”。
-- 检验分数下方显示次级文字“检测结果由 lm.ikale.io 提供”，其中域名使用 `--font-mono`；英文界面使用对应译文。
-- 摘要卡片右侧的分数、标签和来源说明作为一个整体，相对卡片垂直居中；窄屏保留左右两栏，允许模型名和来源说明换行。
-- 无置信度时显示不可用状态，不以零替代。
-- 强制检测保留与完整检测相同的模型名字号和对比度。摘要右侧显示检验分数“暂不可用”；候选列表只展示名次、模型名和家族，不绘制空置信度条。
-- 无可评分结果时显示补齐有效回复的操作提示，不输出模型推断。
-- 候选行包含名次、模型名、家族、置信度条、百分比。
-- 窄屏将置信度条移到下一行；保留完整模型名和百分比。
-- 默认显示前八项，允许展开全部。
-- 说明各候选置信度不必递减，也不必合计 100%。
-- 保留库外模型、相近指纹、间歇性替换等限制说明。
-- 结果页右侧主按钮为重新检测，左侧次要按钮保存 PNG；JSON 候选列表导出放在更多菜单。
-- 第一候选的显示置信度严格低于 75% 时，使用 `Alert` 的 `warning` 变体显示“置信度不足：似乎无法辨认生成该样本的模型”。置信度不可用时只显示补齐样本的说明，不按零分触发警告。（来源：2026-09-22 用户要求；这是界面提示阈值，不改变算法评分或排名。）
-- 结果阶段，若某条参与检测的有效回复最小有效数字不低于 200，将该样本的 Compact 卡片与展开详情标为 warning 黄色边框和底色，Compact 卡片附警告图标；结果区在置信度警告之前用 `Alert` 的 `warning` 变体显示标题「样本 x 分布异常，检测结果不可靠！」，说明该分布由提示词引起、原提示词重测仍会出现。多条时以逗号列出编号，如「样本 1, 2」。判定由 `shared/sample-distribution.ts` 提供，只作界面提示，不改变评分或排名。（来源：2026-09-30 用户要求。）
-- 异常提示内提供次要按钮：API 模式为“更换提示词并重测”，为异常样本生成新提示词（数量与保留样本互不重复）、清除其回复和结果，并沿用原取样参数立即重新取样；手动模式为“更换提示词”，只替换提示词并清空对应回复。其余样本保持不变。（来源：2026-09-30 用户实测，gpt-6-sol 对同一中文提示词稳定输出 323–355 的整数。）
-- API 检测完成后，第一候选置信度达到 75%，且模型 ID 去掉供应商前缀后与本次选取的模型一致时，从屏幕左下角和右下角同时向中间喷出一次彩带。切换页面、模式或修改配置不重复播放；减少动态效果时不播放。
-- 每侧喷出 220 片彩带，使用 32° 扩散角；喷射方向和速度随视口尺寸调整，主体射程为视口宽度的 75%，即左侧喷向横向 75% 附近，右侧喷向 25% 附近。
+- [SHOULD] 1024px 起页面锁定在视口可用高度内：左侧 288px 导航列表，右侧内容，两侧分别滚动。1024px 以下导航改为横向 `Tabs`，页面整体滚动。
+- [SHOULD] 导航列表使用虚拟滚动，只渲染可见项、预加载项和当前选中项；方向键、Home、End 切换选中项，焦点随选中项移动。
+- [SHOULD] 内容区的每条记录是一张 `fp-card`：标题行为 `text-meta` muted 的序号与元数据，右侧为状态徽标；原文用 `fp-reply` 原样显示；参考原文放在 `text-card-title` 的折叠项里。
 
-### 图片
+### 长文文档
 
-- 使用浏览器 Canvas，逻辑宽度 1200px，按 2 倍像素密度导出 PNG。
-- 包含站名、日期、第一候选、前五项、实际有效样本数和限制说明。
-- 使用当前语言及主题，并等待字体加载。
-- 不包含 API Key、接口地址、用户填写的模型 ID 或回复正文。
-- 零置信度的填充宽度为零；不可用置信度显示破折号。
+- [SHOULD] 顶栏下为 1440px 框架：1024px 起左侧为页面树侧栏（顶部是搜索框），中间为正文，1280px 起右侧为本页目录。1024px 以下页面树改为抽屉，顶栏下方 44px 的 `DocsBar` 放目录和搜索按钮，本页目录收为可展开的条。
+- [SHOULD] 页面标题用 `text-h1`；描述、侧栏、目录用 `text-body`；h2 用 `text-section-title`，h3 用 `text-card-title`；正文段落 14px、行高 1.75，颜色为 90% 前景色；行内代码和代码块 13px 等宽。（决策：长文行高高于工具页的 1.5，只用于文档正文。来源：2026-10-01 文档站按本文件实现时确定。）
+- [SHOULD] `Card` 为 12px 圆角、1px 边框、16px 内边距、无阴影，卡片间隔 16px；图标用 muted-foreground 放在标题左侧，不放图标底板。
+- [SHOULD] `Callout` 沿用 `Alert` 的外观：8px 圆角；info 与 idea 用 primary 图标；warn 用 warning 底色和边框；error 用 destructive；success 用 success 图标。
+- [SHOULD] 代码块为 8px 圆角、细边框；Tabs 的标签栏和面板是同一张 12px 圆角卡片，面板内不再嵌套卡片。
+- [SHOULD] 表格撑满正文宽度，表头为 600 字重、muted 底色；列宽之和超过正文时，表格在外层容器内横向滚动，字号不变；同一列的 th 与 td 对齐方式相同。（决策：表格保持表格布局，宽表交给外层容器滚动。来源：2026-10-02 用户指出文档表格没有撑满外框。）
+- [SHOULD] 表头不换行；某列所有正文单元格都不超过 8 个汉字或 16 个拉丁字符时，整列 `whitespace-nowrap`。（决策：自动表格布局把剩余宽度分给最长的列，中文可在任意两字之间断行，短表头会被挤成一字一行。来源：2026-10-02 用户指出“位置”表头竖排。）
+- [SHOULD] Mermaid 图居中，过宽时横向滚动；渲染完成前显示 13px muted 源码。
 
-### 文档站
+### 导出图片
 
-- 文档站在 `docs/`（Fumadocs，React Router 预渲染）。页面顶部使用与检测站相同的顶栏：相同尺寸、`.fp-brand-mark` 像素指纹动画、两行标识（副行写“文档”/“Docs”）、仓库入口、语言切换和主题菜单（浅色 / 深色 / 跟随系统）。导航“检测 / 样本库 / 文档”中，“检测”“样本库”是指向检测站 `#/`、`#/library` 的普通链接，“文档”为当前项并显示下划线。语言切换进入另一语言的同一页面。（决策：文档与检测共用一个应用外壳。来源：2026-10-01 用户要求文档站按 design.md 实现。）
-- 顶栏下方使用 1440px 框架：1024px 起左侧为页面树侧栏（顶部是搜索框），中间为正文，1280px 起右侧为本页目录。1024px 以下页面树改为抽屉，顶栏下方用 44px 的目录栏放“目录”按钮和搜索按钮，本页目录收为可展开的条。（决策：文档需要页面树导航。来源：同上。）
-- Fumadocs 的 `md` 断点设为 1024px，与检测站的布局断点一致。（决策：抽屉与侧栏的切换点沿用 1024px。）
-- 字号使用第 4 章的角色：页面标题用 `text-h1`；描述、侧栏、目录和顶栏用 `text-body`；h2 用 `text-section-title`，h3 用 `text-card-title`，表格用 `text-body`。正文段落为 14px，行高 1.75；行内代码为 13px。（决策：文档是长文，行高高于工具页的 1.5，只用于文档站正文。来源：同上。）
-- 卡片（`Card`）使用 12px 圆角、细边框、16px 内边距，不加阴影，卡片间隔 16px。图标放在标题左侧，使用 muted-foreground，不放图标底板。
-- 提示框（`Callout`）沿用检测站 `Alert` 的样式：8px 圆角；info 与 idea 用 primary 图标；warn 用 warning 底色和边框；error 用 destructive；success 用 success 图标。
-- 代码块和控件使用 8px 圆角，不加阴影。Tabs 是一张卡片，面板与标签栏在同一表面，不嵌套卡片。同一列的 th/td 对齐方式一致，宽表在正文内横向滚动。
-- 公式由 rehype-katex 渲染。`docs/package.json` 中的 `katex` 版本与 rehype-katex 依赖的版本一致。（来源：2026-10-01 审查发现版本不一致，公式失去排版规则。）
-- 减少动效与 focus-visible 的要求同第 4 章。Fumadocs 控件去掉 outline 而没有替代样式时，补 2px ring。
+- [SHOULD] 用浏览器 Canvas 绘制：逻辑宽度 1200px，按 2 倍像素密度导出 PNG；使用当前语言和主题配色，等待字体加载完成后绘制。
+- [MUST] 导出图片不包含凭据、请求地址和用户输入的原文。
+- [MUST] 零置信度的条形宽度为零；不可用的置信度显示破折号。
 
-### Open Graph 图片
+### 链接预览图
 
-- 每个文档页在构建时预渲染一张 1200×630 PNG（`/docs/og/<页面>/image.png`，英文为 `/docs/en/og/…`）。`docs/app/routes/og.ts` 经 `docs/app/lib/og-response.ts` 用 Takumi 渲染 `docs/app/lib/og-image.tsx` 的 `OgImage`，不使用 Fumadocs 自带的 `generateOGImage`。（来源：2026-10-02 用户要求按 design.md 优化 OG 模板。）
-- 检测站首页用同一模板：`docs/app/routes/og-detector.ts` 预渲染 `/docs/og/detector.png`（路径在 `docs/site.config.ts` 的 `detectorImage`），标题为 `detect.title`，描述为 `app.description`，署名为 `by Ikaleio`，不显示栏目。`web/vite.config.ts` 在 `index.html` 写入 description、`og:*` 和 `twitter:card`（`summary_large_image`）、`twitter:image`，绝对网址由 `SITE_ORIGIN` 与 `DOCS_BASE` 得出。index.html 的语言是 zh-CN，所以首页只有中文图片和中文标签。（来源：2026-10-02 用户要求官网首页也生成 OG 并支持 Twitter 大图卡片。）
-- 构图：深色主题；顶部一行左侧为品牌、右侧为 `SITE_ORIGIN` 的主机名（22px、muted-foreground）；中间垂直居中依次为栏目、标题、描述；底部为 128px 高的数字雨像素带，上边 2px border 分隔。像素带与检测页 CLI 提示条一致：`rain` 效果，每格 8px，muted-foreground/30，`mask-image: linear-gradient(90deg, transparent 25%, #000 70%)` 向左渐隐。（来源：2026-10-02 用户从六套构图中选定“数字雨”。）
-- 颜色只用 token：Takumi 读入 `web/src/tokens.css` 和 Fumadocs 的 `shadcn.css`，模板使用 `bg-fd-background`、`text-fd-muted-foreground` 等与文档站相同的类名，不写色值字面量。
-- 字号角色只用于 OG 图（决策：图片在链接卡片里约缩小到 0.4 倍，正文字号需要放大）：品牌为顶栏尺寸的 1.5 倍（指纹 48px、标题 21px、署名 18px）；栏目 24px、行高 1.4、muted-foreground；标题 68px、行高 1.12、600 字重、`text-balance`，最多 2 行；描述 30px、行高 1.5、muted-foreground、`text-pretty`，最多 2 行。
-- [必须] 限制行数的文字同时使用 `line-clamp-*` 和 `text-ellipsis`。只写 `line-clamp-*` 时 Takumi 直接截掉后半句，不画省略号。（来源：2026-10-02 布局检查发现。）
-- 栏目取页面树中页面上方的文件夹名，用“ / ”连接；最后一个文件夹名与标题相同（文件夹的首页）时去掉它；顶层页面不显示栏目。没有描述的页面不输出描述节点。
-- 品牌与顶栏一致：16 格像素指纹、`--font-brand-title` 的 `Fingerpoint Detector`（不换行）、`--font-brand-byline` 的“文档”/“Docs”。像素指纹和数字雨都是对应效果在减少动效时的静帧（3.7 秒、固定种子），用 currentColor 的方格绘制，带 `aria-hidden`。
-- [必须] 文字框离左右边缘至少 48px、上下至少 20px，文字框之间不重叠，`aria-hidden` 装饰不压在文字上。检查方法：对全部页面用 Takumi `measure()` 比较文字框与装饰框。（来源：2026-10-02 检查发现原模板在 7 个英文页把站名挤出画布。）
-
-### 样本库
-
-- 使用 `.fp-page-wide`，最大宽度 1440px。
-- 首屏包含标题、真实模型/样本总数、搜索、家族筛选、排序与导出入口。
-- 桌面使用表格：模型、家族、样本数、有效数字、来源。
-- 数量右对齐；同一列的 th/td 对齐方式一致。
-- 窄屏使用两层信息列表，长模型名称和 ID 换行，不压缩正文。
-- 模型名称为真实链接；桌面整行普通点击进入详情。
-- 详情页桌面锁定在屏幕可用高度内，左侧挑战导航、右侧回复分别滚动；窄屏导航保留横向 Tabs 和页面滚动。
-- 桌面挑战列表使用虚拟滚动，只渲染可见项、预加载项和当前选中项。方向键及 Home/End 可切换挑战，焦点随选中项移动。
-- 每条回复展示自己的原始提示词，不从同组第一条回复推断其他提示词。
-- 只展示记录实际具有的来源、服务提供方、渠道、批次、时间信息。
-- 清除端点中的认证信息、查询参数和私有主机信息；不展示完整原始 metadata 对象。
-- 请求失败显示重试；没有模型、没有回复、搜索为空分别显示对应状态。
+- [MUST] 1200×630，深色主题。顶部一行：左侧品牌，右侧主机名（22px，muted-foreground）。中间垂直居中依次为分组行、标题、描述。底部为 128px 高的数字雨像素带，上边 2px border 分隔：`rain` 效果，每格 8px，muted-foreground/30，`mask-image: linear-gradient(90deg, transparent 25%, #000 70%)` 向左渐隐。
+- [SHOULD] 字号只用于预览图：品牌为顶栏尺寸的 1.5 倍（指纹 48px、标题 21px、署名 18px）；分组行 24px、行高 1.4、muted；标题 68px、行高 1.12、600 字重、`text-balance`，最多 2 行；描述 30px、行高 1.5、muted、`text-pretty`，最多 2 行。（决策：预览图在链接卡片里约缩小到 0.4 倍，字号需要放大。来源：2026-10-02 预览图改版时确定。）
+- [MUST] 限制行数的文字同时使用 `line-clamp-*` 和 `text-ellipsis`，截断处显示省略号。
+- [MUST] 文字框离左右边缘至少 48px、离上下边缘至少 20px，文字框之间不重叠，装饰不压在文字上。检查方法：对全部预览图用 Takumi `measure()` 比较文字框与装饰框。
+- [SHOULD] 分组行显示页面所在的上级分组，用“ / ”连接；末级分组与标题相同时不显示它；没有分组或没有描述时，不输出对应的行。
+- [SHOULD] 颜色只用 `fd-*` 类（如 `bg-fd-background`、`text-fd-muted-foreground`）；像素图案是对应效果减少动效时的静帧（3.7 秒、固定种子），用 currentColor 的方格绘制。
 
 ## 4. 视觉规则
 
 ### 字体与颜色
 
-- 使用 `src/tokens.css` 的 Geist Variable 和 CJK 系统回退。接口、Key 和 ID 输入可用 `--font-mono`。
-- 标识标题使用 `--font-brand-title`（Noto Serif SC）；署名使用 `--font-brand-byline`（Noto Sans SC），与参考的 FisProxy 标识一致。`src/tokens.css` 从 `@fontsource-variable/noto-serif-sc` 和 `@fontsource-variable/noto-sans-sc` 包引用英文标识所需的 Latin WOFF2 文件，随站点构建加载。
-- 正文与控件使用 `text-body` 或组件的 `text-sm`。移动输入框使用 1rem，避免浏览器自动缩放。
-- `text-meta` 只承载数量、日期等次要内容，不承载主要操作和限制说明。
-- 数值统一使用 tabular-nums；百分比保留一位小数。
-- 浅色及深色 token 都在 `src/tokens.css` 中定义，页面不复制色值。
-- 蓝色用于主要操作、焦点和置信度条；状态使用 success、warning、destructive 语义色；`--star` 只用于求 Star 入口，不作为状态色。
-- 不按厂商分配置信度条颜色。
+- [SHOULD] 界面文字用 `--font-sans`（Geist Variable 加 CJK 系统回退）；列表、表格和结论中作为条目名称的标识符也用 `--font-sans`。`fp-mono` 只用于输入框里的地址、标识符和密钥，命令片段，名称下方的次级原始标识符（`text-meta` muted），以及证据详情中逐位比较的数值。
+- [MUST] 品牌标题用 `--font-brand-title`（Noto Serif SC Variable），署名用 `--font-brand-byline`（Noto Sans SC Variable）。
+- [SHOULD] 字号只用以下角色。例外：按钮的 `sm`/`xs` 尺寸自带字号；代码片段与提示条用 13px。
+
+| 角色 | 用途 |
+|---|---|
+| `text-display` | 结论中的主名称、不可评分时的结论 |
+| `text-display-number` | 结论中的主百分比 |
+| `text-h1` | 页面标题，每页一个 |
+| `text-section-title` | 区块标题、证据块的主值、文档 h2 |
+| `text-card-title` | 卡片标题、折叠项标题、文档 h3 |
+| `text-body` | 正文、控件、表格、列表行 |
+| `text-meta` | 计数、日期、标签、次要说明 |
+
+- [MUST] `text-meta` 不承载主要操作、结论和限制说明。
+- [SHOULD] 768px 以下输入框字号为 1rem，避免移动浏览器自动缩放。
+- [SHOULD] 数值使用 tabular-nums（全局已开启）。
+- [SHOULD] 颜色只用 `web/src/tokens.css` 的 token，浅色与深色各一套；页面不写色值字面量。语义如下：
+
+| token | 含义 |
+|---|---|
+| `primary` | 主要操作、焦点环、当前导航、链接、置信度条 |
+| `success` | 完成、一致、可用 |
+| `warning` | 进行中、不足、需要注意 |
+| `destructive` | 失败、错误、不一致 |
+| `muted-foreground` | 次要文字、像素装饰 |
+| `star` | 只用于 `fp-star-link`，不作状态色 |
+
+- [MUST] 置信度条只用 primary，不按候选所属的分组分配颜色。
 
 ### 布局与表面
 
-- 页面边距在 640px 和 1024px 处从 16px 增为 24px 和 32px。
-- 页面区域间隔 24px；卡片间隔及内边距 16px。
-- 卡片圆角 12px，控件 8px，细边框。普通卡片不加阴影。
-- 只为真正的对象或数据集合设置表面，不堆叠多层卡片。
-- 遇到长文本先换行或局部滚动，不隐藏整页溢出。
-- 窄屏操作栏避开 safe-area-inset-bottom，不遮挡末尾内容。
-- 保留可见 focus-visible；可滚动回复允许键盘聚焦。
+- [SHOULD] 页面容器左右内边距：640px 以下 16px，640px 起 24px，1024px 起 32px；顶栏内容区相同。最大宽度 1440px。
+- [SHOULD] 区块间隔 24px；卡片间隔和卡片内边距 16px；卡片内的组间隔 12px；行内元素间隔 8px。
+- [SHOULD] 卡片用 `--radius-card`，控件、代码块和提示框用 `--radius`，徽标用 `--radius-badge`；边框为 1px `--border`。普通卡片不加阴影，只有浮层使用 `--shadow-overlay`。
+- [SHOULD] 只为真实的对象或数据集合设置表面；卡片里不再嵌套卡片，详情中的列表不加边框。
+- [MUST] 页面不横向溢出：长文本先换行（标识符用 `overflow-wrap:anywhere`）或在自身区域内滚动，不隐藏整页溢出。
+- [MUST] 全局预留滚动条空间（`scrollbar-gutter: stable`），内容不随滚动条出现而横移。
+- [SHOULD] 断点只用以下四个：640px（容器内边距、顶栏双行）、768px（固定操作栏、候选行两行、列表与表格切换、触控尺寸）、1024px（三列网格、文档侧栏、主从分栏、证据两列）、1280px（文档本页目录）。文档站 Fumadocs 的 `md` 断点设为 1024px。
+
+### 控件与状态
+
+- [SHOULD] 按钮 `Button`：每个操作区只有一个 `default`（primary）主按钮，放在最右；次要操作用 `outline`；工具栏和行内低优先级操作用 `ghost`；危险操作用 `destructive`。操作栏用默认尺寸（36px），行内用 `sm`，图标按钮用 `icon-*`。
+- [SHOULD] 状态徽标：`Badge` 高 22px、`--radius-badge`、`text-meta` font-medium，色调取 `toneClass` 的 muted、success、warning、destructive；进行中时在文字前加旋转的 lucide `Loader2`。
+- [MUST] 进行中的徽标和按钮用 lucide `Loader2` 旋转图标，不用像素 spinner。
+- [SHOULD] 等待与载入：计算状态行用 `scan` 加 `PixelSpinner`；列表载入用 `blocks`；尚无内容的输入区用 `rain`；等待开始的区域背景用 `dither`。
+- [SHOULD] 空状态、未找到、无法评分：`Empty` 加 `static` 像素效果；载入失败时改用 destructive/35，并给出重试按钮。
+- [SHOULD] 错误：字段错误用 `FieldError`；区块级错误用 `Alert variant="destructive"`；需要注意的整行提示用 `Alert variant="warning"`；原始错误详情放在用户主动打开的 `Dialog` 里。
+- [SHOULD] 禁用：50% 不透明度、`not-allowed` 光标；运行中被锁定的区域整体禁用，不隐藏。
+- [SHOULD] 复制、保存等即时操作用 `Sonner` toast 反馈结果。
+- [MUST] 每个可聚焦元素有可见的焦点样式：控件原语用 3px `ring-ring/50` 加 `border-ring`；链接和其他元素用全局 2px `--ring` outline、偏移 2px；第三方控件去掉 outline 时补 2px ring。可滚动区域可以用键盘聚焦。
 
 ### 动效
 
-- `src/lib/motion.ts` 是弹簧参数唯一来源。
-- snappy：stiffness 500 / damping 45；用于短控件反馈与样本详情的局部高度展开。
-- smooth：260 / 34；用于导航容器内的位置变化。
-- gentle：120 / 24；用于结果条和数值过渡。置信度条用 scaleX，不逐帧修改布局宽度。
-- 三组弹簧均使用足够阻尼，避免越过目标后回弹。按钮、徽标和 Tabs 不使用 transition-all。
-- 主导航切页使用原生 View Transition，300ms 横向平移；不支持该 API 或减少动效时即时切页。卡片仍使用独立的局部高度展开动画。
-- 首批八项可错开 60ms；展开的后续候选不延长等待。
-- 流式文本不添加逐字动画。
-- 尊重 reduced-motion：取消错开与位移，数字直接到目标值，弹层、加载状态及 CSS 过渡也立即完成。
-- 动效不能阻止取消、输入或键盘导航。
+- [MUST] 弹簧参数只来自 `web/src/lib/motion.ts` 的 `spring`：`snappy` 用于短控件反馈和局部高度展开；`smooth` 用于导航容器内的位置变化和列表重排；`gentle` 用于数值和置信度条。
+- [MUST] 弹簧阻尼足够，元素不越过目标位置再回弹。
+- [SHOULD] 置信度条用 `scaleX` 做动画，不逐帧修改宽度；按钮、徽标和 Tabs 不用 `transition-all`。
+- [SHOULD] 工具页之间切换用原生 View Transition 横向平移 300ms：前进向左，返回向右，顶栏不动；切换后回到顶部；浏览器不支持时直接切换。
+- [SHOULD] 列表首批最多 8 项，每项错开 60ms（`listStagger`、`listItem`）；展开的后续项不错开。
+- [SHOULD] 卡片和它的详情不共享 `layoutId`，详情只在原位做高度展开。
+- [SHOULD] 流式文本不做逐字动画，末尾用 `fp-caret` 闪烁光标。
+- [SHOULD] 成功确认的庆祝效果：从视口左下角和右下角同时向中间喷出一次彩带，每侧 220 片、扩散角 32°，主体射程为视口宽度的 75%；同一结果只播放一次。
+- [MUST] 减少动效时：取消错开与位移，数值直接显示目标值，浮层、加载和 CSS 过渡立即完成，像素装饰只画一帧，不播放庆祝效果。
+- [MUST] 动效不阻挡取消、输入和键盘导航。
 
-### 像素着色器
+### 像素装饰
 
-- 装饰区域和长耗时操作使用像素风 GLSL 动画。（来源：2026-09-27 用户要求。）
-- 使用 `PixelShader` 与 `PixelSpinner`；效果定义在 `src/lib/pixel-effects.ts`，全站共用 `src/lib/pixel-renderer.ts` 的一个离屏 WebGL 上下文，不为单个装饰新建上下文。
-- 宿主元素决定尺寸；画布按 `cell` 整格缩放，用 `image-rendering: pixelated` 放大。
-- 颜色取宿主的 currentColor（含 alpha）。非强调区域统一使用 muted-foreground，不使用蓝色或黄色粒子。（来源：2026-09-28 用户反馈强调色装饰喧宾夺主。）
-- 例外：计算主按钮内的 spinner 跟随按钮文字色；样本库载入失败使用 destructive。
-- 结果摘要卡不放顶边粒子。有检测结果时，在模型名称右侧用 `logo` 效果拼出该模型家族的彩色品牌标识；参考库中的每个 family 都要在 `src/lib/brand-logos.ts` 中有对应 SVG，缺失时不显示标识。（来源：2026-09-27 用户要求；随后要求改为彩色。）
-- 品牌标识按像素画绘制：固定 24×24 网格，覆盖过半的格子为实心像素并沿用品牌色，无抗锯齿；轮廓压暗，右下一格黑色半透明阴影。优先用品牌彩色版；黑色标识和 Kimi 的白色 K 用 currentColor（前景色），随主题切换重绘。宽屏放在名称右侧（72px），窄屏放在标签上方（48px）。（来源：2026-09-27 用户反馈原效果只是模糊图标，并要求改为彩色。）
-- 取样中的状态徽标和主按钮使用原有 lucide `Loader2` 旋转图标，不使用着色器 spinner。（来源：2026-09-27 用户要求。）
-- 装饰不承载数据含义，设置 aria-hidden，不接收指针事件。背景类装饰放在 `isolate` 容器内的 `-z-10` 层，不遮挡文字。
-- 只绘制进入视口的装饰，上限 24fps；着色器时间统一以 0.5 倍速推进（`PLAYBACK_RATE`）；减少动效时只绘制一帧静态画面；不支持 WebGL 时保持透明。（来源：2026-09-27 用户要求放慢到 0.5x。）
-- 页脚不放像素装饰。（来源：2026-09-28 用户要求删除页脚波纹。）
+- [MUST] 只用 `PixelShader` 和 `PixelSpinner`；全站共享 `web/src/lib/pixel-renderer.ts` 的一个 WebGL 上下文，不为单个装饰新建上下文。
+- [SHOULD] 宿主元素决定尺寸，画布按 `cell` 整格放大，`image-rendering: pixelated`。
+- [MUST] 颜色取宿主的 currentColor（含透明度），按下表使用 muted-foreground 及其透明度，不用蓝色或黄色粒子。例外：主按钮内的 spinner 跟随按钮文字色；载入失败用 destructive/35。
+- [MUST] 装饰设 `aria-hidden`，不接收指针事件，不承载数据含义；背景装饰放在 `isolate` 容器的 `-z-10` 层，不遮挡文字。
+- [MUST] 只绘制进入视口的装饰，最高 24fps，时间按 0.5 倍速推进（`PLAYBACK_RATE`）；不支持 WebGL 时保持透明。
 
-| 效果 | 位置 | 颜色 |
+| 效果 | 使用位置 | 颜色 |
 |---|---|---|
-| fingerprint | 顶栏标识，2px 格；文档 OG 图的品牌标识（静帧） | muted-foreground |
-| rain | CLI 提示条背景，向左渐隐；API 请求尚无回复时的回复区；文档 OG 图底部像素带（静帧，向左渐隐） | muted-foreground/30 |
-| dither | API 模式的等待取样区域 | muted-foreground/20 |
-| march | 取样中样本卡标题下的分隔线 | muted-foreground/60 |
-| scan | 计算状态行 | muted-foreground/60 |
-| spinner | 计算主按钮、计算状态行、样本详情载入 | currentColor |
-| blocks | 样本库与样本详情的载入骨架 | muted-foreground/25 |
-| logo | 结果摘要中模型名称右侧的品牌标识（图像取自 `lib/brand-logos.ts`） | 品牌色；currentColor 部分用 foreground |
-| static | 空状态、未找到模型、不可评分结果、样本库载入失败 | muted-foreground；载入失败用 destructive/35 |
+| `fingerprint` | 品牌标识，2px 格；预览图品牌标识的静帧 | muted-foreground |
+| `rain` | 提示条背景（向左渐隐）；尚无内容的输入区；预览图底部像素带的静帧 | muted-foreground/30 |
+| `dither` | 等待开始的区域背景 | muted-foreground/20 |
+| `march` | 进行中卡片标题下的分隔线 | muted-foreground/60 |
+| `scan` | 计算状态行 | muted-foreground/60 |
+| `spinner` | 计算中的主按钮、计算状态行、详情载入 | currentColor |
+| `blocks` | 列表与详情的载入骨架 | muted-foreground/25 |
+| `logo` | 结论名称旁的品牌像素标识 | 品牌色；单色部分用 foreground |
+| `static` | 空状态、未找到、无法评分、载入失败 | muted-foreground/40–45；失败用 destructive/35 |
+
+- [MUST] `logo` 效果画成像素画：24×24 网格，覆盖过半的格子画成实心像素并沿用品牌色，无抗锯齿，轮廓压暗，右下方一格半透明黑色阴影。黑色或白色的单色标识用 currentColor，随主题重绘。宽屏 72px，放在名称右侧；窄屏 48px，放在标签上方。`web/src/lib/brand-logos.ts` 没有对应 SVG 时不显示。
 
 ## 5. 可用原语
 
-| 角色 | 实现名称 | 路径 | 状态 |
-|---|---|---|---|
-| 颜色与主题 | background、foreground、card、popover、primary、muted、muted-foreground、border、input、ring、success、warning、destructive、star | `src/tokens.css`、`src/index.css` | 已实现 |
-| 字号 | text-display、text-display-number、text-h1、text-section-title、text-card-title、text-body、text-meta | `src/tokens.css` | 已实现 |
-| 应用外壳 | fp-topbar、fp-topbar-inner、fp-topbar-actions、fp-brand、fp-brand-mark、fp-brand-text、fp-brand-title、fp-brand-byline、fp-nav、fp-nav-indicator、fp-repository-link；--fp-topbar-height | `src/shell.css` | 已实现 |
-| 容器 | fp-shell、fp-page、fp-page-wide、fp-grid-samples、fp-detect-footer、fp-actionbar、fp-result-row | `src/index.css` | 已实现 |
-| 表面与数据 | fp-card、fp-bar、fp-reply、fp-mono | `src/index.css` | 已实现 |
-| 控件 | Button、Input、Textarea、Field、Switch、ToggleGroup、Tabs、Collapsible | `src/components/ui/` | 已实现 |
-| 浮层 | Dialog、DropdownMenu、Tooltip、Sonner | `src/components/ui/` | 已实现 |
-| 数据反馈 | Table、Badge、Empty、Skeleton、Alert | `src/components/ui/` | 已实现 |
-| 检测对象 | SampleCard、SampleStrip、ResultPanel、ApiConfigPanel（摘要类 fp-api-summary） | `src/components/`、`src/index.css` | 已实现 |
-| 连接方式 | ProxySettings、useConnectionRoute | `src/components/proxy-settings.tsx`、`src/lib/use-connection-route.ts`、`src/lib/route.ts` | 已实现 |
-| 分词器探测 | TokenizerCard、TokenizerStripButton、TokenizerDetails、ModelCheck、useTokenizerProbe；复用 ConfidenceBar；fp-custom-tokenizer-candidates | `src/components/tokenizer-panel.tsx`、`src/components/tokenizer-claim.tsx`、`src/lib/use-tokenizer-probe.ts`、`src/index.css` | 已实现 |
-| 动效 | useMotionPreset、spring、listStagger、listItem | `src/lib/motion.ts` | 已实现 |
-| 像素装饰 | PixelShader、PixelSpinner、fp-pixel、fp-brand-mark | `src/components/pixel-shader.tsx`、`src/lib/pixel-effects.ts`、`src/lib/pixel-renderer.ts`、`src/shell.css` | 已实现 |
-| 文档站 | SiteHeader、DocsBar、Callout、Card | `docs/app/components/` | 已实现 |
-| Open Graph 图片 | OgImage、Brand、PixelFingerprint、ogRenderer、ogFontFamilies、ogResponse | `docs/app/lib/og-image.tsx`、`docs/app/lib/og.server.ts`、`docs/app/lib/og-response.ts` | 已实现 |
-| 图标 | lucide-react | `package.json` | 已安装 |
+| 角色 | 实现名称 | 路径 | 使用条件 | 状态 |
+|---|---|---|---|---|
+| 颜色与主题 | `background` `foreground` `card` `popover` `primary` `secondary` `muted` `muted-foreground` `accent` `border` `input` `ring` `success` `warning` `destructive` `star` | `web/src/tokens.css`、`web/src/index.css` | 所有颜色 | 已实现 |
+| 圆角与阴影 | `--radius` `--radius-card` `--radius-badge` `--shadow-overlay` | `web/src/tokens.css` | 控件、卡片、徽标、浮层 | 已实现 |
+| 字号角色 | `text-display` `text-display-number` `text-h1` `text-section-title` `text-card-title` `text-body` `text-meta` | `web/src/tokens.css` | 所有文字 | 已实现 |
+| 应用外壳 | `fp-topbar` `fp-topbar-inner` `fp-topbar-actions` `fp-brand` `fp-brand-mark` `fp-brand-text` `fp-brand-title` `fp-brand-byline` `fp-nav` `fp-nav-indicator` `fp-repository-link`；`--fp-topbar-height` | `web/src/shell.css` | 工具页和文档页顶栏 | 已实现 |
+| 页面容器 | `fp-shell` `fp-page` `fp-page-wide` `fp-footer` | `web/src/index.css` | 工具页 | 已实现 |
+| 工作台布局 | `fp-grid-samples` `fp-detect-footer` `fp-actionbar` `fp-cli-promo` `fp-cli-command` `fp-cli-link` `fp-star-link` | `web/src/index.css` | 多卡片工作台 | 已实现 |
+| 表面与数据 | `fp-card`（`data-warning`） `fp-bar` `fp-reply` `fp-mono` `fp-caret` `fp-api-summary` `fp-result-summary` `fp-result-score` `fp-result-row`（`data-unscored`） | `web/src/index.css` | 卡片、置信度条、原文、标识符、候选行 | 已实现 |
+| 控件 | `Button` `Input` `Textarea` `Field` `FieldError` `Switch` `ToggleGroup` `Segmented` `Tabs` `Collapsible` | `web/src/components/ui/`、`web/src/components/segmented.tsx` | 表单与操作 | 已实现 |
+| 浮层 | `Dialog` `DropdownMenu` `Tooltip` `Sonner` | `web/src/components/ui/` | 详情、菜单、提示、toast | 已实现 |
+| 数据反馈 | `Table` `Badge` `Empty` `Skeleton` `Alert`（`default` `warning` `destructive`） `Separator` | `web/src/components/ui/` | 表格、状态、空状态、警告 | 已实现 |
+| 工作台组件 | `SampleCard` `SampleStrip` `StateBadge` `toneClass` `ResultPanel` `ConfidenceBar` `AnimatedPercent` `ApiConfigPanel` `ProxySettings` | `web/src/components/` | 多卡片工作台 | 已实现 |
+| 证据详情 | `TokenizerCard` `TokenizerStripButton` `TokenizerDetails` `ModelCheck`；`fp-custom-tokenizer-candidates` | `web/src/components/tokenizer-panel.tsx`、`web/src/components/tokenizer-claim.tsx`、`web/src/index.css` | 两列证据详情 | 已实现 |
+| 动效 | `spring` `useMotionPreset` `listStagger` `listItem` | `web/src/lib/motion.ts` | 所有动画 | 已实现 |
+| 像素装饰 | `PixelShader`（`effect` `cell` `image`） `PixelSpinner` `fp-pixel` | `web/src/components/pixel-shader.tsx`、`web/src/lib/pixel-effects.ts`、`web/src/lib/pixel-renderer.ts`、`web/src/shell.css` | 品牌、加载、等待、空状态 | 已实现 |
+| 文档组件 | `SiteHeader` `DocsBar` `Card` `Callout` `Mermaid` `TokenizerClasses` | `docs/app/components/` | 文档站 | 已实现 |
+| 预览图 | `OgImage` `ogResponse` `ogRenderer` `ogFontFamilies` | `docs/app/lib/og-image.tsx`、`docs/app/lib/og-response.ts`、`docs/app/lib/og.server.ts` | 链接预览图 | 已实现 |
+| 图标 | lucide-react | `web/package.json`、`docs/package.json` | 所有图标 | 已实现 |
 
-[必须] 公开原语是本表的组件、类和 token；使用前确认 API 存在。
-[建议] 页面专用样式使用 `fp-custom-*` 名称。（决策：区分共享布局与页面例外。）
-[建议] 页面可使用 Tailwind 默认布局和间距工具；不得另建平行的颜色或字号系统。（决策：保留 shadcn 的组合方式。）
-[必须] 新的跨页面视觉变体先加入共享组件，不用页面覆盖隐藏行为差异。
+- [MUST] 公开原语是本表列出的 token、类、组件和 prop；页面只使用这些名称，使用前确认 API 存在，不猜测未列出的名称。
+- [SHOULD] 页面专用样式使用 `fp-custom-*` 名称，可以使用 Tailwind 的布局和间距工具。（决策：区分共享原语与页面例外，保留 shadcn 的组合方式。来源：项目初版设计决策。）
+- [MUST] 页面专用样式只调整位置、尺寸和间距，不改变已发布原语的字号、边框、圆角和表面；新的跨页面视觉变体先加入共享组件或类。
 
-## 6. 文案与数据
+背景装饰需要 `isolate` 容器：
 
-- 文案唯一入口：`src/i18n/messages.ts`。英文对象必须满足与中文相同的键结构。
-- Provider 位于 `src/i18n/index.tsx`，负责语言偏好、插值、数字和日期格式。
-- 初始语言先读取用户偏好，再根据浏览器语言选择中文或英文。
-- 切换语言时更新 document.lang 和页面标题，不清除检测内容。
-- 提示词、用户回复、模型 ID 和原始样本不翻译；翻译提示词会改变算法输入。
-- 协议名称保留 API 官方名称。
-- 错误正文按 code/HTTP 状态映射为本地化提示，原始详情仅在主动打开的对话框中显示。
-- 原始详情先脱敏，不显示密钥或 Authorization 值。
-- 不猜测网络错误就是 CORS、403 就是 Key 错误；文案要求检查相关条件。
-- 缺失日期或提示词明确说明缺失，不补造记录。
+```tsx
+<div className="relative isolate overflow-hidden rounded-xl border">
+  <PixelShader effect="dither" className="absolute inset-0 -z-10 text-muted-foreground/20" />
+  <p className="text-body">等待开始</p>
+</div>
+```
+
+整行警告带图标与可选操作：
+
+```tsx
+<Alert variant="warning" className="p-4">
+  <TriangleAlert aria-hidden="true" />
+  <AlertTitle>标题</AlertTitle>
+  <AlertDescription>说明</AlertDescription>
+</Alert>
+```
+
+## 6. 文案与数字格式
+
+- [MUST] 界面文案按读者选择的语言显示；用户输入的文本、生成的文本、标识符和原始记录保持原文，不翻译。
+- [SHOULD] 标题用名词短语；按钮用动词开头的短语；说明文字用一句话写条件或后果，不重复标题。
+- [SHOULD] 第三方协议和 API 名称使用官方写法。
+- [MUST] 结果文案只复述数据给出的结论、排名和限制说明，不补写解释、原因或数据之外的阈值判断；排名不写成身份确认。
+- [MUST] 错误提示用读者能操作的语言列出可能的原因和检查项，不断言单一原因；原始错误详情只在用户打开的对话框里显示。
+- [MUST] 界面、导出图片、错误详情和日志不显示密钥和 Authorization 值；原始详情先脱敏。
+- [MUST] 缺失的日期、来源和原文写明缺失，不补造；记录里不存在的元数据项不显示占位值。
+- [SHOULD] 百分比保留一位小数，按读者语言格式化（i18n 的 `percent`）；计数使用读者语言的千位分隔（`number`）；日期显示为年、月、日，月和日补足两位（`date`）。
+- [SHOULD] 单行省略的长值（标识符、地址、原文）把完整值放在 `title` 中。
 
 ## 7. 反模式
 
-[必须] 不把评分原因、内部特征向量或诊断对象作为黑盒结果解释。
-[必须] 不把分词器一致写成“已确认模型身份”；同一种分词器常被多个模型复用。
-[必须] 不把未知置信度显示为 0%，不自行添加判定阈值。
-[必须] 不把密钥写入 URL、导出图片或日志。
-[必须] 请求和密钥只发往所选连接方式指定的去向；“自动”可能改经本站代理，设置的说明文字写明这一点。不把失败的直连请求自动改走代理。（来源：2026-10-01 用户要求连接方式改为四选一，不要缓存和授权系统。）
-[必须] 不在设置草稿变化时自动发送模型请求。
-[必须] 不自动向参考库写入检测回复。
-[必须] 不添加 URL 分享、贡献样本、登录等未请求入口。
-[建议] 不默认采用居中宣传标题加卡片网格。（决策：检测工具需要任务密度。）
-[建议] 不叠加卡片、装饰图标底板或渐变；像素装饰只按“像素着色器”一节的位置和颜色使用。（决策：使用表面、文字和状态建立层级。）
-[建议] 普通元数据不使用胶囊徽标。（决策：徽标只表示状态。）
+- [SHOULD] 不默认采用居中宣传标题加卡片网格的页面结构。
+- [SHOULD] 不在卡片里嵌套卡片。
+- [SHOULD] 不放装饰性图标底板或彩色图标背景；`EmptyMedia` 只放像素装饰。
+- [SHOULD] 不使用原语之外的字号、字重或色值字面量。
+- [SHOULD] 主要信息不用小号、低对比度的文字。
+- [SHOULD] 普通元数据不用胶囊徽标；徽标只表示状态。
+- [SHOULD] 不使用渐变；预览图像素带的渐隐遮罩除外。
+- [MUST] 不用蓝色或黄色像素粒子装饰非强调区域。
+- [MUST] 不把未知或不可用的数值显示为 0。
+- [MUST] 不把推断性的结论写成确认。
 
 ## 8. 实现与接入
 
-- Bun workspace 根目录为 `projects/`；产品构建不依赖 `research/`。
-- React Router v7 使用 HashRouter，路由为 `/`、`/library`、`/library/:modelId`。
-- 样式为 Tailwind v4；shadcn 使用现有 base-nova / Base UI 组件，不切换到另一套组件系统。
-- 动效使用已安装的 `framer-motion`。
-- `next-themes` 通过 html.dark 应用主题，`index.html` 在加载前恢复偏好。
-- 主题偏好保存到 `fp-theme`。存储不可用时，首屏按系统外观显示；原生控件和滚动条使用当前主题的 color-scheme。文档站通过 Fumadocs RootProvider 的 next-themes `storageKey` 使用同一个键，主题菜单同为三项单选，两处的主题选择互相同步。
-- 颜色 token、字号角色（`text-*`）与品牌字体在 `src/tokens.css`；顶栏外壳类与像素装饰宿主 `.fp-pixel` 在 `src/shell.css`。两个文件都在 `@import "tailwindcss"` 之后导入：检测站由 `src/index.css` 导入，文档站由 `docs/app/app.css` 直接导入，Fumadocs 的 shadcn 预设把颜色映射为文档配色。文档顶栏通过相对路径导入 `src/components/pixel-shader.tsx`，只在浏览器中懒加载。新增或修改 token 或外壳类时同时检查两处。
-- 文档站和检测站首页的 OG 图由 `docs/app/lib/og-response.ts` 以 `?raw` 读入 `src/tokens.css` 与 `fumadocs-ui/css/shadcn.css` 交给 Takumi；`docs/app/lib/og.server.ts` 用 tokens.css 的族名注册 Geist Variable、Noto Sans SC Variable 与 Noto Serif SC Variable 的 Latin 子集，没有指定字体的文字按 Geist、Noto Sans SC 回退（Takumi 不读系统字体）。修改 token、品牌字体或 shadcn 映射时同时检查 OG 图。
-- `src/lib/client.ts` 载入静态参考库，在 Worker 中调用共享算法，Worker 不可用时使用同一实现回退。
-- 每次取样或探测开始时，`src/lib/use-connection-route.ts` 按连接方式确定路由：直连；本站代理 `/api/proxy`；自建 Worker 的已保存有效地址；自动模式用真实请求的方法与头名、假 Key（`sk-cors-check`）和 `{}` 请求体检查一次（8 秒超时），读到任何 HTTP 响应即直连，否则经本站代理。检查结果不缓存，每次运行重新检查。
-- 直连请求与自动检查共用 `directHeaders` 与 `directInit`：不携带 Cookie 和 Referer，`redirect: 'error'`；Messages 附带 `anthropic-dangerous-direct-browser-access: true`。
-- 直连请求在网络层失败时，`src/lib/client.ts` 报错误码 `direct_network`：文案同时列出地址或网络问题、接口不允许浏览器跨域两种可能，并指向“连接方式”，不断言原因是 CORS。
-- 连接方式以 `{ mode, endpoint }` 保存在 localStorage 的 `fingerpoint-proxy-v1`，mode 缺失或未知时为自动。自建 Worker 模式只使用该模式下保存的有效地址：地址为空或无效时运行不开始，提示并聚焦 Worker 地址输入框，不回退到本站代理或旧地址。每次运行开始时把路由写进 `Route`，运行中修改设置不影响正在进行的请求。
-- 经代理时浏览器向该代理发送请求及认证头，不携带 Cookie。代理实现为单文件 Worker `worker/main.js`：只转发允许的 HTTPS 域名和三种协议端点，不跟随重定向，不保存或记录密钥，不转发 Cookie；Messages 由代理发送 x-api-key 和 anthropic-version。跨域调用自建 Worker 时，Worker 按 `ALLOWED_ORIGINS` 回应预检和 CORS 头。上游以成功状态返回 JSON、SSE 以外的内容（通常是 Base URL 路径错误时的网页）时，代理返回 502 并在错误对象中带 `code: upstream_not_api`；网页把它映射为错误码 `upstream_not_api`，提示检查 Base URL 路径，不提示稍后重试。（来源：2026-10-01 用户遇到 `https://openrouter.ai/v1` 经代理一直 502。）
-- “检查代理”向代理发 GET，读到 `service: fingerpoint-api-proxy` 为可用；读不到响应时再发 no-cors GET，得到不透明响应说明能连上但浏览器无法读取，仍失败则为无法连接。
-- `src/lib/worker-deploy.ts` 生成 Deploy to Cloudflare 链接，并把 GitHub 上的 `worker/main.js` 与 `worker/wrangler.json` 的兼容日期、兼容标志打包成 Workers Playground 链接（multipart 正文经 lz-string 压缩后放在片段中）。
-- `shared/detection.ts` 与 `shared/completion.ts` 负责请求和 JSON/SSE 解析；UI 使用结构化状态和错误 code。
-- 分词器探测的请求、用量解析、后验概率与测试文本选择在 `shared/tokenizer-*.ts`；`src/lib/client.ts` 从静态数据载入 `tokenizer_bank.json`，测试请求与取样请求走同一条已确定的连接方式（直连或代理）。探测结果不进入数字指纹的分析结果。
-- `src/lib/export-image.ts` 在 Canvas 中生成 PNG。JSON 导出包含只来自数字指纹的候选列表；本次会话的探测已结束时，另在 `tokenizer` 下附探测报告（判定、与所填模型的一致性和每个测试请求的计数），不含请求配置和 API Key。
-- 构建命令为 `bun run typecheck` 和 `bun run build`；渲染检查直接运行网页，不用单元测试替代视觉检查。
+- [MUST] 颜色 token、字号角色和品牌字体只在 `web/src/tokens.css` 定义；顶栏外壳类和像素装饰宿主 `.fp-pixel` 只在 `web/src/shell.css` 定义。检测站由 `web/src/index.css` 在 `@import "tailwindcss"` 之后导入两者；文档站由 `docs/app/app.css` 直接导入两者，再由 Fumadocs 的 `shadcn.css` 把颜色映射为 `fd-*`。修改 token 或外壳类时同时检查两处和预览图。
+- [SHOULD] 预览图由 `docs/app/lib/og-response.ts` 把 `web/src/tokens.css` 和 Fumadocs 的 `shadcn.css` 原文交给 Takumi；`docs/app/lib/og.server.ts` 用 tokens.css 中的族名注册 Geist Variable、Noto Sans SC Variable 和 Noto Serif SC Variable 的 Latin 子集，没有指定字体的文字按 Geist、Noto Sans SC 回退（Takumi 不读系统字体）。
+- [SHOULD] 字体加载：Geist 来自 `@fontsource-variable/geist`；品牌字体在 `web/src/tokens.css` 用 `@font-face` 引用 `@fontsource-variable/noto-serif-sc` 与 `@fontsource-variable/noto-sans-sc` 的 Latin WOFF2，随站点构建加载。
+- [MUST] 主题由 next-themes 在 `html` 上切换 `dark` 类；`web/index.html` 在页面加载前读取偏好，避免闪烁。偏好保存在 `fp-theme`，文档站通过 Fumadocs RootProvider 的 `storageKey` 使用同一个键，两站的主题选择互相同步。存储不可用时按系统外观显示；原生控件和滚动条使用当前主题的 color-scheme。
+- [SHOULD] 组件来自 shadcn 的 base-nova（Base UI），位于 `web/src/components/ui/`；动画使用 framer-motion；图标使用 lucide-react。不切换到另一套组件系统。
+- [SHOULD] 文档站的 MDX 组件映射在 `docs/app/components/mdx.tsx`。Markdown 表格使用 Fumadocs 的滚动外层，表头与短列由 `docs/app/lib/remark-label-columns.ts` 标记为不换行；由数据生成的表格使用同一个外层，表头同样不换行。文档顶栏通过相对路径导入 `web/src/components/pixel-shader.tsx`，只在浏览器中懒加载。
+- [SHOULD] 公式样式来自 `katex/dist/katex.css`；`docs/package.json` 中 `katex` 的版本与 rehype-katex 依赖的版本保持一致，否则公式失去排版规则。
 
 ## 词汇表
 
 | 概念 | 名称 |
 |---|---|
-| 一条生成提示词及其回复 | 样本 / Sample |
-| API 生成回复 | 取样 / Sampling |
-| 提交三条回复给算法 | 验证 / Verify |
-| 算法返回的候选集合 | 结果 / Result |
-| 历史参考数据 | 样本库 / Reference Library |
-| 算法给出的匹配估计 | 置信度 / Confidence |
-| 把文本切成 token 的规则 | 分词器 / Tokenizer |
-| 计数方式几乎相同的开源分词器的分组 | 类 / Class |
-| 从用量识别上游分词器的检测步骤 | 分词器探测 / Tokenizer probe |
-| 分词器探测发送的一段短文本 | 测试文本 / Probe text |
-| 只含固定前后缀、不含测试文本的请求 | 对照请求 / Baseline request |
-| 上游在请求里额外加入的内容，例如系统提示词 | 隐藏内容 / Hidden input |
-| 接口返回的 token 数 | 用量 / Usage |
-| 替浏览器转发请求的服务 | 转发代理 / Forwarding proxy |
-| 决定请求直连还是经哪个代理转发的设置 | 连接方式 / Connection |
-| 用户自己部署的 `worker/main.js` | 自建 Worker / Own Worker |
+| 工具页和文档页共用的顶部条 | 顶栏 `fp-topbar` |
+| 顶栏左侧的像素指纹与两行文字 | 品牌标识 `fp-brand` |
+| 一次处理多份同类输入并给出结论的页面类型 | 多卡片工作台 |
+| 工作台里的一份输入及其参考原文 | 输入卡片 `SampleCard` |
+| 结果状态下收起的卡片行 | 摘要条 `SampleStrip` |
+| 页头下方一行的命令与入口 | 提示条 `fp-cli-promo` |
+| 页面末尾的主次操作 | 操作栏 `fp-actionbar` |
+| 结论卡片与候选列表 | 结果区 `ResultPanel` |
+| 候选列表中的一行 | 候选行 `fp-result-row` |
+| 表示匹配程度的横条 | 置信度条 `ConfidenceBar` |
+| 收起为一行摘要的表单卡片 | 配置卡片 `ApiConfigPanel` |
+| 判定、核对和逐条记录的展开详情 | 两列证据详情 `TokenizerDetails` |
+| 表格或两层列表形式的数据页 | 数据长列表 |
+| 左侧导航、右侧内容的页面类型 | 主从浏览 |
+| 侧栏、正文、本页目录组成的页面类型 | 长文文档 |
+| 浏览器生成的结果 PNG | 导出图片 |
+| 文档构建生成的 Open Graph 图片 | 链接预览图 `OgImage` |
+| GLSL 像素动画 | 像素装饰 `PixelShader` |
+| 表示状态的小标签 | 状态徽标 `Badge`、`StateBadge` |
+
+## 待定事项
+
+- [UNCONFIRMED] 数据记录卡片和主从浏览的分组小标题使用 h2 语义，但视觉为 `text-meta`；区块标题的语义层级与视觉层级是否应一致，尚未确认。（来源：2026-10-02 测量记录，主从浏览页“Closest fingerprints”与记录卡片标题。）
+- [UNCONFIRMED] 768px 以下，32px 高的输入框行高为 22.857px，其他输入框为 24px；高度与行高是否应统一，尚未确认。（来源：2026-10-02 测量记录，配置卡片在 390px 宽度下。）

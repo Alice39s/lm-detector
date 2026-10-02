@@ -23,7 +23,7 @@ const codeKeys: Record<ErrorCode, Parameters<I18n['t']>[0]> = {
   upstream_not_api: 'errors.upstream_not_api',
 }
 
-/** 把共享层错误映射为用户可读文案（design.md 6.4）。原始 message 由调用方放入「查看详情」。 */
+/** 把共享层错误映射为用户可读文案（design.md「文案与数字格式」）。原始 message 由调用方放入「查看详情」。 */
 export function describeError(i18n: I18n, error: unknown, fallbackKey: Parameters<I18n['t']>[0] = 'errors.unknown'): string {
   return describe(i18n, (error as CodedError)?.code, (error as CodedError)?.httpStatus, fallbackKey)
 }

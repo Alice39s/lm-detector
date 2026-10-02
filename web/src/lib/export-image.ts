@@ -9,7 +9,7 @@ function cssVar(name: string) {
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim()
 }
 
-/** design.md 3.6：1200px 宽、2x、当前主题色；不含 Key、接口地址、模型输入、回复正文。 */
+/** design.md「导出图片」：1200px 宽、2x、当前主题色；不含凭据、请求地址和用户输入的原文。 */
 export async function exportResultImage(result: Analysis, i18n: I18n): Promise<void> {
   if (!result.results.length) throw new Error('No scored candidates')
   await document.fonts.ready

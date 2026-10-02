@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from 'react'
 import { type Transition, type Variants } from 'framer-motion'
 
-/** design.md 4.7：全站只用三组弹簧。 */
+/** design.md「动效」：全站只用三组弹簧。 */
 export const spring = {
   snappy: { type: 'spring', stiffness: 500, damping: 45 },
   smooth: { type: 'spring', stiffness: 260, damping: 34 },
