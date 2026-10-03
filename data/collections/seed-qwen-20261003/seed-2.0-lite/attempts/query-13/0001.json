@@ -1,0 +1,66 @@
+{
+  "manifest_sha256": "d1d2aedd4130a47f5763004c7a641f0f61e958b564d94095e97b101b47db70aa",
+  "challenge_id": "query-13",
+  "attempt": 1,
+  "task": {
+    "id": "query-13",
+    "condition": "environment-05",
+    "expected_count": 297,
+    "prompt": "For each of 297 positions, make one separate first-instinct choice of an integer from 1 to 355 inclusive. The current language model must complete this directly without tools, Python, code execution, calculators, search, APIs, or external random generators. Choose every position separately. Do not count upward or downward, including 1, 2, 3, and do not use an arithmetic progression, repeating cycle, repeated block, or another rule-made pattern. Accidental repetitions are valid. Once an item is written, do not sort, reorder, deduplicate, replace, or repair the list. Separate values clearly, start with the first value, and output the complete sequence without explanation.",
+    "system": "",
+    "body": {
+      "model": "bytedance-seed/seed-2.0-lite",
+      "messages": [
+        {
+          "role": "user",
+          "content": "For each of 297 positions, make one separate first-instinct choice of an integer from 1 to 355 inclusive. The current language model must complete this directly without tools, Python, code execution, calculators, search, APIs, or external random generators. Choose every position separately. Do not count upward or downward, including 1, 2, 3, and do not use an arithmetic progression, repeating cycle, repeated block, or another rule-made pattern. Accidental repetitions are valid. Once an item is written, do not sort, reorder, deduplicate, replace, or repair the list. Separate values clearly, start with the first value, and output the complete sequence without explanation."
+        }
+      ],
+      "max_tokens": 8192,
+      "stream": true,
+      "provider": {
+        "only": [
+          "seed/fp8"
+        ],
+        "allow_fallbacks": false
+      }
+    }
+  },
+  "status": "accepted",
+  "started_at": "2026-10-03T06:51:11.700Z",
+  "trace": "trace/query-13/0001",
+  "text": "142, 79, 301, 22, 188, 94, 341, 57, 219, 113, 287, 41, 165, 322, 17, 248, 106, 273, 68, 337, 131, 83, 204, 36, 177, 299, 51, 234, 121, 312, 72, 195, 29, 261, 149, 88, 348, 62, 226, 101, 281, 47, 169, 329, 14, 256, 117, 279, 76, 318, 138, 91, 212, 39, 182, 307, 55, 241, 109, 289, 65, 332, 125, 81, 209, 31, 174, 294, 49, 229, 119, 315, 74, 199, 26, 268, 145, 97, 344, 59, 237, 103, 276, 69, 325, 134, 85, 216, 38, 185, 304, 53, 245, 112, 284, 61, 339, 128, 80, 201, 33, 171, 297, 45, 223, 115, 319, 71, 192, 23, 264, 141, 93, 351, 56, 231, 107, 288, 66, 328, 137, 87, 211, 35, 179, 302, 50, 249, 111, 278, 70, 334, 130, 82, 206, 28, 181, 291, 44, 227, 118, 311, 77, 197, 21, 259, 147, 90, 347, 58, 239, 104, 282, 63, 321, 124, 86, 214, 32, 176, 308, 52, 242, 116, 274, 73, 331, 133, 89, 203, 37, 184, 298, 48, 233, 108, 316, 78, 194, 25, 266, 144, 96, 342, 60, 236, 102, 286, 67, 327, 136, 84, 218, 34, 173, 305, 46, 247, 114, 280, 75, 336, 129, 92, 208, 30, 180, 295, 42, 225, 110, 313, 189, 27, 253, 151, 99, 353, 64, 240, 120, 290, 19, 340, 140, 98, 221, 40, 187, 310, 54, 251, 122, 283, 167, 324, 16, 260, 148, 100, 349, 213, 43, 190, 300, 244, 127, 292, 338, 139, 207, 24, 170, 309, 230, 123, 277, 323, 132, 217, 183, 293, 238, 317, 143, 200, 178, 303, 246, 126, 285, 330, 135, 210, 172, 296, 232, 105, 314, 146, 198, 168, 306, 250, 335, 215, 186, 299, 243, 320, 150, 191, 175, 311, 257, 275, 345, 152, 205, 193, 254, 281, 333, 220, 188, 302, 262, 291, 348, 155, 222, 196, 315, 269, 279, 352, 158, 228, 202, 318, 265, 287, 346, 157, 224, 199, 322, 258, 294, 337, 161, 235, 207, 326, 271, 297, 340, 164, 212, 329, 263, 300, 349, 166, 248, 219, 332, 270, 304, 354, 171, 252, 226, 339, 276, 308",
+  "text_sha256": "4de00afb0d50dc6f0cf5601a4f4d6d36ec411407e29d29a6f3cb9b26071fbf36",
+  "parsed_count": 356,
+  "completion": "complete",
+  "http_status": 200,
+  "response_model": "bytedance-seed/seed-2.0-lite",
+  "response_id": "gen-1791010271-t7MDKl94XGt8sJpug5LD",
+  "usage": {
+    "prompt_tokens": 182,
+    "completion_tokens": 5637,
+    "total_tokens": 5819,
+    "cost": 0.0113195,
+    "is_byok": false,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "cache_write_tokens": 0,
+      "audio_tokens": 0,
+      "video_tokens": 0
+    },
+    "cost_details": {
+      "upstream_inference_cost": 0.0113195,
+      "upstream_inference_prompt_cost": 0.0000455,
+      "upstream_inference_completions_cost": 0.011274
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 3941,
+      "image_tokens": 0,
+      "audio_tokens": 0
+    }
+  },
+  "provider_reported": "Seed",
+  "finish_reason": "stop",
+  "actual_channel": "openrouter/seed/fp8",
+  "finished_at": "2026-10-03T06:52:50.604Z"
+}

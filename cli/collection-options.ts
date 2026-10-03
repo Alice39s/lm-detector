@@ -127,7 +127,7 @@ Interactive enrollment previews the destination and counts before confirmation.
 Noninteractive enrollment requires an explicit --data-dir.
 --yes skips confirmation only with an explicit --data-dir.
 --dry-run validates evidence and reports counts without writing or confirmation.
-After a write, run fpd retrain --data-dir DIR to fit matching verifier and confidence parameters.
+After a write, run fpd retrain --data-dir DIR to fit a matching ranker and confidence calibration.
 --json selects noninteractive mode and writes the final report to stdout.
 ` : `Usage: fpd sample [options]
        fpd sample --resume DIR [--max-attempts N]

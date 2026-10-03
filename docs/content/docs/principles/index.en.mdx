@@ -10,14 +10,12 @@ flowchart LR
     B --> C["Parse the integer sequence"]
     C --> D["Features<br/>value distribution + position blocks + final digits"]
     D --> E["Ranker<br/>LDA · nearest neighbors · nuisance-free centroids"]
-    D --> F["Verifier<br/>Gaussian likelihood ratios + linear model"]
     E --> G["Temperature calibration<br/>confidence within the bank"]
     E --> H["Detection result"]
-    F --> H
     G --> H
 ```
 
-[Ranking, verification, and calibration](./ranking.mdx) explains how the features score the candidates. The [tokenizer probe](./tokenizer.mdx) looks only at the token counts in usage; its result is reference information shown on its own and does not enter the ranking or the confidence of the number fingerprint.
+[Ranking and calibration](./ranking.mdx) explains how the features score the candidates. The [tokenizer probe](./tokenizer.mdx) looks only at the token counts in usage; its result is reference information shown on its own and does not enter the ranking or the confidence of the number fingerprint.
 
 ## Challenges
 

@@ -9,6 +9,7 @@ const sections = [
     ['-k, --apikey KEY', 'API key. Env: API_KEY. Flags override environment variables.'],
     ['-a, --api TYPE', 'responses (default), chatcompletion, or message; any prefix or cc.'],
     ['-e, --effort LEVEL', 'Omitted by default. none/minimal/low/medium/high/xhigh/max, or any provider value.'],
+    ['-t, --service-tier TIER', 'flex, default, fast, or ultrafast. Default sends nothing. Aliases: slow (flex), f (fast), uf (ultrafast). Messages sends speed; other APIs send service_tier.'],
     ['-ns, --no-stream', 'Use JSON instead of SSE. SSE is enabled by default.'],
     ['--timeout SECONDS', 'First SSE byte deadline. Default: 120. No deadline after SSE starts; JSON must finish within this time.'],
   ] },
@@ -64,7 +65,7 @@ function Help() {
       <Text dimColor>Defaults: Responses · SSE · relaxed · count 3 · parallel 3 · one round</Text>
       <Text>fpd sample [options] · collect a portable reference batch</Text>
       <Text>fpd enroll RUN [options] · validate and enroll a batch</Text>
-      <Text>fpd retrain --data-dir DIR · fit verifier and confidence offline</Text>
+      <Text>fpd retrain --data-dir DIR · fit ranker and confidence offline</Text>
       <Text dimColor>Use the subcommand --help for its options.</Text>
     </Box>
     {sections.map(section => <Box key={section.title} flexDirection="column" marginTop={1}>

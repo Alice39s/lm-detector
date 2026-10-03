@@ -1,3 +1,4 @@
+import { isServiceTier } from '@fingerpoint/shared/completion-request'
 import type { ApiProfile, WebApiConfig } from '@/lib/config'
 
 const fileKind = 'fingerpoint-api-profile'
@@ -33,6 +34,7 @@ export async function readProfileFile(file: File): Promise<{ name: string; confi
   if (value.format !== 'openai' && value.format !== 'responses' && value.format !== 'anthropic') {
     throw new Error('Invalid profile file')
   }
+  if (value.serviceTier !== undefined && !isServiceTier(value.serviceTier)) throw new Error('Invalid profile file')
   for (const field of ['stream', 'parallel', 'autoVerify']) {
     if (typeof value[field] !== 'boolean') throw new Error('Invalid profile file')
   }
@@ -47,6 +49,7 @@ export async function readProfileFile(file: File): Promise<{ name: string; confi
       model: value.model as string,
       effort: value.effort as string,
       format: value.format,
+      serviceTier: value.serviceTier ?? 'default',
       stream: value.stream as boolean,
       parallel: value.parallel as boolean,
       relaxed: value.relaxed === undefined ? true : value.relaxed as boolean,
@@ -66,6 +69,7 @@ export async function saveProfileFile(profile: ApiProfile, name: string): Promis
     model: profile.model,
     effort: profile.effort,
     format: profile.format,
+    serviceTier: profile.serviceTier,
     stream: profile.stream,
     parallel: profile.parallel,
     relaxed: profile.relaxed,

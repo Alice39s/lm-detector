@@ -28,6 +28,7 @@ import { ProxySettings } from '@/components/proxy-settings'
 import { cn } from '@/lib/utils'
 import { useMotionPreset } from '@/lib/motion'
 import { TOKENIZER_MODEL } from '@fingerpoint/shared/tokenizer-posterior'
+import { serviceTierField } from '@fingerpoint/shared/completion-request'
 
 const placeholders: Record<WebApiConfig['format'], string> = {
   openai: 'https://api.openai.com/v1',
@@ -353,13 +354,26 @@ export function ApiConfigPanel({ open, onOpenChange, config, update, profileMana
               <datalist id="api-efforts">{efforts.map(effort => <option key={effort} value={effort} />)}</datalist>
               <FieldDescription id="api-effort-help">{t('api.effortHelp')}</FieldDescription>
             </Field>
-            <Field className="md:col-span-2">
+            <Field>
               <FieldLabel>{t('api.format')}</FieldLabel>
               <Segmented label={t('api.format')} value={config.format} disabled={disabled} onChange={format => update({ format })} options={[
                 { value: 'openai', label: t('api.formatChat') },
                 { value: 'anthropic', label: t('api.formatMessages') },
                 { value: 'responses', label: t('api.formatResponses') },
               ]} />
+            </Field>
+            <Field>
+              <FieldLabel>{t('api.serviceTier')}</FieldLabel>
+              <Segmented label={t('api.serviceTier')} value={config.serviceTier} disabled={disabled} onChange={serviceTier => update({ serviceTier })} options={[
+                { value: 'flex', label: 'Flex' },
+                { value: 'default', label: t('api.serviceTierDefault') },
+                { value: 'fast', label: 'Fast' },
+                { value: 'ultrafast', label: 'Ultrafast' },
+              ]} />
+              <FieldDescription>
+                {config.serviceTier === 'default' ? t('api.serviceTierDefaultHelp')
+                  : t(config.format === 'anthropic' ? 'api.serviceTierSpeedHelp' : 'api.serviceTierHelp', { field: serviceTierField(config.format), tier: config.serviceTier })}
+              </FieldDescription>
             </Field>
           </FieldGroup>
           <Separator />

@@ -1,0 +1,66 @@
+{
+  "manifest_sha256": "234fb5521f112c08194781394ac7ab69e7d0f4f874d0f8a51f5e5b042178f476",
+  "challenge_id": "query-13",
+  "attempt": 1,
+  "task": {
+    "id": "query-13",
+    "condition": "environment-05",
+    "expected_count": 297,
+    "prompt": "For each of 297 positions, make one separate first-instinct choice of an integer from 1 to 355 inclusive. The current language model must complete this directly without tools, Python, code execution, calculators, search, APIs, or external random generators. Choose every position separately. Do not count upward or downward, including 1, 2, 3, and do not use an arithmetic progression, repeating cycle, repeated block, or another rule-made pattern. Accidental repetitions are valid. Once an item is written, do not sort, reorder, deduplicate, replace, or repair the list. Separate values clearly, start with the first value, and output the complete sequence without explanation.",
+    "system": "",
+    "body": {
+      "model": "bytedance-seed/seed-2.0-mini",
+      "messages": [
+        {
+          "role": "user",
+          "content": "For each of 297 positions, make one separate first-instinct choice of an integer from 1 to 355 inclusive. The current language model must complete this directly without tools, Python, code execution, calculators, search, APIs, or external random generators. Choose every position separately. Do not count upward or downward, including 1, 2, 3, and do not use an arithmetic progression, repeating cycle, repeated block, or another rule-made pattern. Accidental repetitions are valid. Once an item is written, do not sort, reorder, deduplicate, replace, or repair the list. Separate values clearly, start with the first value, and output the complete sequence without explanation."
+        }
+      ],
+      "max_tokens": 8192,
+      "stream": true,
+      "provider": {
+        "only": [
+          "seed/fp8"
+        ],
+        "allow_fallbacks": false
+      }
+    }
+  },
+  "status": "accepted",
+  "started_at": "2026-10-03T06:49:54.189Z",
+  "trace": "trace/query-13/0001",
+  "text": "27 142 329 61 250 8 284 151 336 55 194 269 88 304 109 176 297 42 220 341 66 135 246 75 276 146 324 97 184 264 34 204 301 114 237 59 272 154 348 51 191 253 85 316 122 179 291 47 215 334 63 144 245 78 282 166 326 92 181 259 38 208 307 111 231 60 271 155 345 58 198 256 89 318 128 174 294 45 211 333 67 149 248 71 286 167 325 95 186 267 39 209 308 115 238 57 278 159 343 52 195 257 81 311 124 170 289 49 217 339 69 141 244 72 280 162 322 91 189 265 36 202 302 108 230 62 270 152 340 56 190 251 83 312 126 175 295 44 212 331 65 138 255 87 315 121 168 287 48 210 335 54 192 252 80 310 120 165 290 41 218 338 70 145 247 77 283 161 320 90 180 260 33 205 305 117 235 50 275 150 342 46 197 258 86 317 127 173 292 43 213 332 53 193 254 82 314 123 171 288 37 201 306 118 236 68 273 156 347 55 196 259 84 309 116 233 64 277 157 346 40 199 261 35 200 303 112 232 66 274 158 344 57 194 256 88 313 125 178 296 45 216 337 76 139 250 79 285 160 321 94 182 262 32 203 300 110 229 61 268 153 349 52 191 255 89 319 129 172 293 47 219 340 74 147 251 81 311 127 163 298 39 207 304 107 234 58 279 169 328 99 185 263 38 206 301 105",
+  "text_sha256": "163bce2b73be39abad1a128459a61f52e9449dce503db444637779e1a0e192ed",
+  "parsed_count": 297,
+  "completion": "complete",
+  "http_status": 200,
+  "response_model": "bytedance-seed/seed-2.0-mini",
+  "response_id": "gen-1791010197-EoDRcvVnC2r54yLyZRch",
+  "usage": {
+    "prompt_tokens": 182,
+    "completion_tokens": 6894,
+    "total_tokens": 7076,
+    "cost": 0.0027758,
+    "is_byok": false,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "cache_write_tokens": 0,
+      "audio_tokens": 0,
+      "video_tokens": 0
+    },
+    "cost_details": {
+      "upstream_inference_cost": 0.0027758,
+      "upstream_inference_prompt_cost": 0.0000182,
+      "upstream_inference_completions_cost": 0.0027576
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 5787,
+      "image_tokens": 0,
+      "audio_tokens": 0
+    }
+  },
+  "provider_reported": "Seed",
+  "finish_reason": "stop",
+  "actual_channel": "openrouter/seed/fp8",
+  "finished_at": "2026-10-03T06:50:36.017Z"
+}

@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import confetti from 'canvas-confetti'
 import type { Analysis } from '@fingerpoint/shared/types'
 import { useMotionPreset } from '@/lib/motion'
-import { confidenceOf, NORMAL_CONFIDENCE_THRESHOLD } from '@/lib/result-confidence'
+import { NORMAL_CONFIDENCE_THRESHOLD } from '@/lib/result-confidence'
 
 const modelId = (model: string) => model.trim().replace(/^[^/]+\//, '').replace(/(\d)\.(?=\d)/g, '$1-')
 
@@ -16,7 +16,7 @@ export function useModelMatchCelebration(result: Analysis | null, selectedModel:
     if (!enabled || reduced || !result || !selectedModel || result.decision === 'unscorable') return
 
     const top = result.results[0]
-    const confidence = top ? confidenceOf(top) : null
+    const confidence = top?.probability ?? null
     if (!top || confidence === null || !Number.isFinite(confidence) || confidence < NORMAL_CONFIDENCE_THRESHOLD) return
     if (!modelId(selectedModel) || modelId(top.model) !== modelId(selectedModel)) return
 

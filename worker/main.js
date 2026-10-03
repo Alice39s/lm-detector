@@ -19,6 +19,8 @@
 const UPSTREAM_TIMEOUT_MS = 250_000
 /** Used when a Worker has no ALLOWED_ORIGINS variable, as after a Playground deploy; `wrangler.json` sets the same value. */
 const DEFAULT_ALLOWED_ORIGINS = 'https://lm.ikale.io'
+/** Beta header that the Anthropic API needs for `speed`, equal to SPEED_BETA in `shared/completion-request.ts`. */
+const SPEED_BETA = 'fast-mode-2026-02-01'
 
 const MAX_BODY_BYTES = 128 * 1024
 const ENDPOINT_SUFFIXES = { openai: '/chat/completions', responses: '/responses', anthropic: '/messages' }
@@ -162,6 +164,7 @@ export async function proxyRequest(request, options = {}) {
     if (format === 'anthropic') {
       headers.set('x-api-key', authorization.slice(7))
       headers.set('anthropic-version', '2023-06-01')
+      if (body.speed !== undefined) headers.set('anthropic-beta', SPEED_BETA)
     } else headers.set('Authorization', authorization)
 
     const upstream = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body), signal, redirect: 'manual' })

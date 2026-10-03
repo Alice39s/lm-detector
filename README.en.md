@@ -26,7 +26,7 @@ An API relay or a third-party provider can claim to serve one model and actually
 - **Three protocols**: OpenAI Responses, Chat Completions, and Anthropic Messages. SSE streaming is the default.
 - **Reference bank**: covers common model families such as GPT, Claude, Gemini, Grok, Qwen, and DeepSeek. The library page on the website shows the bank in read-only mode and can export it.
 - **Tokenizer probe (optional, off by default)**: turn on “Tokenizer probe” in the API configuration on the website, or add `--tokenizer` on the command line. Detection then sends about 12 more short requests and identifies the upstream tokenizer (the rule a model uses to cut text into tokens) from the token counts in the API `usage`. It checks the tokenizer against the model you entered. The result is reference only: the ranking and the confidence come from the number fingerprint alone and do not wait for the probe. Many models share one tokenizer, so a matching tokenizer does not prove the model identity.
-- **Choose the connection**: by default, Auto lets the browser call an API directly when it allows web pages to, and sends requests through this site's proxy when the browser's cross-origin restriction (CORS) blocks that. You can also always use Direct, this site's proxy, or a Cloudflare Worker you [deploy in one click](https://lm.ikale.io/docs/en/deployment/worker).
+- **Choose the connection**: by default, requests go through this site's proxy. You can also pick Auto, which lets the browser call an API directly when it allows web pages to and uses this site's proxy when the browser's cross-origin restriction (CORS) blocks that, or always use Direct or a Cloudflare Worker you [deploy in one click](https://lm.ikale.io/docs/en/deployment/worker).
 - **Traceable data maintenance**: `fpd sample`, `fpd enroll`, and `fpd retrain` collect, enroll, and refit offline. All failures and earlier attempts stay on record.
 
 > [!IMPORTANT]
@@ -66,7 +66,7 @@ The full documentation is at [lm.ikale.io/docs/en](https://lm.ikale.io/docs/en),
 | --- | --- |
 | [Website](https://lm.ikale.io/docs/en/web) | Sampling modes, API configuration, reading results, tokenizer probe, connection modes |
 | [Command line](https://lm.ikale.io/docs/en/cli) | Detection, the optional tokenizer probe, sampling and resuming, enrollment and retraining |
-| [How it works](https://lm.ikale.io/docs/en/principles) | Challenges and features, ranking and verification, confidence calibration, the tokenizer probe |
+| [How it works](https://lm.ikale.io/docs/en/principles) | Challenges and features, ranking, confidence calibration, the tokenizer probe |
 | [Deployment](https://lm.ikale.io/docs/en/deployment) | Cloudflare Pages, GitHub Pages, Vercel, a self-deployed Worker proxy |
 | [Reference](https://lm.ikale.io/docs/en/reference/data) | Data files and change log, proxy API |
 | [Development](https://lm.ikale.io/docs/en/development) | Project structure, design spec, packaging and release |

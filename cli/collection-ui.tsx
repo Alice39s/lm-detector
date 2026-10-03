@@ -212,7 +212,7 @@ function Completion({ report }: { report: CollectionReport }) {
       {report.destination && <Text color="green">{report.status === 'enrolled' ? 'Enrolled' : 'Destination'}: {terminalText(report.destination)}</Text>}
       {report.enrollment && <Text>{report.enrollment.added} new · {report.enrollment.skipped} duplicates skipped · {report.enrollment.total} total{report.status === 'validated' ? ' · dry run, no changes' : ''}</Text>}
       {report.destination && report.status === 'complete' && !report.enrollment && !report.error && <Text dimColor>No reference data was written.</Text>}
-      {report.status === 'enrolled' && !!report.enrollment?.added && <Text color="yellow">Verifier/calibration not retrained. Confidence is unavailable until matching parameters are exported.</Text>}
+      {report.status === 'enrolled' && !!report.enrollment?.added && <Text color="yellow">Detector not retrained. Confidence is unavailable until a matching ranker and calibration are exported.</Text>}
       {report.error && <Text color="red">{terminalText(report.error)}</Text>}
       {report.next.map(command => <Text key={command} color="cyan">{terminalText(command)}</Text>)}
     </Box>

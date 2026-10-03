@@ -23,7 +23,7 @@ export function useConnectionRoute() {
     }
     setChecking(true)
     try {
-      return await allowsDirect(url, config.format) ? { kind: 'direct' } : { kind: 'proxy', endpoint: SITE_PROXY }
+      return await allowsDirect(url, config) ? { kind: 'direct' } : { kind: 'proxy', endpoint: SITE_PROXY }
     } finally { setChecking(false) }
   }, [])
 

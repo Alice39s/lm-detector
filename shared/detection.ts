@@ -1,4 +1,4 @@
-import { completionBody, COMPLETION_TIMEOUT_MS } from './completion-request'
+import { completionBody, COMPLETION_TIMEOUT_MS, sendsSpeed, SPEED_BETA } from './completion-request'
 import { readCompletion } from './completion'
 import { parseNumbers } from './fingerprint-core.js'
 import { throughputMeter } from './throughput'
@@ -11,6 +11,7 @@ export const directTransport:CompletionTransport = (url,config,body,signal) => {
   if(config.format==='anthropic'){
     headers['x-api-key']=config.apiKey
     headers['anthropic-version']='2023-06-01'
+    if(sendsSpeed(config))headers['anthropic-beta']=SPEED_BETA
   }else headers.Authorization='Bearer '+config.apiKey
   return fetch(url,{method:'POST',headers,body:JSON.stringify(body),signal,redirect:'error'})
 }

@@ -57,3 +57,25 @@ def reference_records(path: Path) -> list[dict]:
                 endpoint=batch['source'].get('endpoint'), collected_at=batch.get('created_at'),
             ))
     return records
+
+
+def reference_panel(rows: list[dict], ids: list[str]) -> list[dict]:
+    """Group each model's first answers to query-01..36 into twelve three-answer environments."""
+    first = {}
+    for row in rows:
+        first.setdefault((row['source'], row.get('challenge_id')), row)
+    panel = []
+    for label in ids:
+        for environment in range(1, 13):
+            queries = [f'query-{i:02d}' for i in range(3 * environment - 2, 3 * environment + 1)]
+            members = [first.get((label, query)) for query in queries]
+            if any(row is None for row in members):
+                raise ValueError(f'Missing reference challenge: {label}, environment {environment}')
+            condition = f'environment-{environment:02d}'
+            if any(not re.fullmatch(rf'{condition}(?:-[pe][0-9a-f]{{12}})?(?::.*)?', row['condition_id']) for row in members):
+                raise ValueError(f'Reference condition mismatch: {label}, {condition}')
+            panel.append(dict(id=f'{label}:{condition}', model=label, environment=environment,
+                row_ids=[row['row_id'] for row in members],
+                recorded_conditions=[row['condition_id'] for row in members],
+                reasoning_efforts=[row.get('reasoning_effort', 'default') for row in members]))
+    return panel

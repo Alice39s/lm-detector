@@ -10,8 +10,7 @@ from sklearn.metrics import roc_auc_score
 
 from calibration import temperature
 from ensemble_confidence_core import Ensemble
-from export import save, sha
-from shared_verifier_core import json_default
+from export import json_default, save, sha
 
 ENVIRONMENTS = range(1, 13)
 
@@ -51,7 +50,7 @@ def fit(data_dir: Path, out: Path, rows: list[dict], bank: dict, panel: list[dic
     by_id = {row['row_id']: row for row in rows}
     truth = np.array([ids.index(group['model']) for group in panel])
     save(out / 'plan.json', dict(created_at=datetime.now(timezone.utc).isoformat(),
-        scope='Fit one positive temperature on frozen ranker; ranking and verifier unchanged',
+        scope='Fit one positive temperature on the frozen ranker; ranking unchanged',
         method='For each reference environment, refit full ranker outside that environment, '
                'score held-out three-answer groups, pool scores and minimize multiclass NLL',
         nested_check='Each outer environment is excluded from every inner ranker; fit tau on '
@@ -124,7 +123,7 @@ def fit(data_dir: Path, out: Path, rows: list[dict], bank: dict, panel: list[dic
     gate = metrics['nested']
     passed = gate['binary_nll'] < gate['constant_binary_nll'] and gate['auc'] is not None and gate['auc'] > .75
     head = dict(schema='shared-confidence-v2', method='ranking-temperature', tau=tau,
-        binding=dict(base_sha256=artifact['base_sha256'], verifier_sha256=artifact['verifier_sha256'],
+        binding=dict(base_sha256=artifact['base_sha256'],
             reference_sha256=artifact['source_reference_sha256'], model_ids=ids),
         calibration_run=str(out.relative_to(data_dir)),
         fit_groups=int(len(panel)), fit_environments=len(ENVIRONMENTS),

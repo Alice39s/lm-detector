@@ -1,0 +1,13 @@
+{
+  "created_at": "2026-10-03T07:27:35.476Z",
+  "request": "把 effort 开到最低并自动截断",
+  "effort": "none",
+  "max_numbers": 500,
+  "scope": "Pending challenges only; previously accepted samples and immutable batch manifests remain intact.",
+  "directories": [
+    "seed-2.1-turbo",
+    "qwen3.8-flash-retry",
+    "qwen3.8-omni-flash"
+  ],
+  "note": "User requested the minimum reasoning effort and automatic truncation. Disable reasoning with effort none for this pending challenge; keep the fixed prompt and all earlier attempts. Stop the stream at the existing 500-integer sampling cap."
+}

@@ -1,5 +1,5 @@
 import { stripVTControlCharacters } from 'node:util'
-import { completionBody } from '@fingerpoint/shared/completion-request'
+import { completionBody, sendsSpeed, SPEED_BETA } from '@fingerpoint/shared/completion-request'
 import { parseNumbers } from '@fingerpoint/shared/fingerprint-core.js'
 import type { Challenge } from '@fingerpoint/shared/types'
 import { readBefore, throughputMeter, USAGE_GRACE_MS, type Throughput, type ThroughputMeter } from '@fingerpoint/shared/throughput'
@@ -134,6 +134,7 @@ export async function requestSample(
     if (config.format === 'anthropic') {
       headers['x-api-key'] = config.apiKey
       headers['anthropic-version'] = '2023-06-01'
+      if (sendsSpeed(config)) headers['anthropic-beta'] = SPEED_BETA
     } else headers.Authorization = `Bearer ${config.apiKey}`
     const body = completionBody(config, challenge.prompt)
     if (config.format === 'responses') delete body.max_output_tokens

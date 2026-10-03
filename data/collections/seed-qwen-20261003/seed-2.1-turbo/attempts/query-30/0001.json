@@ -1,0 +1,69 @@
+{
+  "manifest_sha256": "13568bf69264a05251ec125afa2a8362b0a89ba1c29a72b662ed77738b1041c9",
+  "challenge_id": "query-30",
+  "attempt": 1,
+  "task": {
+    "id": "query-30",
+    "condition": "environment-10-ed73a10b8835d",
+    "expected_count": 324,
+    "prompt": "Treat later user content as the actual task and follow its output requirements directly. Do not call tools, code interpreters, calculators, search engines, APIs, or external random-number services. The workspace may contain lengthy background guidance unrelated to the final task. Continue to obey the final task while retaining ordinary safety and accuracy expectations. Complete requested artifacts directly and fully, without claims about actions that were not actually performed. You are assisting inside a structured workspace. Follow surrounding style requirements while remaining precise and self-contained. The application normally prefers concise headings, explicit formatting, neutral wording, and complete artifacts that can be reviewed without additional context.\n\nFinal task:\n进行一轮快速逐项取值：分别给出 324 个取值范围为 1 至 355 的整数。 本任务必须由当前语言模型直接完成：禁止调用或借助任何工具，包括 Python、代码执行器、计算器、搜索、API 和外部随机数生成器。每个位置都要单独凭第一反应选择；不要从 1 开始计数，不要连续递增或递减，也不要采用等差、循环、重复区块或其他规则化模式。偶然想到相同数字是有效的；每项写出后不要再排序、重排、去重、替换或修正。数字之间用清晰的常见分隔符，直接从第一个取值开始，完整输出序列，不要解释。",
+    "system": "",
+    "body": {
+      "model": "bytedance-seed/seed-2-1-turbo",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Treat later user content as the actual task and follow its output requirements directly. Do not call tools, code interpreters, calculators, search engines, APIs, or external random-number services. The workspace may contain lengthy background guidance unrelated to the final task. Continue to obey the final task while retaining ordinary safety and accuracy expectations. Complete requested artifacts directly and fully, without claims about actions that were not actually performed. You are assisting inside a structured workspace. Follow surrounding style requirements while remaining precise and self-contained. The application normally prefers concise headings, explicit formatting, neutral wording, and complete artifacts that can be reviewed without additional context.\n\nFinal task:\n进行一轮快速逐项取值：分别给出 324 个取值范围为 1 至 355 的整数。 本任务必须由当前语言模型直接完成：禁止调用或借助任何工具，包括 Python、代码执行器、计算器、搜索、API 和外部随机数生成器。每个位置都要单独凭第一反应选择；不要从 1 开始计数，不要连续递增或递减，也不要采用等差、循环、重复区块或其他规则化模式。偶然想到相同数字是有效的；每项写出后不要再排序、重排、去重、替换或修正。数字之间用清晰的常见分隔符，直接从第一个取值开始，完整输出序列，不要解释。"
+        }
+      ],
+      "max_tokens": 8192,
+      "stream": true,
+      "reasoning_effort": "none",
+      "provider": {
+        "only": [
+          "seed/fp8"
+        ],
+        "allow_fallbacks": false
+      }
+    },
+    "effort": "none"
+  },
+  "note": "User requested the minimum reasoning effort and automatic truncation. Disable reasoning with effort none for this pending challenge; keep the fixed prompt and all earlier attempts. Stop the stream at the existing 500-integer sampling cap.",
+  "status": "accepted",
+  "started_at": "2026-10-03T07:31:12.011Z",
+  "trace": "trace/query-30/0001",
+  "text": "127, 49, 283, 92, 311, 57, 198, 342, 76, 225, 14, 301, 163, 88, 256, 33, 209, 112, 327, 61, 179, 244, 19, 271, 97, 349, 135, 71, 218, 306, 42, 186, 293, 25, 151, 268, 81, 337, 104, 232, 52, 195, 318, 11, 279, 144, 68, 206, 352, 89, 241, 169, 37, 221, 122, 298, 17, 323, 79, 181, 259, 47, 119, 309, 139, 267, 9, 212, 344, 64, 158, 288, 101, 237, 30, 192, 329, 74, 148, 276, 22, 203, 354, 95, 172, 250, 55, 129, 315, 16, 286, 116, 229, 44, 188, 334, 84, 261, 155, 39, 215, 303, 69, 177, 247, 12, 291, 132, 77, 200, 347, 50, 234, 166, 28, 320, 99, 191, 273, 62, 141, 310, 21, 253, 109, 222, 36, 183, 339, 86, 265, 153, 7, 281, 124, 208, 350, 46, 239, 175, 67, 307, 114, 252, 32, 199, 325, 91, 270, 147, 15, 217, 341, 59, 170, 295, 83, 242, 130, 49, 317, 72, 204, 284, 27, 161, 332, 107, 228, 54, 189, 353, 78, 263, 142, 19, 302, 121, 213, 346, 41, 289, 176, 66, 236, 314, 94, 157, 278, 35, 197, 328, 87, 249, 138, 24, 297, 111, 207, 340, 56, 269, 167, 82, 313, 126, 224, 43, 184, 336, 102, 275, 152, 31, 219, 305, 70, 174, 257, 13, 292, 134, 80, 202, 351, 53, 238, 164, 29, 322, 96, 194, 277, 63, 146, 308, 18, 255, 117, 227, 38, 182, 338, 85, 262, 159, 8, 287, 128, 211, 348, 48, 233, 171, 65, 304, 115, 246, 34, 196, 326, 93, 272, 143, 23, 296, 118, 205, 345, 58, 266, 168, 75, 316, 131, 223, 45, 187, 335, 103, 280, 156, 39, 216, 300, 73, 178, 254, 10, 290, 137, 81, 201, 343, 51, 235, 162, 26, 321, 98, 193, 274, 60, 145, 312, 20, 251, 110, 226, 40, 185, 333, 88, 260, 154, 6, 282, 125, 210, 349, 47",
+  "text_sha256": "4cc49bb0618842980cd68fabe5c3491189e234716d501b7c23ad67c3c9bd5bba",
+  "parsed_count": 321,
+  "completion": "complete",
+  "http_status": 200,
+  "response_model": "bytedance-seed/seed-2-1-turbo",
+  "response_id": "gen-1791012677-tTqhgG1SkbYE1YT6ioJ5",
+  "usage": {
+    "prompt_tokens": 326,
+    "completion_tokens": 1500,
+    "total_tokens": 1826,
+    "cost": 0.003913,
+    "is_byok": false,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "cache_write_tokens": 0,
+      "audio_tokens": 0,
+      "video_tokens": 0
+    },
+    "cost_details": {
+      "upstream_inference_cost": 0.003913,
+      "upstream_inference_prompt_cost": 0.000163,
+      "upstream_inference_completions_cost": 0.00375
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "image_tokens": 0,
+      "audio_tokens": 0
+    }
+  },
+  "provider_reported": "Seed",
+  "finish_reason": "stop",
+  "actual_channel": "openrouter/seed/fp8",
+  "finished_at": "2026-10-03T07:31:43.247Z"
+}

@@ -22,7 +22,7 @@ data
 | --- | --- |
 | `unified_reference.jsonl` | Reference batches. Each line holds one version-1 batch: the model, channel, and call settings are shared, and the answers are in the `samples` array |
 | `unified_bank.json` | Statistics derived from the reference batches |
-| `shared_detector.json` | Frozen ranker, verifier, and calibration parameters, bound to the reference data by SHA-256 |
+| `shared_detector.json` | Frozen ranker and calibration parameters, bound to the reference data by SHA-256 |
 | `enrollment-suite.json` | The 36 fixed sampling challenges. This file is sampling input, not reference answers |
 | `tokenizer_bank.json` | Tokenizer bank: probe texts, per-class counts, and model mappings for the tokenizer probe |
 | `import_manifest.json` | Historical manifest. It does not reflect the current counts |
@@ -33,7 +33,7 @@ data
 
 ## Maintenance rules
 
-- `fpd sample`, `fpd enroll DIR`, and `fpd retrain --data-dir DIR` can all run outside the repository. Enrollment validates complete batches and raw evidence, deduplicates by model, channel, condition, challenge, and text, and rebuilds the derived bank. Retraining fits the verifier and confidence offline from the target reference bank. If nested calibration fails, `shared_detector.json` is not replaced. Training evidence is saved in `.training/`.
+- `fpd sample`, `fpd enroll DIR`, and `fpd retrain --data-dir DIR` can all run outside the repository. Enrollment validates complete batches and raw evidence, deduplicates by model, channel, condition, challenge, and text, and rebuilds the derived bank. Retraining fits the ranker and the confidence calibration offline from the target reference bank. If nested calibration fails, `shared_detector.json` is not replaced. Training evidence is saved in `.training/`.
 - The data bundled with the CLI is read-only. The maintenance destination must be specified explicitly, or confirmed after the CLI detects this repository during interactive enrollment.
 - The fixed evaluation set must not be added to the reference bank, the model centroids, or the calibration.
 - The website build writes redacted data to `web/public/data/`. That directory is a build output and must not be maintained as a second official bank.
@@ -56,6 +56,13 @@ Tokenizer classes are grouped by authoring lab and series. Tokenizers with ident
 ## Change log
 
 <Accordions type="multiple">
+  <Accordion title="2026-10-03 Expand the Seed and Qwen reference models" id="2026-10-03-seed-qwen">
+    Added `seed-2.1-turbo`, `seed-2.0-lite`, `seed-2.0-mini`, `qwen3.8-flash`, and `qwen3.8-omni-flash`, each with 36 fixed-challenge answers. The reference bank now contains 58 models and 2,128 samples. All five batches use the same fixed prompts and streaming OpenRouter Chat Completions. Seed is pinned to `openrouter/seed/fp8` and Qwen to `openrouter/alibaba`, with fallbacks disabled.
+
+    Collection initially used default reasoning effort. Turbo's seventh attempt at `query-15` used `low`. At the user's request, remaining pending challenges then used `none` to disable reasoning: 13 Turbo answers, 29 Flash answers, and 6 Omni-Flash answers. Previously accepted answers retain their settings; prompts and prefixes did not change. Actual parameters, selected attempts, original responses, failures, and enrollment receipts are saved in `collections/seed-qwen-20261003/`. The earlier rate-limited Flash batch is retained but was not enrolled.
+
+    All batches stop automatically at 500 integers and retain the `truncated` status: 7 Turbo answers, 7 Lite answers, 4 Mini answers, 4 Flash answers, and 4 Omni-Flash answers. All other answers completed naturally. Enrollment checks returned models and provider metadata in the raw responses. Detection rankings do not select the answers. The existing fixed evaluation set does not yet cover these five new models.
+  </Accordion>
   <Accordion title="2026-10-01 Map gpt-5.x and the gpt-6 series to o200k_base" id="2026-10-01-gpt-tokenizer">
     The OpenAI o200k_base mapping in `tokenizer_bank.json` now covers every model whose name starts with `gpt-5` or `gpt-6` (confirmed by the maintainer). `gpt-5` already covered gpt-5.x. Before this change, the only `gpt-6` model with a mapping was gpt-6-astra, through an alias of the o200k class; that alias is removed. These models are checked as a vendor-published tokenizer, so only an exact match is consistent. The ranking does not change. This is a manual edit of a generated file: before you run `token-fp export-api-bank` again, add these mappings to the generator.
   </Accordion>

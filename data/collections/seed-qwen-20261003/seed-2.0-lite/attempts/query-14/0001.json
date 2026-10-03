@@ -1,0 +1,66 @@
+{
+  "manifest_sha256": "d1d2aedd4130a47f5763004c7a641f0f61e958b564d94095e97b101b47db70aa",
+  "challenge_id": "query-14",
+  "attempt": 1,
+  "task": {
+    "id": "query-14",
+    "condition": "environment-05",
+    "expected_count": 315,
+    "prompt": "Provide exactly 315 whole-number choices between 1 and 355 inclusive, choosing each item separately as it comes to mind. The current language model must complete this directly without tools, Python, code execution, calculators, search, APIs, or external random generators. Choose every position separately. Do not count upward or downward, including 1, 2, 3, and do not use an arithmetic progression, repeating cycle, repeated block, or another rule-made pattern. Accidental repetitions are valid. Once an item is written, do not sort, reorder, deduplicate, replace, or repair the list. Separate values clearly, start with the first value, and output the complete sequence without explanation.",
+    "system": "",
+    "body": {
+      "model": "bytedance-seed/seed-2.0-lite",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Provide exactly 315 whole-number choices between 1 and 355 inclusive, choosing each item separately as it comes to mind. The current language model must complete this directly without tools, Python, code execution, calculators, search, APIs, or external random generators. Choose every position separately. Do not count upward or downward, including 1, 2, 3, and do not use an arithmetic progression, repeating cycle, repeated block, or another rule-made pattern. Accidental repetitions are valid. Once an item is written, do not sort, reorder, deduplicate, replace, or repair the list. Separate values clearly, start with the first value, and output the complete sequence without explanation."
+        }
+      ],
+      "max_tokens": 8192,
+      "stream": true,
+      "provider": {
+        "only": [
+          "seed/fp8"
+        ],
+        "allow_fallbacks": false
+      }
+    }
+  },
+  "status": "accepted",
+  "started_at": "2026-10-03T06:51:44.099Z",
+  "trace": "trace/query-14/0001",
+  "text": "72, 198, 34, 267, 112, 291, 45, 322, 17, 219, 156, 88, 304, 61, 243, 137, 22, 338, 99, 184, 53, 276, 149, 39, 207, 78, 311, 124, 258, 11, 289, 165, 49, 347, 82, 221, 141, 67, 301, 188, 31, 235, 106, 272, 58, 199, 121, 329, 7, 261, 174, 42, 316, 93, 247, 152, 28, 294, 118, 342, 74, 212, 169, 51, 308, 85, 239, 132, 19, 281, 102, 331, 64, 227, 181, 37, 319, 97, 253, 145, 47, 279, 111, 351, 79, 204, 161, 55, 297, 89, 241, 134, 25, 327, 109, 264, 178, 33, 303, 71, 216, 147, 62, 335, 91, 256, 128, 14, 286, 189, 44, 313, 81, 229, 159, 59, 344, 104, 271, 171, 38, 299, 68, 232, 122, 21, 321, 95, 268, 183, 48, 306, 76, 211, 143, 54, 349, 115, 278, 167, 35, 292, 87, 245, 139, 16, 318, 101, 251, 176, 41, 332, 73, 224, 154, 66, 302, 98, 262, 187, 29, 339, 119, 284, 162, 50, 315, 84, 237, 131, 23, 296, 108, 274, 179, 46, 325, 77, 218, 146, 60, 346, 92, 259, 168, 36, 309, 113, 269, 191, 57, 328, 80, 226, 157, 40, 353, 105, 249, 182, 32, 314, 86, 234, 140, 27, 287, 117, 280, 173, 52, 337, 94, 244, 151, 18, 300, 120, 266, 195, 63, 323, 70, 215, 136, 24, 290, 100, 277, 185, 43, 341, 83, 222, 148, 56, 310, 96, 255, 164, 30, 334, 110, 270, 177, 127, 298, 75, 230, 153, 65, 348, 107, 260, 190, 13, 320, 126, 248, 170, 305, 114, 282, 180, 9, 330, 142, 257, 193, 285, 129, 208, 317, 135, 265, 197, 69, 340, 116, 275, 186, 326, 90, 238, 160, 15, 293, 123, 242, 172, 350, 103, 254, 166, 20, 312, 144, 228, 158, 333, 263, 192, 307, 220, 138, 354, 240, 175, 288, 125, 213, 324, 273, 194, 343, 231, 155, 225, 336, 10, 202, 355, 6, 223, 205, 8, 345, 214, 1, 352, 206, 2, 209, 3, 210, 4, 217, 5, 295",
+  "text_sha256": "e88ced54f01bd9fa2fbba6ad68b14897526186ee4f959d2d445e7e779109a170",
+  "parsed_count": 339,
+  "completion": "complete",
+  "http_status": 200,
+  "response_model": "bytedance-seed/seed-2.0-lite",
+  "response_id": "gen-1791010309-YmHbD93d086zeoU81DJ2",
+  "usage": {
+    "prompt_tokens": 181,
+    "completion_tokens": 5037,
+    "total_tokens": 5218,
+    "cost": 0.01011925,
+    "is_byok": false,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "cache_write_tokens": 0,
+      "audio_tokens": 0,
+      "video_tokens": 0
+    },
+    "cost_details": {
+      "upstream_inference_cost": 0.01011925,
+      "upstream_inference_prompt_cost": 0.00004525,
+      "upstream_inference_completions_cost": 0.010074
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 3450,
+      "image_tokens": 0,
+      "audio_tokens": 0
+    }
+  },
+  "provider_reported": "Seed",
+  "finish_reason": "stop",
+  "actual_channel": "openrouter/seed/fp8",
+  "finished_at": "2026-10-03T06:53:04.624Z"
+}

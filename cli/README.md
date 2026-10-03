@@ -13,7 +13,7 @@ npx lmfpd@latest -b https://api.example.com/v1 -k sk-xxx -m gpt-6-astra --count 
 npx lmfpd@latest --help
 ```
 
-With Bun and no Node.js installation, use `bunx --bun lmfpd@latest --help`. The runner downloads the package when needed. The package includes the detection algorithms, reference bank, and verifier. It requires no repository checkout. The installed executable is named `fpd`.
+With Bun and no Node.js installation, use `bunx --bun lmfpd@latest --help`. The runner downloads the package when needed. The package includes the detection algorithms, reference bank, and detector parameters. It requires no repository checkout. The installed executable is named `fpd`.
 
 ## Run from source
 
@@ -53,6 +53,7 @@ Explicit flags override environment variables. Credentials do not appear in the 
 | `-ns`, `--no-stream` | Request JSON instead of SSE. |
 | `--timeout` | Timeout in seconds. Default: 120. Fractional seconds are supported. |
 | `-e`, `--effort` | Optional provider reasoning effort. Accepts any string, including `none`, `minimal`, `low`, `medium`, `high`, `xhigh`, and `max`. Omitted from API requests by default. |
+| `-t`, `--service-tier` | Service tier: `flex`, `default`, `fast`, or `ultrafast`. Any prefix works. Aliases: `slow` (flex), `f` (fast), `uf` (ultrafast), `priority` (fast), `standard` (default). `default` omits the parameter. |
 | `--challenges FILE` | Reuse a JSON array of challenges in every round. Its length must match `--count` (default: 3). |
 | `--bank FILE` | Use a custom reference bank. |
 | `--tokenizer` | Run the tokenizer probe. Off by default. Sends about 12 more requests, at most `--max-probes` + 2. The ranking is the same with or without it. |
@@ -64,7 +65,7 @@ Explicit flags override environment variables. Credentials do not appear in the 
 | `--no-update-check` | Disable background update checks. Also accepts `FPD_NO_UPDATE_CHECK=1` or `NO_UPDATE_NOTIFIER=1`. |
 | `-h`, `--help` | Show help. |
 
-`--base-url` and `--api-key` are accepted as aliases. An origin such as `https://api.example.com` uses `/v1`. A base URL with a path preserves that path and appends the selected endpoint. Messages requests use `x-api-key` and `anthropic-version` headers.
+`--base-url` and `--api-key` are accepted as aliases. An origin such as `https://api.example.com` uses `/v1`. A base URL with a path preserves that path and appends the selected endpoint. Messages requests use `x-api-key` and `anthropic-version` headers. Messages sends the service tier as `speed` with the `anthropic-beta: fast-mode-2026-02-01` header; Responses and Chat Completions send it as `service_tier`.
 
 Detection requests omit the optional output token limit for Responses and Chat Completions. Messages requests keep `max_tokens: 8192`, which that API requires.
 
@@ -90,7 +91,7 @@ The default relaxed mode stops a streaming sample after it receives the requeste
 
 A naturally completed sample must contain at least `max(80, ceil(expected_count * 0.55))` valid numbers, matching the existing scorer. A refusal, provider error, or unfinished response is rejected unless relaxed mode already stopped it at the requested count.
 
-Relaxed mode can rank one or two valid samples, including when that is the requested count. Partial rankings have no confidence scores; the verifier and confidence calibration still require three valid samples. Strict mode requires `--count 3`, disables the client count limit, waits for complete responses, and skips scoring unless all three samples succeed. Combining `--strict` with `--count 1` or `--count 2` is rejected before any model requests. Provider token limits still apply. Failed samples remain visible and are preserved in saved results.
+Relaxed mode can rank one or two valid samples, including when that is the requested count. Partial rankings have no confidence scores; confidence calibration requires three valid samples. Strict mode requires `--count 3`, disables the client count limit, waits for complete responses, and skips scoring unless all three samples succeed. Combining `--strict` with `--count 1` or `--count 2` is rejected before any model requests. Provider token limits still apply. Failed samples remain visible and are preserved in saved results.
 
 All requested samples must settle before the next round starts, including failed requests. Each round uses its own concurrency limit, capped at the sample count. The CLI does not retry requests automatically. A failed round does not prevent later rounds from running.
 
@@ -164,13 +165,13 @@ In this repository, output defaults to `runs/`; elsewhere it defaults to `./fpd-
 
 An interrupted enrollment is validated during preview without applying it. Confirmed enrollment completes the prepared transaction before importing new samples. Unexpected changes outside that transaction are never overwritten.
 
-Reference JSONL contains one version-1 batch per line, with shared metadata and a `samples` array. Old row and collection-manifest formats are rejected. Enrollment rebuilds the chosen bank but does not silently retrain its verifier. Run `fpd retrain --data-dir DIR` after enrollment to fit and export a matching verifier and confidence calibration. The command requires `uv` and Python with the pinned numerical dependencies; it does not call a model API or use holdout data. It stores fit evidence and the previous detector under `DIR/.training/`, then replaces `DIR/shared_detector.json` only after nested calibration validation passes. Failed fitting or validation leaves the previous detector intact. The package's bundled bank stays read-only. See [Sampling and resuming](https://lm.ikale.io/docs/en/cli/sampling) and [Enrollment and retraining](https://lm.ikale.io/docs/en/cli/enroll) for the full workflow.
+Reference JSONL contains one version-1 batch per line, with shared metadata and a `samples` array. Old row and collection-manifest formats are rejected. Enrollment rebuilds the chosen bank but does not silently retrain its detector; until the bank and detector match again, detection falls back to the legacy ranking without confidence. Run `fpd retrain --data-dir DIR` after enrollment to fit and export a matching ranker and confidence calibration. The command requires `uv` and Python with the pinned numerical dependencies; it does not call a model API or use holdout data. It stores fit evidence and the previous detector under `DIR/.training/`, then replaces `DIR/shared_detector.json` only after nested calibration validation passes. Failed fitting or validation leaves the previous detector intact. The package's bundled bank stays read-only. See [Sampling and resuming](https://lm.ikale.io/docs/en/cli/sampling) and [Enrollment and retraining](https://lm.ikale.io/docs/en/cli/enroll) for the full workflow.
 
 The previous detection interface remains available in the repository as `bun run detect:legacy`.
 
 ## Package builds and automatic publication
 
-`bun run build:cli` creates `dist/fpd/`. It bundles CLI commands, the fixed collection suite, shared algorithms, the bank worker, and product-local offline fitting modules. It copies the public reference bank and verifier and pins installed runtime dependency versions. Raw collection records are not packaged. Sampling and enrollment work under Node or Bun outside the checkout; offline retraining additionally requires `uv` and Python.
+`bun run build:cli` creates `dist/fpd/`. It bundles CLI commands, the fixed collection suite, shared algorithms, the bank worker, and product-local offline fitting modules. It copies the public reference bank and detector parameters and pins installed runtime dependency versions. Raw collection records are not packaged. Sampling and enrollment work under Node or Bun outside the checkout; offline retraining additionally requires `uv` and Python.
 
 The `Publish FPD CLI` workflow runs on `main` when CLI, shared algorithms, reference data, dependencies, or release configuration change. It also supports manual dispatch. Each build uses `0.0.<Unix time in milliseconds>` as its version and publishes the `latest` tag. No manual version bump or Git tag is required. Release jobs run sequentially, verify a clean installation outside the checkout, and check the npm tag after publishing.
 

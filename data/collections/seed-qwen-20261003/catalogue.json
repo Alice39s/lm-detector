@@ -1,0 +1,749 @@
+{
+  "fetched_at": "2026-10-03T06:42:56.612Z",
+  "models": [
+    {
+      "target": {
+        "label": "seed-2.1-turbo",
+        "model": "bytedance-seed/seed-2-1-turbo",
+        "family": "seed",
+        "familyName": "Seed",
+        "provider": "seed/fp8"
+      },
+      "model": {
+        "id": "bytedance-seed/seed-2-1-turbo",
+        "canonical_slug": "bytedance-seed/seed-2-1-turbo-20260810",
+        "hugging_face_id": null,
+        "name": "ByteDance Seed: Seed 2.1 Turbo",
+        "created": 1786552176,
+        "description": "Seed 2.1 Turbo is a multimodal model from ByteDance Seed for coding and long-horizon agent workflows. It is suited for end-to-end software delivery, multi-step task execution, and understanding visual and...",
+        "context_length": 262144,
+        "architecture": {
+          "modality": "text+image+video->text",
+          "input_modalities": [
+            "text",
+            "image",
+            "video"
+          ],
+          "output_modalities": [
+            "text"
+          ],
+          "tokenizer": "Other",
+          "instruct_type": null
+        },
+        "pricing": {
+          "prompt": "0.0000005",
+          "completion": "0.0000025"
+        },
+        "top_provider": {
+          "context_length": 262144,
+          "max_completion_tokens": 235929,
+          "is_moderated": false
+        },
+        "per_request_limits": null,
+        "supported_parameters": [
+          "frequency_penalty",
+          "include_reasoning",
+          "max_tokens",
+          "reasoning",
+          "response_format",
+          "stop",
+          "structured_outputs",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_p"
+        ],
+        "default_parameters": {},
+        "supported_voices": null,
+        "knowledge_cutoff": null,
+        "expiration_date": null,
+        "links": {
+          "details": "/api/v1/models/bytedance-seed/seed-2-1-turbo-20260810/endpoints"
+        },
+        "reasoning": {
+          "mandatory": false
+        }
+      },
+      "endpoints": {
+        "id": "bytedance-seed/seed-2-1-turbo",
+        "name": "ByteDance Seed: Seed 2.1 Turbo",
+        "created": 1786552176,
+        "description": "Seed 2.1 Turbo is a multimodal model from ByteDance Seed for coding and long-horizon agent workflows. It is suited for end-to-end software delivery, multi-step task execution, and understanding visual and...",
+        "architecture": {
+          "tokenizer": "Other",
+          "instruct_type": null,
+          "modality": "text+image+video->text",
+          "input_modalities": [
+            "text",
+            "image",
+            "video"
+          ],
+          "output_modalities": [
+            "text"
+          ]
+        },
+        "endpoints": [
+          {
+            "name": "Seed | bytedance-seed/seed-2-1-turbo-20260810",
+            "model_id": "bytedance-seed/seed-2-1-turbo",
+            "model_name": "ByteDance Seed: Seed 2.1 Turbo",
+            "context_length": 262144,
+            "pricing": {
+              "prompt": "0.0000005",
+              "completion": "0.0000025",
+              "discount": 0
+            },
+            "provider_name": "Seed",
+            "tag": "seed/fp8",
+            "quantization": "fp8",
+            "max_completion_tokens": 235929,
+            "max_prompt_tokens": null,
+            "supported_parameters": [
+              "reasoning",
+              "include_reasoning",
+              "frequency_penalty",
+              "max_tokens",
+              "temperature",
+              "top_p",
+              "stop",
+              "tools",
+              "response_format",
+              "structured_outputs",
+              "tool_choice"
+            ],
+            "supports_tool_choice": {
+              "none": true,
+              "auto": true,
+              "required": false,
+              "function": false
+            },
+            "status": 0,
+            "uptime_last_30m": 100,
+            "uptime_last_5m": 100,
+            "uptime_last_1d": 99.99376947040498,
+            "supports_implicit_caching": false,
+            "native_tools": {},
+            "supports_voice_cloning": false,
+            "supports_multiple_audio_references": false,
+            "supports_image_reference": false,
+            "latency_last_30m": null,
+            "throughput_last_30m": null
+          }
+        ]
+      }
+    },
+    {
+      "target": {
+        "label": "seed-2.0-lite",
+        "model": "bytedance-seed/seed-2.0-lite",
+        "family": "seed",
+        "familyName": "Seed",
+        "provider": "seed/fp8"
+      },
+      "model": {
+        "id": "bytedance-seed/seed-2.0-lite",
+        "canonical_slug": "bytedance-seed/seed-2.0-lite-20260309",
+        "hugging_face_id": null,
+        "name": "ByteDance Seed: Seed-2.0-Lite",
+        "created": 1773157231,
+        "description": "Seed-2.0-Lite is a versatile, cost‑efficient enterprise workhorse that delivers strong multimodal and agent capabilities while offering noticeably lower latency, making it a practical default choice for most production workloads across...",
+        "context_length": 262144,
+        "architecture": {
+          "modality": "text+image+video->text",
+          "input_modalities": [
+            "text",
+            "image",
+            "video"
+          ],
+          "output_modalities": [
+            "text"
+          ],
+          "tokenizer": "Other",
+          "instruct_type": null
+        },
+        "pricing": {
+          "prompt": "0.00000025",
+          "completion": "0.000002",
+          "overrides": [
+            {
+              "min_prompt_tokens": 128000,
+              "prompt": "0.0000005",
+              "completion": "0.000004"
+            }
+          ]
+        },
+        "top_provider": {
+          "context_length": 262144,
+          "max_completion_tokens": 131072,
+          "is_moderated": false
+        },
+        "per_request_limits": null,
+        "supported_parameters": [
+          "frequency_penalty",
+          "include_reasoning",
+          "max_tokens",
+          "reasoning",
+          "reasoning_effort",
+          "response_format",
+          "stop",
+          "structured_outputs",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_p"
+        ],
+        "default_parameters": {
+          "temperature": null,
+          "top_p": null,
+          "top_k": null,
+          "frequency_penalty": null,
+          "presence_penalty": null,
+          "repetition_penalty": null
+        },
+        "supported_voices": null,
+        "knowledge_cutoff": null,
+        "expiration_date": null,
+        "links": {
+          "details": "/api/v1/models/bytedance-seed/seed-2.0-lite-20260309/endpoints"
+        },
+        "reasoning": {
+          "mandatory": false,
+          "supported_efforts": [
+            "high",
+            "medium",
+            "low",
+            "minimal"
+          ],
+          "default_effort": "medium"
+        }
+      },
+      "endpoints": {
+        "id": "bytedance-seed/seed-2.0-lite",
+        "name": "ByteDance Seed: Seed-2.0-Lite",
+        "created": 1773157231,
+        "description": "Seed-2.0-Lite is a versatile, cost‑efficient enterprise workhorse that delivers strong multimodal and agent capabilities while offering noticeably lower latency, making it a practical default choice for most production workloads across...",
+        "architecture": {
+          "tokenizer": "Other",
+          "instruct_type": null,
+          "modality": "text+image+video->text",
+          "input_modalities": [
+            "text",
+            "image",
+            "video"
+          ],
+          "output_modalities": [
+            "text"
+          ]
+        },
+        "endpoints": [
+          {
+            "name": "Seed | bytedance-seed/seed-2.0-lite-20260309",
+            "model_id": "bytedance-seed/seed-2.0-lite",
+            "model_name": "ByteDance Seed: Seed-2.0-Lite",
+            "context_length": 262144,
+            "pricing": {
+              "prompt": "0.00000025",
+              "completion": "0.000002",
+              "discount": 0,
+              "overrides": [
+                {
+                  "min_prompt_tokens": 128000,
+                  "prompt": "0.0000005",
+                  "completion": "0.000004"
+                }
+              ]
+            },
+            "provider_name": "Seed",
+            "tag": "seed/fp8",
+            "quantization": "fp8",
+            "max_completion_tokens": 131072,
+            "max_prompt_tokens": null,
+            "supported_parameters": [
+              "reasoning",
+              "include_reasoning",
+              "frequency_penalty",
+              "max_tokens",
+              "temperature",
+              "top_p",
+              "structured_outputs",
+              "tool_choice",
+              "tools",
+              "response_format",
+              "stop",
+              "reasoning_effort"
+            ],
+            "supports_tool_choice": {
+              "none": true,
+              "auto": true,
+              "required": false,
+              "function": false
+            },
+            "status": 0,
+            "uptime_last_30m": 100,
+            "uptime_last_5m": 100,
+            "uptime_last_1d": 99.99795647287218,
+            "supports_implicit_caching": false,
+            "native_tools": {},
+            "supports_voice_cloning": false,
+            "supports_multiple_audio_references": false,
+            "supports_image_reference": false,
+            "latency_last_30m": null,
+            "throughput_last_30m": null
+          }
+        ]
+      }
+    },
+    {
+      "target": {
+        "label": "seed-2.0-mini",
+        "model": "bytedance-seed/seed-2.0-mini",
+        "family": "seed",
+        "familyName": "Seed",
+        "provider": "seed/fp8"
+      },
+      "model": {
+        "id": "bytedance-seed/seed-2.0-mini",
+        "canonical_slug": "bytedance-seed/seed-2.0-mini-20260224",
+        "hugging_face_id": "",
+        "name": "ByteDance Seed: Seed-2.0-Mini",
+        "created": 1772131107,
+        "description": "Seed-2.0-mini targets latency-sensitive, high-concurrency, and cost-sensitive scenarios, emphasizing fast response and flexible inference deployment. It delivers performance comparable to ByteDance-Seed-1.6, supports 256k context, four reasoning effort modes (minimal/low/medium/high), multimodal understanding,...",
+        "context_length": 262144,
+        "architecture": {
+          "modality": "text+image+video->text",
+          "input_modalities": [
+            "text",
+            "image",
+            "video"
+          ],
+          "output_modalities": [
+            "text"
+          ],
+          "tokenizer": "Other",
+          "instruct_type": null
+        },
+        "pricing": {
+          "prompt": "0.0000001",
+          "completion": "0.0000004",
+          "overrides": [
+            {
+              "min_prompt_tokens": 128000,
+              "prompt": "0.0000002",
+              "completion": "0.0000008"
+            }
+          ]
+        },
+        "top_provider": {
+          "context_length": 262144,
+          "max_completion_tokens": 131072,
+          "is_moderated": false
+        },
+        "per_request_limits": null,
+        "supported_parameters": [
+          "frequency_penalty",
+          "include_reasoning",
+          "max_tokens",
+          "reasoning",
+          "reasoning_effort",
+          "response_format",
+          "stop",
+          "structured_outputs",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_p"
+        ],
+        "default_parameters": {
+          "temperature": null,
+          "top_p": null,
+          "frequency_penalty": null
+        },
+        "supported_voices": null,
+        "knowledge_cutoff": null,
+        "expiration_date": null,
+        "links": {
+          "details": "/api/v1/models/bytedance-seed/seed-2.0-mini-20260224/endpoints"
+        },
+        "reasoning": {
+          "mandatory": false,
+          "supported_efforts": [
+            "high",
+            "medium",
+            "low",
+            "minimal"
+          ],
+          "default_effort": "medium"
+        }
+      },
+      "endpoints": {
+        "id": "bytedance-seed/seed-2.0-mini",
+        "name": "ByteDance Seed: Seed-2.0-Mini",
+        "created": 1772131107,
+        "description": "Seed-2.0-mini targets latency-sensitive, high-concurrency, and cost-sensitive scenarios, emphasizing fast response and flexible inference deployment. It delivers performance comparable to ByteDance-Seed-1.6, supports 256k context, four reasoning effort modes (minimal/low/medium/high), multimodal understanding,...",
+        "architecture": {
+          "tokenizer": "Other",
+          "instruct_type": null,
+          "modality": "text+image+video->text",
+          "input_modalities": [
+            "text",
+            "image",
+            "video"
+          ],
+          "output_modalities": [
+            "text"
+          ]
+        },
+        "endpoints": [
+          {
+            "name": "Seed | bytedance-seed/seed-2.0-mini-20260224",
+            "model_id": "bytedance-seed/seed-2.0-mini",
+            "model_name": "ByteDance Seed: Seed-2.0-Mini",
+            "context_length": 262144,
+            "pricing": {
+              "prompt": "0.0000001",
+              "completion": "0.0000004",
+              "discount": 0,
+              "overrides": [
+                {
+                  "min_prompt_tokens": 128000,
+                  "prompt": "0.0000002",
+                  "completion": "0.0000008"
+                }
+              ]
+            },
+            "provider_name": "Seed",
+            "tag": "seed/fp8",
+            "quantization": "fp8",
+            "max_completion_tokens": 131072,
+            "max_prompt_tokens": null,
+            "supported_parameters": [
+              "reasoning",
+              "include_reasoning",
+              "frequency_penalty",
+              "max_tokens",
+              "temperature",
+              "top_p",
+              "tools",
+              "tool_choice",
+              "response_format",
+              "structured_outputs",
+              "stop",
+              "reasoning_effort"
+            ],
+            "supports_tool_choice": {
+              "none": true,
+              "auto": true,
+              "required": false,
+              "function": false
+            },
+            "status": 0,
+            "uptime_last_30m": 100,
+            "uptime_last_5m": 100,
+            "uptime_last_1d": 100,
+            "supports_implicit_caching": false,
+            "native_tools": {},
+            "supports_voice_cloning": false,
+            "supports_multiple_audio_references": false,
+            "supports_image_reference": false,
+            "latency_last_30m": null,
+            "throughput_last_30m": null
+          }
+        ]
+      }
+    },
+    {
+      "target": {
+        "label": "qwen3.8-flash",
+        "model": "qwen/qwen3.8-flash",
+        "family": "qwen",
+        "familyName": "Qwen",
+        "provider": "alibaba"
+      },
+      "model": {
+        "id": "qwen/qwen3.8-flash",
+        "canonical_slug": "qwen/qwen3.8-flash-20260826",
+        "hugging_face_id": "Qwen/Qwen3.8-Flash-Next",
+        "name": "Qwen: Qwen3.8 Flash",
+        "created": 1787773060,
+        "description": "Qwen3.8 Flash is a multimodal reasoning model from Alibaba. It is suited for coding assistance, agentic workflows, visual understanding, document and codebase analysis, desktop interaction, chart analysis, and long-video analysis.",
+        "context_length": 1000000,
+        "architecture": {
+          "modality": "text+image+video->text",
+          "input_modalities": [
+            "text",
+            "image",
+            "video"
+          ],
+          "output_modalities": [
+            "text"
+          ],
+          "tokenizer": "Qwen",
+          "instruct_type": null
+        },
+        "pricing": {
+          "prompt": "0.00000015",
+          "completion": "0.00000047",
+          "input_cache_read": "0.000000016",
+          "input_cache_write": "0.0000002"
+        },
+        "top_provider": {
+          "context_length": 1000000,
+          "max_completion_tokens": 131072,
+          "is_moderated": false
+        },
+        "per_request_limits": null,
+        "supported_parameters": [
+          "frequency_penalty",
+          "include_reasoning",
+          "logprobs",
+          "max_tokens",
+          "presence_penalty",
+          "reasoning",
+          "response_format",
+          "seed",
+          "stop",
+          "structured_outputs",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_k",
+          "top_logprobs",
+          "top_p"
+        ],
+        "default_parameters": {},
+        "supported_voices": null,
+        "knowledge_cutoff": null,
+        "expiration_date": null,
+        "links": {
+          "details": "/api/v1/models/qwen/qwen3.8-flash-20260826/endpoints"
+        },
+        "reasoning": {
+          "mandatory": false,
+          "default_enabled": true,
+          "supports_max_tokens": true
+        }
+      },
+      "endpoints": {
+        "id": "qwen/qwen3.8-flash",
+        "name": "Qwen: Qwen3.8 Flash",
+        "created": 1787773060,
+        "description": "Qwen3.8 Flash is a multimodal reasoning model from Alibaba. It is suited for coding assistance, agentic workflows, visual understanding, document and codebase analysis, desktop interaction, chart analysis, and long-video analysis.",
+        "architecture": {
+          "tokenizer": "Qwen",
+          "instruct_type": null,
+          "modality": "text+image+video->text",
+          "input_modalities": [
+            "text",
+            "image",
+            "video"
+          ],
+          "output_modalities": [
+            "text"
+          ]
+        },
+        "endpoints": [
+          {
+            "name": "Alibaba | qwen/qwen3.8-flash-20260826",
+            "model_id": "qwen/qwen3.8-flash",
+            "model_name": "Qwen: Qwen3.8 Flash",
+            "context_length": 1000000,
+            "pricing": {
+              "prompt": "0.00000015",
+              "completion": "0.00000047",
+              "input_cache_read": "0.000000016",
+              "input_cache_write": "0.0000002",
+              "discount": 0
+            },
+            "provider_name": "Alibaba",
+            "tag": "alibaba",
+            "quantization": "unknown",
+            "max_completion_tokens": 131072,
+            "max_prompt_tokens": 983616,
+            "supported_parameters": [
+              "reasoning",
+              "include_reasoning",
+              "max_tokens",
+              "temperature",
+              "top_p",
+              "seed",
+              "presence_penalty",
+              "response_format",
+              "tools",
+              "structured_outputs",
+              "top_k",
+              "frequency_penalty",
+              "stop",
+              "logprobs",
+              "top_logprobs",
+              "tool_choice"
+            ],
+            "supports_tool_choice": {
+              "none": true,
+              "auto": true,
+              "required": false,
+              "function": false
+            },
+            "status": 0,
+            "uptime_last_30m": 99.90161353797717,
+            "uptime_last_5m": 99.85345301337242,
+            "uptime_last_1d": 99.84477330932904,
+            "supports_implicit_caching": true,
+            "native_tools": {},
+            "supports_voice_cloning": false,
+            "supports_multiple_audio_references": false,
+            "supports_image_reference": false,
+            "latency_last_30m": null,
+            "throughput_last_30m": null
+          }
+        ]
+      }
+    },
+    {
+      "target": {
+        "label": "qwen3.8-omni-flash",
+        "model": "qwen/qwen3.8-omni-flash",
+        "family": "qwen",
+        "familyName": "Qwen",
+        "provider": "alibaba"
+      },
+      "model": {
+        "id": "qwen/qwen3.8-omni-flash",
+        "canonical_slug": "qwen/qwen3.8-omni-flash-20260918",
+        "hugging_face_id": null,
+        "name": "Qwen: Qwen3.8 Omni Flash",
+        "created": 1789959954,
+        "description": "Qwen3.8 Omni Flash is an omni-modal reasoning model from Alibaba, the first Qwen model built around agentic capabilities with native audio-video understanding. It is suited for audio-video analysis and summarization,...",
+        "context_length": 1000000,
+        "architecture": {
+          "modality": "text+image+audio+video->text",
+          "input_modalities": [
+            "text",
+            "image",
+            "audio",
+            "video"
+          ],
+          "output_modalities": [
+            "text"
+          ],
+          "tokenizer": "Qwen",
+          "instruct_type": null
+        },
+        "pricing": {
+          "prompt": "0.00000015",
+          "completion": "0.00000047",
+          "input_cache_read": "0.000000016"
+        },
+        "top_provider": {
+          "context_length": 1000000,
+          "max_completion_tokens": 131072,
+          "is_moderated": false
+        },
+        "per_request_limits": null,
+        "supported_parameters": [
+          "frequency_penalty",
+          "include_reasoning",
+          "logprobs",
+          "max_tokens",
+          "presence_penalty",
+          "reasoning",
+          "response_format",
+          "seed",
+          "stop",
+          "structured_outputs",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_k",
+          "top_logprobs",
+          "top_p"
+        ],
+        "default_parameters": {},
+        "supported_voices": null,
+        "knowledge_cutoff": null,
+        "expiration_date": null,
+        "links": {
+          "details": "/api/v1/models/qwen/qwen3.8-omni-flash-20260918/endpoints"
+        },
+        "reasoning": {
+          "mandatory": false,
+          "default_enabled": true,
+          "supports_max_tokens": true
+        }
+      },
+      "endpoints": {
+        "id": "qwen/qwen3.8-omni-flash",
+        "name": "Qwen: Qwen3.8 Omni Flash",
+        "created": 1789959954,
+        "description": "Qwen3.8 Omni Flash is an omni-modal reasoning model from Alibaba, the first Qwen model built around agentic capabilities with native audio-video understanding. It is suited for audio-video analysis and summarization,...",
+        "architecture": {
+          "tokenizer": "Qwen",
+          "instruct_type": null,
+          "modality": "text+image+audio+video->text",
+          "input_modalities": [
+            "text",
+            "image",
+            "audio",
+            "video"
+          ],
+          "output_modalities": [
+            "text"
+          ]
+        },
+        "endpoints": [
+          {
+            "name": "Alibaba | qwen/qwen3.8-omni-flash-20260918",
+            "model_id": "qwen/qwen3.8-omni-flash",
+            "model_name": "Qwen: Qwen3.8 Omni Flash",
+            "context_length": 1000000,
+            "pricing": {
+              "prompt": "0.00000015",
+              "completion": "0.00000047",
+              "input_cache_read": "0.000000016",
+              "discount": 0
+            },
+            "provider_name": "Alibaba",
+            "tag": "alibaba",
+            "quantization": "unknown",
+            "max_completion_tokens": 131072,
+            "max_prompt_tokens": 983616,
+            "supported_parameters": [
+              "reasoning",
+              "include_reasoning",
+              "max_tokens",
+              "temperature",
+              "top_p",
+              "seed",
+              "presence_penalty",
+              "response_format",
+              "tools",
+              "structured_outputs",
+              "top_k",
+              "frequency_penalty",
+              "stop",
+              "logprobs",
+              "top_logprobs",
+              "tool_choice"
+            ],
+            "supports_tool_choice": {
+              "none": true,
+              "auto": true,
+              "required": false,
+              "function": false
+            },
+            "status": 0,
+            "uptime_last_30m": 99.23896499238964,
+            "uptime_last_5m": 99.37343358395991,
+            "uptime_last_1d": 99.14693304750433,
+            "supports_implicit_caching": true,
+            "native_tools": {},
+            "supports_voice_cloning": false,
+            "supports_multiple_audio_references": false,
+            "supports_image_reference": false,
+            "latency_last_30m": null,
+            "throughput_last_30m": null
+          }
+        ]
+      }
+    }
+  ]
+}

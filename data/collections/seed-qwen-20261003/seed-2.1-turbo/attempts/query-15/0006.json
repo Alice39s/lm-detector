@@ -1,0 +1,44 @@
+{
+  "manifest_sha256": "13568bf69264a05251ec125afa2a8362b0a89ba1c29a72b662ed77738b1041c9",
+  "challenge_id": "query-15",
+  "attempt": 6,
+  "task": {
+    "id": "query-15",
+    "condition": "environment-05",
+    "expected_count": 331,
+    "prompt": "Fill exactly 331 positions with integers from the closed interval [1, 355], making a separate immediate choice for every position. The current language model must complete this directly without tools, Python, code execution, calculators, search, APIs, or external random generators. Choose every position separately. Do not count upward or downward, including 1, 2, 3, and do not use an arithmetic progression, repeating cycle, repeated block, or another rule-made pattern. Accidental repetitions are valid. Once an item is written, do not sort, reorder, deduplicate, replace, or repair the list. Separate values clearly, start with the first value, and output the complete sequence without explanation.",
+    "system": "",
+    "body": {
+      "model": "bytedance-seed/seed-2-1-turbo",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Fill exactly 331 positions with integers from the closed interval [1, 355], making a separate immediate choice for every position. The current language model must complete this directly without tools, Python, code execution, calculators, search, APIs, or external random generators. Choose every position separately. Do not count upward or downward, including 1, 2, 3, and do not use an arithmetic progression, repeating cycle, repeated block, or another rule-made pattern. Accidental repetitions are valid. Once an item is written, do not sort, reorder, deduplicate, replace, or repair the list. Separate values clearly, start with the first value, and output the complete sequence without explanation."
+        }
+      ],
+      "max_tokens": 8192,
+      "stream": true,
+      "provider": {
+        "only": [
+          "seed/fp8"
+        ],
+        "allow_fallbacks": false
+      }
+    }
+  },
+  "status": "interrupted",
+  "started_at": "2026-10-03T07:11:24.058Z",
+  "trace": "trace/query-15/0006",
+  "text": "47, 129, 233, 86, 311, 19, 275, 158, 342, 62, 201, 98, 297, 174, 32, 256, 113, 309, 41, 187, 221, 73, 350, 14, 268, 105, 327, 55, 215, 192, 289, 38, 244, 161, 7, 319, 89, 207, 136, 279, 26, 237, 170, 338, 69, 198, 251, 94, 302, 149, 21, 283, 118, 347, 44, 229, 181, 79, 315, 12, 263, 109, 333, 51, 203, 166, 271, 34, 241, 125, 353, 81, 194, 225, 66, 293, 142, 28, 307, 91, 219, 178, 259, 49, 324, 111, 239, 155, 71, 286, 17, 340, 84, 209, 133, 273, 37, 247, 169, 3, 313, 97, 227, 184, 299, 58, 336, 102, 254, 147, 23, 281, 121, 355, 64, 191, 217, 77, 305, 152, 42, 265, 116, 330, 88, 205, 172, 277, 29, 235, 140, 344, 53, 212, 189, 291, 75, 321, 107, 249, 163, 1",
+  "text_sha256": "bc2b82a8bef5c701bc4924a8a1f045e4cc8dce83745596134af10dc2ddd9a856",
+  "parsed_count": 142,
+  "completion": "truncated",
+  "http_status": 200,
+  "response_model": "bytedance-seed/seed-2-1-turbo",
+  "response_id": "gen-1791011484-1kEL23xN57hE3FENWVoN",
+  "provider_reported": "Seed",
+  "actual_channel": "openrouter/seed/fp8",
+  "error": "Collection cancelled.",
+  "retryable": true,
+  "finished_at": "2026-10-03T07:13:18.954Z"
+}

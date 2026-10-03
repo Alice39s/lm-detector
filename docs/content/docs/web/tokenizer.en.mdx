@@ -6,9 +6,9 @@ icon: Binary
 
 A tokenizer is the rule a model uses to split text into tokens. Models from one vendor usually share a tokenizer, so knowing which one the upstream (the service behind the address you entered) uses is a useful cross-check on the number fingerprint's ranking. It also exposes a channel that claims `gpt-5` while serving a Qwen tokenizer.
 
-The tokenizer probe is reference information only: it appears on its own in the "Tokenizer probe" card, the fourth entry of the sample strip, and the tokenizer details. It does not change the candidate ranking, the confidence, or the verification scores, and the detection result does not wait for it.
+The tokenizer probe is reference information only: it appears on its own in the "Tokenizer probe" card, the fourth entry of the sample strip, and the tokenizer details. It does not change the candidate ranking or the confidence, and the detection result does not wait for it.
 
-The tokenizer probe is part of API mode and is off by default. Turn on the "Tokenizer probe" switch in the API configuration to probe while sampling. It costs about 12 extra short requests while sampling, at most 22; APIs billed per request bill these requests. They reuse your reasoning-effort setting (except on Messages) and, apart from Messages, set no output limit, so a reasoning model can spend noticeably more tokens. Manual mode has no API to ask, so it does not probe.
+The tokenizer probe is part of API mode and is off by default. Turn on the "Tokenizer probe" switch in the API configuration to probe while sampling. It costs about 12 extra short requests while sampling, at most 22; APIs billed per request bill these requests. They reuse your service tier and your reasoning-effort setting (effort except on Messages) and, apart from Messages, set no output limit, so a reasoning model can spend noticeably more tokens. Manual mode has no API to ask, so it does not probe.
 
 ## What happens during a detection
 

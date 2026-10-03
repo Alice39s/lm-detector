@@ -7,7 +7,7 @@ import { missing, withLock } from './storage'
 
 const usage = `Usage: fpd retrain --data-dir DIR
 
-Refit the shared verifier and closed-set ranking calibration from an enrolled
+Refit the ranker and closed-set confidence calibration from an enrolled
 reference bank. Requires uv and Python; does not call a model API. The original
 detector is preserved if fitting or calibration validation fails.
 `

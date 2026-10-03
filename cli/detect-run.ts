@@ -69,12 +69,13 @@ function englishAnalysis(analysis: Analysis): Analysis {
     reason = `Ranked ${analysis.used_outputs} valid sample${analysis.used_outputs === 1 ? '' : 's'}. Confidence requires three valid samples.`
   } else if (analysis.method === 'custom-bank-legacy-ranking') {
     label = 'Custom bank ranking'
-    reason = 'The verifier does not match this bank. Confidence is unavailable.'
+    reason = 'The detector does not match this bank. Confidence is unavailable.'
+  } else if (analysis.probability_status === 'reference_calibrated') {
+    label = 'Calibrated ranking'
+    reason = 'Confidence is a closed-set probability within the reference bank.'
   } else {
-    const agrees = analysis.verification_top === analysis.prediction
-    label = agrees ? 'Ranker and verifier agree' : 'Ranker and verifier disagree'
-    reason = agrees ? 'Both methods selected the same leading candidate.'
-      : `The verifier preferred ${analysis.results.find(row => row.model === analysis.verification_top)?.display_name ?? analysis.verification_top}. Candidate order follows the ranker.`
+    label = 'Uncalibrated ranking'
+    reason = 'The confidence calibration does not match this detector. Confidence is unavailable.'
   }
   return {
     ...analysis, prediction_name: analysis.decision === 'unscorable' ? 'Not scored' : analysis.prediction_name,

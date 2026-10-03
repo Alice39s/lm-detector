@@ -26,7 +26,7 @@ const help = `用法：bun run detect --base-url https://api.example.com/v1 --mo
 
 API 模式与网页共用挑战、请求参数、响应解析、有效性判定和评分。
 每次生成三个随机挑战；正式库需要三条有效回答，失败挑战会保留为空输出。
-输出排名分数和逐候选置信度。置信度为当前 36 模型核验器的匹配估计，各项不要求合计 100%。
+输出排名分数和逐候选置信度。置信度是参考库内的校准概率，全部候选合计 100%。
 自定义库使用传统排名。不会将回答加入参考库。
 `
 
@@ -95,7 +95,7 @@ try {
     console.log(`第一候选：${analysis.prediction_name}`)
     console.log(`有效回答：${analysis.used_outputs}/${outputs.length}；${analysis.evidence.label}`)
     console.log(analysis.evidence.reason)
-    for (const row of analysis.results.slice(0,5)) console.log(`${row.display_name}\t排名 ${row.score.toFixed(4)}\t置信度 ${row.verification_confidence != null ? `${(row.verification_confidence*100).toFixed(1)}%` : '不可用'}`)
+    for (const row of analysis.results.slice(0,5)) console.log(`${row.display_name}\t排名 ${row.score.toFixed(4)}\t置信度 ${row.probability != null ? `${(row.probability*100).toFixed(1)}%` : '不可用'}`)
     if (values.output) console.log(`结果已保存：${values.output}`)
   }
 } catch (error) {

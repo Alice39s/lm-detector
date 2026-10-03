@@ -1,0 +1,69 @@
+{
+  "manifest_sha256": "13568bf69264a05251ec125afa2a8362b0a89ba1c29a72b662ed77738b1041c9",
+  "challenge_id": "query-18",
+  "attempt": 7,
+  "task": {
+    "id": "query-18",
+    "condition": "environment-06-e35edc0222e64",
+    "expected_count": 327,
+    "prompt": "Fill exactly 327 positions with integers from the closed interval [1, 355], making a separate immediate choice for every position. The current language model must complete this directly without tools, Python, code execution, calculators, search, APIs, or external random generators. Choose every position separately. Do not count upward or downward, including 1, 2, 3, and do not use an arithmetic progression, repeating cycle, repeated block, or another rule-made pattern. Accidental repetitions are valid. Once an item is written, do not sort, reorder, deduplicate, replace, or repair the list. Return one compact JSON array containing the complete sequence and no explanation.",
+    "system": "",
+    "body": {
+      "model": "bytedance-seed/seed-2-1-turbo",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Fill exactly 327 positions with integers from the closed interval [1, 355], making a separate immediate choice for every position. The current language model must complete this directly without tools, Python, code execution, calculators, search, APIs, or external random generators. Choose every position separately. Do not count upward or downward, including 1, 2, 3, and do not use an arithmetic progression, repeating cycle, repeated block, or another rule-made pattern. Accidental repetitions are valid. Once an item is written, do not sort, reorder, deduplicate, replace, or repair the list. Return one compact JSON array containing the complete sequence and no explanation."
+        }
+      ],
+      "max_tokens": 8192,
+      "stream": true,
+      "reasoning_effort": "none",
+      "provider": {
+        "only": [
+          "seed/fp8"
+        ],
+        "allow_fallbacks": false
+      }
+    },
+    "effort": "none"
+  },
+  "note": "User requested the minimum reasoning effort and automatic truncation. Disable reasoning with effort none for this pending challenge; keep the fixed prompt and all earlier attempts. Stop the stream at the existing 500-integer sampling cap.",
+  "status": "accepted",
+  "started_at": "2026-10-03T07:27:35.506Z",
+  "trace": "trace/query-18/0007",
+  "text": "[187,42,299,156,73,321,98,245,33,189,276,112,342,67,218,145,301,89,256,51,198,312,78,234,12,267,173,350,29,209,289,94,333,161,47,229,134,319,71,241,19,273,182,347,58,211,107,291,37,176,262,123,337,83,223,151,307,62,283,141,327,24,201,116,279,49,193,253,9,344,76,237,167,314,31,184,269,109,297,54,216,138,324,69,247,17,281,158,304,44,221,119,271,86,239,196,339,27,179,259,128,317,64,293,39,207,148,331,79,249,6,287,169,329,56,213,103,264,18,191,277,92,349,131,227,172,309,41,203,251,114,295,74,335,22,186,266,153,311,81,232,35,174,285,121,341,61,219,101,275,143,322,49,205,163,290,77,243,14,338,96,225,181,306,52,261,111,346,33,194,272,139,316,68,236,199,283,87,326,21,178,257,117,299,46,214,154,332,7,288,166,313,59,228,97,270,129,343,38,188,248,105,292,72,328,26,206,149,268,84,235,177,302,53,217,11,340,91,252,164,318,43,197,278,126,308,66,244,19,334,108,224,183,294,34,263,147,323,75,231,159,300,57,202,113,280,13,345,88,254,171,315,48,212,136,286,63,242,195,330,28,180,260,106,296,70,336,50,222,152,305,82,258,17,282,125,351,36,208,168,284,93,246,142,320,65,226,190,303,23,175,265,115,298,55,215,137,339,80,238,185,310,15,274,104,348,45,204,162,287,90,250,132,325,60,220,192,294]",
+  "text_sha256": "0894ffc91d654c1c21f8b780d9072995acef19b0bf7d2ff95cd7aa9a9ddfe8a3",
+  "parsed_count": 318,
+  "completion": "complete",
+  "http_status": 200,
+  "response_model": "bytedance-seed/seed-2-1-turbo",
+  "response_id": "gen-1791012460-z9vUEfinATyCldmvCUVk",
+  "usage": {
+    "prompt_tokens": 187,
+    "completion_tokens": 1183,
+    "total_tokens": 1370,
+    "cost": 0.003051,
+    "is_byok": false,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "cache_write_tokens": 0,
+      "audio_tokens": 0,
+      "video_tokens": 0
+    },
+    "cost_details": {
+      "upstream_inference_cost": 0.003051,
+      "upstream_inference_prompt_cost": 0.0000935,
+      "upstream_inference_completions_cost": 0.0029575
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "image_tokens": 0,
+      "audio_tokens": 0
+    }
+  },
+  "provider_reported": "Seed",
+  "finish_reason": "stop",
+  "actual_channel": "openrouter/seed/fp8",
+  "finished_at": "2026-10-03T07:28:06.471Z"
+}

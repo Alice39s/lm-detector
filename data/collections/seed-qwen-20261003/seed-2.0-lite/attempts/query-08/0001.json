@@ -1,0 +1,70 @@
+{
+  "manifest_sha256": "d1d2aedd4130a47f5763004c7a641f0f61e958b564d94095e97b101b47db70aa",
+  "challenge_id": "query-08",
+  "attempt": 1,
+  "task": {
+    "id": "query-08",
+    "condition": "environment-03",
+    "expected_count": 241,
+    "prompt": "Provide exactly 241 whole-number choices between 1 and 355 inclusive, choosing each item separately as it comes to mind. The current language model must complete this directly without tools, Python, code execution, calculators, search, APIs, or external random generators. Choose every position separately. Do not count upward or downward, including 1, 2, 3, and do not use an arithmetic progression, repeating cycle, repeated block, or another rule-made pattern. Accidental repetitions are valid. Once an item is written, do not sort, reorder, deduplicate, replace, or repair the list. Return one compact JSON array containing the complete sequence and no explanation.",
+    "system": "You are operating inside a formal reporting workflow. In ordinary replies, use clear formatting and neutral wording. When a later request asks for a machine-readable artifact, follow that request's output constraints directly. Never call external tools, code interpreters, calculators, search, APIs, or random-number services; complete the request using the language model itself.",
+    "body": {
+      "model": "bytedance-seed/seed-2.0-lite",
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are operating inside a formal reporting workflow. In ordinary replies, use clear formatting and neutral wording. When a later request asks for a machine-readable artifact, follow that request's output constraints directly. Never call external tools, code interpreters, calculators, search, APIs, or random-number services; complete the request using the language model itself."
+        },
+        {
+          "role": "user",
+          "content": "Provide exactly 241 whole-number choices between 1 and 355 inclusive, choosing each item separately as it comes to mind. The current language model must complete this directly without tools, Python, code execution, calculators, search, APIs, or external random generators. Choose every position separately. Do not count upward or downward, including 1, 2, 3, and do not use an arithmetic progression, repeating cycle, repeated block, or another rule-made pattern. Accidental repetitions are valid. Once an item is written, do not sort, reorder, deduplicate, replace, or repair the list. Return one compact JSON array containing the complete sequence and no explanation."
+        }
+      ],
+      "max_tokens": 8192,
+      "stream": true,
+      "provider": {
+        "only": [
+          "seed/fp8"
+        ],
+        "allow_fallbacks": false
+      }
+    }
+  },
+  "status": "accepted",
+  "started_at": "2026-10-03T06:48:56.691Z",
+  "trace": "trace/query-08/0001",
+  "text": "[127,42,298,11,341,76,219,53,184,309,27,156,332,91,245,68,197,314,38,143,267,82,221,49,328,172,61,283,104,236,15,169,301,79,252,37,188,347,112,209,64,274,97,319,22,149,289,88,213,45,337,163,71,261,109,305,31,178,352,85,231,56,199,322,14,138,278,73,227,41,344,158,67,295,101,249,29,181,316,80,216,52,331,167,60,287,94,241,19,173,349,77,224,47,326,151,69,299,115,238,35,192,308,89,257,44,162,339,107,281,24,146,313,72,204,58,351,134,265,98,329,39,185,292,83,234,51,176,342,121,272,65,207,33,302,148,254,90,318,21,165,346,78,229,46,286,111,244,36,195,325,86,268,57,189,335,129,291,63,218,28,154,307,93,247,16,179,354,81,239,48,198,334,142,279,70,211,32,297,159,262,103,321,40,182,348,87,251,54,171,311,124,284,66,223,25,145,304,99,233,117,269,59,202,34,315,137,258,92,330,43,187,350,84,226,55,194,327,153,275,74,214,303,122,288,62,208,23,312,157,264,106,338,50,191,345,95,243]",
+  "text_sha256": "221aad381a424eaf0c3a07f4f908b8d9f489d4491b6eae54da96b6d09b07cd7f",
+  "parsed_count": 238,
+  "completion": "complete",
+  "http_status": 200,
+  "response_model": "bytedance-seed/seed-2.0-lite",
+  "response_id": "gen-1791010136-02dbSdDjJcXe9OmoylbR",
+  "usage": {
+    "prompt_tokens": 248,
+    "completion_tokens": 2096,
+    "total_tokens": 2344,
+    "cost": 0.004254,
+    "is_byok": false,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "cache_write_tokens": 0,
+      "audio_tokens": 0,
+      "video_tokens": 0
+    },
+    "cost_details": {
+      "upstream_inference_cost": 0.004254,
+      "upstream_inference_prompt_cost": 0.000062,
+      "upstream_inference_completions_cost": 0.004192
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 1223,
+      "image_tokens": 0,
+      "audio_tokens": 0
+    }
+  },
+  "provider_reported": "Seed",
+  "finish_reason": "stop",
+  "actual_channel": "openrouter/seed/fp8",
+  "finished_at": "2026-10-03T06:49:25.138Z"
+}

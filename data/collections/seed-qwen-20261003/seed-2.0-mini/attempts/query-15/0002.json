@@ -1,0 +1,66 @@
+{
+  "manifest_sha256": "234fb5521f112c08194781394ac7ab69e7d0f4f874d0f8a51f5e5b042178f476",
+  "challenge_id": "query-15",
+  "attempt": 2,
+  "task": {
+    "id": "query-15",
+    "condition": "environment-05",
+    "expected_count": 331,
+    "prompt": "Fill exactly 331 positions with integers from the closed interval [1, 355], making a separate immediate choice for every position. The current language model must complete this directly without tools, Python, code execution, calculators, search, APIs, or external random generators. Choose every position separately. Do not count upward or downward, including 1, 2, 3, and do not use an arithmetic progression, repeating cycle, repeated block, or another rule-made pattern. Accidental repetitions are valid. Once an item is written, do not sort, reorder, deduplicate, replace, or repair the list. Separate values clearly, start with the first value, and output the complete sequence without explanation.",
+    "system": "",
+    "body": {
+      "model": "bytedance-seed/seed-2.0-mini",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Fill exactly 331 positions with integers from the closed interval [1, 355], making a separate immediate choice for every position. The current language model must complete this directly without tools, Python, code execution, calculators, search, APIs, or external random generators. Choose every position separately. Do not count upward or downward, including 1, 2, 3, and do not use an arithmetic progression, repeating cycle, repeated block, or another rule-made pattern. Accidental repetitions are valid. Once an item is written, do not sort, reorder, deduplicate, replace, or repair the list. Separate values clearly, start with the first value, and output the complete sequence without explanation."
+        }
+      ],
+      "max_tokens": 8192,
+      "stream": true,
+      "provider": {
+        "only": [
+          "seed/fp8"
+        ],
+        "allow_fallbacks": false
+      }
+    }
+  },
+  "status": "accepted",
+  "started_at": "2026-10-03T06:51:51.339Z",
+  "trace": "trace/query-15/0002",
+  "text": "17,42,129,256,89,301,55,217,19,348,76,153,289,41,112,275,68,190,330,22,145,267,98,225,312,5,107,182,299,37,164,241,83,205,322,13,119,197,250,71,233,308,49,175,281,62,159,269,91,212,340,28,136,228,58,188,315,7,124,209,277,82,195,327,45,170,253,65,238,305,16,115,185,293,52,222,335,33,149,270,79,219,318,11,167,247,94,201,345,2,132,259,75,178,285,51,230,311,47,192,265,87,210,338,24,155,272,61,244,302,39,127,198,287,73,227,325,43,162,255,69,180,317,8,142,235,57,207,332,30,139,260,81,215,342,19,110,187,295,54,220,320,48,151,278,77,199,309,14,169,252,63,232,319,26,146,263,85,203,336,35,121,193,288,72,224,329,46,172,249,92,200,347,4,135,258,67,184,307,18,157,273,80,218,316,38,123,206,283,60,237,304,20,165,251,59,196,323,29,141,268,88,211,341,23,118,191,290,56,221,331,32,150,279,70,231,314,40,171,254,90,204,344,10,133,266,86,214,328,44,161,245,66,183,303,15,126,194,286,74,226,321,27,143,264,50,208,337,31,148,271,84,216,339,25,117,186,292,53,223,333,36,152,276,78,284,95,242,306,3,102,179,257,64,239,310,9,131,261,97,202,343,12,168,248,96,213,326,105,181,298,34,158,274,100,240,313,21,140,262,99,291,334,101,104,106,108,109,111,113,114,116,120,122,125,128,130,134,137,144,147,154,156,160,163,166,173,174,176,177,189",
+  "text_sha256": "2276313db94d6df6de0ef2dfd0c5de3fab506b61b967e8515cc5478d51562237",
+  "parsed_count": 331,
+  "completion": "complete",
+  "http_status": 200,
+  "response_model": "bytedance-seed/seed-2.0-mini",
+  "response_id": "gen-1791010316-PXyEsNxQ5PqF8QfpMVzA",
+  "usage": {
+    "prompt_tokens": 182,
+    "completion_tokens": 7652,
+    "total_tokens": 7834,
+    "cost": 0.003079,
+    "is_byok": false,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "cache_write_tokens": 0,
+      "audio_tokens": 0,
+      "video_tokens": 0
+    },
+    "cost_details": {
+      "upstream_inference_cost": 0.003079,
+      "upstream_inference_prompt_cost": 0.0000182,
+      "upstream_inference_completions_cost": 0.0030608
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 6433,
+      "image_tokens": 0,
+      "audio_tokens": 0
+    }
+  },
+  "provider_reported": "Seed",
+  "finish_reason": "stop",
+  "actual_channel": "openrouter/seed/fp8",
+  "finished_at": "2026-10-03T06:52:38.911Z"
+}

@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { isServiceTier, type ServiceTier } from '@fingerpoint/shared/completion-request'
 import type { ApiConfig } from '@fingerpoint/shared/types'
 
 export interface WebApiConfig extends ApiConfig {
+  serviceTier: ServiceTier
   relaxed: boolean
   autoVerify: boolean
   /** Probe the tokenizer alongside sampling and show it as reference information beside the result. */
@@ -46,6 +48,7 @@ export const defaultConfig: WebApiConfig = {
   model: '',
   effort: '',
   format: 'openai',
+  serviceTier: 'default',
   stream: true,
   parallel: true,
   relaxed: true,
@@ -53,11 +56,11 @@ export const defaultConfig: WebApiConfig = {
   tokenizerProbe: false,
 }
 
-const configFields = ['baseUrl', 'apiKey', 'model', 'effort', 'format', 'stream', 'parallel', 'relaxed', 'autoVerify', 'tokenizerProbe'] as const
+const configFields = ['baseUrl', 'apiKey', 'model', 'effort', 'format', 'serviceTier', 'stream', 'parallel', 'relaxed', 'autoVerify', 'tokenizerProbe'] as const
 
 function snapshot(profile: ApiProfile): ProfileSnapshot {
-  const { name, baseUrl, apiKey, model, effort, format, stream, parallel, relaxed, autoVerify, tokenizerProbe } = profile
-  return { name, baseUrl, apiKey, model, effort, format, stream, parallel, relaxed, autoVerify, tokenizerProbe }
+  const { name, baseUrl, apiKey, model, effort, format, serviceTier, stream, parallel, relaxed, autoVerify, tokenizerProbe } = profile
+  return { name, baseUrl, apiKey, model, effort, format, serviceTier, stream, parallel, relaxed, autoVerify, tokenizerProbe }
 }
 
 function readSnapshot(raw: unknown): ProfileSnapshot | null {
@@ -68,6 +71,7 @@ function readSnapshot(raw: unknown): ProfileSnapshot | null {
     if (typeof value[field] !== 'string') return null
   }
   if (value.format !== 'openai' && value.format !== 'responses' && value.format !== 'anthropic') return null
+  if (value.serviceTier !== undefined && !isServiceTier(value.serviceTier)) return null
   for (const field of ['stream', 'parallel', 'autoVerify']) {
     if (typeof value[field] !== 'boolean') return null
   }
@@ -81,6 +85,7 @@ function readSnapshot(raw: unknown): ProfileSnapshot | null {
     model: value.model as string,
     effort: value.effort as string,
     format: value.format,
+    serviceTier: value.serviceTier ?? 'default',
     stream: value.stream as boolean,
     parallel: value.parallel as boolean,
     relaxed: typeof value.relaxed === 'boolean' ? value.relaxed : true,
@@ -116,6 +121,7 @@ function sanitizeProfile(raw: unknown, fallbackId: string, fallbackName = ''): A
     if (obj.format === 'openai' || obj.format === 'responses' || obj.format === 'anthropic') {
       profile.format = obj.format
     }
+    if (isServiceTier(obj.serviceTier)) profile.serviceTier = obj.serviceTier
     for (const field of ['stream', 'parallel', 'relaxed', 'autoVerify', 'tokenizerProbe'] as const) {
       if (typeof obj[field] === 'boolean') profile[field] = obj[field] as boolean
     }
@@ -184,8 +190,8 @@ function persist(state: StoredApiProfiles) {
   localStorage.setItem(PROFILES_STORAGE_KEY, JSON.stringify(state))
   const active = state.profiles.find(p => p.id === state.activeId) ?? state.profiles[0]
   if (active) {
-    const { baseUrl, apiKey, model, effort, format, stream, parallel, relaxed, autoVerify, tokenizerProbe } = active
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ baseUrl, apiKey, model, effort, format, stream, parallel, relaxed, autoVerify, tokenizerProbe }))
+    const { baseUrl, apiKey, model, effort, format, serviceTier, stream, parallel, relaxed, autoVerify, tokenizerProbe } = active
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ baseUrl, apiKey, model, effort, format, serviceTier, stream, parallel, relaxed, autoVerify, tokenizerProbe }))
   }
   localStorage.removeItem(LEGACY_KEY)
   sessionStorage.removeItem(SESSION_KEY)

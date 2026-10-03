@@ -52,24 +52,23 @@ const estimatedUsageClasses = new Set(['o200k', 'cl100k'])
 
 function Ranking({ analysis, compact, safe }: { analysis: Analysis; compact: boolean; safe: (text: string) => string }) {
   const calibrated = analysis.probability_status === 'reference_calibrated'
-  const hasConfidence = analysis.results.some(row => row.verification_confidence != null)
   return <Box flexDirection="column" marginTop={1}>
     <Text bold color="cyan">LEADING CANDIDATES</Text>
     <Box>
       <Box width={4}><Text dimColor>#</Text></Box>
       <Box flexGrow={1}><Text dimColor>Model</Text></Box>
       <Box width={9} justifyContent="flex-end"><Text dimColor>Score</Text></Box>
-      <Box width={12} justifyContent="flex-end"><Text dimColor>{calibrated ? 'Confidence' : hasConfidence ? 'Verifier' : 'Confidence'}</Text></Box>
+      <Box width={12} justifyContent="flex-end"><Text dimColor>Confidence</Text></Box>
     </Box>
     {analysis.results.slice(0, compact ? 3 : 5).map((row, index) => <Box key={row.model}>
       <Box width={4}><Text color={index === 0 ? 'cyan' : undefined}>{index + 1}</Text></Box>
       <Box flexGrow={1} flexBasis={0}><Text wrap="truncate-end" bold={index === 0}>{safe(row.display_name)}</Text></Box>
       <Box width={9} justifyContent="flex-end"><Text>{row.score.toFixed(3)}</Text></Box>
-      <Box width={12} justifyContent="flex-end"><Text color={index === 0 ? 'cyan' : undefined}>{percentage(row.verification_confidence)}</Text></Box>
+      <Box width={12} justifyContent="flex-end"><Text color={index === 0 ? 'cyan' : undefined}>{percentage(row.probability)}</Text></Box>
     </Box>)}
     <Text dimColor>{analysis.decision === 'partial' ? 'Partial ranking · confidence unavailable'
       : calibrated ? 'Confidence is relative to the reference bank; it does not prove identity.'
-      : hasConfidence ? 'Verifier values are uncalibrated scores, not identity probabilities.' : 'Confidence unavailable for this bank.'}</Text>
+      : 'Confidence unavailable for this detector.'}</Text>
     {!compact && <Text dimColor>{safe(analysis.evidence.label)}</Text>}
   </Box>
 }
@@ -145,7 +144,7 @@ function Dashboard({ state, options, bankSize, tokenizerBank, cancel, saved, fat
       <Text><Text bold color="cyan">FPD</Text><Text dimColor> / MODEL FINGERPOINT DETECTOR (</Text><Text color="cyan">{terminalLink('lm.ikale.io', 'https://lm.ikale.io', { fallback: false })}</Text><Text dimColor>)</Text></Text>
       <Text wrap="truncate-end" bold>{options.input ? `Offline · ${safe(options.input)}` : safe(options.config.model)}</Text>
       {!compact && !options.input && <Text dimColor wrap="truncate-middle">{safe(options.config.baseUrl)}</Text>}
-      <Text dimColor>{options.input ? 'Saved outputs' : `${options.api} · ${options.config.stream ? 'SSE' : 'JSON'} · count ${options.count} · parallel ${options.parallel}`} · {options.strict ? 'strict' : 'relaxed'} · {bankSize} models{options.tokenizer ? ' · tokenizer probe' : ''}</Text>
+      <Text dimColor>{options.input ? 'Saved outputs' : `${options.api}${options.config.serviceTier === 'default' ? '' : ` · ${options.config.serviceTier}`} · ${options.config.stream ? 'SSE' : 'JSON'} · count ${options.count} · parallel ${options.parallel}`} · {options.strict ? 'strict' : 'relaxed'} · {bankSize} models{options.tokenizer ? ' · tokenizer probe' : ''}</Text>
     </Box>
     <Box justifyContent="space-between">
       <Text bold>{state.finishedAt ? '●' : spinner} {phase} · round {latest?.index ?? 1}/{state.total}</Text>
@@ -183,7 +182,7 @@ function Dashboard({ state, options, bankSize, tokenizerBank, cancel, saved, fat
         <Box width={5}><Text dimColor>#{round.index}</Text></Box>
         <Box flexGrow={1} flexBasis={0}><Text wrap="truncate-end" color={round.error ? 'yellow' : undefined}>{safe(round.analysis?.prediction_name || 'Not scored')}</Text></Box>
         <Box width={7} justifyContent="flex-end"><Text dimColor>{round.samples.filter(acceptedSample).length}/{round.samples.length}</Text></Box>
-        <Box width={10} justifyContent="flex-end"><Text>{percentage(round.analysis?.verification_confidence)}</Text></Box>
+        <Box width={10} justifyContent="flex-end"><Text>{percentage(round.analysis?.probability)}</Text></Box>
       </Box>)}
       {history.length > visibleHistory.length && <Text dimColor>Showing the last {visibleHistory.length} rounds. Use --output to save every round.</Text>}
       {final && consensus && <Text>{tied ? 'Tied lead' : 'Most frequent'}: <Text bold>{safe(consensus[0])}</Text>{tied ? ' and others' : ''} · {consensus[1]}/{scored} scored rounds</Text>}
@@ -230,7 +229,7 @@ export function createDisplay(options: DetectOptions, bankSize: number, cancel: 
         if (round?.finishedAt && !settled.has(`${round.index}`)) {
           settled.add(`${round.index}`)
           const analysis = round.analysis?.results.length ? round.analysis : undefined
-          process.stderr.write(`[${round.index}/${state.total}] ${analysis ? `Leading: ${clean(analysis.prediction_name)} · ${percentage(analysis.verification_confidence)}` : `Not scored: ${clean(round.error ?? '')}`}\n`)
+          process.stderr.write(`[${round.index}/${state.total}] ${analysis ? `Leading: ${clean(analysis.prediction_name)} · ${percentage(analysis.probability)}` : `Not scored: ${clean(round.error ?? '')}`}\n`)
         }
         if (state.roundsFinishedAt && state.tokenizerSettled === false && !state.cancelled && !settled.has('final')) {
           settled.add('final')

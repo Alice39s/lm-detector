@@ -71,7 +71,7 @@ export function exportBank(bank:Bank){download('unified_bank.json',JSON.stringif
 /** The tokenizer probe shown beside the result; it travels as reference information and never changes the candidates. */
 export interface ResultTokenizer { run:TokenizerRun; bank:TokenizerBank; startedAt:number; model:string }
 export function exportAnalysis(result:Analysis,probe?:ResultTokenizer){
-  const candidates=result.results.map(r=>({model:r.model,name:r.display_name,confidence:r.verification_confidence??r.probability??null}))
+  const candidates=result.results.map(r=>({model:r.model,name:r.display_name,confidence:r.probability}))
   // Counts, probe ids, response model names and the claimed model leave with the result; the address and key stay behind.
   const tokenizer=probe?tokenizerReport(probe.run,probe.bank,{createdAt:probe.startedAt,model:probe.model}):undefined
   download('fingerpoint-result.json',JSON.stringify(sanitize({candidates,tokenizer}),null,2)+'\n')
@@ -93,7 +93,7 @@ const proxyTransport = (proxy:string):CompletionTransport => (url,config,body,si
  * does not allow browser CORS; the browser cannot tell them apart, so it gets its own code.
  */
 const directTransport:CompletionTransport = (url,config,body,signal) =>
-  fetch(url,{...directInit,method:'POST',headers:directHeaders(config.format,config.apiKey,Boolean(body.stream)),body:JSON.stringify(browserBody(config,body)),signal})
+  fetch(url,{...directInit,method:'POST',headers:directHeaders(config,config.apiKey,Boolean(body.stream)),body:JSON.stringify(browserBody(config,body)),signal})
     .catch(error=>{throw error instanceof TypeError?coded('The browser could not call the API directly.','direct_network'):error})
 /** A proxied route names its relay, so a later settings change cannot redirect a running job. */
 export type Route = {kind:'direct'}|{kind:'proxy';endpoint:string}

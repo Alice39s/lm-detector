@@ -215,7 +215,7 @@ export async function runCollectionCommand(command: 'sample' | 'enroll', args: s
           ['Batch', directory], ['Destination', destination.path], ['Destination source', destination.automatic ? 'Detected repository (not yet written)' : 'Explicit --data-dir'],
           ['New samples', String(preview.added)], ['Duplicates skipped', String(preview.skipped)], ['Resulting samples', String(preview.total)],
           ['Accepted responses', `${report.natural} natural completions · ${report.truncated} accepted truncations · ${report.unknownCompletion} unknown completion`],
-          ['Verifier', preview.added ? 'Not retrained; updated bank needs matching verifier/calibration.' : 'No reference changes.'],
+          ['Detector', preview.added ? 'Not retrained; updated bank needs a matching ranker and calibration.' : 'No reference changes.'],
         ], 'Write these samples and rebuild this reference bank?')
         if (confirmed) {
           report.enrollment = await enroll(directory, destination.path, false, progress)

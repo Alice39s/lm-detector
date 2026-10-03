@@ -1,0 +1,66 @@
+{
+  "manifest_sha256": "234fb5521f112c08194781394ac7ab69e7d0f4f874d0f8a51f5e5b042178f476",
+  "challenge_id": "query-05",
+  "attempt": 1,
+  "task": {
+    "id": "query-05",
+    "condition": "environment-02",
+    "expected_count": 239,
+    "prompt": "Using only this model's own immediate choices, provide exactly 239 whole numbers from 1 through 355 inclusive. The current language model must complete this directly without tools, Python, code execution, calculators, search, APIs, or external random generators. Choose every position separately. Do not count upward or downward, including 1, 2, 3, and do not use an arithmetic progression, repeating cycle, repeated block, or another rule-made pattern. Accidental repetitions are valid. Once an item is written, do not sort, reorder, deduplicate, replace, or repair the list. Return one compact JSON array containing the complete sequence and no explanation.",
+    "system": "",
+    "body": {
+      "model": "bytedance-seed/seed-2.0-mini",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Using only this model's own immediate choices, provide exactly 239 whole numbers from 1 through 355 inclusive. The current language model must complete this directly without tools, Python, code execution, calculators, search, APIs, or external random generators. Choose every position separately. Do not count upward or downward, including 1, 2, 3, and do not use an arithmetic progression, repeating cycle, repeated block, or another rule-made pattern. Accidental repetitions are valid. Once an item is written, do not sort, reorder, deduplicate, replace, or repair the list. Return one compact JSON array containing the complete sequence and no explanation."
+        }
+      ],
+      "max_tokens": 8192,
+      "stream": true,
+      "provider": {
+        "only": [
+          "seed/fp8"
+        ],
+        "allow_fallbacks": false
+      }
+    }
+  },
+  "status": "accepted",
+  "started_at": "2026-10-03T06:44:07.793Z",
+  "trace": "trace/query-05/0001",
+  "text": "[12,45,198,89,312,55,278,14,223,341,7,165,290,93,255,38,177,301,62,210,11,189,333,76,245,3,152,287,81,267,22,195,320,51,239,9,148,270,105,350,44,201,317,68,229,18,172,298,99,260,35,181,305,72,240,5,158,280,85,258,27,192,325,59,220,15,169,295,101,352,49,205,310,79,250,32,185,308,65,235,6,155,285,88,265,25,190,322,57,225,20,175,300,90,252,41,208,315,75,248,29,180,303,60,230,10,160,288,83,262,28,198,328,54,228,21,170,299,95,256,36,188,318,70,243,4,150,275,80,268,30,194,330,66,233,45,200,319,77,247,33,183,306,71,244,24,178,302,91,254,42,209,316,78,249,31,186,309,67,234,17,173,297,96,257,39,182,307,73,246,26,193,329,58,227,19,171,296,92,253,40,207,314,74,242,34,184,311,82,261,23,179,304,98,259,37,187,313,84,263,48,202,318,75,245,29,180,303,60,230,10,160,288,83,262,28,198,328,54,228,21,170,299,95,256,36,188,318,70,243,4,150,275,80,268,30,194,330,66,233,45,200,319,77,247,33,183,306,71,244,24,178,302,91,254,42,209,316,78,249,31,186,309,67,234,17,173,297,96,257,39,182,307,73,246,26,193,329,58,227,19,171,296,92,253,40,207,314,74,242,34,184,311,82,261,23,179,304,98,259]",
+  "text_sha256": "dc765521eca3e233059ab81045b9a6e43074a6c62284ca6c8a3cf1a965d2271d",
+  "parsed_count": 300,
+  "completion": "complete",
+  "http_status": 200,
+  "response_model": "bytedance-seed/seed-2.0-mini",
+  "response_id": "gen-1791009847-Q8JwvlBeoqaLxUIKmaGD",
+  "usage": {
+    "prompt_tokens": 173,
+    "completion_tokens": 5213,
+    "total_tokens": 5386,
+    "cost": 0.0021025,
+    "is_byok": false,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "cache_write_tokens": 0,
+      "audio_tokens": 0,
+      "video_tokens": 0
+    },
+    "cost_details": {
+      "upstream_inference_cost": 0.0021025,
+      "upstream_inference_prompt_cost": 0.0000173,
+      "upstream_inference_completions_cost": 0.0020852
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 4138,
+      "image_tokens": 0,
+      "audio_tokens": 0
+    }
+  },
+  "provider_reported": "Seed",
+  "finish_reason": "stop",
+  "actual_channel": "openrouter/seed/fp8",
+  "finished_at": "2026-10-03T06:44:37.697Z"
+}

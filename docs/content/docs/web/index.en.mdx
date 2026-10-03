@@ -4,7 +4,7 @@ description: The manual and API sampling modes, the switches in the API configur
 icon: Globe
 ---
 
-The detection website [lm.ikale.io](https://lm.ikale.io) is a pure frontend app. Challenge generation, feature extraction, ranking, and verification all run in the browser, and the reference bank is served as static files. The website only runs detection and browses the reference bank read-only. It never writes any reply to the reference bank. Your API key is sent only when a request goes out, to the API you enter or to a forwarding proxy, as the connection mode you choose decides; see [Connection](./connection.mdx).
+The detection website [lm.ikale.io](https://lm.ikale.io) is a pure frontend app. Challenge generation, feature extraction, and ranking all run in the browser, and the reference bank is served as static files. The website only runs detection and browses the reference bank read-only. It never writes any reply to the reference bank. Your API key is sent only when a request goes out, to the API you enter or to a forwarding proxy, as the connection mode you choose decides; see [Connection](./connection.mdx).
 
 ## Sampling modes
 
@@ -26,6 +26,7 @@ The detection website [lm.ikale.io](https://lm.ikale.io) is a pure frontend app.
 | API key | Hidden by default. You can toggle it visible |
 | Reasoning effort | Can be left blank, or set to any `reasoning_effort` value that the upstream supports |
 | Protocol | Chat Completions, Messages, or Responses |
+| Service tier | Flex, Default, Fast, or Ultrafast. Default sends no parameter. Messages sends `speed` with the `anthropic-beta: fast-mode-2026-02-01` header; Chat Completions and Responses send `service_tier` |
 
 Switches below the configuration, all on by default except "Tokenizer probe":
 
@@ -35,20 +36,17 @@ Switches below the configuration, all on by default except "Tokenizer probe":
 - **Verify automatically after sampling**: computes the result automatically once all three samples succeed and no other sample is still sampling.
 - **Tokenizer probe**: off by default. When on, it sends about 12 extra short requests while sampling (at most 22) and identifies the upstream tokenizer. The result is reference information and does not change the ranking. APIs billed per request bill these requests. See [Tokenizer probe](./tokenizer.mdx).
 
-Below the switches is "Connection": Auto (the default), Direct, This site's proxy, or Own Worker. It decides whether the browser calls the API directly or sends requests through a proxy; see [Connection](./connection.mdx).
+Below the switches is "Connection": Auto, Direct, This site's proxy (the default), or Own Worker. It decides whether the browser calls the API directly or sends requests through a proxy; see [Connection](./connection.mdx).
 
 The configuration and the key are saved automatically in the browser's localStorage and are restored after a reload or when you reopen the page. The profile menu supports several profiles, which you can rename, create, duplicate, and delete. "Save" only confirms the current configuration in the browser. "Export" and "Load" move a configuration between a file and the browser. An exported file contains your API key in plain text, so do not send it to anyone or upload it to cloud storage. "Connection" is a browser-level setting and does not belong to any profile.
 
 ## Reading results [#reading-results]
 
-If all three answers are valid, the result area lists the candidates of the reference bank in ranking order, with one confidence value per row:
-
-- When the confidence is calibrated, it is a relative probability within the reference bank: all candidates total 100%, and models outside the bank are not included.
-- When it is not calibrated, the row shows an estimate from the verification score, which is not a probability.
+If all three answers are valid, the result area lists the candidates of the reference bank in ranking order, with one confidence value per row. The confidence is a relative probability within the reference bank: all candidates total 100%, and models outside the bank are not included. When the calibration does not match the detector, the page shows only the ranking, without confidence.
 
 The ranking and the confidence come from the number fingerprint alone. In API mode, the result of the [tokenizer probe](./tokenizer.mdx) appears separately as reference information in the fourth entry of the sample strip and in the tokenizer details. The result does not wait for the probe, which keeps running beside it.
 
-If the confidence of the top candidate is below 75%, the page shows a low-confidence warning. If only one or two answers are valid, the page shows only the ranking, without confidence. The command line also marks a disagreement when the top-ranked candidate differs from the verifier's choice; see [Detection](../cli/detect.mdx#results).
+If the confidence of the top candidate is below 75%, the page shows a low-confidence warning. If only one or two answers are valid, the page shows only the ranking, without confidence.
 
 If the smallest valid number of a sample is 200 or more, the page marks its distribution as abnormal and the result as unreliable. The prompt causes this distribution, so resampling with the same prompt repeats it. In API mode, "New prompt and resample" generates new challenges for these samples and samples them again at once with the original settings; in manual mode, "New prompt" only replaces the prompts and clears the matching answers. The other samples stay as they are. This warning plays no part in scoring.
 

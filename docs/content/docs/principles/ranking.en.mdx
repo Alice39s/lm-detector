@@ -1,6 +1,6 @@
 ---
-title: Ranking, verification, and calibration
-description: Three scores set the candidate order, the verifier checks "is this the same model", and a temperature softmax gives the confidence within the reference bank.
+title: Ranking and calibration
+description: Three scores set the candidate order, and a temperature softmax gives the confidence within the reference bank.
 ---
 
 ## Ranker
@@ -17,26 +17,15 @@ $$
 
 The ranking score $s$ sets the candidate order.
 
-## Verifier
-
-The verifier runs only when all three answers are valid. It projects the features into a low-dimensional space and calculates these features for each candidate:
-
-- Gaussian log densities under three hypotheses: "same model", "other model", and "model outside the bank"
-- The likelihood gain of each single answer
-- The nearest-neighbor distance to the reference answers of the candidate
-- The ranking-score margin of the candidate
-
-A linear model combines these features into a verification score. If the top-ranked candidate differs from the candidate with the highest verification score, the result marks the disagreement.
-
 ## Confidence calibration [#calibration]
 
-The confidence is a temperature softmax within the reference bank:
+The confidence is calculated only when all three answers are valid and the calibration in `data/shared_detector.json` matches the detector. It is a temperature softmax within the reference bank:
 
 $$
 p_k = \frac{\exp(\tau s_k)}{\sum_j \exp(\tau s_j)}
 $$
 
-`fpd retrain` fits the temperature $\tau$ offline. It holds out each of the 12 environments, then each pair of environments, and refits the ranker 78 times. The held-out results give the estimate of $\tau$. The nested held-out binary NLL must be lower than a constant baseline, and the AUC must be greater than 0.75. Otherwise, retraining does not replace the current detector. $p_k$ is distributed only among the models in the reference bank. It is not the probability that the service really is that model.
+`fpd retrain` fits the temperature $\tau$ offline. It holds out each of the 12 environments, then each pair of environments, and refits the ranker 78 times. The held-out results give the estimate of $\tau$. The nested held-out binary NLL must be lower than a constant baseline, and the AUC must be greater than 0.75. Otherwise, retraining does not replace the current detector. $p_k$ is distributed only among the models in the reference bank: all candidates add up to 100%, and models outside the bank are not included. It is not the probability that the service really is that model. When the calibration does not match the detector, the result gives the ranking only, without confidence.
 
 ## Reference bank and detector
 
@@ -44,7 +33,7 @@ $$
 | --- | --- |
 | `data/unified_reference.jsonl` | Reference batches. Each line holds the model, channel, request parameters, and answers |
 | `data/unified_bank.json` | Statistics derived from the reference batches |
-| `data/shared_detector.json` | Frozen ranker, verifier, and calibration parameters, bound to the reference data by SHA-256 |
+| `data/shared_detector.json` | Frozen ranker and calibration parameters, bound to the reference data by SHA-256 |
 | `data/enrollment-suite.json` | The 36 fixed sampling challenges |
 
-If the reference bank does not match the detector (for example, a custom bank from `--bank`), detection gives a legacy ranking only, without verification scores or confidence. See [Data files](../reference/data.mdx) for the format and change log of the data files.
+If the reference bank does not match the detector (for example, a custom bank from `--bank`), detection gives a legacy ranking only, without confidence. See [Data files](../reference/data.mdx) for the format and change log of the data files.

@@ -18,12 +18,11 @@ import sys
 from bank_builder import read_rows
 from calibrate import fit as calibrate
 from export import install, save, sha
-from shared_verifier_core import reference_panel
+from reference_data import reference_panel
 from train import fit as train
 
 SOURCE_FILES = ('retrain.py', 'train.py', 'calibrate.py', 'export.py', 'fingerprint.py',
                 'reference_data.py', 'bank_builder.py', 'ensemble_confidence_core.py',
-                'identity_verification_core.py', 'mlp_core.py', 'shared_verifier_core.py',
                 'calibration.py')
 
 
@@ -35,8 +34,8 @@ def input_data(data_dir: Path):
     if bank.get('schema') != 'robust-number-fingerprint-bank' or bank.get('reference_sha256') != reference_sha:
         raise ValueError('Reference data and bank differ; rebuild the bank first')
     ids = [model['id'] for model in bank['models']]
-    if len(ids) < 10 or len(set(ids)) != len(ids):
-        raise ValueError('The eight-dimensional verifier needs at least ten distinct reference identities')
+    if len(ids) < 2 or len(set(ids)) != len(ids):
+        raise ValueError('Ranking needs at least two distinct reference identities')
     rows = read_rows(reference)
     if (Counter(row['source'] for row in rows)
             != Counter({model['id']: model['response_count'] for model in bank['models']})):
@@ -80,7 +79,7 @@ def main() -> int:
             model_ids=[model['id'] for model in bank['models']],
             panel_groups=len(panel), new_api_calls=0))
         print('TRAIN', out, file=sys.stderr, flush=True)
-        candidate = train(data_dir, out / 'fit', rows, bank, panel, reference_sha, bank_sha)
+        candidate = train(data_dir, out / 'fit', rows, bank, reference_sha, bank_sha)
         if sha(data_dir / 'unified_reference.jsonl') != reference_sha or sha(data_dir / 'unified_bank.json') != bank_sha:
             raise ValueError('Reference inputs changed during fitting')
         print('CALIBRATE 78 held-out ranker fits', file=sys.stderr, flush=True)

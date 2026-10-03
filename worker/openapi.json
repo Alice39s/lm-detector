@@ -31,7 +31,7 @@
         "operationId": "relayRequest",
         "tags": ["proxy"],
         "summary": "Relay an API request",
-        "description": "Sends `body` to the upstream endpoint `url` with the caller's key and streams the JSON or SSE response back unchanged, including the upstream status. For `anthropic`, the key goes upstream as `x-api-key` with `anthropic-version: 2023-06-01`; otherwise as `Authorization`. Redirects are not followed and cookies are not forwarded. The upstream request times out after 250 seconds, and cancelling the call cancels it.",
+        "description": "Sends `body` to the upstream endpoint `url` with the caller's key and streams the JSON or SSE response back unchanged, including the upstream status. For `anthropic`, the key goes upstream as `x-api-key` with `anthropic-version: 2023-06-01`, plus `anthropic-beta: fast-mode-2026-02-01` when `body` contains `speed`; otherwise as `Authorization`. Redirects are not followed and cookies are not forwarded. The upstream request times out after 250 seconds, and cancelling the call cancels it.",
         "security": [{ "upstreamKey": [] }],
         "requestBody": {
           "required": true,

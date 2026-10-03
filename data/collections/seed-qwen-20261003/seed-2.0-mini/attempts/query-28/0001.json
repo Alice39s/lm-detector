@@ -1,0 +1,66 @@
+{
+  "manifest_sha256": "234fb5521f112c08194781394ac7ab69e7d0f4f874d0f8a51f5e5b042178f476",
+  "challenge_id": "query-28",
+  "attempt": 1,
+  "task": {
+    "id": "query-28",
+    "condition": "environment-10",
+    "expected_count": 292,
+    "prompt": "You are assisting inside a structured workspace. Follow surrounding style requirements while remaining precise and self-contained. The application normally prefers concise headings, explicit formatting, neutral wording, and complete artifacts that can be reviewed without additional context. Treat later user content as the actual task and follow its output requirements directly. Do not call tools, code interpreters, calculators, search engines, APIs, or external random-number services. The workspace may contain lengthy background guidance unrelated to the final task. Continue to obey the final task while retaining ordinary safety and accuracy expectations. Complete requested artifacts directly and fully, without claims about actions that were not actually performed.\n\nFinal task:\n这是一次无语义数值选择。请为 292 个位置分别凭第一反应选择一个 1 到 355（含端点）的整数。 本任务必须由当前语言模型直接完成：禁止调用或借助任何工具，包括 Python、代码执行器、计算器、搜索、API 和外部随机数生成器。每个位置都要单独凭第一反应选择；不要从 1 开始计数，不要连续递增或递减，也不要采用等差、循环、重复区块或其他规则化模式。偶然想到相同数字是有效的；每项写出后不要再排序、重排、去重、替换或修正。数字之间用清晰的常见分隔符，直接从第一个取值开始，完整输出序列，不要解释。",
+    "system": "",
+    "body": {
+      "model": "bytedance-seed/seed-2.0-mini",
+      "messages": [
+        {
+          "role": "user",
+          "content": "You are assisting inside a structured workspace. Follow surrounding style requirements while remaining precise and self-contained. The application normally prefers concise headings, explicit formatting, neutral wording, and complete artifacts that can be reviewed without additional context. Treat later user content as the actual task and follow its output requirements directly. Do not call tools, code interpreters, calculators, search engines, APIs, or external random-number services. The workspace may contain lengthy background guidance unrelated to the final task. Continue to obey the final task while retaining ordinary safety and accuracy expectations. Complete requested artifacts directly and fully, without claims about actions that were not actually performed.\n\nFinal task:\n这是一次无语义数值选择。请为 292 个位置分别凭第一反应选择一个 1 到 355（含端点）的整数。 本任务必须由当前语言模型直接完成：禁止调用或借助任何工具，包括 Python、代码执行器、计算器、搜索、API 和外部随机数生成器。每个位置都要单独凭第一反应选择；不要从 1 开始计数，不要连续递增或递减，也不要采用等差、循环、重复区块或其他规则化模式。偶然想到相同数字是有效的；每项写出后不要再排序、重排、去重、替换或修正。数字之间用清晰的常见分隔符，直接从第一个取值开始，完整输出序列，不要解释。"
+        }
+      ],
+      "max_tokens": 8192,
+      "stream": true,
+      "provider": {
+        "only": [
+          "seed/fp8"
+        ],
+        "allow_fallbacks": false
+      }
+    }
+  },
+  "status": "accepted",
+  "started_at": "2026-10-03T06:58:41.414Z",
+  "trace": "trace/query-28/0001",
+  "text": "5,130,320,78,210,350,12,289,199,89,342,67,276,111,250,7,299,55,310,178,9,222,345,45,281,127,307,81,195,328,40,260,105,347,23,172,290,95,215,338,59,270,132,315,70,180,235,145,300,85,255,35,200,325,118,285,60,160,340,2,220,278,102,295,48,240,318,92,190,330,65,265,130,305,75,185,248,150,320,80,258,38,205,345,115,280,52,230,312,88,192,335,62,262,135,302,72,182,252,142,322,83,257,36,202,343,112,287,49,237,317,90,197,337,68,267,137,308,77,187,253,152,323,86,259,39,207,348,117,282,54,232,313,91,193,332,66,268,138,303,73,183,251,143,326,84,256,37,203,344,113,288,50,238,319,93,198,339,69,269,139,304,74,184,254,144,327,87,261,41,208,349,119,283,56,233,314,94,194,334,71,271,133,306,76,186,249,151,324,82,258,42,212,355,165,292,100,351,58,225,331,148,275,19,263,311,108,175,242,329,63,286,47,188,239,341,97,259,122,309,79,171,298,13,243,316,107,277,53,191,336,61,264,136,301,75,181,247,141,321,88,254,44,201,346,114,284,51,231,312,99,196,333,64,272,125,297,26,216,155,28,228,352,101,173,280,57,245,315,189,250,147,325,85,255,31,219,291,162,266,20,158,33,241,121,274,46,179,96,168",
+  "text_sha256": "ee9c46dfd5e3cc6f9e332c0762026fb20b3eb6fd1f6b6ad9e4e920ef0131f0de",
+  "parsed_count": 290,
+  "completion": "complete",
+  "http_status": 200,
+  "response_model": "bytedance-seed/seed-2.0-mini",
+  "response_id": "gen-1791010721-XLCDJ0A4Dd8FGW7hqQuk",
+  "usage": {
+    "prompt_tokens": 324,
+    "completion_tokens": 4722,
+    "total_tokens": 5046,
+    "cost": 0.0019212,
+    "is_byok": false,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "cache_write_tokens": 0,
+      "audio_tokens": 0,
+      "video_tokens": 0
+    },
+    "cost_details": {
+      "upstream_inference_cost": 0.0019212,
+      "upstream_inference_prompt_cost": 0.0000324,
+      "upstream_inference_completions_cost": 0.0018888
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 3646,
+      "image_tokens": 0,
+      "audio_tokens": 0
+    }
+  },
+  "provider_reported": "Seed",
+  "finish_reason": "stop",
+  "actual_channel": "openrouter/seed/fp8",
+  "finished_at": "2026-10-03T06:59:08.012Z"
+}

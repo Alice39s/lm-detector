@@ -1,9 +1,8 @@
 import type { Analysis } from '@fingerpoint/shared/types'
 import type { I18n } from '@/i18n'
-import { confidenceOf } from '@/lib/result-confidence'
 
 export const isUncertain = (result: Analysis) =>
-  confidenceOf(result.results[0] ?? {}) === null
+  (result.results[0]?.probability ?? null) === null
 
 function cssVar(name: string) {
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim()
@@ -55,7 +54,7 @@ export async function exportResultImage(result: Analysis, i18n: I18n): Promise<v
   ctx.fillStyle = uncertain ? c.mutedFg : c.fg
   ctx.font = font(36, 600)
   ctx.fillText(top?.display_name ?? result.prediction_name, pad + 24, y + 52, width - pad * 2 - 48 - 220)
-  const conf = top ? confidenceOf(top) : null
+  const conf = top?.probability ?? null
   if (conf !== null) {
     ctx.textAlign = 'right'
     ctx.font = font(44, 600)
@@ -80,7 +79,7 @@ export async function exportResultImage(result: Analysis, i18n: I18n): Promise<v
     ctx.fillStyle = c.fg
     ctx.font = font(15, 500)
     ctx.fillText(r.display_name, nameX, ry + rowH / 2, barX - nameX - 24)
-    const v = confidenceOf(r)
+    const v = r.probability
     ctx.fillStyle = c.muted
     roundRect(ctx, barX, ry + rowH / 2 - 3, barW, 6, 3, c.muted)
     if (v !== null) {

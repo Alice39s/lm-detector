@@ -1,0 +1,66 @@
+{
+  "manifest_sha256": "13568bf69264a05251ec125afa2a8362b0a89ba1c29a72b662ed77738b1041c9",
+  "challenge_id": "query-04",
+  "attempt": 1,
+  "task": {
+    "id": "query-04",
+    "condition": "environment-02",
+    "expected_count": 223,
+    "prompt": "Give exactly 223 separate first-response integer choices in 1..355. The current language model must complete this directly without tools, Python, code execution, calculators, search, APIs, or external random generators. Choose every position separately. Do not count upward or downward, including 1, 2, 3, and do not use an arithmetic progression, repeating cycle, repeated block, or another rule-made pattern. Accidental repetitions are valid. Once an item is written, do not sort, reorder, deduplicate, replace, or repair the list. Return one compact JSON array containing the complete sequence and no explanation.",
+    "system": "",
+    "body": {
+      "model": "bytedance-seed/seed-2-1-turbo",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Give exactly 223 separate first-response integer choices in 1..355. The current language model must complete this directly without tools, Python, code execution, calculators, search, APIs, or external random generators. Choose every position separately. Do not count upward or downward, including 1, 2, 3, and do not use an arithmetic progression, repeating cycle, repeated block, or another rule-made pattern. Accidental repetitions are valid. Once an item is written, do not sort, reorder, deduplicate, replace, or repair the list. Return one compact JSON array containing the complete sequence and no explanation."
+        }
+      ],
+      "max_tokens": 8192,
+      "stream": true,
+      "provider": {
+        "only": [
+          "seed/fp8"
+        ],
+        "allow_fallbacks": false
+      }
+    }
+  },
+  "status": "accepted",
+  "started_at": "2026-10-03T06:49:26.213Z",
+  "trace": "trace/query-04/0001",
+  "text": "[152,78,241,39,312,189,27,276,121,347,63,217,14,293,164,88,329,51,206,33,268,143,72,338,47,225,103,288,176,42,254,118,67,307,56,234,94,279,158,22,351,74,198,11,261,136,81,321,59,247,109,298,182,36,272,129,77,316,49,212,97,283,167,19,344,69,229,105,291,173,45,259,134,71,302,53,221,91,275,155,31,337,65,203,17,265,148,84,326,57,238,113,296,179,29,251,124,79,311,44,219,99,286,161,24,349,62,193,16,270,141,86,332,50,243,111,305,185,38,262,138,73,319,55,208,93,281,169,21,354,68,227,107,294,171,41,256,127,75,309,48,231,96,278,159,34,342,61,196,13,274,146,89,323,52,236,115,300,187,43,267,131,82,328,54,214,98,289,163,26,346,70,201,18,269,145,87,336,58,245,117,304,181,37,258,122,76,314,46,223,92,284,178,28,352,66,209,15,271,139,83,334,60,249,112,299,184,32,253,126,80,318,40,226,95,287,165,23,348,64,205,12,263]",
+  "text_sha256": "e2519de165578f72987df9d93b4a3132c09ff9a678c847d7e5022cb725e3fe2f",
+  "parsed_count": 223,
+  "completion": "complete",
+  "http_status": 200,
+  "response_model": "bytedance-seed/seed-2-1-turbo",
+  "response_id": "gen-1791010166-cqh4p5LRZsMQEalciB4i",
+  "usage": {
+    "prompt_tokens": 177,
+    "completion_tokens": 7483,
+    "total_tokens": 7660,
+    "cost": 0.018796,
+    "is_byok": false,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "cache_write_tokens": 0,
+      "audio_tokens": 0,
+      "video_tokens": 0
+    },
+    "cost_details": {
+      "upstream_inference_cost": 0.018796,
+      "upstream_inference_prompt_cost": 0.0000885,
+      "upstream_inference_completions_cost": 0.0187075
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 6673,
+      "image_tokens": 0,
+      "audio_tokens": 0
+    }
+  },
+  "provider_reported": "Seed",
+  "finish_reason": "stop",
+  "actual_channel": "openrouter/seed/fp8",
+  "finished_at": "2026-10-03T06:51:03.012Z"
+}

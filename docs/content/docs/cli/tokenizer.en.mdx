@@ -17,7 +17,7 @@ The tokenizer probe is off by default. With `--tokenizer`, fpd sends one baselin
 
 The probe result is reference only:
 
-- The candidate ranking, the confidence, and the verification scores come from the number fingerprint alone. They are the same with or without the probe.
+- The candidate ranking and the confidence come from the number fingerprint alone. They are the same with or without the probe.
 - Each round is scored when its samples finish. Scoring does not wait for the probe.
 - A matching tokenizer does not prove the model identity, because many models share one tokenizer.
 

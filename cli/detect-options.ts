@@ -1,6 +1,9 @@
 import { parseArgs } from 'node:util'
+import { SERVICE_TIERS, type ServiceTier } from '@fingerpoint/shared/completion-request'
 import { TOKENIZER_MODEL } from '@fingerpoint/shared/tokenizer-posterior'
 import type { ApiConfig } from '@fingerpoint/shared/types'
+
+const TIER_ALIASES: Record<string, ServiceTier> = { f: 'fast', uf: 'ultrafast', slow: 'flex', priority: 'fast', standard: 'default' }
 
 export interface DetectOptions {
   config: ApiConfig
@@ -36,6 +39,7 @@ export function parseOptions(args: string[], env = process.env): DetectOptions |
     api: { type: 'string', short: 'a' }, count: { type: 'string' }, parallel: { type: 'string', short: 'p' },
     repeat: { type: 'string', short: 'n' }, strict: { type: 'boolean', short: 's' },
     'no-stream': { type: 'boolean' }, timeout: { type: 'string' }, effort: { type: 'string', short: 'e' },
+    'service-tier': { type: 'string', short: 't' },
     input: { type: 'string' }, output: { type: 'string' }, bank: { type: 'string' },
     challenges: { type: 'string' }, json: { type: 'boolean' }, help: { type: 'boolean', short: 'h' },
     'base-url': { type: 'string' }, 'api-key': { type: 'string' },
@@ -47,6 +51,10 @@ export function parseOptions(args: string[], env = process.env): DetectOptions |
   const api = apiInput === 'cc' ? 'chatcompletion'
     : (['responses', 'chatcompletion', 'message'] as const).find(name => name.startsWith(apiInput))
   if (!apiInput || !api) throw new Error('--api must be a prefix of responses, chatcompletion, or message (or cc).')
+  // Aliases come first, so `f` means fast rather than flex.
+  const tierInput = (values['service-tier'] ?? 'default').toLowerCase()
+  const serviceTier = Object.hasOwn(TIER_ALIASES, tierInput) ? TIER_ALIASES[tierInput] : SERVICE_TIERS.find(tier => tier.startsWith(tierInput))
+  if (!tierInput || !serviceTier) throw new Error('--service-tier must be flex, default, fast, or ultrafast, a prefix, or an alias: f, uf, slow, priority, standard.')
   const count = positiveInteger(values.count ?? '3', '--count', 3)
   const parallel = Math.min(positiveInteger(values.parallel ?? '3', '--parallel', 3), count)
   const repeat = positiveInteger(values.repeat ?? '1', '--repeat')
@@ -77,7 +85,7 @@ export function parseOptions(args: string[], env = process.env): DetectOptions |
     apiKey: (values.apikey ?? values['api-key'] ?? env.API_KEY ?? '').trim(),
     baseUrl: (values.baseurl ?? values['base-url'] ?? env.BASE_URL ?? '').trim(),
     format: api === 'message' ? 'anthropic' : api === 'chatcompletion' ? 'openai' : 'responses',
-    stream: !values['no-stream'], effort: values.effort ?? '',
+    serviceTier, stream: !values['no-stream'], effort: values.effort ?? '',
   }
   if (!values.input) {
     for (const [name, value, variable] of [

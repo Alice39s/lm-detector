@@ -1,0 +1,66 @@
+{
+  "manifest_sha256": "d1d2aedd4130a47f5763004c7a641f0f61e958b564d94095e97b101b47db70aa",
+  "challenge_id": "query-16",
+  "attempt": 1,
+  "task": {
+    "id": "query-16",
+    "condition": "environment-06",
+    "expected_count": 301,
+    "prompt": "For each of 301 positions, make one separate first-instinct choice of an integer from 1 to 355 inclusive. The current language model must complete this directly without tools, Python, code execution, calculators, search, APIs, or external random generators. Choose every position separately. Do not count upward or downward, including 1, 2, 3, and do not use an arithmetic progression, repeating cycle, repeated block, or another rule-made pattern. Accidental repetitions are valid. Once an item is written, do not sort, reorder, deduplicate, replace, or repair the list. Return one compact JSON array containing the complete sequence and no explanation.",
+    "system": "",
+    "body": {
+      "model": "bytedance-seed/seed-2.0-lite",
+      "messages": [
+        {
+          "role": "user",
+          "content": "For each of 301 positions, make one separate first-instinct choice of an integer from 1 to 355 inclusive. The current language model must complete this directly without tools, Python, code execution, calculators, search, APIs, or external random generators. Choose every position separately. Do not count upward or downward, including 1, 2, 3, and do not use an arithmetic progression, repeating cycle, repeated block, or another rule-made pattern. Accidental repetitions are valid. Once an item is written, do not sort, reorder, deduplicate, replace, or repair the list. Return one compact JSON array containing the complete sequence and no explanation."
+        }
+      ],
+      "max_tokens": 8192,
+      "stream": true,
+      "provider": {
+        "only": [
+          "seed/fp8"
+        ],
+        "allow_fallbacks": false
+      }
+    }
+  },
+  "status": "accepted",
+  "started_at": "2026-10-03T06:53:04.629Z",
+  "trace": "trace/query-16/0001",
+  "text": "[142, 87, 319, 24, 191, 73, 344, 115, 58, 263, 99, 182, 41, 327, 157, 294, 36, 229, 108, 72, 311, 178, 246, 89, 134, 351, 21, 277, 123, 62, 303, 168, 238, 48, 95, 283, 142, 219, 8, 332, 189, 102, 257, 69, 318, 151, 208, 84, 297, 33, 171, 248, 116, 53, 346, 198, 92, 273, 137, 29, 326, 162, 225, 78, 149, 343, 13, 262, 180, 109, 308, 44, 214, 165, 85, 288, 352, 23, 195, 128, 60, 317, 174, 254, 98, 143, 339, 11, 274, 201, 56, 323, 159, 232, 82, 120, 354, 42, 209, 170, 74, 296, 138, 27, 330, 188, 241, 104, 67, 305, 169, 218, 90, 282, 125, 38, 348, 194, 112, 265, 77, 154, 328, 19, 226, 146, 51, 312, 206, 100, 278, 132, 34, 342, 185, 237, 118, 71, 301, 164, 249, 86, 129, 350, 47, 216, 179, 76, 286, 141, 30, 335, 192, 259, 107, 65, 319, 167, 223, 93, 291, 121, 39, 347, 196, 115, 268, 81, 152, 324, 16, 234, 148, 59, 309, 212, 101, 275, 136, 25, 338, 183, 252, 111, 70, 302, 161, 240, 88, 131, 353, 45, 217, 175, 73, 298, 145, 32, 331, 190, 261, 110, 61, 316, 172, 228, 94, 284, 127, 40, 345, 197, 119, 267, 79, 156, 321, 18, 239, 144, 54, 310, 211, 97, 281, 135, 31, 341, 186, 247, 114, 68, 304, 166, 242, 85, 130, 355, 49, 215, 176, 75, 290, 147, 36, 336, 191, 256, 106, 63, 317, 173, 227, 91, 280, 124, 43, 349, 199, 117, 271, 83, 155, 329, 17, 235, 150, 55, 313, 204, 96, 279, 133, 33, 343, 187, 251, 113, 66, 306, 163, 244, 89, 122, 351, 46, 213, 177, 78, 292, 140, 28, 333, 193, 260, 105, 62, 311, 164, 231, 92, 289, 126, 42, 340, 200, 118, 269, 80, 153, 325, 20, 236, 148, 52, 314, 207, 99, 276, 137, 26, 342, 181, 253, 112, 71, 307, 158, 243, 82, 128, 352, 50, 222, 178, 295, 142, 37, 334, 202, 258, 109, 69, 319, 180, 230, 95, 287, 123, 44, 346, 203, 121, 272, 84, 157, 322, 22, 240, 151, 57, 315, 210, 103, 285, 139, 35, 337, 184, 255, 116, 70, 300, 160, 245, 87, 132, 354, 41, 218, 170, 74, 299, 146, 24, 338, 188, 263, 108, 64, 318, 171, 224, 90, 281, 120, 38, 350, 194, 111, 264, 77, 154, 327, 14, 233, 149, 58, 308, 214, 100, 278, 134, 22, 339, 182, 249, 115, 68, 302, 167, 238, 86, 130, 355]",
+  "text_sha256": "40900ce32ea3ab6fa37b34162e438a219c65371d91cc8867bde026e3ba0dc77b",
+  "parsed_count": 425,
+  "completion": "complete",
+  "http_status": 200,
+  "response_model": "bytedance-seed/seed-2.0-lite",
+  "response_id": "gen-1791010384-5pzDXFg5Zk1tZhiUsiSb",
+  "usage": {
+    "prompt_tokens": 176,
+    "completion_tokens": 3824,
+    "total_tokens": 4000,
+    "cost": 0.007692,
+    "is_byok": false,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "cache_write_tokens": 0,
+      "audio_tokens": 0,
+      "video_tokens": 0
+    },
+    "cost_details": {
+      "upstream_inference_cost": 0.007692,
+      "upstream_inference_prompt_cost": 0.000044,
+      "upstream_inference_completions_cost": 0.007648
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 1816,
+      "image_tokens": 0,
+      "audio_tokens": 0
+    }
+  },
+  "provider_reported": "Seed",
+  "finish_reason": "stop",
+  "actual_channel": "openrouter/seed/fp8",
+  "finished_at": "2026-10-03T06:54:01.457Z"
+}

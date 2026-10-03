@@ -1,0 +1,45 @@
+{
+  "manifest_sha256": "13568bf69264a05251ec125afa2a8362b0a89ba1c29a72b662ed77738b1041c9",
+  "challenge_id": "query-29",
+  "attempt": 1,
+  "task": {
+    "id": "query-29",
+    "condition": "environment-10-e015ae0649e14",
+    "expected_count": 308,
+    "prompt": "The application normally prefers concise headings, explicit formatting, neutral wording, and complete artifacts that can be reviewed without additional context. Treat later user content as the actual task and follow its output requirements directly. Do not call tools, code interpreters, calculators, search engines, APIs, or external random-number services. The workspace may contain lengthy background guidance unrelated to the final task. Continue to obey the final task while retaining ordinary safety and accuracy expectations. Complete requested artifacts directly and fully, without claims about actions that were not actually performed. You are assisting inside a structured workspace. Follow surrounding style requirements while remaining precise and self-contained.\n\nFinal task:\n请完成无语义整数选择任务：逐项给出 308 个闭区间 [1, 355] 内的整数，每次只决定当前一项。 本任务必须由当前语言模型直接完成：禁止调用或借助任何工具，包括 Python、代码执行器、计算器、搜索、API 和外部随机数生成器。每个位置都要单独凭第一反应选择；不要从 1 开始计数，不要连续递增或递减，也不要采用等差、循环、重复区块或其他规则化模式。偶然想到相同数字是有效的；每项写出后不要再排序、重排、去重、替换或修正。数字之间用清晰的常见分隔符，直接从第一个取值开始，完整输出序列，不要解释。",
+    "system": "",
+    "body": {
+      "model": "bytedance-seed/seed-2-1-turbo",
+      "messages": [
+        {
+          "role": "user",
+          "content": "The application normally prefers concise headings, explicit formatting, neutral wording, and complete artifacts that can be reviewed without additional context. Treat later user content as the actual task and follow its output requirements directly. Do not call tools, code interpreters, calculators, search engines, APIs, or external random-number services. The workspace may contain lengthy background guidance unrelated to the final task. Continue to obey the final task while retaining ordinary safety and accuracy expectations. Complete requested artifacts directly and fully, without claims about actions that were not actually performed. You are assisting inside a structured workspace. Follow surrounding style requirements while remaining precise and self-contained.\n\nFinal task:\n请完成无语义整数选择任务：逐项给出 308 个闭区间 [1, 355] 内的整数，每次只决定当前一项。 本任务必须由当前语言模型直接完成：禁止调用或借助任何工具，包括 Python、代码执行器、计算器、搜索、API 和外部随机数生成器。每个位置都要单独凭第一反应选择；不要从 1 开始计数，不要连续递增或递减，也不要采用等差、循环、重复区块或其他规则化模式。偶然想到相同数字是有效的；每项写出后不要再排序、重排、去重、替换或修正。数字之间用清晰的常见分隔符，直接从第一个取值开始，完整输出序列，不要解释。"
+        }
+      ],
+      "max_tokens": 8192,
+      "stream": true,
+      "reasoning_effort": "none",
+      "provider": {
+        "only": [
+          "seed/fp8"
+        ],
+        "allow_fallbacks": false
+      }
+    },
+    "effort": "none"
+  },
+  "note": "User requested the minimum reasoning effort and automatic truncation. Disable reasoning with effort none for this pending challenge; keep the fixed prompt and all earlier attempts. Stop the stream at the existing 500-integer sampling cap.",
+  "status": "accepted",
+  "started_at": "2026-10-03T07:30:34.506Z",
+  "trace": "trace/query-29/0001",
+  "text": "127, 294, 53, 189, 341, 77, 216, 92, 302, 41, 178, 269, 15, 323, 104, 251, 68, 203, 335, 88, 146, 278, 36, 198, 312, 59, 163, 234, 7, 287, 115, 242, 81, 194, 347, 22, 181, 299, 47, 212, 99, 263, 137, 319, 65, 229, 10, 274, 151, 338, 73, 207, 31, 171, 283, 50, 238, 111, 308, 18, 254, 85, 192, 344, 44, 218, 122, 290, 61, 169, 270, 29, 185, 326, 97, 246, 70, 221, 3, 261, 133, 315, 79, 209, 349, 42, 174, 281, 55, 231, 107, 297, 16, 257, 90, 201, 332, 63, 158, 276, 25, 187, 329, 117, 249, 83, 214, 38, 166, 289, 52, 239, 109, 305, 1, 267, 142, 321, 71, 205, 34, 179, 292, 49, 227, 95, 265, 129, 311, 67, 219, 12, 279, 155, 336, 75, 196, 30, 161, 285, 57, 236, 113, 300, 20, 252, 87, 183, 331, 46, 211, 125, 295, 69, 176, 268, 8, 317, 102, 244, 80, 200, 343, 33, 172, 280, 54, 233, 105, 304, 14, 260, 139, 327, 74, 208, 39, 188, 298, 45, 225, 93, 259, 121, 314, 62, 213, 5, 272, 149, 334, 78, 199, 32, 167, 288, 56, 237, 110, 307, 19, 256, 89, 191, 340, 40, 217, 124, 293, 60, 165, 275, 27, 186, 325, 96, 248, 82, 223, 2, 262, 135, 318, 72, 206, 35, 173, 284, 51, 232, 108, 306, 17, 253, 86, 190, 342, 43, 215, 126, 296, 64, 170, 271, 9, 316, 101, 245, 84, 220, 4, 258, 131, 322, 76, 197, 37, 164, 286, 58, 240, 112, 303, 21, 250, 91, 184, 330, 48, 226, 123, 291, 66, 177, 273, 11, 320, 100, 247, 78, 222, 6, 266, 140, 333, 70, 195, 28, 168, 282, 49, 235, 116, 301, 23, 255, 94, 182, 337, 47, 224, 120, 313, 63, 175, 277, 13, 328, 103, 243, 81, 210, 346, 34, 162, 290, 53, 230, 114, 309, 24, 249, 88, 193, 348, 39, 228, 128, 310, 68, 160, 279, 4, 264, 136, 324, 71, 202, 30, 180, 294, 55, 239, 106, 303, 16, 263, 95, 189, 345, 41, 216, 119, 312, 61, 159, 286, 18, 251, 85, 198, 339, 46, 209, 128, 289, 57, 173, 276, 10, 322, 98, 246, 76, 221, 350, 36, 182, 297, 50, 236, 112, 307, 22, 258, 83, 204, 341, 44, 219, 125, 292, 67, 168, 271, 7, 317, 104, 242, 73, 214, 344, 31, 176, 287, 52, 234, 107, 300, 26, 254, 91, 196, 335, 42, 227, 118, 315, 69, 171, 268, 8, 326, 96, 248, 79, 207, 352, 38, 187, 299, 54, 238, 115, 305, 19, 261, 86, 201, 347, 48, 223, 129, 314, 65, 166, 278, 12, 330, 102, 244, 77, 217, 337, 29, 179, 283, 51, 231, 110, 302, 17, 257, 93, 192, 340, 43, 212, 122, 295, 60, 163, 269, 6, 319, 100, 250, 84, 203, 349, 35, 185, 281, 49, 240, 111, 308, 21, 252, 90, 199, 332, 45, 226, 127, 311, 66, 174, 274, 9",
+  "text_sha256": "18cb074ca214d75fb693d579cb36acd03eb18a637c84edc73446bae706e4309a",
+  "parsed_count": 500,
+  "completion": "truncated",
+  "http_status": 200,
+  "response_model": "bytedance-seed/seed-2-1-turbo",
+  "response_id": "gen-1791012634-hdFcCZDu0Dxh87eORznM",
+  "provider_reported": "Seed",
+  "actual_channel": "openrouter/seed/fp8",
+  "finished_at": "2026-10-03T07:31:11.988Z"
+}

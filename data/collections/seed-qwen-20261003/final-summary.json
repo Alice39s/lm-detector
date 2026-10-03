@@ -1,0 +1,412 @@
+{
+  "generated_at": "2026-10-03T07:43:50.480Z",
+  "existing_batches_preserved": true,
+  "prompts_unchanged": true,
+  "models_before": 53,
+  "models_after": 58,
+  "samples_before": 1948,
+  "samples_after": 2128,
+  "added_models": [
+    {
+      "label": "seed-2.1-turbo",
+      "directory": "/Users/ikaleio/Projects/lm-fingerpoint-detector/projects/data/collections/seed-qwen-20261003/seed-2.1-turbo",
+      "samples": 36,
+      "channel": "openrouter/seed/fp8",
+      "api_model": "bytedance-seed/seed-2-1-turbo",
+      "efforts": {
+        "default": 22,
+        "low": 1,
+        "none": 13
+      },
+      "overrides": [
+        {
+          "challenge": "query-15",
+          "effort": "low",
+          "attempt": 7
+        },
+        {
+          "challenge": "query-18",
+          "effort": "none",
+          "attempt": 7
+        },
+        {
+          "challenge": "query-22",
+          "effort": "none",
+          "attempt": 5
+        },
+        {
+          "challenge": "query-26",
+          "effort": "none",
+          "attempt": 2
+        },
+        {
+          "challenge": "query-27",
+          "effort": "none",
+          "attempt": 1
+        },
+        {
+          "challenge": "query-28",
+          "effort": "none",
+          "attempt": 1
+        },
+        {
+          "challenge": "query-29",
+          "effort": "none",
+          "attempt": 1
+        },
+        {
+          "challenge": "query-30",
+          "effort": "none",
+          "attempt": 1
+        },
+        {
+          "challenge": "query-31",
+          "effort": "none",
+          "attempt": 1
+        },
+        {
+          "challenge": "query-32",
+          "effort": "none",
+          "attempt": 1
+        },
+        {
+          "challenge": "query-33",
+          "effort": "none",
+          "attempt": 1
+        },
+        {
+          "challenge": "query-34",
+          "effort": "none",
+          "attempt": 1
+        },
+        {
+          "challenge": "query-35",
+          "effort": "none",
+          "attempt": 1
+        },
+        {
+          "challenge": "query-36",
+          "effort": "none",
+          "attempt": 1
+        }
+      ],
+      "natural": 29,
+      "truncated": [
+        "query-22",
+        "query-29",
+        "query-31",
+        "query-32",
+        "query-34",
+        "query-35",
+        "query-36"
+      ],
+      "failed_attempts": 20,
+      "interrupted_attempts": 4,
+      "receipt_run_id": "eece49a2-788f-47ff-80f7-a9f67cefa571"
+    },
+    {
+      "label": "seed-2.0-lite",
+      "directory": "/Users/ikaleio/Projects/lm-fingerpoint-detector/projects/data/collections/seed-qwen-20261003/seed-2.0-lite",
+      "samples": 36,
+      "channel": "openrouter/seed/fp8",
+      "api_model": "bytedance-seed/seed-2.0-lite",
+      "efforts": {
+        "default": 36
+      },
+      "overrides": [],
+      "natural": 29,
+      "truncated": [
+        "query-12",
+        "query-18",
+        "query-26",
+        "query-27",
+        "query-30",
+        "query-33",
+        "query-36"
+      ],
+      "failed_attempts": 2,
+      "interrupted_attempts": 0,
+      "receipt_run_id": "2256ea9d-10c3-4440-94b6-7c40c09ebddf"
+    },
+    {
+      "label": "seed-2.0-mini",
+      "directory": "/Users/ikaleio/Projects/lm-fingerpoint-detector/projects/data/collections/seed-qwen-20261003/seed-2.0-mini",
+      "samples": 36,
+      "channel": "openrouter/seed/fp8",
+      "api_model": "bytedance-seed/seed-2.0-mini",
+      "efforts": {
+        "default": 36
+      },
+      "overrides": [],
+      "natural": 32,
+      "truncated": [
+        "query-10",
+        "query-21",
+        "query-30",
+        "query-35"
+      ],
+      "failed_attempts": 17,
+      "interrupted_attempts": 2,
+      "receipt_run_id": "def07a15-ca65-4c82-b869-8eca538ee6c3"
+    },
+    {
+      "label": "qwen3.8-flash",
+      "directory": "/Users/ikaleio/Projects/lm-fingerpoint-detector/projects/data/collections/seed-qwen-20261003/qwen3.8-flash-retry",
+      "samples": 36,
+      "channel": "openrouter/alibaba",
+      "api_model": "qwen/qwen3.8-flash",
+      "efforts": {
+        "default": 7,
+        "none": 29
+      },
+      "overrides": [
+        {
+          "challenge": "query-08",
+          "effort": "none",
+          "attempt": 10
+        },
+        {
+          "challenge": "query-09",
+          "effort": "none",
+          "attempt": 6
+        },
+        {
+          "challenge": "query-10",
+          "effort": "none",
+          "attempt": 1
+        },
+        {
+          "challenge": "query-11",
+          "effort": "none",
+          "attempt": 1
+        },
+        {
+          "challenge": "query-12",
+          "effort": "none",
+          "attempt": 1
+        },
+        {
+          "challenge": "query-13",
+          "effort": "none",
+          "attempt": 1
+        },
+        {
+          "challenge": "query-14",
+          "effort": "none",
+          "attempt": 1
+        },
+        {
+          "challenge": "query-15",
+          "effort": "none",
+          "attempt": 1
+        },
+        {
+          "challenge": "query-16",
+          "effort": "none",
+          "attempt": 1
+        },
+        {
+          "challenge": "query-17",
+          "effort": "none",
+          "attempt": 1
+        },
+        {
+          "challenge": "query-18",
+          "effort": "none",
+          "attempt": 1
+        },
+        {
+          "challenge": "query-19",
+          "effort": "none",
+          "attempt": 2
+        },
+        {
+          "challenge": "query-20",
+          "effort": "none",
+          "attempt": 1
+        },
+        {
+          "challenge": "query-21",
+          "effort": "none",
+          "attempt": 2
+        },
+        {
+          "challenge": "query-22",
+          "effort": "none",
+          "attempt": 1
+        },
+        {
+          "challenge": "query-23",
+          "effort": "none",
+          "attempt": 3
+        },
+        {
+          "challenge": "query-24",
+          "effort": "none",
+          "attempt": 1
+        },
+        {
+          "challenge": "query-25",
+          "effort": "none",
+          "attempt": 1
+        },
+        {
+          "challenge": "query-26",
+          "effort": "none",
+          "attempt": 1
+        },
+        {
+          "challenge": "query-27",
+          "effort": "none",
+          "attempt": 1
+        },
+        {
+          "challenge": "query-28",
+          "effort": "none",
+          "attempt": 1
+        },
+        {
+          "challenge": "query-29",
+          "effort": "none",
+          "attempt": 1
+        },
+        {
+          "challenge": "query-30",
+          "effort": "none",
+          "attempt": 1
+        },
+        {
+          "challenge": "query-31",
+          "effort": "none",
+          "attempt": 1
+        },
+        {
+          "challenge": "query-32",
+          "effort": "none",
+          "attempt": 1
+        },
+        {
+          "challenge": "query-33",
+          "effort": "none",
+          "attempt": 1
+        },
+        {
+          "challenge": "query-34",
+          "effort": "none",
+          "attempt": 1
+        },
+        {
+          "challenge": "query-35",
+          "effort": "none",
+          "attempt": 1
+        },
+        {
+          "challenge": "query-36",
+          "effort": "none",
+          "attempt": 1
+        }
+      ],
+      "natural": 32,
+      "truncated": [
+        "query-08",
+        "query-16",
+        "query-17",
+        "query-18"
+      ],
+      "failed_attempts": 41,
+      "interrupted_attempts": 3,
+      "receipt_run_id": "64603b65-c3c3-4683-a1e8-08dd104f477d"
+    },
+    {
+      "label": "qwen3.8-omni-flash",
+      "directory": "/Users/ikaleio/Projects/lm-fingerpoint-detector/projects/data/collections/seed-qwen-20261003/qwen3.8-omni-flash",
+      "samples": 36,
+      "channel": "openrouter/alibaba",
+      "api_model": "qwen/qwen3.8-omni-flash",
+      "efforts": {
+        "default": 30,
+        "none": 6
+      },
+      "overrides": [
+        {
+          "challenge": "query-31",
+          "effort": "none",
+          "attempt": 2
+        },
+        {
+          "challenge": "query-32",
+          "effort": "none",
+          "attempt": 2
+        },
+        {
+          "challenge": "query-33",
+          "effort": "none",
+          "attempt": 1
+        },
+        {
+          "challenge": "query-34",
+          "effort": "none",
+          "attempt": 1
+        },
+        {
+          "challenge": "query-35",
+          "effort": "none",
+          "attempt": 1
+        },
+        {
+          "challenge": "query-36",
+          "effort": "none",
+          "attempt": 1
+        }
+      ],
+      "natural": 32,
+      "truncated": [
+        "query-31",
+        "query-32",
+        "query-34",
+        "query-36"
+      ],
+      "failed_attempts": 5,
+      "interrupted_attempts": 4,
+      "receipt_run_id": "eb0ef85c-5e8a-4812-a0d3-ff94604bdcae"
+    }
+  ],
+  "shared_detector_matches_bank": true,
+  "holdout": {
+    "comparable": true,
+    "uncovered_models": [
+      "seed-2.0-mini",
+      "seed-2.0-lite",
+      "qwen3.8-omni-flash",
+      "seed-2.1-turbo",
+      "qwen3.8-flash"
+    ],
+    "before_top1": 81,
+    "after_top1": 83,
+    "before_verifier_top1": 84,
+    "after_verifier_top1": 83
+  },
+  "new_holdout_api_calls": 0,
+  "old_flash_batch_retained": true,
+  "validation": {
+    "typecheck": {
+      "exit_code": 0
+    },
+    "build": {
+      "exit_code": 0
+    },
+    "public_data": {
+      "models": 58,
+      "samples": 2128,
+      "detector_matches": true
+    },
+    "dist_data": {
+      "models": 58,
+      "samples": 2128,
+      "detector_matches": true
+    },
+    "scoped_diff_check": {
+      "exit_code": 0
+    }
+  }
+}

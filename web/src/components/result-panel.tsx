@@ -8,7 +8,7 @@ import type { Mode } from '@/components/sample-card'
 import { useI18n } from '@/i18n'
 import { brandLogos } from '@/lib/brand-logos'
 import { listItem, listStagger, spring as motionSpring, useMotionPreset } from '@/lib/motion'
-import { confidenceOf, NORMAL_CONFIDENCE_THRESHOLD } from '@/lib/result-confidence'
+import { NORMAL_CONFIDENCE_THRESHOLD } from '@/lib/result-confidence'
 import type { Analysis } from '@fingerpoint/shared/types'
 
 const VISIBLE = 8
@@ -41,9 +41,9 @@ export function ResultPanel({ result, anomalous, mode, onReplacePrompts }: { res
   const unscorable = result.decision === 'unscorable' || result.results.length === 0
   const top = result.results[0]
   const logo = top && brandLogos[top.family]
-  const topConfidence = top ? confidenceOf(top) : null
+  const topConfidence = top?.probability ?? null
   const lowConfidence = !unscorable && topConfidence !== null && topConfidence < NORMAL_CONFIDENCE_THRESHOLD
-  const hasScores = result.results.some(r => confidenceOf(r) !== null)
+  const hasScores = result.results.some(r => r.probability !== null)
   const rows = all ? result.results : result.results.slice(0, VISIBLE)
 
   return (
@@ -71,7 +71,7 @@ export function ResultPanel({ result, anomalous, mode, onReplacePrompts }: { res
               {topConfidence === null
                 ? <span className="text-body text-muted-foreground">{t('detect.scoreUnavailable')}</span>
                 : <AnimatedPercent value={topConfidence} className="text-display-number" />}
-              <span className="text-meta text-muted-foreground">{t('detect.scoreLabel')}</span>
+              <span className="text-meta text-muted-foreground">{t('detect.confidence')}</span>
               <span className="text-meta text-muted-foreground">
                 {t('detect.resultSourceBefore')}<span className="fp-mono">lm.ikale.io</span>{t('detect.resultSourceAfter')}
               </span>
@@ -99,7 +99,7 @@ export function ResultPanel({ result, anomalous, mode, onReplacePrompts }: { res
       {!unscorable && (
         <motion.ol className="fp-card px-4" variants={reduced ? undefined : listStagger} initial={reduced ? false : 'hidden'} animate="show" aria-label={t('detect.result')}>
           {rows.map((r, i) => {
-            const v = confidenceOf(r)
+            const v = r.probability
             return (
               <motion.li key={r.model} className="fp-result-row text-body" data-unscored={!hasScores || undefined} variants={!reduced && i < VISIBLE ? listItem : undefined}>
                 <span className="text-muted-foreground">{i + 1}</span>

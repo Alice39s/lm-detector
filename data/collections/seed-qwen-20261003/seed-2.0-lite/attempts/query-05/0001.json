@@ -1,0 +1,66 @@
+{
+  "manifest_sha256": "d1d2aedd4130a47f5763004c7a641f0f61e958b564d94095e97b101b47db70aa",
+  "challenge_id": "query-05",
+  "attempt": 1,
+  "task": {
+    "id": "query-05",
+    "condition": "environment-02",
+    "expected_count": 239,
+    "prompt": "Using only this model's own immediate choices, provide exactly 239 whole numbers from 1 through 355 inclusive. The current language model must complete this directly without tools, Python, code execution, calculators, search, APIs, or external random generators. Choose every position separately. Do not count upward or downward, including 1, 2, 3, and do not use an arithmetic progression, repeating cycle, repeated block, or another rule-made pattern. Accidental repetitions are valid. Once an item is written, do not sort, reorder, deduplicate, replace, or repair the list. Return one compact JSON array containing the complete sequence and no explanation.",
+    "system": "",
+    "body": {
+      "model": "bytedance-seed/seed-2.0-lite",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Using only this model's own immediate choices, provide exactly 239 whole numbers from 1 through 355 inclusive. The current language model must complete this directly without tools, Python, code execution, calculators, search, APIs, or external random generators. Choose every position separately. Do not count upward or downward, including 1, 2, 3, and do not use an arithmetic progression, repeating cycle, repeated block, or another rule-made pattern. Accidental repetitions are valid. Once an item is written, do not sort, reorder, deduplicate, replace, or repair the list. Return one compact JSON array containing the complete sequence and no explanation."
+        }
+      ],
+      "max_tokens": 8192,
+      "stream": true,
+      "provider": {
+        "only": [
+          "seed/fp8"
+        ],
+        "allow_fallbacks": false
+      }
+    }
+  },
+  "status": "accepted",
+  "started_at": "2026-10-03T06:44:24.763Z",
+  "trace": "trace/query-05/0001",
+  "text": "[72, 194, 37, 281, 112, 9, 342, 167, 58, 223, 309, 41, 185, 99, 264, 131, 27, 335, 179, 74, 218, 317, 53, 152, 83, 249, 106, 39, 291, 148, 67, 203, 328, 121, 14, 276, 188, 89, 237, 301, 47, 161, 79, 258, 114, 351, 62, 199, 94, 229, 314, 31, 172, 82, 242, 101, 287, 55, 143, 71, 269, 127, 22, 338, 159, 91, 214, 305, 44, 181, 64, 279, 136, 11, 347, 175, 86, 233, 321, 49, 166, 76, 254, 109, 296, 59, 155, 80, 245, 119, 282, 38, 191, 97, 221, 312, 29, 178, 68, 261, 133, 17, 332, 163, 88, 217, 308, 42, 189, 73, 273, 124, 8, 344, 170, 92, 239, 318, 52, 151, 84, 251, 111, 289, 35, 197, 61, 227, 325, 46, 147, 77, 266, 139, 24, 339, 182, 95, 248, 104, 299, 57, 169, 70, 211, 303, 33, 187, 81, 271, 129, 19, 349, 158, 87, 236, 315, 50, 174, 66, 257, 117, 292, 40, 193, 90, 224, 322, 26, 164, 78, 241, 132, 12, 336, 180, 98, 263, 107, 306, 48, 154, 141, 207, 319, 54, 177, 85, 231, 116, 284, 36, 195, 69, 268, 122, 21, 341, 168, 93, 244, 103, 298, 45, 184, 75, 253, 130, 16, 329, 157, 226, 307, 51, 171, 63, 275, 118, 288, 32, 190, 96, 219, 326, 43, 160, 145, 260, 125, 28, 334, 238, 108, 295, 56, 222, 313, 186, 259, 137, 10, 346, 247, 113, 290, 34, 198, 270, 128, 25, 337, 213, 304, 183, 256, 234, 320, 149, 267, 134, 18, 350, 192, 232, 110, 293, 60, 144, 262, 126, 15, 340, 228, 105, 300, 240, 120, 30, 331, 215, 310, 277, 140, 23, 173, 225, 302, 150, 265, 13, 327, 246, 102, 297, 235, 311, 196, 65, 278, 135, 6, 345, 220]",
+  "text_sha256": "03dcf330d606b58da1c5f7d027efd78886b383cc999d6f856ad8f67fc88e7c4b",
+  "parsed_count": 303,
+  "completion": "complete",
+  "http_status": 200,
+  "response_model": "bytedance-seed/seed-2.0-lite",
+  "response_id": "gen-1791009865-UEio0HT5iupq4e4zT5tq",
+  "usage": {
+    "prompt_tokens": 173,
+    "completion_tokens": 4879,
+    "total_tokens": 5052,
+    "cost": 0.00980125,
+    "is_byok": false,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "cache_write_tokens": 0,
+      "audio_tokens": 0,
+      "video_tokens": 0
+    },
+    "cost_details": {
+      "upstream_inference_cost": 0.00980125,
+      "upstream_inference_prompt_cost": 0.00004325,
+      "upstream_inference_completions_cost": 0.009758
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 3459,
+      "image_tokens": 0,
+      "audio_tokens": 0
+    }
+  },
+  "provider_reported": "Seed",
+  "finish_reason": "stop",
+  "actual_channel": "openrouter/seed/fp8",
+  "finished_at": "2026-10-03T06:45:39.640Z"
+}

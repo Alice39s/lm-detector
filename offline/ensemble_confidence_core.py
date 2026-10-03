@@ -1,4 +1,4 @@
-"""Reference-fitted ensemble ranker for verifier fitting and calibration."""
+"""Reference-fitted ensemble ranker for production scoring and calibration."""
 import numpy as np
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.preprocessing import normalize
