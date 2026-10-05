@@ -17,7 +17,7 @@ icon: Rocket
 
 ### 填写 API 配置 [step]
 
-API 模式需要 Base URL、API Key 和模型名。协议可选 Chat Completions、Messages 和 Responses。配置和密钥只保存在当前浏览器；配置菜单可以保存多份预设，也可以导出为文件；导出的文件包含 API Key 明文，不要发给别人或上传到网盘。
+API 模式需要 Base URL、API Key 和模型名。协议可选 Chat Completions、Responses 和 Messages。配置和密钥只保存在当前浏览器；配置菜单可以保存多份预设，也可以导出为文件；导出的文件包含 API Key 明文，不要发给别人或上传到网盘。
 
 [分词器探测](./web/tokenizer.mdx)默认关闭。在 API 配置中打开“分词器探测”后，页面在采样的同时多发约 12 条短请求（最多 22 条），识别上游的分词器（模型把文字切成 token 的规则）。探测结果单独显示，只作参考：排名和置信度不使用它，结果也不等待它。按次计费的接口对这些请求照常计费。
 

@@ -1,4 +1,5 @@
 import { useId, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronDown, Copy, Loader2, MoreVertical, TriangleAlert } from 'lucide-react'
 import { toast } from 'sonner'
 import { Badge } from '@/components/ui/badge'
@@ -11,6 +12,7 @@ import { useI18n } from '@/i18n'
 import { cn } from '@/lib/utils'
 import { parseNumbers } from '@/lib/client'
 import { describe } from '@/lib/errors'
+import { useMotionPreset } from '@/lib/motion'
 import type { Challenge, ErrorCode, SampleState } from '@fingerpoint/shared/types'
 import type { Throughput } from '@fingerpoint/shared/throughput'
 
@@ -84,6 +86,7 @@ export function SampleCard({ index, challenge, sample, mode, canSample, locked, 
   const unaccepted = !sample.text.trim() && Boolean(sample.draftText?.trim()) && !busy
   const min = minimumNumbers(challenge.expected_count)
   const promptNote = t('detect.promptNote')
+  const { smooth, reduced } = useMotionPreset()
 
   useLayoutEffect(() => {
     const reply = replyRef.current
@@ -135,7 +138,19 @@ export function SampleCard({ index, challenge, sample, mode, canSample, locked, 
             {t('detect.copy')}
           </Button>
         </div>
-        <PromptText text={challenge.prompt} />
+        <div className="relative">
+          <AnimatePresence initial={false} mode="popLayout">
+            <motion.div
+              key={challenge.id}
+              initial={reduced ? false : { opacity: 0, y: 8, filter: 'blur(4px)' }}
+              animate={{ opacity: 1, y: 0, filter: 'blur(0px)', transitionEnd: { filter: 'none' } }}
+              exit={{ opacity: 0, y: -8, filter: 'blur(4px)' }}
+              transition={{ ...smooth, delay: reduced ? 0 : index * 0.06 }}
+            >
+              <PromptText text={challenge.prompt} />
+            </motion.div>
+          </AnimatePresence>
+        </div>
         {promptNote && <p className="text-meta text-muted-foreground">{promptNote}</p>}
       </div>
       <div className="h-px bg-border" />

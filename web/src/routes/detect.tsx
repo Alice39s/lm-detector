@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useLocation, useSearchParams } from 'react-router'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowUpRight, Copy, Loader2, MoreVertical, Star, Terminal } from 'lucide-react'
+import { ArrowUpRight, Copy, Loader2, MoreVertical, RefreshCw, Star, Terminal } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -23,6 +23,8 @@ import { useModelMatchCelebration } from '@/lib/use-model-match-celebration'
 import { useTokenizerProbe } from '@/lib/use-tokenizer-probe'
 import { useConnectionRoute } from '@/lib/use-connection-route'
 import { docsHref } from '@/lib/docs'
+import { markStarVisited, REPOSITORY_URL, starPromptAllowed } from '@/lib/star'
+import { toastWithStar } from '@/components/star-prompt'
 import { cn } from '@/lib/utils'
 import type { Analysis, Challenge, CodedError, CollectionProgress } from '@fingerpoint/shared/types'
 import { redactPrivateMetadata } from '@fingerpoint/shared/privacy'
@@ -33,6 +35,7 @@ type Phase = 'edit' | 'sampling' | 'computing' | 'result'
 type Expanded = number | 'tokenizer' | null
 const idle = (): SampleUI => ({ text: '', state: 'idle' })
 const cliCommand = 'bunx lmfpd@latest --help'
+const MotionRefresh = motion.create(RefreshCw)
 
 function safeError(message: string | undefined, key: string): string | undefined {
   if (!message) return undefined
@@ -47,7 +50,7 @@ export default function DetectRoute() {
   const bank = useLoadedBank()
   const i18n = useI18n()
   const { t } = i18n
-  const { snappy, reduced } = useMotionPreset()
+  const { snappy, smooth, reduced } = useMotionPreset()
   const active = useLocation().pathname === '/'
   const [params, setParams] = useSearchParams()
   const [mode, setMode] = useState<Mode>(() => params.get('mode') === 'api' ? 'api' : 'manual')
@@ -66,6 +69,9 @@ export default function DetectRoute() {
   const [resultModel, setResultModel] = useState<string | null>(null)
   const [expanded, setExpanded] = useState<Expanded>(null)
   const [errorDetail, setErrorDetail] = useState<string | null>(null)
+  /** Turns the rotate icon half a turn per rotation. */
+  const [rotations, setRotations] = useState(0)
+  const askedStar = useRef(false)
   const [config, update, profileManager] = useApiConfig(() => toast.error(t('errors.unknown')))
   const previousProfileId = useRef(profileManager.activeId)
   const [apiConfigOpen, setApiConfigOpen] = useState(() => !configComplete(config))
@@ -269,16 +275,36 @@ export default function DetectRoute() {
     if (route && generation.current === token && mounted.current) tokenizer.start(requestConfig, route)
   }
 
-  function restart() {
-    stop()
-    tokenizer.reset()
-    verifying.current = null
-    setComputing(false)
+  /** Three new prompts; the replies and the result belonged to the old ones. */
+  function freshPrompts() {
     replaceChallenges(client.generateChallenges(3))
     replaceSamples([idle(), idle(), idle()])
     sampled.current = []
     setResult(null)
     setExpanded(null)
+  }
+
+  function restart() {
+    stop()
+    tokenizer.reset()
+    verifying.current = null
+    setComputing(false)
+    freshPrompts()
+  }
+
+  /** After a finished detection, Start over asks for a Star once per page session. */
+  function restartAfterResult() {
+    restart()
+    if (askedStar.current || !starPromptAllowed()) return
+    askedStar.current = true
+    toastWithStar(t('detect.restartReady'), t('detect.starAfterRestart'), 'message')
+  }
+
+  /** The probe measures the upstream rather than the prompts, so rotating keeps it. */
+  function rotatePrompts() {
+    if (locked) return
+    setRotations(n => n + 1)
+    freshPrompts()
   }
 
   /** Abnormal distributions follow the prompt, so retrying them needs new prompts. */
@@ -301,7 +327,7 @@ export default function DetectRoute() {
 
   async function saveImage() {
     if (!result) return
-    try { await exportResultImage(result, i18n); if (mounted.current) toast.success(t('detect.imageSaved')) }
+    try { await exportResultImage(result, i18n); if (mounted.current) toastWithStar(t('detect.imageSaved'), t('detect.starAfterImage'), 'success') }
     catch { if (mounted.current) toast.error(t('detect.imageFailed')) }
   }
 
@@ -351,8 +377,9 @@ export default function DetectRoute() {
   }
 
   function renderSample(index: number, collapsible = false) {
+    // Keyed by slot, so a new prompt crossfades inside the card that stays.
     return <SampleCard
-      key={challenges[index].id}
+      key={index}
       index={index}
       challenge={challenges[index]}
       sample={samples[index]}
@@ -372,7 +399,7 @@ export default function DetectRoute() {
     <div className={cn('fp-page', 'has-actionbar')}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-h1">{t('detect.title')}</h1>
-        <Segmented label={t('detect.modeLabel')} value={mode} onChange={changeMode} disabled={locked} options={[{ value: 'manual', label: t('detect.modeManual') }, { value: 'api', label: t('detect.modeApi') }]} />
+        <Segmented label={t('detect.modeLabel')} value={mode} onChange={changeMode} disabled={locked} options={[{ value: 'manual', label: t('detect.modeManual') }, { value: 'api', label: t('detect.modeApi'), recommended: t('detect.modeApiRecommended') }]} />
       </div>
 
       <aside className="fp-cli-promo relative isolate overflow-hidden" aria-label={t('detect.cliTitle')}>
@@ -441,7 +468,7 @@ export default function DetectRoute() {
       {phase === 'result' && result && <ResultPanel result={result} anomalous={anomalous} mode={mode} onReplacePrompts={() => replacePrompts(anomalous)} />}
 
       <div className="fp-detect-footer">
-        <a href="https://github.com/Ikaleio/lm-detector" target="_blank" rel="noopener noreferrer" className="fp-star-link">
+        <a href={REPOSITORY_URL} target="_blank" rel="noopener noreferrer" className="fp-star-link" onClick={markStarVisited}>
           <Star className="size-4" aria-hidden="true" />
           {t('detect.starRequest')}
         </a>
@@ -454,7 +481,7 @@ export default function DetectRoute() {
                 <DropdownMenuContent align="end"><DropdownMenuGroup><DropdownMenuItem onClick={() => exportJson(result)}>{t('detect.exportJson')}</DropdownMenuItem></DropdownMenuGroup></DropdownMenuContent>
               </DropdownMenu>}
               <Button variant="outline" className="h-9" onClick={saveImage}>{t('detect.saveImage')}</Button>
-              <Button className="h-9" onClick={restart}>{t('detect.restart')}</Button>
+              <Button className="h-9" onClick={restartAfterResult}>{t('detect.restart')}</Button>
             </>
           ) : phase === 'sampling' ? (
             <>
@@ -468,7 +495,12 @@ export default function DetectRoute() {
             </>
           ) : (
             <>
-              {samples.some(s => s.text.trim() || s.draftText?.trim()) && <Button variant="ghost" className="h-9" onClick={restart}>{t('detect.restart')}</Button>}
+              {samples.some(s => s.text.trim() || s.draftText?.trim())
+                ? <Button variant="ghost" className="h-9" onClick={restart}>{t('detect.restart')}</Button>
+                : <Button variant="ghost" className="h-9" disabled={locked} onClick={rotatePrompts}>
+                    <MotionRefresh data-icon="inline-start" aria-hidden="true" initial={false} animate={{ rotate: rotations * 180 }} transition={smooth} />
+                    {t('detect.rotatePrompts')}
+                  </Button>}
               {stopProbe}
               {mode === 'api' && emptyIndexes.length > 0 ? (
                 <>

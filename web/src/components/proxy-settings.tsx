@@ -62,7 +62,7 @@ export function ProxySettings({ disabled }: { disabled: boolean }) {
         { value: 'auto', label: t('proxy.mode.auto') },
         { value: 'direct', label: t('proxy.mode.direct') },
         { value: 'site', label: t('proxy.mode.site') },
-        { value: 'worker', label: t('proxy.mode.worker') },
+        { value: 'worker', label: t('proxy.mode.worker'), recommended: true },
       ]} />
       <FieldDescription>{t(`proxy.help.${mode}`)}</FieldDescription>
       {mode === 'worker' && <>

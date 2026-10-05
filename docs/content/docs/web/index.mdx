@@ -17,6 +17,8 @@ icon: Globe
   </Tab>
 </Tabs>
 
+还没有填入回复时，操作栏的“换一组提示词”一次替换三道挑战；已有回复时，“重新检测”替换挑战并清空回复。
+
 ## API 配置
 
 | 字段 | 说明 |
@@ -25,7 +27,7 @@ icon: Globe
 | 模型 | 请求中的模型名 |
 | API Key | 默认隐藏，可以切换显示 |
 | 推理强度 | 可留空，也可以填写上游支持的任意 `reasoning_effort` 值 |
-| 接口协议 | Chat Completions、Messages 或 Responses |
+| 接口协议 | Chat Completions、Responses 或 Messages |
 | 服务等级 | Flex、默认、Fast 或 Ultrafast。默认不发送参数；Messages 发送 `speed` 并带 `anthropic-beta: fast-mode-2026-02-01` 头，Chat Completions 与 Responses 发送 `service_tier` |
 
 配置下方的开关，除“分词器探测”外默认开启：
