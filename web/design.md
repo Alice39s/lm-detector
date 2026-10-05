@@ -1,7 +1,7 @@
 ---
 name: fingerpoint-design
 description: 用于 Fingerpoint Detector 的网页工具界面（多卡片工作台、数据长列表、主从浏览）、文档站长文页、浏览器导出的结果图片和链接预览图。读者是逐条核对数字、标识符和百分比的技术用户；目标是中性灰阶表面、单一蓝色强调、像素指纹装饰和无回弹弹簧动效，中英文混排，浅色与深色主题。
-version: 2026-10-02
+version: 2026-10-06
 ---
 
 ## 1. 范围与优先级
@@ -48,7 +48,8 @@ version: 2026-10-02
 - [SHOULD] 操作行左侧是次要链接 `fp-star-link`，右侧是操作栏 `fp-actionbar`，两端与网格左右边缘对齐，同高 36px。
 - [SHOULD] 768px 以下操作栏固定在视口底部（最小高 64px，避开 safe-area-inset-bottom），页面底部留出同样的空间；次要链接留在内容流末尾。
 - [SHOULD] 结果状态：卡片网格收为一行摘要条 `SampleStrip`；点击一项在摘要条下方展开它的详情，一次只展开一项；再次点击该项或点详情右上角的“收起”关闭。640px 以下摘要条隐藏计数，不缩小文字。
-- [SHOULD] 结果区 `ResultPanel` 自上而下：`text-section-title` 区块标题、摘要卡片、整行警告、`text-body` muted 说明、候选列表、限制说明。区块间隔 24px。
+- [SHOULD] 结果区 `ResultPanel` 自上而下：`text-section-title` 区块标题、摘要卡片、整行警告、`text-body` muted 说明、候选列表、参考核对卡片（可选）、限制说明。区块间隔 24px。
+- [SHOULD] 参考核对卡片 `UsageCheck` 是一张 `fp-card`，内边距 16px、组间隔 12px：标题行左侧 `text-card-title`，右侧 `text-meta` muted 依据；一行 `text-body` muted 说明；无边框行列表，每行最小高 48px、行间 1px 分隔线，三列为名称（font-medium，下方 `text-meta` muted 角色）、4.5rem 宽右对齐的带符号百分比、5rem 宽右对齐的状态徽标（一致 success、不一致 destructive，文字前加 `Badge` 默认 12px 的 lucide 图标）；最后一行 `text-body` muted 汇总。（来源：2026-10-06 用户要求把回复的 token 用量与样本库历史记录拟合比对。）
 - [SHOULD] 摘要卡片分左右两栏。左栏依次为 `text-meta` 标签、`text-display` 名称（`overflow-wrap:anywhere`）、`text-body` muted 次级信息，名称旁放 `logo` 像素标识。右栏右对齐，依次为 `text-display-number` 主百分比、`text-meta` 标签和来源行，整组相对卡片垂直居中。窄屏保留两栏，名称和来源可以换行。
 - [SHOULD] 候选列表放在一张 `fp-card` 里，每行用 `fp-result-row`：24px 序号列、名称列（font-medium）、120px 次要标签列（muted，单行省略）、`ConfidenceBar`、64px 右对齐百分比列，最小行高 48px，行间 1px 分隔线。默认显示前 8 行，末行用 ghost 小按钮展开全部。
 - [SHOULD] 768px 以下候选行改为序号、名称、百分比三列，置信度条移到第二行，隐藏次要标签列。
@@ -220,7 +221,7 @@ version: 2026-10-02
 | 控件 | `Button` `Input` `Textarea` `Field` `FieldError` `Switch` `ToggleGroup` `Segmented` `Tabs` `Collapsible` | `web/src/components/ui/`、`web/src/components/segmented.tsx` | 表单与操作 | 已实现 |
 | 浮层 | `Dialog` `DropdownMenu` `Tooltip` `Sonner` | `web/src/components/ui/` | 详情、菜单、提示、toast | 已实现 |
 | 数据反馈 | `Table` `Badge` `Empty` `Skeleton` `Alert`（`default` `warning` `destructive`） `Separator` | `web/src/components/ui/` | 表格、状态、空状态、警告 | 已实现 |
-| 工作台组件 | `SampleCard` `SampleStrip` `StateBadge` `toneClass` `ResultPanel` `ConfidenceBar` `AnimatedPercent` `ApiConfigPanel` `ProxySettings` | `web/src/components/` | 多卡片工作台 | 已实现 |
+| 工作台组件 | `SampleCard` `SampleStrip` `StateBadge` `toneClass` `ResultPanel` `ConfidenceBar` `AnimatedPercent` `ApiConfigPanel` `ProxySettings` `UsageCheck` | `web/src/components/` | 多卡片工作台 | 已实现 |
 | 证据详情 | `TokenizerCard` `TokenizerStripButton` `TokenizerDetails` `ModelCheck`；`fp-custom-tokenizer-candidates` | `web/src/components/tokenizer-panel.tsx`、`web/src/components/tokenizer-claim.tsx`、`web/src/index.css` | 两列证据详情 | 已实现 |
 | 动效 | `spring` `useMotionPreset` `listStagger` `listItem` | `web/src/lib/motion.ts` | 所有动画 | 已实现 |
 | 像素装饰 | `PixelShader`（`effect` `cell` `image`） `PixelSpinner` `fp-pixel` | `web/src/components/pixel-shader.tsx`、`web/src/lib/pixel-effects.ts`、`web/src/lib/pixel-renderer.ts`、`web/src/shell.css` | 品牌、加载、等待、空状态 | 已实现 |
