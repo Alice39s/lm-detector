@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { motion, useMotionValueEvent, useSpring } from 'framer-motion'
-import { TriangleAlert } from 'lucide-react'
+import { Info, TriangleAlert } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { PixelShader } from '@/components/pixel-shader'
@@ -12,6 +12,8 @@ import { NORMAL_CONFIDENCE_THRESHOLD } from '@/lib/result-confidence'
 import type { Analysis } from '@fingerpoint/shared/types'
 
 const VISIBLE = 8
+// gpt-6.1-sol shares this fingerprint identity; the result explains why they cannot be separated.
+const ASTRA_MODEL = 'gpt-6-astra'
 
 export function AnimatedPercent({ value, className }: { value: number; className?: string }) {
   const { percent } = useI18n()
@@ -93,6 +95,13 @@ export function ResultPanel({ result, anomalous, mode, onReplacePrompts }: { res
         <Alert variant="warning" className="p-4">
           <TriangleAlert aria-hidden="true" />
           <AlertTitle>{t('detect.lowConfidence')}</AlertTitle>
+        </Alert>
+      )}
+      {!unscorable && top.model === ASTRA_MODEL && (
+        <Alert className="p-4">
+          <Info aria-hidden="true" />
+          <AlertTitle>{t('detect.astraNoteTitle')}</AlertTitle>
+          <AlertDescription>{t('detect.astraNoteBody')}</AlertDescription>
         </Alert>
       )}
       {!unscorable && <p className="text-body text-muted-foreground">{result.used_outputs < 3 ? t('detect.partialNote', { n: result.used_outputs }) : t('detect.rankingNote')}</p>}

@@ -116,7 +116,7 @@ my-run
 
 `result.json` 是一个批次；正式的 `unified_reference.jsonl` 每行一个同结构的批次：
 
-- 批次：`schema_version`、`id`、`purpose`、`created_at`、`model`、`source`、`request`、`plan`。
+- 批次：`schema_version`、`id`、`purpose`、`created_at`、`model`、`source`、`request`、`plan`。`model` 含 `id`、`family`、`family_name`；可选的 `display_name` 用于界面显示，缺省时显示 `id`。
 - 每条 `samples`：样本与题目 ID、`condition`、实际提示词、`expected_count`、`attempt`、时间、实际渠道与返回型号、`text`、`completion`、`usage`、`note`、`evidence_path`；逐题覆写时另有可选的 `reasoning_effort`。
 - 不保存重复的模型标签、`strict_valid`、派生数字统计或独立的 `nuisance_group`。当前算法使用 `condition` 作为干扰分组。
 - 历史未知信息保留为 `null`，完整性无法确认时标记 `unknown`。

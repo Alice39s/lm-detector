@@ -3,7 +3,7 @@ import { countNumbers, hellingerFeature, orderedBlockFeature, parseNumbers, robu
 import type { Bank } from './types'
 import type { ReferenceBatch } from './reference'
 
-type Prepared = { source:string; family_id:string; family_name:string; channel:string; condition_id:string; challenge_id:string; numbers:number[]; counts:number[]; h:number[]; o:number[] }
+type Prepared = { source:string; display_name:string; family_id:string; family_name:string; channel:string; condition_id:string; challenge_id:string; numbers:number[]; counts:number[]; h:number[]; o:number[] }
 const avg = (xs:number[]) => xs.reduce((a,b)=>a+b,0)/xs.length
 const dot = (a:number[],b:number[]) => a.reduce((s,x,i)=>s+x*b[i],0)
 const unit = (a:number[]) => { const n=Math.max(Math.sqrt(dot(a,a)),1e-12);return a.map(x=>x/n) }
@@ -52,7 +52,7 @@ export function buildBank(input:ReferenceBatch[],progress:(message:string)=>void
   const rows:Prepared[]=[]
   for(const batch of input)for(const sample of batch.samples){
     const numbers=parseNumbers(sample.text),c=countNumbers(numbers)
-    rows.push({source:batch.model.id,family_id:batch.model.family,family_name:batch.model.family_name,channel:sample.actual_channel??batch.source.channel,condition_id:sample.condition,challenge_id:sample.challenge_id,numbers,counts:c,h:hellingerFeature(c),o:orderedBlockFeature(numbers)})
+    rows.push({source:batch.model.id,display_name:batch.model.display_name??batch.model.id,family_id:batch.model.family,family_name:batch.model.family_name,channel:sample.actual_channel??batch.source.channel,condition_id:sample.condition,challenge_id:sample.challenge_id,numbers,counts:c,h:hellingerFeature(c),o:orderedBlockFeature(numbers)})
   }
   const models=[...new Set(rows.map(r=>r.source))]
   const robust=fit(rows,models)
@@ -77,5 +77,5 @@ export function buildBank(input:ReferenceBatch[],progress:(message:string)=>void
     }
     calibration[String(n)]=calibrate(records)
   }
-  return {schema:'robust-number-fingerprint-bank',built_at:new Date().toISOString(),method:{name:'Ordered-block + nuisance-Hellinger',range:[1,355],alpha:.5,ordered_block_weight:.25},sources:counts(rows.map(r=>r.channel)),recommended_queries:3,minimum_valid_numbers:80,models:models.map(id=>{const selected=rows.filter(r=>r.source===id);return {id,display_name:id,family:selected[0].family_id||'other',family_name:selected[0].family_name||'其他',response_count:selected.length,valid_number_count:selected.reduce((n,r)=>n+r.numbers.length,0),frequency_references:selected.map(r=>r.counts),counts:selected[0].counts.map((_,i)=>selected.reduce((n,r)=>n+r.counts[i],0)),sources:counts(selected.map(r=>r.channel)),conditions:counts(selected.map(r=>r.condition_id))}}),robust,calibration}
+  return {schema:'robust-number-fingerprint-bank',built_at:new Date().toISOString(),method:{name:'Ordered-block + nuisance-Hellinger',range:[1,355],alpha:.5,ordered_block_weight:.25},sources:counts(rows.map(r=>r.channel)),recommended_queries:3,minimum_valid_numbers:80,models:models.map(id=>{const selected=rows.filter(r=>r.source===id);return {id,display_name:selected[0].display_name,family:selected[0].family_id||'other',family_name:selected[0].family_name||'其他',response_count:selected.length,valid_number_count:selected.reduce((n,r)=>n+r.numbers.length,0),frequency_references:selected.map(r=>r.counts),counts:selected[0].counts.map((_,i)=>selected.reduce((n,r)=>n+r.counts[i],0)),sources:counts(selected.map(r=>r.channel)),conditions:counts(selected.map(r=>r.condition_id))}}),robust,calibration}
 }

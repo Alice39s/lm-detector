@@ -116,7 +116,7 @@ my-run
 
 `result.json` holds one batch. The official `unified_reference.jsonl` holds one batch with the same structure per line:
 
-- Batch: `schema_version`, `id`, `purpose`, `created_at`, `model`, `source`, `request`, `plan`.
+- Batch: `schema_version`, `id`, `purpose`, `created_at`, `model`, `source`, `request`, `plan`. `model` holds `id`, `family`, and `family_name`. The optional `display_name` is shown in the interface. Without it, the interface shows `id`.
 - Each entry in `samples`: sample and challenge IDs, `condition`, the actual prompt, `expected_count`, `attempt`, time, the actual channel and response model, `text`, `completion`, `usage`, `note`, `evidence_path`. Per-challenge overrides add an optional `reasoning_effort`.
 - Duplicated model labels, `strict_valid`, derived number statistics, and a separate `nuisance_group` are not stored. The current algorithm uses `condition` as the nuisance group.
 - Historical information that is unknown stays `null`. When completion cannot be confirmed, it is marked `unknown`.

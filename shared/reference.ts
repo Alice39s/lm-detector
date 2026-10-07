@@ -5,6 +5,8 @@ export type Completion = 'complete' | 'truncated' | 'unknown'
 
 export interface BatchModel {
   id: string
+  /** Shown instead of `id` when one identity covers several model names. */
+  display_name?: string
   family: string
   family_name: string
 }
