@@ -121,7 +121,7 @@ my-run
 - 不保存重复的模型标签、`strict_valid`、派生数字统计或独立的 `nuisance_group`。当前算法使用 `condition` 作为干扰分组。
 - 历史未知信息保留为 `null`，完整性无法确认时标记 `unknown`。
 
-新 CLI 不接受旧的 collection manifest 或旧参考行格式。格式迁移前的正式行原样保存在 `data/archive/schema-cutover/`，历史采样证据不改写。
+新 CLI 不接受旧的 collection manifest 或旧参考行格式。格式迁移前的正式行可从 git 历史找回，历史采样证据不改写。
 
 `fpd --input ./my-run/result.json` 可以离线检测，按条件组成最多三条回答一轮；严格模式拒绝截断或完整性未知的样本。
 

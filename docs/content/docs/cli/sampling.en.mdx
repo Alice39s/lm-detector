@@ -121,7 +121,7 @@ my-run
 - Duplicated model labels, `strict_valid`, derived number statistics, and a separate `nuisance_group` are not stored. The current algorithm uses `condition` as the nuisance group.
 - Historical information that is unknown stays `null`. When completion cannot be confirmed, it is marked `unknown`.
 
-The new CLI rejects the old collection manifest and the old reference row format. Official rows from before the format migration are preserved unchanged in `data/archive/schema-cutover/`. Historical sampling evidence is not rewritten.
+The new CLI rejects the old collection manifest and the old reference row format. Official rows from before the format migration can be retrieved from the git history. Historical sampling evidence is not rewritten.
 
 `fpd --input ./my-run/result.json` runs detection offline and groups answers by condition into rounds of up to three. Strict mode rejects samples that are truncated or have unknown completion.
 

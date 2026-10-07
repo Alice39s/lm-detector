@@ -14,7 +14,6 @@ data
 ├── enrollment-suite.json
 ├── tokenizer_bank.json
 ├── import_manifest.json
-├── archive
 └── collections
 ```
 
@@ -26,10 +25,9 @@ data
 | `enrollment-suite.json` | 36 道固定采样挑战；它是采样输入，不是参考回答 |
 | `tokenizer_bank.json` | 分词器库：分词器探测用的测试文本、每一类分词器的计数和型号映射 |
 | `import_manifest.json` | 历史清单，不代表当前数量 |
-| `archive/` | 已退出参考库的历史批次 |
 | `collections/` | 采样请求、尝试和来源核验记录 |
 
-`archive/` 与 `collections/` 不参与评分，也不复制到网站的公开数据。批次与样本的字段见[采样与续采](../cli/sampling.mdx#batch-format)。
+`collections/` 不参与评分，也不复制到网站的公开数据。改名、退库或迁移格式前的参考行不再另存副本，需要时从 git 历史找回。批次与样本的字段见[采样与续采](../cli/sampling.mdx#batch-format)。
 
 ## 维护规则
 
@@ -57,7 +55,7 @@ data
 
 <Accordions type="multiple">
   <Accordion title="2026-10-08 合并 GPT-6 Astra 与 GPT-6.1 Sol 指纹身份" id="2026-10-08-astra-sol">
-    按维护者要求，将 `gpt-6-astra` 和 `gpt-6.1-sol` 合并为一个指纹类别：内部 ID 为 `gpt-6-astra`，界面显示为 `gpt-6-astra/6.1-sol`（批次字段 `model.display_name`）。两个批次各 36 条回答共同参与建库和排名器训练，正式库变为 58 个指纹身份、2,164 条样本。请求型号、响应型号、样本 ID、采集渠道和原始证据保持原值；改名前的两行参考批次保存在 `archive/astra-sol-merge-20261008/`。
+    按维护者要求，将 `gpt-6-astra` 和 `gpt-6.1-sol` 合并为一个指纹类别：内部 ID 为 `gpt-6-astra`，界面显示为 `gpt-6-astra/6.1-sol`（批次字段 `model.display_name`）。两个批次各 36 条回答共同参与建库和排名器训练，正式库变为 58 个指纹身份、2,164 条样本。请求型号、响应型号、样本 ID、采集渠道和原始证据保持原值；改名前的两行参考批次可从 git 历史找回。
 
     检测结果只报告合并类别，不再给两个名字分别排名；网站在该类别排名第一时提示两者无法靠数字指纹可靠区分。固定评估保留两种请求型号的全部 4 组、12 条回答，分别展示原始采样型号，真值映射到合并类别。合并前两个名字之间的误判在合并口径下计为正确，因此评估命中数的变化包含标签合并的影响，不能直接解释为模型区分能力提高。
   </Accordion>
@@ -77,12 +75,12 @@ data
     `tokenizer_bank.json` 的 OpenAI o200k_base 映射覆盖所有以 `gpt-5` 或 `gpt-6` 开头的型号（维护者确认）。此前 `gpt-5` 已覆盖 gpt-5.x；`gpt-6` 开头的型号原本只有 gpt-6-astra 经 o200k 类的别名匹配，这条别名随之删除。这些型号按厂商公开的分词器核对，只有完全一致才算一致；排名不受影响。这是对生成文件的手工修改：重新运行 `token-fp export-api-bank` 前，需要先把这些映射加入生成工具。
   </Accordion>
   <Accordion title="2026-09-30 六个 OpenAI 参考模型改为直连低推理强度" id="2026-09-30-openai-direct">
-    将 gpt-5.4、gpt-5.5、gpt-5.6-sol、gpt-5.6-terra、gpt-5.6-luna、gpt-6-astra 的 16 个 `codex-subscription` 批次（216 条，推理强度未记录）全部退出正式库，原始行保存在 `archive/codex-subscription-20260930/unified_reference.rows.jsonl`。替换原因：配对研究（`research/studies/astra-sol-separation/`）发现，原参考库的采集渠道和推理设置不一致，会干扰 gpt-6-astra 与 gpt-6.1-sol 的指纹比较。新批次使用 OpenAI Key 从本机直连 `api.openai.com` 的 Responses 接口，流式、`reasoning_effort=low`，与 `gpt-6-sol` 一致；各完成 36 道固定挑战，提示词与系统提示和原批次逐条相同，证据保存在 `collections/<型号>-openai-direct-20260930/`。返回型号为 `gpt-5.4-2026-03-05`、`gpt-5.5-2026-04-23`，其余与请求名相同。截断（达到采样上限）：gpt-5.6-luna 7 条、gpt-5.6-terra 1 条、gpt-5.4 1 条，其余自然完成。失败尝试均保留：gpt-6-astra 4 次、gpt-5.4 3 次连接中断，gpt-5.6-terra 1 次、gpt-5.6-luna 2 次有效数字不足，均在下一次尝试成功。
+    将 gpt-5.4、gpt-5.5、gpt-5.6-sol、gpt-5.6-terra、gpt-5.6-luna、gpt-6-astra 的 16 个 `codex-subscription` 批次（216 条，推理强度未记录）全部退出正式库，原始行可从 git 历史找回。替换原因：配对研究（`research/studies/astra-sol-separation/`）发现，原参考库的采集渠道和推理设置不一致，会干扰 gpt-6-astra 与 gpt-6.1-sol 的指纹比较。新批次使用 OpenAI Key 从本机直连 `api.openai.com` 的 Responses 接口，流式、`reasoning_effort=low`，与 `gpt-6-sol` 一致；各完成 36 道固定挑战，提示词与系统提示和原批次逐条相同，证据保存在 `collections/<型号>-openai-direct-20260930/`。返回型号为 `gpt-5.4-2026-03-05`、`gpt-5.5-2026-04-23`，其余与请求名相同。截断（达到采样上限）：gpt-5.6-luna 7 条、gpt-5.6-terra 1 条、gpt-5.4 1 条，其余自然完成。失败尝试均保留：gpt-6-astra 4 次、gpt-5.4 3 次连接中断，gpt-5.6-terra 1 次、gpt-5.6-luna 2 次有效数字不足，均在下一次尝试成功。
   </Accordion>
   <Accordion title="2026-09-30 新增 gpt-6.1-sol，统一 Claude 标签" id="2026-09-30">
     新增 `gpt-6.1-sol` 的 36 条固定挑战回答，证据保存在 `collections/gpt-6.1-sol-openrouter-openai-20260930/`。请求 OpenRouter 型号 `openai/gpt-6.1-sol`，使用 Chat Completions 流式输出、`reasoning_effort=low` 和固定 `openrouter/openai` 渠道（禁止回退）；36 条均由返回型号及 OpenAI 供应商元数据核对，自然完成，无失败或截断。
 
-    同日把 Claude 参考标签统一为小数点版本号（如 `claude-opus-5.5`），`claude-haiku-4-5-20251001` 的标签固定为 `claude-haiku-4.5`；请求型号和原始采样证据保持上游原值，改名前的 25 行保存在 `archive/claude-labels-20260930/`。`gpt-6-sol-20260922` 批次退出正式库，原始行保存在 `archive/gpt-6-sol-20260922/`。
+    同日把 Claude 参考标签统一为小数点版本号（如 `claude-opus-5.5`），`claude-haiku-4-5-20251001` 的标签固定为 `claude-haiku-4.5`；请求型号和原始采样证据保持上游原值，改名前的 25 行可从 git 历史找回。`gpt-6-sol-20260922` 批次退出正式库，原始行同样可从 git 历史找回。
   </Accordion>
   <Accordion title="2026-09-29 新增 claude-sonnet-5.5" id="2026-09-29">
     新增 `claude-sonnet-5.5` 的 36 条固定挑战回答，证据保存在 `collections/claude-sonnet-5.5-openrouter-anthropic-20260929/`。请求 OpenRouter 正式型号 `anthropic/claude-sonnet-5.5`，使用 Chat Completions、默认推理强度和固定 `openrouter/anthropic` 渠道（禁止回退）；36 条均由返回型号及 Anthropic 供应商元数据核对，自然完成，无失败或截断。
@@ -91,12 +89,12 @@ data
     原 `gpt-6-sol` 参考批次（2026-09-22 经 `openrouter/openai` 采集的 36 条回答）标为 `gpt-6-sol-20260922`，保留原请求模型名、渠道和采样证据。新 `gpt-6-sol` 批次在 Ikaleio-TYO 使用 OpenAI Key 直连 `api.openai.com` 的 Responses 接口，以 `reasoning_effort=low` 完成相同的 36 道固定挑战；34 条自然完成，2 条按采样上限截断。原始证据保存在 `collections/gpt-6-sol-openai-direct-20260928/`。首次 Chat Completions 请求因接口不支持 `max_tokens` 返回 HTTP 400，3 条失败记录保存在 `collections/gpt-6-sol-openai-direct-cc-20260928/`，未入库。此后两个标签分别参与评分，直到 2026-09-30 `gpt-6-sol-20260922` 退出正式库；渠道和接口不同，不能仅凭参考库排名推断模型版本差异。
   </Accordion>
   <Accordion title="2026-09-26 DeepSeek 改用固定供应商" id="2026-09-26">
-    六个 DeepSeek 型号的 15 个未固定供应商批次（216 条）全部退出正式库，原始行保存在 `archive/deepseek-unpinned-20260926/unified_reference.rows.jsonl`，原采样尝试继续留在研究目录。新参考批次按型号独立保存在 `collections/deepseek-*-20260926/`：V4.1 Flash 与 V4 Pro 0813 各 36 条固定 `openrouter/deepseek`，Flash 0731、Pro 预览、Flash 预览、V3.2 各 36 条固定 `openrouter/novita`。Flash 0731 的 `query-11` 第 11 次和 `query-23` 第 12 次尝试只覆写 `reasoning_effort=low`，原始失败均保留；停用的 SiliconFlow 备用批次保留在 `collections/` 但没有入库。正式库只纳入完整且来源核对通过的批次，不让 OpenRouter 自动回退或混合供应商回答。
+    六个 DeepSeek 型号的 15 个未固定供应商批次（216 条）全部退出正式库，原始行可从 git 历史找回，原采样尝试继续留在研究目录。新参考批次按型号独立保存在 `collections/deepseek-*-20260926/`：V4.1 Flash 与 V4 Pro 0813 各 36 条固定 `openrouter/deepseek`，Flash 0731、Pro 预览、Flash 预览、V3.2 各 36 条固定 `openrouter/novita`。Flash 0731 的 `query-11` 第 11 次和 `query-23` 第 12 次尝试只覆写 `reasoning_effort=low`，原始失败均保留；停用的 SiliconFlow 备用批次保留在 `collections/` 但没有入库。正式库只纳入完整且来源核对通过的批次，不让 OpenRouter 自动回退或混合供应商回答。
   </Accordion>
   <Accordion title="2026-09-14 K3 改用固定来源" id="2026-09-14">
-    K3 更新使用 36 条固定 MoonshotAI 来源、关闭思考的回答，替换此前未固定提供方的 36 条回答。新旧批次分别位于 `collections/kimi-k3-moonshotai-20260914/` 和 `archive/kimi-k3-unpinned-20260914/`；前缀版本及生效尝试见新批次 manifest。
+    K3 更新使用 36 条固定 MoonshotAI 来源、关闭思考的回答，替换此前未固定提供方的 36 条回答。新批次位于 `collections/kimi-k3-moonshotai-20260914/`，旧批次可从 git 历史找回；前缀版本及生效尝试见新批次 manifest。
   </Accordion>
   <Accordion title="格式迁移" id="schema-cutover">
-    格式迁移前的 1,804 条参考行原样保存在 `archive/schema-cutover/unified_reference.rows.jsonl`。新格式保留全部样本 ID、回答、提示词和顺序，未知完整性不会补成成功。旧格式不再由运行时读取，历史请求与失败尝试仍保留。
+    格式迁移前的 1,804 条参考行可从 git 历史找回。新格式保留全部样本 ID、回答、提示词和顺序，未知完整性不会补成成功。旧格式不再由运行时读取，历史请求与失败尝试仍保留。
   </Accordion>
 </Accordions>
