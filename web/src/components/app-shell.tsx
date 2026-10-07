@@ -194,10 +194,11 @@ export function AppShell({ detect }: { detect: ReactNode }) {
       <footer className="fp-footer text-meta text-muted-foreground">
         <p>{t('app.footer')}</p>
         <p className="fp-mono mt-1">
-          lm-detector
-          {commit && <> / BUILD <a href={`${REPOSITORY_URL}/commit/${commit}`} target="_blank" rel="noopener noreferrer" className="hover:text-foreground">{commit}</a></>}
-          {' / '}
-          <time dateTime={buildTime}>{new Intl.DateTimeFormat(LOCALES.find(l => l.id === locale)!.tag, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(buildTime))}</time>
+          BUILD{commit && <> <a href={`${REPOSITORY_URL}/commit/${commit}`} target="_blank" rel="noopener noreferrer" className="hover:text-foreground">{commit}</a></>}
+          {' ('}
+          {/* sv-SE formats as YYYY-MM-DD HH:mm in the visitor's time zone. */}
+          <time dateTime={buildTime}>{new Date(buildTime).toLocaleString('sv-SE', { dateStyle: 'short', timeStyle: 'short' })}</time>
+          {')'}
         </p>
       </footer>
       <Toaster position="bottom-right" offset={toastOffset} mobileOffset={toastMobileOffset} />
