@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
@@ -13,7 +14,17 @@ const pageUrl = new URL('..', docsUrl).href
 const imageUrl = new URL(detectorImage, docsUrl).href
 const meta = (key: 'name' | 'property', name: string, content: string) => ({ tag: 'meta', attrs: { [key]: name, content }, injectTo: 'head' as const })
 
+// The footer shows the commit and build time. Hosted builds may lack `.git`, so fall back to the platform's commit variable.
+let commit: string | null = null
+try {
+  commit = execFileSync('git', ['rev-parse', '--short=8', 'HEAD'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim()
+} catch {
+  commit = (process.env.VERCEL_GIT_COMMIT_SHA || process.env.CF_PAGES_COMMIT_SHA)?.slice(0, 8) ?? null
+}
+const build = { commit, time: new Date().toISOString() }
+
 export default defineConfig({
+  define: { __BUILD__: JSON.stringify(build) },
   root: fileURLToPath(new URL('.', import.meta.url)),
   envDir: fileURLToPath(new URL('..', import.meta.url)),
   base: './',

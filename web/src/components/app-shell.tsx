@@ -10,7 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { Toaster } from '@/components/ui/sonner'
 import { PixelShader } from '@/components/pixel-shader'
-import { useI18n } from '@/i18n'
+import { LOCALES, useI18n, type Locale } from '@/i18n'
 import { useMotionPreset } from '@/lib/motion'
 import { BankContext } from '@/lib/bank-context'
 import { docsHref } from '@/lib/docs'
@@ -18,16 +18,7 @@ import { markStarVisited, REPOSITORY_URL } from '@/lib/star'
 import * as client from '@/lib/client'
 import type { Bank } from '@fingerpoint/shared/types'
 
-function IconAction({ label, onClick, children }: { label: string; onClick: () => void; children: ReactNode }) {
-  return (
-    <Tooltip>
-      <TooltipTrigger render={<Button variant="ghost" size="icon-lg" aria-label={label} onClick={onClick} />}>
-        {children}
-      </TooltipTrigger>
-      <TooltipContent>{label}</TooltipContent>
-    </Tooltip>
-  )
-}
+const { commit, time: buildTime } = __BUILD__
 
 function ThemeToggle() {
   const { t } = useI18n()
@@ -66,12 +57,27 @@ function ThemeToggle() {
   )
 }
 
-function LanguageToggle() {
+function LanguageMenu() {
   const { t, locale, setLocale } = useI18n()
+  const label = t('app.language', { language: LOCALES.find(l => l.id === locale)!.name })
   return (
-    <IconAction label={t('app.toggleLanguage')} onClick={() => setLocale(locale === 'zh' ? 'en' : 'zh')}>
-      <Languages />
-    </IconAction>
+    <DropdownMenu>
+      <Tooltip>
+        <TooltipTrigger render={<DropdownMenuTrigger render={<Button variant="ghost" size="icon-lg" aria-label={label} />} />}>
+          <Languages data-icon="inline-start" />
+        </TooltipTrigger>
+        <TooltipContent>{label}</TooltipContent>
+      </Tooltip>
+      <DropdownMenuContent align="end" className="min-w-40">
+        <DropdownMenuGroup>
+          <DropdownMenuRadioGroup value={locale} onValueChange={value => setLocale(value as Locale)} aria-label={label}>
+            {LOCALES.map(option => (
+              <DropdownMenuRadioItem key={option.id} value={option.id} lang={option.tag}>{option.name}</DropdownMenuRadioItem>
+            ))}
+          </DropdownMenuRadioGroup>
+        </DropdownMenuGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
 
@@ -172,7 +178,7 @@ export function AppShell({ detect }: { detect: ReactNode }) {
               <Star aria-hidden="true" />
               <span>Star</span>
             </a>
-            <LanguageToggle />
+            <LanguageMenu />
             <ThemeToggle />
           </div>
         </div>
@@ -185,7 +191,15 @@ export function AppShell({ detect }: { detect: ReactNode }) {
           {pathname !== '/' && <Suspense fallback={null}><Outlet /></Suspense>}
         </BankBoundary>
       </main>
-      <footer className="fp-footer text-meta text-muted-foreground">{t('app.footer')}</footer>
+      <footer className="fp-footer text-meta text-muted-foreground">
+        <p>{t('app.footer')}</p>
+        <p className="fp-mono mt-1">
+          lm-detector
+          {commit && <> / BUILD <a href={`${REPOSITORY_URL}/commit/${commit}`} target="_blank" rel="noopener noreferrer" className="hover:text-foreground">{commit}</a></>}
+          {' / '}
+          <time dateTime={buildTime}>{new Intl.DateTimeFormat(LOCALES.find(l => l.id === locale)!.tag, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(buildTime))}</time>
+        </p>
+      </footer>
       <Toaster position="bottom-right" offset={toastOffset} mobileOffset={toastMobileOffset} />
     </div>
   )

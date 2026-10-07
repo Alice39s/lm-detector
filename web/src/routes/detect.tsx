@@ -399,7 +399,7 @@ export default function DetectRoute() {
     <div className={cn('fp-page', 'has-actionbar')}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-h1">{t('detect.title')}</h1>
-        <Segmented label={t('detect.modeLabel')} value={mode} onChange={changeMode} disabled={locked} options={[{ value: 'manual', label: t('detect.modeManual') }, { value: 'api', label: t('detect.modeApi'), recommended: t('detect.modeApiRecommended') }]} />
+        <Segmented label={t('detect.modeLabel')} value={mode} onChange={changeMode} disabled={locked} options={[{ value: 'manual', label: t('detect.modeManual') }, { value: 'api', label: t('detect.modeApi') }]} />
       </div>
 
       <aside className="fp-cli-promo relative isolate overflow-hidden" aria-label={t('detect.cliTitle')}>

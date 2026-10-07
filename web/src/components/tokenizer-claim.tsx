@@ -13,7 +13,8 @@ export function useTokenizerNames(bank: TokenizerBank | null) {
   const { locale, t } = useI18n()
   return useMemo(() => {
     const byId = new Map((bank?.classes ?? []).map(item => [item.id, item]))
-    const series = (item: TokenizerClass) => locale === 'zh' ? item.series_zh : item.series
+    // The bank names series in Simplified Chinese and English only.
+    const series = (item: TokenizerClass) => locale.startsWith('zh') ? item.series_zh : item.series
     const name = (id: string) => { const item = byId.get(id); return item ? series(item) : id }
     const category = (value: string) => (categories as readonly string[]).includes(value) ? t(`tokenizer.category.${value}` as MessageKey) : value
     return { byId, series, name, category }
