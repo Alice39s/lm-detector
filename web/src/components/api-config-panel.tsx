@@ -21,6 +21,7 @@ import { Separator } from '@/components/ui/separator'
 import { Switch } from '@/components/ui/switch'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { Segmented } from '@/components/segmented'
+import { BrandIcon } from '@/components/brand-icon'
 import { useI18n } from '@/i18n'
 import type { ApiProfile, ApiProfileManager, WebApiConfig } from '@/lib/config'
 import { readProfileFile, saveProfileFile } from '@/lib/profile-file'
@@ -357,9 +358,9 @@ export function ApiConfigPanel({ open, onOpenChange, config, update, profileMana
             <Field>
               <FieldLabel>{t('api.format')}</FieldLabel>
               <Segmented label={t('api.format')} value={config.format} disabled={disabled} onChange={format => update({ format })} options={[
-                { value: 'openai', label: t('api.formatChat') },
-                { value: 'anthropic', label: t('api.formatMessages') },
-                { value: 'responses', label: t('api.formatResponses') },
+                { value: 'openai', label: t('api.formatChat'), icon: <BrandIcon family="gpt" /> },
+                { value: 'responses', label: t('api.formatResponses'), icon: <BrandIcon family="gpt" /> },
+                { value: 'anthropic', label: t('api.formatMessages'), icon: <BrandIcon family="claude" /> },
               ]} />
             </Field>
             <Field>

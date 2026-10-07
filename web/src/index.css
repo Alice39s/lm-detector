@@ -97,7 +97,16 @@ html[data-page-direction]::view-transition-new(root) { animation-name: fp-page-i
 .fp-star-link:hover { background: color-mix(in oklab, var(--star) 14%, var(--card)); border-color: color-mix(in oklab, var(--star) 55%, var(--border)); }
 .fp-star-link:focus-visible { border-color: var(--ring); box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent); }
 .fp-star-link svg { fill: currentColor; }
+.fp-star-link[data-size="sm"] { gap: .25rem; height: 1.75rem; padding: 0 .625rem; font-size: .8125rem; }
+/* A toast that asks for a Star, laid out like Sonner's own toasts with a row of actions under the text. */
+.fp-star-toast { display: flex; flex-direction: column; gap: .75rem; width: var(--width); padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--popover); color: var(--popover-foreground); box-shadow: 0 4px 12px oklch(0 0 0 / 0.1); font-size: .8125rem; line-height: 1.4; }
+/* Toaster offsets in app-shell.tsx: the gutter follows the .fp-page side padding; the lift clears the fixed action bar. */
+.fp-shell { --fp-toast-gutter: 1rem; --fp-toast-lift: 0px; }
+@media (min-width: 640px) { .fp-shell { --fp-toast-gutter: 1.5rem; } }
+@media (min-width: 1024px) { .fp-shell { --fp-toast-gutter: 2rem; } }
+@media (max-width: 767px) { .fp-shell[data-detect-active="true"] { --fp-toast-lift: 64px; } }
 .fp-actionbar { display: flex; justify-content: flex-end; align-items: center; gap: 0.5rem; }
+.fp-recommend { display: inline-flex; align-items: center; height: 1.125rem; padding: 0 .375rem; border-radius: var(--radius-badge); background: color-mix(in oklab, var(--primary) 10%, transparent); color: var(--primary); font-size: .75rem; line-height: 1; font-weight: 500; white-space: nowrap; }
 @media (max-width: 767px) {
   .fp-actionbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; min-height: 64px; padding: .5rem 1rem calc(.5rem + env(safe-area-inset-bottom)); background: var(--background); border-top: 1px solid var(--border); }
   .fp-actionbar [data-slot="button"] { height: 44px; }

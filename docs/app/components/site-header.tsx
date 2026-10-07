@@ -1,8 +1,9 @@
 import { lazy, Suspense, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { Link, useLocation } from 'react-router'
 import { Menu } from '@base-ui/react/menu'
-import { Check, GitBranch, Languages, Monitor, Moon, Sun } from 'lucide-react'
+import { Check, GitBranch, Languages, Monitor, Moon, Star, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
+import { markStarVisited } from '../../../web/src/lib/star'
 import type { Locale } from '@/lib/i18n'
 import { siteText } from '@/lib/layout.shared'
 import { appUrl, docsBase, repositoryUrl } from '@/lib/shared'
@@ -114,6 +115,10 @@ export function SiteHeader({ locale }: { locale: Locale }) {
           <a className="fp-repository-link" href={repositoryUrl} target="_blank" rel="noopener noreferrer" aria-label={text.repository} title={text.repository}>
             <GitBranch className="size-4" aria-hidden="true" />
             <span>Ikaleio/lm-detector</span>
+          </a>
+          <a className="fp-repository-star" href={repositoryUrl} target="_blank" rel="noopener noreferrer" aria-label={text.star} title={text.star} onClick={markStarVisited}>
+            <Star aria-hidden="true" />
+            <span>Star</span>
           </a>
           <Link
             to={switchLocale(pathname, docsBase, otherLocale)}

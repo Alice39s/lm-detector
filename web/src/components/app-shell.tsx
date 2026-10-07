@@ -3,7 +3,7 @@ import { flushSync } from 'react-dom'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router'
 import { motion } from 'framer-motion'
 import { useTheme } from 'next-themes'
-import { GitBranch, Languages, Monitor, Moon, Sun } from 'lucide-react'
+import { GitBranch, Languages, Monitor, Moon, Star, Sun } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -14,6 +14,7 @@ import { useI18n } from '@/i18n'
 import { useMotionPreset } from '@/lib/motion'
 import { BankContext } from '@/lib/bank-context'
 import { docsHref } from '@/lib/docs'
+import { markStarVisited, REPOSITORY_URL } from '@/lib/star'
 import * as client from '@/lib/client'
 import type { Bank } from '@fingerpoint/shared/types'
 
@@ -73,6 +74,16 @@ function LanguageToggle() {
     </IconAction>
   )
 }
+
+/**
+ * Toasts line up with the right edge of the 1440px content column: `--fp-toast-gutter` is the page's side padding.
+ * `--fp-toast-lift` raises them above the fixed action bar on narrow screens.
+ */
+const toastOffset = {
+  right: 'max(var(--fp-toast-gutter), calc((100% - 1440px) / 2 + var(--fp-toast-gutter)))',
+  bottom: 'calc(var(--fp-toast-lift) + 2rem)',
+}
+const toastMobileOffset = { bottom: 'calc(var(--fp-toast-lift) + 1rem + env(safe-area-inset-bottom))' }
 
 export function AppShell({ detect }: { detect: ReactNode }) {
   const { t, locale } = useI18n()
@@ -153,9 +164,13 @@ export function AppShell({ detect }: { detect: ReactNode }) {
             {indicator && <motion.span aria-hidden="true" className="fp-nav-indicator" initial={false} animate={indicator} transition={reduced ? { duration: 0 } : smooth} />}
           </nav>
           <div className="fp-topbar-actions flex items-center gap-1 justify-self-end">
-            <a className="fp-repository-link" href="https://github.com/Ikaleio/lm-detector" target="_blank" rel="noopener noreferrer" aria-label={t('app.repository')} title={t('app.repository')}>
+            <a className="fp-repository-link" href={REPOSITORY_URL} target="_blank" rel="noopener noreferrer" aria-label={t('app.repository')} title={t('app.repository')}>
               <GitBranch className="size-4" aria-hidden="true" />
               <span>Ikaleio/lm-detector</span>
+            </a>
+            <a className="fp-repository-star" href={REPOSITORY_URL} target="_blank" rel="noopener noreferrer" aria-label={t('app.star')} title={t('app.star')} onClick={markStarVisited}>
+              <Star aria-hidden="true" />
+              <span>Star</span>
             </a>
             <LanguageToggle />
             <ThemeToggle />
@@ -171,7 +186,7 @@ export function AppShell({ detect }: { detect: ReactNode }) {
         </BankBoundary>
       </main>
       <footer className="fp-footer text-meta text-muted-foreground">{t('app.footer')}</footer>
-      <Toaster position="bottom-right" />
+      <Toaster position="bottom-right" offset={toastOffset} mobileOffset={toastMobileOffset} />
     </div>
   )
 }

@@ -9,7 +9,14 @@
 .fp-brand-byline { font-family: var(--font-brand-byline); font-size: .75rem; line-height: 1rem; font-weight: 400; color: color-mix(in oklab, var(--foreground) 70%, transparent); }
 .fp-repository-link { display: inline-flex; align-items: center; gap: .4rem; padding: .5rem; border-radius: var(--radius); color: var(--muted-foreground); font-size: .75rem; white-space: nowrap; text-decoration: none; }
 .fp-repository-link:hover { color: var(--foreground); background: var(--accent); }
-@media (max-width: 1023px) { .fp-repository-link span { display: none; } }
+.fp-repository-star { display: inline-flex; align-items: center; justify-content: center; gap: .3rem; height: 2rem; padding: 0 .625rem; border: 1px solid color-mix(in oklab, var(--star) 35%, var(--border)); border-radius: var(--radius); background: color-mix(in oklab, var(--star) 8%, transparent); color: var(--star); font-size: .75rem; font-weight: 500; white-space: nowrap; text-decoration: none; outline: none; transition: background-color .15s, border-color .15s; }
+.fp-repository-star:hover { background: color-mix(in oklab, var(--star) 14%, transparent); border-color: color-mix(in oklab, var(--star) 55%, var(--border)); }
+.fp-repository-star:focus-visible { border-color: var(--ring); box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent); }
+.fp-repository-star svg { width: .875rem; height: .875rem; flex-shrink: 0; fill: currentColor; }
+@media (max-width: 1023px) {
+  .fp-repository-link span, .fp-repository-star span { display: none; }
+  .fp-repository-star { width: 2rem; padding: 0; }
+}
 .fp-nav { position: relative; display: flex; gap: 1.5rem; justify-self: center; height: 100%; }
 .fp-nav a { position: relative; display: flex; align-items: center; height: 100%; font-size: 0.875rem; color: var(--muted-foreground); text-decoration: none; }
 .fp-nav a:hover, .fp-nav a[aria-current="page"] { color: var(--foreground); }
@@ -20,11 +27,17 @@
   .fp-topbar-inner { grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: 56px 32px; }
   .fp-nav { grid-column: 1 / -1; grid-row: 2; }
   .fp-topbar-actions { grid-column: 2; grid-row: 1; }
+  /* The Star entry opens the same repository, so the brand keeps its width. */
+  .fp-repository-link { display: none; }
 }
 @media (min-width: 640px) { .fp-topbar-inner { padding-left: 1.5rem; padding-right: 1.5rem; } }
 @media (min-width: 1024px) { .fp-topbar-inner { padding-left: 2rem; padding-right: 2rem; } }
 /* 窄屏触控：操作区的图标按钮（仓库入口除外）至少 44px。 */
-@media (max-width: 767px) { .fp-topbar-actions > :not(.fp-repository-link) { min-width: 44px; min-height: 44px; } }
+@media (max-width: 767px) {
+  .fp-topbar-actions > :not(.fp-repository-link) { min-width: 44px; min-height: 44px; }
+  /* At 44px the Star entry drops its chip and keeps the gold star, like the icon buttons beside it. */
+  .fp-repository-star, .fp-repository-star:hover { border-color: transparent; background: transparent; }
+}
 
 /* 宿主决定尺寸，画布按整格放大。 */
 @layer components {

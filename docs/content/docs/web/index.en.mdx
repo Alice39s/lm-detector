@@ -17,6 +17,8 @@ The detection website [lm.ikale.io](https://lm.ikale.io) is a pure frontend app.
   </Tab>
 </Tabs>
 
+Before any reply is filled in, "New prompts" in the action bar replaces all three challenges at once. Once a reply is there, "Start over" replaces the challenges and clears the replies.
+
 ## API configuration
 
 | Field | Description |
@@ -25,7 +27,7 @@ The detection website [lm.ikale.io](https://lm.ikale.io) is a pure frontend app.
 | Model | The model name in the request |
 | API key | Hidden by default. You can toggle it visible |
 | Reasoning effort | Can be left blank, or set to any `reasoning_effort` value that the upstream supports |
-| Protocol | Chat Completions, Messages, or Responses |
+| Protocol | Chat Completions, Responses, or Messages |
 | Service tier | Flex, Default, Fast, or Ultrafast. Default sends no parameter. Messages sends `speed` with the `anthropic-beta: fast-mode-2026-02-01` header; Chat Completions and Responses send `service_tier` |
 
 Switches below the configuration, all on by default except "Tokenizer probe":

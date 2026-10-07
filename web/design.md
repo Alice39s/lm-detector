@@ -1,7 +1,7 @@
 ---
 name: fingerpoint-design
 description: 用于 Fingerpoint Detector 的网页工具界面（多卡片工作台、数据长列表、主从浏览）、文档站长文页、浏览器导出的结果图片和链接预览图。读者是逐条核对数字、标识符和百分比的技术用户；目标是中性灰阶表面、单一蓝色强调、像素指纹装饰和无回弹弹簧动效，中英文混排，浅色与深色主题。
-version: 2026-10-02
+version: 2026-10-06
 ---
 
 ## 1. 范围与优先级
@@ -27,13 +27,14 @@ version: 2026-10-02
 
 ### 应用外壳
 
-- [MUST] 工具页和文档页共用顶栏 `fp-topbar`：桌面高 56px，三栏网格，左侧品牌标识，中间主导航，右侧仓库入口、语言切换和主题菜单。
-- [SHOULD] 640px 以下顶栏改为 88px 双行（56px 加 32px），主导航排在第二行；1024px 以下仓库入口只显示图标。
-- [MUST] 768px 以下，顶栏右侧的图标按钮（仓库入口除外）至少 44×44px。
+- [MUST] 工具页和文档页共用顶栏 `fp-topbar`：桌面高 56px，三栏网格，左侧品牌标识，中间主导航，右侧仓库入口、Star 入口、语言切换和主题菜单。
+- [SHOULD] 640px 以下顶栏改为 88px 双行（56px 加 32px），主导航排在第二行，仓库入口隐藏，由指向同一仓库的 Star 入口代替；1024px 以下仓库入口和 Star 入口只显示图标。
+- [SHOULD] Star 入口 `fp-repository-star` 高 32px，`star` 色图标与 `text-meta` 500 字重文字，边框为 35% `star` 混入 `border`，底色为 8% `star`。（决策：在仓库入口旁给出一个低调的 Star 入口。来源：2026-10-06 用户要求。）
+- [MUST] 768px 以下，顶栏右侧的图标按钮（仓库入口除外）至少 44×44px；Star 入口在这一宽度去掉边框和底色，只保留 `star` 色图标。
 - [MUST] 品牌标识 `fp-brand`：左侧 32px 像素指纹 `fp-brand-mark`（muted-foreground），右侧两行文字，上行 `fp-brand-title`，下行 `fp-brand-byline`。
 - [SHOULD] 当前导航项用 2px primary 下划线 `fp-nav-indicator` 标出，下划线只在导航容器内横移。指向另一个站点的导航项是普通整页链接，不参与下划线动画。
 - [MUST] 主题菜单是“浅色 / 深色 / 跟随系统”三项单选，标出当前项，默认跟随系统；切换主题或语言不清除页面上已输入的内容。
-- [SHOULD] 顶栏右侧图标：仓库入口用 lucide `GitBranch`，语言切换用 `Languages`，主题按钮显示当前选项对应的 `Sun`、`Moon` 或 `Monitor`；图标 16px，按钮带可读名称。
+- [SHOULD] 顶栏右侧图标：仓库入口用 lucide `GitBranch`，Star 入口用填充的 `Star`，语言切换用 `Languages`，主题按钮显示当前选项对应的 `Sun`、`Moon` 或 `Monitor`；图标 16px，按钮带可读名称。
 - [MUST] 页脚居中，使用 `text-meta` muted 文字，不放像素装饰。
 
 ### 多卡片工作台
@@ -57,7 +58,10 @@ version: 2026-10-02
 - [SHOULD] 需要警示的卡片和它的详情使用 `fp-card[data-warning]`，卡片标题旁加警告图标；结果区同时用 `Alert variant="warning"` 说明原因，并排在其他警告之前。
 - [SHOULD] 可折叠配置卡片 `ApiConfigPanel`：收起时为一行 48px 等宽摘要 `fp-api-summary`，长值单行省略，完整值放在 `title`，不显示密钥；展开后为表单，桌面两列，窄屏一列。展开和收起用 220ms 高度与透明度过渡，摘要位置不动。
 - [SHOULD] 表单中的开关组之后用分隔线开始下一组。`Segmented` 下方用一行 `text-meta` muted 文字，只说明当前选中的选项。
+- [SHOULD] `Segmented` 选项可以在文字前放 16px 图标（`icon`），在文字后放推荐标记 `RecommendMark`（`recommended`，传字符串时作为标记文字）。（来源：2026-10-06 用户要求为推荐选项加标记。）
+- [SHOULD] 选项图标是协议或厂商的标识时，用 `BrandIcon` 画平面 SVG：取 `web/src/lib/brand-logos.ts` 的同一份标识，有彩色版用彩色版，单色部分用 currentColor；不做像素化。（来源：2026-10-06 用户要求用标识区分接口协议。）
 - [SHOULD] 提交时有缺项：展开缺项所在的区域，聚焦第一个缺失字段，字段下方用 `FieldError` 说明。
+- [SHOULD] 推荐标记 `RecommendMark`（`fp-recommend`）高 18px、`--radius-badge` 圆角、primary 文字和 10% primary 底色、`text-meta` 500 字重，放在推荐选项的文字后、推荐设置的标题后或推荐取值下方，文字计入该项的可访问名称或取值文本；一组选项最多一个推荐标记。标记文字默认是“推荐”，需要给出理由时换成一句短句。（来源：2026-10-06 用户要求为推荐选项和推荐设置加标记，并为 API 模式写明推荐理由。）
 - [SHOULD] 带检查动作的输入框：右侧放 outline 按钮；检查结果写在输入框下方 `role="status"` 的 `text-meta` 文字中，成功用 success 色。
 
 ### 两列证据详情
@@ -145,7 +149,7 @@ version: 2026-10-02
 | `warning` | 进行中、不足、需要注意 |
 | `destructive` | 失败、错误、不一致 |
 | `muted-foreground` | 次要文字、像素装饰 |
-| `star` | 只用于 `fp-star-link`，不作状态色 |
+| `star` | 只用于 Star 入口（`fp-star-link`、`fp-repository-star`），不作状态色 |
 
 - [MUST] 置信度条只用 primary，不按候选所属的分组分配颜色。
 
@@ -169,6 +173,8 @@ version: 2026-10-02
 - [SHOULD] 错误：字段错误用 `FieldError`；区块级错误用 `Alert variant="destructive"`；需要注意的整行提示用 `Alert variant="warning"`；原始错误详情放在用户主动打开的 `Dialog` 里。
 - [SHOULD] 禁用：50% 不透明度、`not-allowed` 光标；运行中被锁定的区域整体禁用，不隐藏。
 - [SHOULD] 复制、保存等即时操作用 `Sonner` toast 反馈结果。
+- [SHOULD] 请求读者行动的 toast 用 `toastWithStar` 的 `fp-star-toast`：外观与 Sonner 默认 toast 相同（`popover` 表面、1px 边框、`--radius`、13px 文字，成功时标题前加 `CircleCheck`）；文字下方右对齐一行操作，依次为 muted ghost `sm` 的拒绝、ghost `sm` 的忽略，最右为 `fp-star-link[data-size="sm"]`。拒绝和忽略的文案写明各自的隐藏时长（一周、一次）。读者点过 Star 入口后，同一操作只显示普通 toast；拒绝后一周内也是如此。（来源：2026-10-06 用户要求 Star 请求带忽略和拒绝按钮，并给出两者的文案。）
+- [SHOULD] toast 停在右下角：600px 以上右缘与 1440px 内容栏的右缘对齐（离视口右边至少等于页面左右内边距），离底边 32px；600px 及以下左右各 16px、离底边 16px。768px 以下的检测页再抬高 64px，停在固定操作栏上方。（来源：2026-10-06 用户要求 toast 离右下角留出更多距离。）
 - [MUST] 每个可聚焦元素有可见的焦点样式：控件原语用 3px `ring-ring/50` 加 `border-ring`；链接和其他元素用全局 2px `--ring` outline、偏移 2px；第三方控件去掉 outline 时补 2px ring。可滚动区域可以用键盘聚焦。
 
 ### 动效
@@ -179,6 +185,7 @@ version: 2026-10-02
 - [SHOULD] 工具页之间切换用原生 View Transition 横向平移 300ms：前进向左，返回向右，顶栏不动；切换后回到顶部；浏览器不支持时直接切换。
 - [SHOULD] 列表首批最多 8 项，每项错开 60ms（`listStagger`、`listItem`）；展开的后续项不错开。
 - [SHOULD] 卡片和它的详情不共享 `layoutId`，详情只在原位做高度展开。
+- [SHOULD] 卡片里的参考原文被替换时，卡片按位置保留，原文在原位用 `smooth` 交叉淡入：旧文字上移 8px、模糊 4px 后淡出，新文字从下方 8px、模糊 4px 进入；多张卡片按顺序错开 60ms。触发替换的按钮图标每次用 `smooth` 转半圈。（来源：2026-10-06 用户要求替换提示词时加过渡动画。）
 - [SHOULD] 流式文本不做逐字动画，末尾用 `fp-caret` 闪烁光标。
 - [SHOULD] 成功确认的庆祝效果：从视口左下角和右下角同时向中间喷出一次彩带，每侧 220 片、扩散角 32°，主体射程为视口宽度的 75%；同一结果只播放一次。
 - [MUST] 减少动效时：取消错开与位移，数值直接显示目标值，浮层、加载和 CSS 过渡立即完成，像素装饰只画一帧，不播放庆祝效果。
@@ -213,16 +220,18 @@ version: 2026-10-02
 | 颜色与主题 | `background` `foreground` `card` `popover` `primary` `secondary` `muted` `muted-foreground` `accent` `border` `input` `ring` `success` `warning` `destructive` `star` | `web/src/tokens.css`、`web/src/index.css` | 所有颜色 | 已实现 |
 | 圆角与阴影 | `--radius` `--radius-card` `--radius-badge` `--shadow-overlay` | `web/src/tokens.css` | 控件、卡片、徽标、浮层 | 已实现 |
 | 字号角色 | `text-display` `text-display-number` `text-h1` `text-section-title` `text-card-title` `text-body` `text-meta` | `web/src/tokens.css` | 所有文字 | 已实现 |
-| 应用外壳 | `fp-topbar` `fp-topbar-inner` `fp-topbar-actions` `fp-brand` `fp-brand-mark` `fp-brand-text` `fp-brand-title` `fp-brand-byline` `fp-nav` `fp-nav-indicator` `fp-repository-link`；`--fp-topbar-height` | `web/src/shell.css` | 工具页和文档页顶栏 | 已实现 |
+| 应用外壳 | `fp-topbar` `fp-topbar-inner` `fp-topbar-actions` `fp-brand` `fp-brand-mark` `fp-brand-text` `fp-brand-title` `fp-brand-byline` `fp-nav` `fp-nav-indicator` `fp-repository-link` `fp-repository-star`；`--fp-topbar-height` | `web/src/shell.css` | 工具页和文档页顶栏 | 已实现 |
 | 页面容器 | `fp-shell` `fp-page` `fp-page-wide` `fp-footer` | `web/src/index.css` | 工具页 | 已实现 |
-| 工作台布局 | `fp-grid-samples` `fp-detect-footer` `fp-actionbar` `fp-cli-promo` `fp-cli-command` `fp-cli-link` `fp-star-link` | `web/src/index.css` | 多卡片工作台 | 已实现 |
+| 工作台布局 | `fp-grid-samples` `fp-detect-footer` `fp-actionbar` `fp-cli-promo` `fp-cli-command` `fp-cli-link` `fp-star-link`（`data-size="sm"`） | `web/src/index.css` | 多卡片工作台 | 已实现 |
 | 表面与数据 | `fp-card`（`data-warning`） `fp-bar` `fp-reply` `fp-mono` `fp-caret` `fp-api-summary` `fp-result-summary` `fp-result-score` `fp-result-row`（`data-unscored`） | `web/src/index.css` | 卡片、置信度条、原文、标识符、候选行 | 已实现 |
-| 控件 | `Button` `Input` `Textarea` `Field` `FieldError` `Switch` `ToggleGroup` `Segmented` `Tabs` `Collapsible` | `web/src/components/ui/`、`web/src/components/segmented.tsx` | 表单与操作 | 已实现 |
-| 浮层 | `Dialog` `DropdownMenu` `Tooltip` `Sonner` | `web/src/components/ui/` | 详情、菜单、提示、toast | 已实现 |
+| 控件 | `Button` `Input` `Textarea` `Field` `FieldError` `Switch` `ToggleGroup` `Segmented`（选项 `icon` `recommended`） `Tabs` `Collapsible` | `web/src/components/ui/`、`web/src/components/segmented.tsx` | 表单与操作 | 已实现 |
+| 品牌标识 | `BrandIcon` | `web/src/components/brand-icon.tsx` | `Segmented` 选项 | 已实现 |
+| 浮层 | `Dialog` `DropdownMenu` `Tooltip` `Sonner` `toastWithStar`（`fp-star-toast`） | `web/src/components/ui/`、`web/src/components/star-prompt.tsx` | 详情、菜单、提示、toast | 已实现 |
 | 数据反馈 | `Table` `Badge` `Empty` `Skeleton` `Alert`（`default` `warning` `destructive`） `Separator` | `web/src/components/ui/` | 表格、状态、空状态、警告 | 已实现 |
 | 工作台组件 | `SampleCard` `SampleStrip` `StateBadge` `toneClass` `ResultPanel` `ConfidenceBar` `AnimatedPercent` `ApiConfigPanel` `ProxySettings` | `web/src/components/` | 多卡片工作台 | 已实现 |
 | 证据详情 | `TokenizerCard` `TokenizerStripButton` `TokenizerDetails` `ModelCheck`；`fp-custom-tokenizer-candidates` | `web/src/components/tokenizer-panel.tsx`、`web/src/components/tokenizer-claim.tsx`、`web/src/index.css` | 两列证据详情 | 已实现 |
 | 动效 | `spring` `useMotionPreset` `listStagger` `listItem` | `web/src/lib/motion.ts` | 所有动画 | 已实现 |
+| 推荐标记 | `RecommendMark`（`fp-recommend`） | `web/src/components/recommend-mark.tsx`、`web/src/index.css` | 推荐选项、推荐设置、推荐取值 | 已实现 |
 | 像素装饰 | `PixelShader`（`effect` `cell` `image`） `PixelSpinner` `fp-pixel` | `web/src/components/pixel-shader.tsx`、`web/src/lib/pixel-effects.ts`、`web/src/lib/pixel-renderer.ts`、`web/src/shell.css` | 品牌、加载、等待、空状态 | 已实现 |
 | 文档组件 | `SiteHeader` `DocsBar` `Card` `Callout` `Mermaid` `TokenizerClasses` | `docs/app/components/` | 文档站 | 已实现 |
 | 预览图 | `OgImage` `ogResponse` `ogRenderer` `ogFontFamilies` | `docs/app/lib/og-image.tsx`、`docs/app/lib/og-response.ts`、`docs/app/lib/og.server.ts` | 链接预览图 | 已实现 |

@@ -17,7 +17,7 @@ Open **[lm.ikale.io](https://lm.ikale.io)** and select a detection mode:
 
 ### Fill in the API configuration [step]
 
-API mode needs a Base URL, an API key, and a model name. The protocol can be Chat Completions, Messages, or Responses. The configuration and the key are saved only in the current browser. The profile menu can store several profiles and can also export them to files. An exported file contains your API key in plain text, so do not send it to anyone or upload it to cloud storage.
+API mode needs a Base URL, an API key, and a model name. The protocol can be Chat Completions, Responses, or Messages. The configuration and the key are saved only in the current browser. The profile menu can store several profiles and can also export them to files. An exported file contains your API key in plain text, so do not send it to anyone or upload it to cloud storage.
 
 The [tokenizer probe](./web/tokenizer.mdx) is off by default. If you turn on “Tokenizer probe” in the API configuration, the page sends about 12 more short requests (at most 22) while it samples. These requests identify the upstream tokenizer (the rule a model uses to cut text into tokens). The probe result shows separately and is reference only: the ranking and the confidence do not use it, and the result does not wait for it. APIs that bill per request bill these requests.
 
