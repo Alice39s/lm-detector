@@ -1,0 +1,38 @@
+{
+  "created_at": "2026-10-07T19:39:38.192Z",
+  "identity": "gpt-6-astra / gpt-6.1-sol",
+  "original_labels": [
+    "gpt-6-astra",
+    "gpt-6.1-sol"
+  ],
+  "reason": "Maintainer requested one fingerprint identity for the two model labels.",
+  "previous_reference_sha256": "1bcdaf7c53c570ad8457bfcae81cc8e5c3e9a91c2f9988370464a8f19c162d25",
+  "reference_sha256": "08fd9cd821ce9c342ffb4e1b4a9d61e7832560f63a5474d94cf728cb7d41e9d4",
+  "archived_rows_sha256": "71f263687bac374e1a85e31ad669a647085d08c95d678c3c9413d0be7fcf1f2f",
+  "batches": [
+    {
+      "id": "bb270365-9d92-4207-bee3-1efaffee5dd8",
+      "original_label": "gpt-6.1-sol",
+      "samples": 36,
+      "request_model": "openai/gpt-6.1-sol",
+      "channel": "openrouter/openai",
+      "reasoning_effort": "low"
+    },
+    {
+      "id": "60b35b90-c1b7-42a4-9ded-672d895a847e",
+      "original_label": "gpt-6-astra",
+      "samples": 36,
+      "request_model": "gpt-6-astra",
+      "channel": "openai/direct",
+      "reasoning_effort": "low"
+    }
+  ],
+  "preserved": [
+    "batch IDs",
+    "sample IDs",
+    "sample content and order",
+    "request and response model IDs",
+    "source channels",
+    "original collection manifests and traces"
+  ]
+}
