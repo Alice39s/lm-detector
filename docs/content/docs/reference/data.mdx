@@ -56,6 +56,11 @@ data
 ## 变更记录
 
 <Accordions type="multiple">
+  <Accordion title="2026-10-08 新增 claude-haiku-5.5" id="2026-10-08-haiku-5.5">
+    新增 `claude-haiku-5.5` 的 36 条固定挑战回答，正式库扩展到 59 个型号、2,164 条样本。请求型号为 `anthropic/claude-haiku-5.5`，使用 OpenRouter Chat Completions 流式输出、`reasoning_effort=low` 和固定 `openrouter/anthropic` 渠道，禁止回退。提示词和系统提示沿用固定挑战集。
+
+    本机前三次请求因地区限制返回 HTTP 403，随后在 Ikaleio-TYO 续采同一批次。36 条回答均自然完成，无截断，返回型号和 Anthropic 供应商元数据均通过原始响应校验。采样证据、3 条失败尝试和入库收据保存在 `collections/claude-haiku-5.5-openrouter-anthropic-low-20261008/`。现有固定评估集尚未覆盖这个新增型号。
+  </Accordion>
   <Accordion title="2026-10-03 扩充 Seed 与 Qwen 参考型号" id="2026-10-03-seed-qwen">
     新增 `seed-2.1-turbo`、`seed-2.0-lite`、`seed-2.0-mini`、`qwen3.8-flash` 和 `qwen3.8-omni-flash`，各 36 条固定挑战回答。正式库扩展到 58 个型号、2,128 条样本。五个批次使用同一套固定提示词，均通过 OpenRouter Chat Completions 流式采集；Seed 固定 `openrouter/seed/fp8`，Qwen 固定 `openrouter/alibaba`，均禁止回退。
 

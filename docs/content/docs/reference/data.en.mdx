@@ -56,6 +56,11 @@ Tokenizer classes are grouped by authoring lab and series. Tokenizers with ident
 ## Change log
 
 <Accordions type="multiple">
+  <Accordion title="2026-10-08 Add claude-haiku-5.5" id="2026-10-08-haiku-5.5">
+    Added 36 fixed-challenge answers for `claude-haiku-5.5`. The reference bank now contains 59 models and 2,164 samples. The requested model is `anthropic/claude-haiku-5.5`. Collection uses streaming OpenRouter Chat Completions, `reasoning_effort=low`, and the fixed `openrouter/anthropic` channel with fallbacks disabled. Prompts and system prompts come from the fixed challenge suite.
+
+    The first three local requests returned HTTP 403 because of a regional restriction. Collection then resumed the same batch on Ikaleio-TYO. All 36 answers completed naturally, without truncation. The returned model and Anthropic provider metadata passed checks against the raw responses. Sampling evidence, the three failed attempts, and the enrollment receipt are saved in `collections/claude-haiku-5.5-openrouter-anthropic-low-20261008/`. The existing fixed evaluation set does not yet cover this new model.
+  </Accordion>
   <Accordion title="2026-10-03 Expand the Seed and Qwen reference models" id="2026-10-03-seed-qwen">
     Added `seed-2.1-turbo`, `seed-2.0-lite`, `seed-2.0-mini`, `qwen3.8-flash`, and `qwen3.8-omni-flash`, each with 36 fixed-challenge answers. The reference bank now contains 58 models and 2,128 samples. All five batches use the same fixed prompts and streaming OpenRouter Chat Completions. Seed is pinned to `openrouter/seed/fp8` and Qwen to `openrouter/alibaba`, with fallbacks disabled.
 
