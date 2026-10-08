@@ -20,7 +20,7 @@ def fit(data_dir: Path, out: Path, rows: list[dict], bank: dict, reference_sha: 
     ranker = Ensemble(rows, ids)
     with (out / 'base.pkl').open('wb') as file:
         pickle.dump(dict(ranker=ranker), file, protocol=5)
-    artifact = dict(schema='shared-detector-v1',
+    artifact = dict(schema='shared-detector-v2',
         source_run=str(out.relative_to(data_dir)),
         base_sha256=sha(out / 'base.pkl'),
         source_reference_sha256=reference_sha,

@@ -9,7 +9,7 @@ flowchart LR
     A["Challenge prompt<br/>about 300 integers from 1 to 355"] --> B["Target model"]
     B --> C["Parse the integer sequence"]
     C --> D["Features<br/>value distribution + position blocks + final digits"]
-    D --> E["Ranker<br/>LDA · nearest neighbors · nuisance-free centroids"]
+    D --> E["Ranker<br/>frequency ranking · position/order discriminant"]
     E --> G["Temperature calibration<br/>confidence within the bank"]
     E --> H["Detection result"]
     G --> H

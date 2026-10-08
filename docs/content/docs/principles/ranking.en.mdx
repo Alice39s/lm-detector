@@ -1,21 +1,34 @@
 ---
 title: Ranking and calibration
-description: Three scores set the candidate order, and a temperature softmax gives the confidence within the reference bank.
+description: A frequency ranking and a position/order discriminant set the candidate order with equal weights, and a temperature softmax gives the confidence within the reference bank.
 ---
 
 ## Ranker
 
-The ranker calculates three scores for each model in the reference bank. It standardizes each score across the candidates and adds them with weights:
+The ranker calculates two scores for each model in the reference bank: the frequency ranking $f$ and the position/order discriminant $q$. It standardizes each score across the candidates and adds them with equal weights:
 
 $$
-s = 0.5\, z_{\text{LDA}} + 0.25\, z_{\text{kNN}} + 0.25\, z_{\text{centroid}}
+s = 0.5\, z(f) + 0.5\, z(q), \qquad f = 0.5\, z_{\text{LDA}} + 0.25\, z_{\text{kNN}} + 0.25\, z_{\text{centroid}}
 $$
+
+The frequency ranking $f$ has three parts:
 
 - **LDA**: a linear discriminant projection of the features of the first 128 integers, averaged over the answers.
 - **Nearest neighbors**: the mean of the 7 smallest squared distances to the reference answers of the model, with the median over the answers.
 - **Nuisance-free centroids**: the prompt environment shifts the whole distribution of a model. When the bank is built, SVD estimates a nuisance subspace of at most 2 dimensions from the mean offsets of the environments. At scoring time, the ranker first projects out this subspace, then calculates the cosine similarity to each model centroid. The position-block features are also compared with the model templates of each environment.
 
-The ranking score $s$ sets the candidate order.
+The position/order discriminant $q$ is an LDA with shrinkage 0.5. It uses four feature blocks with 751 dimensions in total:
+
+| Block | Dimensions | Weight | Content |
+| --- | ---: | ---: | --- |
+| Value distribution | 355 | 0.6 | The same Hellinger embedding as the frequency ranking |
+| Positions and final digits | 74 | 0.15 | The same block distribution as the frequency ranking |
+| Position kernel | 102 | 0.125 | 24 value RBFs and 10 final-digit indicators, each multiplied by 3 relative-position polynomials and averaged. It shows whether a type of number occurs more often at the start, middle, or end |
+| Sequence | 220 | 0.125 | Correlation, step size, and equality rates at 8 lags; transition matrices of 8 value bins and of final digits, with marginals removed; up/down persistence; bin coverage in short windows |
+
+Each block is standardized and normalized to unit length, then concatenated with its weight. The ranker standardizes the discriminant values of each answer across the candidates, then averages them over the answers.
+
+The ranking score $s$ sets the candidate order. The weights of the two scores and the shrinkage come from leave-one-environment-out cross-validation on the reference bank. The fixed evaluation set does not take part in this selection.
 
 ## Confidence calibration [#calibration]
 

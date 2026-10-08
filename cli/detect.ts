@@ -47,7 +47,7 @@ export async function runDetectionCommand(args: string[]) {
       ])
       const bank = bankData as Bank, detector = detectorData as SharedDetector
       if (!Array.isArray(bank?.models) || !bank.models.length) throw new Error('The reference bank must contain a nonempty models array.')
-      if (detector?.schema !== 'shared-detector-v1') throw new Error('The detector artifact has an unsupported schema.')
+      if (detector?.schema !== 'shared-detector-v2') throw new Error('The detector artifact has an unsupported schema.')
       let tokenizerBank: TokenizerBank | undefined
       if (tokenizerData !== undefined) {
         assertTokenizerBank(tokenizerData)

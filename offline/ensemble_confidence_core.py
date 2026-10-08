@@ -4,6 +4,11 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.preprocessing import normalize
 from bank_builder import fit_robust_artifacts
 from fingerprint import hellinger_feature, ordered_block_feature, count_numbers
+from positional_core import PositionalLDA
+
+# Selected by leave-one-environment-out reference CV (research/studies/ranker-v2-20261008).
+POSITIONAL_SHRINKAGE=.5
+BLEND={'frequency':.5,'positional':.5}
 
 
 def z(x):
@@ -48,6 +53,7 @@ class Ensemble:
         self.full,self.full_params=fit_transform(blocks['full'])
         self.lda=LinearDiscriminantAnalysis(solver='lsqr',shrinkage=.05,priors=np.full(len(ids),1/len(ids))).fit(head,labels)
         self.bank=fit_robust_artifacts(rows,ids)
+        self.positional=PositionalLDA([r['numbers'] for r in rows],labels,len(ids),POSITIONAL_SHRINKAGE)
     def single(self,numbers):
         blocks=feature_blocks(numbers)
         l=self.lda.decision_function(transform(blocks['head'],self.head_params))
@@ -55,14 +61,16 @@ class Ensemble:
         distances=np.maximum(0,np.sum(x*x,axis=1)[:,None]+np.sum(self.full*self.full,axis=1)[None,:]-2*x@self.full.T)
         near=np.stack([-np.sort(distances[:,self.labels==i],axis=1)[:,:7].mean(axis=1) for i in range(len(self.ids))],axis=1)
         base,absolute=bank_components(blocks['full'],self.bank)
-        return dict(lda=l,neighbors=near,base=base,absolute=absolute)
+        return dict(lda=l,neighbors=near,base=base,absolute=absolute,positional=self.positional.decision(numbers))
     @staticmethod
     def group(single,slots):
         def slot_mean(x):return np.stack([x[idx].mean(axis=0) for idx in slots])
         l=slot_mean(z(single['lda'])).mean(axis=0)
         near=np.median(slot_mean(single['neighbors']),axis=0)
         base=slot_mean(single['base']).mean(axis=0)
-        scores=.5*z(l[None,:])[0]+.25*z(near[None,:])[0]+.25*z(base[None,:])[0]
+        frequency=.5*z(l[None,:])[0]+.25*z(near[None,:])[0]+.25*z(base[None,:])[0]
+        positional=slot_mean(z(single['positional'])).mean(axis=0)
+        scores=BLEND['frequency']*z(frequency)+BLEND['positional']*z(positional)
         absolute=slot_mean(single['absolute']).mean(axis=0)
         return scores,float(absolute.max())
     def score_groups(self,groups):

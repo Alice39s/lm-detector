@@ -23,7 +23,7 @@ from train import fit as train
 
 SOURCE_FILES = ('retrain.py', 'train.py', 'calibrate.py', 'export.py', 'fingerprint.py',
                 'reference_data.py', 'bank_builder.py', 'ensemble_confidence_core.py',
-                'calibration.py')
+                'positional_core.py', 'calibration.py')
 
 
 def input_data(data_dir: Path):

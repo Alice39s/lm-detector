@@ -7,6 +7,8 @@ import tempfile
 
 import numpy as np
 
+from ensemble_confidence_core import BLEND
+
 
 def json_default(value):
     if isinstance(value, np.ndarray):
@@ -29,7 +31,9 @@ def export_ranker(ranker):
     return dict(head_params=ranker.head_params, full_params=ranker.full_params,
         lda_weights=ranker.lda.coef_, lda_bias=ranker.lda.intercept_,
         references=[ranker.full[ranker.labels == i] for i in range(len(ranker.ids))],
-        bank=ranker.bank)
+        bank=ranker.bank, blend=BLEND,
+        positional=dict(params=ranker.positional.params, weights=ranker.positional.coefficient,
+                        bias=ranker.positional.intercept))
 
 
 def install(data_dir: Path, fit_dir: Path, calibration_dir: Path, bank: dict,

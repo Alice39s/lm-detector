@@ -1,4 +1,5 @@
 import { analyzeGlobalOutputs, countNumbers, hellingerFeature, orderedBlockFeature, parseNumbers } from './fingerprint-core.js'
+import { positionalDecision, type PositionalHead } from './positional'
 import type { Analysis, Bank, Output } from './types'
 
 type Vector = number[]
@@ -6,7 +7,7 @@ type Matrix = Vector[]
 type Preprocessing = {mean:Vector;scale:Vector}[]
 type FeatureBank = {feature_mean:Vector;feature_scale:Vector;nuisance_basis:Matrix;centroids:Matrix}
 export interface SharedDetector {
-  schema:'shared-detector-v1'
+  schema:'shared-detector-v2'
   source_run:string
   base_sha256:string
   source_reference_sha256:string
@@ -17,7 +18,8 @@ export interface SharedDetector {
   calibration?:null|{schema:'shared-confidence-v2';method:'ranking-temperature';tau:number;
     binding:{base_sha256:string;reference_sha256:string;model_ids:string[]};calibration_run:string}
   ranker:{head_params:Preprocessing;full_params:Preprocessing;lda_weights:Matrix;lda_bias:Vector;
-    references:Matrix[];bank:{hellinger:FeatureBank;ordered_blocks:FeatureBank & {environment_centroids:Matrix[]}}}
+    references:Matrix[];bank:{hellinger:FeatureBank;ordered_blocks:FeatureBank & {environment_centroids:Matrix[]}}
+    blend:{frequency:number;positional:number};positional:PositionalHead}
 }
 
 const dot = (a:Vector,b:Vector) => a.reduce((sum,x,i)=>sum+x*b[i],0)
@@ -53,7 +55,7 @@ function baseline(b:Matrix,bank:SharedDetector['ranker']['bank']):Vector {
 }
 
 export function supportsSharedDetector(bank:Bank,artifact:SharedDetector):boolean {
-  return artifact.schema==='shared-detector-v1' && bank.built_at===artifact.bank_built_at &&
+  return artifact.schema==='shared-detector-v2' && bank.built_at===artifact.bank_built_at &&
     bank.models.length===artifact.model_ids.length && bank.models.every((m,i)=>
       m.id===artifact.model_ids[i] && m.response_count===artifact.response_counts[i])
 }
@@ -93,7 +95,9 @@ function rankSharedNumbers(numbers:Matrix,artifact:SharedDetector):Vector {
   })
   const l=z(columnMean(lda)),near=z(a.references.map(ref=>median(ax.map(x=>-nearest(x,ref)))))
   const base=z(columnMean(full.map(b=>baseline(b,a.bank))))
-  const ranking=l.map((x,i)=>.5*x+.25*near[i]+.25*base[i])
+  const frequency=z(l.map((x,i)=>.5*x+.25*near[i]+.25*base[i]))
+  const positional=z(columnMean(numbers.map(n=>z(positionalDecision(n,a.positional)))))
+  const ranking=frequency.map((x,i)=>a.blend.frequency*x+a.blend.positional*positional[i])
   if(!ranking.every(Number.isFinite))throw new Error('排名计算产生无效数值，请刷新后重试')
   return ranking
 }
@@ -119,7 +123,7 @@ export function analyzeSharedOutputs(outputs:Output[],bank:Bank,artifact:SharedD
   const used=diagnostics.filter(d=>d.accepted).length
   const common={probability:null,absolute_match:null,family_probability:null,
     probability_status:'unavailable',risk_certificate:null,
-    used_outputs:used,diagnostics,method:'shared-detector-v1',
+    used_outputs:used,diagnostics,method:'shared-detector-v2',
     model_version:{base_sha256:artifact.base_sha256}}
   if(options.allowPartial && used>0 && used<3 && outputs.length<=3) {
     const ranking=rankSharedNumbers(parsed.filter((_,i)=>diagnostics[i].accepted),artifact)
