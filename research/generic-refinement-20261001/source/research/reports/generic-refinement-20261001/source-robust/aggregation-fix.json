@@ -1,8 +1,0 @@
-{
-  "reason": "Independent audit found the clean-transfer positional comparator omitted the original per-answer zscore before group averaging.",
-  "before": "position_scores = single.reshape(len(groups), 3, len(ids)).mean(1)",
-  "after": "position_scores = z(single).reshape(len(groups), 3, len(ids)).mean(1)",
-  "scope": "Clean-transfer first-fusion comparator and half-fusion developmental diagnostics only; primary reference selection and candidate heads unchanged.",
-  "grid_changed": false,
-  "fixed_holdout_opened": false
-}
